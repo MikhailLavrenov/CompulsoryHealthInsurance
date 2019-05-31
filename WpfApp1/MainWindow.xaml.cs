@@ -23,17 +23,20 @@ namespace WpfApp1
     {
         public MainWindow()
         {
-            /*
-            var db = new UserContext();
-            var patient = new Patient { Surname = "Бобров", Name = "Константин", Patronymic = "Игоревич", Initials = "БКИ", PatientId = 1 };
-
-            db.Patients.Add(patient);
-            db.SaveChanges();*/
-            var pat = new Patient { Surname = "Бобров", Patronymic = "Игоревич", Initials = "БКИ", PatientId = 1 };
-            var t= (pat.Name??"").Length;
-
-
             InitializeComponent();
+
+            Test();
+
+
+        }
+
+        public static async void Test()
+        {
+            WebSiteSRZ site = new WebSiteSRZ("http://11.0.0.28/", true, "10.10.45.43", 3128);
+            await site.Authorize("UshanovaTA", "UshanovaTA1");
+            site.DbfToExcel(@"C:\Users\ЛавреновМВ\Desktop\ATT_MO_temp_ERW3sdcxf1XCa.DBF", @"C:\Users\ЛавреновМВ\Desktop\attmo.xlsx");
+            //await site.GetPatientsExcelFile(DateTime.Now, @"C:\Users\ЛавреновМВ\Desktop\attmo.xlsx");
+            site.Dispose();
         }
     }
 }

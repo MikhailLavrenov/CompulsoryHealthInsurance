@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 
 namespace WpfApp1.Models
 {
-    class Patient
+    public class Patient
     {
         public int PatientId { get; set; }
         public string Initials { get; set; }
         public string Surname { get; set; }
         public string Name { get; set; }
         public string Patronymic { get; set; }
-        public int Insurance { get; set; }
+        public string InsuranceNumber { get; set; }
 
         public void SetInitialsFromFullName()
         {
