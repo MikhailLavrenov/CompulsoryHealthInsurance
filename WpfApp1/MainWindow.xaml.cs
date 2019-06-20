@@ -1,5 +1,7 @@
-﻿using System;
+﻿using FomsPatientsDB.Models;
+using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -26,17 +28,54 @@ namespace WpfApp1
             InitializeComponent();
 
             Test();
-
-
         }
 
         public static async void Test()
-        {
-            WebSiteSRZ site = new WebSiteSRZ("http://11.0.0.28/", true, "10.10.45.43", 3128);
-            await site.Authorize("UshanovaTA", "UshanovaTA1");
-            site.DbfToExcel(@"C:\Users\ЛавреновМВ\Desktop\ATT_MO_temp_ERW3sdcxf1XCa.DBF", @"C:\Users\ЛавреновМВ\Desktop\attmo.xlsx");
-            //await site.GetPatientsExcelFile(DateTime.Now, @"C:\Users\ЛавреновМВ\Desktop\attmo.xlsx");
+            {
+            /*
+            var file = new PatientsFile();
+            await file.Open(@"C:\Users\ЛавреновМВ\Desktop\myattmo.xlsx");
+            var newPatients = await file.GetVerifedPatients();
+
+            var db = new CacheDB();
+            db.Patients.Load();
+            var existenInsuaranceNumbers=db.Patients.Select(x => x.InsuranceNumber).ToHashSet();
+            var newUniqPatients = newPatients
+            .Where(x=>!existenInsuaranceNumbers.Contains(x.InsuranceNumber))
+            .GroupBy(x=>x.InsuranceNumber)
+            .Select(x=>x.First())
+            .ToList();
+            db.Patients.AddRange(newUniqPatients);
+            db.SaveChanges();
+            */
+            var credentialList = new List<Credential>
+                    {
+                    new Credential() { Login = "UshanovaTA", Password = "UshanovaTA1", RequestsLeft=10 },
+                    new Credential() { Login = "IvandikovaEP", Password = "IvandikovaEP1", RequestsLeft=10 }
+                    };
+            var credentials = new  RoundRobinCredentials(credentialList);
+
+            Credential credential;
+            for (int i = 0; i < 10; i++)
+                {
+                var flag=credentials.TryGetNext(out  credential);
+                }
+
+           /* 
+            var file = new PatientsFile();
+            await file.Open(@"C:\Users\ЛавреновМВ\Desktop\attmo.xlsx");
+            var unverifiedPatients = await file.GetUnverifiedPatientsInsuaranceNumber(20);
+            var verifiedPatients = await WebSiteSRZ.GetPatients("http://11.0.0.28/", "10.10.45.43",  3128, unverifiedPatients, credentials, 2);
+
+
+            /*
+            WebSiteSRZ site = new WebSiteSRZ("http://11.0.0.28/", "10.10.45.43", 3128);
+            site.Authorize(new Credential() { Login = "UshanovaTA", Password = "UshanovaTA1" });
+            
+            //await site.GetPatientsFile(@"C:\Users\ЛавреновМВ\Desktop\attmo.xlsx", DateTime.Now);
+            var patient= await site.GetPatient("2757010827000340");
             site.Dispose();
+            */
         }
     }
 }

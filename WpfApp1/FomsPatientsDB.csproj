@@ -93,8 +93,11 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Models\Credentials.cs" />
+    <Compile Include="Models\PatientsFile.cs" />
+    <Compile Include="Models\Credential.cs" />
     <Compile Include="Models\Patient.cs" />
-    <Compile Include="Models\UserContext.cs" />
+    <Compile Include="Models\CacheDB.cs" />
     <Compile Include="Models\WebSiteSRZ.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
@@ -121,6 +124,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="ViewModels\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

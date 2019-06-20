@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace WpfApp1.Models
 {
-    class UserContext : DbContext
+    class CacheDB : DbContext
     {
-        public UserContext()
+        public CacheDB()
             : base("DBConnectionString")
         { }
 
