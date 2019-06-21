@@ -93,7 +93,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Models\Credentials.cs" />
+    <Compile Include="Models\RoundRobinCredentials.cs" />
     <Compile Include="Models\PatientsFile.cs" />
     <Compile Include="Models\Credential.cs" />
     <Compile Include="Models\Patient.cs" />

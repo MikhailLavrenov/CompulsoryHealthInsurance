@@ -50,22 +50,22 @@ namespace WpfApp1
             */
             var credentialList = new List<Credential>
                     {
-                    new Credential() { Login = "UshanovaTA", Password = "UshanovaTA1", RequestsLeft=10 },
-                    new Credential() { Login = "IvandikovaEP", Password = "IvandikovaEP1", RequestsLeft=10 }
+                    new Credential() { Login = "SluzhenkoNV", Password = "SluzhenkoNV1", RequestsLimit=10 },
+                    new Credential() { Login = "BershadskayaNP", Password = "BershadskayaNP1", RequestsLimit=10 }
                     };
-            var credentials = new  RoundRobinCredentials(credentialList);
-
+            /*
+            var credentials = new  RoundRobinCredentials(credentialList);            
             Credential credential;
             for (int i = 0; i < 10; i++)
                 {
-                var flag=credentials.TryGetNext(out  credential);
+                var flag=credentials.TryGetNext(out credential);
                 }
-
-           /* 
+ */
+           
             var file = new PatientsFile();
             await file.Open(@"C:\Users\ЛавреновМВ\Desktop\attmo.xlsx");
-            var unverifiedPatients = await file.GetUnverifiedPatientsInsuaranceNumber(20);
-            var verifiedPatients = await WebSiteSRZ.GetPatients("http://11.0.0.28/", "10.10.45.43",  3128, unverifiedPatients, credentials, 2);
+            var unverifiedPatients = await file.GetUnverifiedInsuaranceNumbersAsync(20);
+            var verifiedPatients = WebSiteSRZ.GetPatients("http://11.0.0.28/", "10.10.45.43",  3128, unverifiedPatients, credentialList, 2);
 
 
             /*

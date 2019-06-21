@@ -146,7 +146,7 @@ namespace FomsPatientsDB.Models
             }
 
         //преобразует строки из файла в список пациентов
-        public async Task<List<Patient>> GetVerifedPatients()
+        public async Task<List<Patient>> GetVerifedPatientsAsync()
             {
             return await Task.Run(() =>
             {
@@ -172,14 +172,14 @@ namespace FomsPatientsDB.Models
             }
 
         //Находит строки без полных ФИО
-        public async Task<ConcurrentStack<string>> GetUnverifiedPatientsInsuaranceNumber(int limitCount)
+        public async Task<string[]> GetUnverifiedInsuaranceNumbersAsync(int limitCount)
             {
             if (initialsColumn == -1)
                 throw new Exception("Не найден столбец с инициалами ФИО");
 
             return await Task.Run(() =>
             {
-                var patients = new ConcurrentStack<string>();
+                var patients = new ConcurrentBag<string>();
 
                 Parallel.For(headerIndex + 1, maxRow + 1, (row, state) =>
                 {
@@ -190,7 +190,7 @@ namespace FomsPatientsDB.Models
                     if (insuranceValue != null && initialsValue != null && surnameValue == null)
                         {                        
                         if (patients.Count < limitCount)
-                            patients.Push(insuranceValue.ToString());
+                            patients.Add(insuranceValue.ToString());
                         else
                             state.Break();
                         }
@@ -198,9 +198,9 @@ namespace FomsPatientsDB.Models
 
                 //из-за асинхронного выполнения, размер стэка может получиться больше чем надо, выкидываем лишнее
                 while (patients.Count > limitCount)
-                    patients.TryPop(out string _);
+                    patients.TryTake(out string _);
 
-                return patients;
+                return patients.ToArray();
             });
             }
 

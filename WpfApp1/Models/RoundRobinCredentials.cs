@@ -7,11 +7,10 @@ namespace FomsPatientsDB.Models
     //возввращает учтеные данные по кругу пока лимит запросов не исчерпан
     class RoundRobinCredentials
         {
+        private readonly object syncLock = new object();
         private List<Credential> credentials;
         private int currentIndex;
         private int count;
-
-        public Credential Current { get; private set; }
 
         public RoundRobinCredentials(List<Credential> credentials)
             {
@@ -19,21 +18,32 @@ namespace FomsPatientsDB.Models
             credentials.ForEach(x => this.credentials.Add(x.Copy()));
             currentIndex = -1;
             count = credentials.Count;
-            totalRequestsLeft = credentials.Select(x => x.RequestsLeft).Sum();
             }
 
-        public bool TryMoveNext()
-            {            
-            MoveNext();
-
-            int iterator = 0;
-            while (Current.RequestsLeft == 0 && iterator < count)
+        public bool TryGetNext(out Credential credential)
+            {
+            lock (syncLock)
                 {
                 MoveNext();
-                iterator++;
-                }
 
-            return iterator<count ? true :false;
+                int iterator = 0;
+                while (credentials[currentIndex].RequestsLimit == 0 && iterator < count)
+                    {
+                    MoveNext();
+                    iterator++;
+                    }
+
+                if (iterator < count)
+                    {
+                    credential =  credentials[currentIndex];
+                    return true;
+                    }
+                else
+                    {
+                    credential =  null;
+                    return false;
+                    }
+                }
             }
 
         private void MoveNext()
@@ -41,8 +51,6 @@ namespace FomsPatientsDB.Models
             currentIndex++;
             if (currentIndex == count)
                 currentIndex = 0;
-
-            Current = credentials[currentIndex];
             }
         }
     }
