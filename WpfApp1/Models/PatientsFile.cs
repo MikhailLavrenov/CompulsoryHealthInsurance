@@ -14,7 +14,7 @@ namespace FomsPatientsDB.Models
     /// </summary>
     public class PatientsFile : IDisposable
         {
-        private static readonly object lockSync = new object();
+        private static readonly object locker = new object();
         private ExcelPackage excel;
         private ExcelWorksheet sheet;
         private ColumnAttribute[] columnsAttributes;
@@ -131,8 +131,8 @@ namespace FomsPatientsDB.Models
 
                     name = sheet.Cells[1, i].Value.ToString();
                     synonim = GetColumnAttribute(name);
-                    if (name != synonim.alternativeName)
-                        sheet.Cells[1, i].Value = synonim.alternativeName;
+                    if (name != synonim.altName)
+                        sheet.Cells[1, i].Value = synonim.altName;
 
                     sheet.Column(i).Hidden = synonim.hide;
                     if (synonim.delete)
@@ -220,7 +220,7 @@ namespace FomsPatientsDB.Models
                                 var patient = cachedPatients.Where(x => x.InsuranceNumber == insuranceValue.ToString() && x.Initials == initialsValue.ToString()).FirstOrDefault();
 
                                 if (patient != null)
-                                    lock (lockSync)
+                                    lock (locker)
                                         {
                                         sheet.Cells[row, surnameColumn].Value = patient.Surname;
                                         sheet.Cells[row, nameColumn].Value = patient.Name;
@@ -244,7 +244,7 @@ namespace FomsPatientsDB.Models
         //возвращает альтернативное название столбца, если синонима нет возвращает это же название
         private string GetColumnAlternativeName(string columnName)
             {
-            string altName = columnsAttributes.Where(x => x.name == columnName).FirstOrDefault().alternativeName;
+            string altName = columnsAttributes.Where(x => x.name == columnName).FirstOrDefault().altName;
 
             if (altName == null)
                 altName = columnName;
@@ -256,10 +256,10 @@ namespace FomsPatientsDB.Models
         private ColumnAttribute GetColumnAttribute(string name)
             {
             foreach (var attribute in columnsAttributes)
-                if ((attribute.name == name) || (attribute.alternativeName == name))
+                if ((attribute.name == name) || (attribute.altName == name))
                     return attribute;
 
-            return new ColumnAttribute { name = name, alternativeName = name, hide = false, delete = false };
+            return new ColumnAttribute { name = name, altName = name, hide = false, delete = false };
             }
 
         //проверяет структуру файла, при необходимости добавляет столбцы Фамилия, Имя, Отчество
@@ -320,7 +320,7 @@ namespace FomsPatientsDB.Models
                     continue;
 
                 var cellText = cellValue.ToString();
-                if ((cellText == column.name) || (cellText == column.alternativeName))
+                if ((cellText == column.name) || (cellText == column.altName))
                     return col;
                 }
             return -1;
@@ -334,7 +334,7 @@ namespace FomsPatientsDB.Models
         public struct ColumnAttribute
             {
             public string name;
-            public string alternativeName;
+            public string altName;
             public bool hide;
             public bool delete;
             }

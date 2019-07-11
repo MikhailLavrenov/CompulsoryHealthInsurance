@@ -93,11 +93,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Models\RoundRobinCredentials.cs" />
     <Compile Include="Models\PatientsFile.cs" />
     <Compile Include="Models\Credential.cs" />
     <Compile Include="Models\Patient.cs" />
-    <Compile Include="Models\CacheDB.cs" />
+    <Compile Include="Models\Database.cs" />
     <Compile Include="Models\WebSiteSRZ.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
