@@ -1,0 +1,33 @@
+﻿<UserControl x:Class="PatientsFomsRepository.Views.AttachedPatientsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:PatientsFomsRepository.Views"
+             mc:Ignorable="d">
+
+    <StackPanel  >
+        <TextBlock Text="Определить полные ФИО в файле пациентов"></TextBlock>
+
+        <StackPanel Orientation="Horizontal" >
+            <CheckBox Name="CheckBox1" Content="Скачать новый файл на дату: " VerticalAlignment="Center"/>
+            <DatePicker Visibility="{Binding IsChecked, ElementName=CheckBox1}"/>
+        </StackPanel>
+        
+        <StackPanel Orientation="Horizontal" >
+            <TextBlock Text="Путь к файлу: "/>
+            <TextBox Width="150" HorizontalAlignment="Left"/>
+            <Button Content="Выбрать"/>
+        </StackPanel>
+        <Button Content="ОК"/>
+
+        <TextBlock Text="Загрузить из файла в базу данных полные ФИО"></TextBlock>
+        <StackPanel Orientation="Horizontal" >
+            <Button Content="Шаблон файла"/>
+            <Button Content="Загрузить" />
+        </StackPanel>
+    </StackPanel>
+
+
+    
+</UserControl>

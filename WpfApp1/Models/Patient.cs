@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Text;
 
-namespace WpfApp1.Models
+namespace PatientsFomsRepository.Models
     {
     public class Patient
         {

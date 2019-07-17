@@ -10,7 +10,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WpfApp1.Models
+namespace PatientsFomsRepository.Models
     {
 
     /// <summary>

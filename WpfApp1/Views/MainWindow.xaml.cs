@@ -14,9 +14,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using WpfApp1.Models;
+using PatientsFomsRepository.Models;
 
-namespace WpfApp1
+namespace PatientsFomsRepository.Views
 {
     /// <summary>
     /// Логика взаимодействия для MainWindow.xaml
