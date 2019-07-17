@@ -3,15 +3,20 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
              xmlns:local="clr-namespace:PatientsFomsRepository.Views"
              mc:Ignorable="d">
 
     <StackPanel  >
-        <TextBlock Text="Определить полные ФИО в файле пациентов"></TextBlock>
+        <TextBlock Text="Подставить полные ФИО в файл пациентов"></TextBlock>
 
         <StackPanel Orientation="Horizontal" >
-            <CheckBox Name="CheckBox1" Content="Скачать новый файл на дату: " VerticalAlignment="Center"/>
-            <DatePicker Visibility="{Binding IsChecked, ElementName=CheckBox1}"/>
+            <CheckBox Name="CheckBox1" Content="Скачать новый файл на дату: " VerticalAlignment="Center" IsChecked="True"/>
+            <DatePicker Visibility="{Binding IsChecked, ElementName=CheckBox1}" SelectedDate="{x:Static sys:DateTime.Now}" >
+                <DatePicker.CacheMode>
+                    <BitmapCache/>
+                </DatePicker.CacheMode>
+            </DatePicker>
         </StackPanel>
         
         <StackPanel Orientation="Horizontal" >
@@ -21,10 +26,11 @@
         </StackPanel>
         <Button Content="ОК"/>
 
-        <TextBlock Text="Загрузить из файла в базу данных полные ФИО"></TextBlock>
+        <Border Margin="0,10,0,10" BorderThickness="1" BorderBrush="Black" Width="auto"/>
+        <TextBlock Text="Загрузить полные ФИО из файла в базу данных"></TextBlock>
         <StackPanel Orientation="Horizontal" >
-            <Button Content="Шаблон файла"/>
-            <Button Content="Загрузить" />
+            <Button Content="Загрузить в базу данных" />
+            <Button Content="Скачать шаблон файла"/>
         </StackPanel>
     </StackPanel>
 
