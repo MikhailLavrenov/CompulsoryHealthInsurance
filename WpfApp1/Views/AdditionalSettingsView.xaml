@@ -6,7 +6,34 @@
              xmlns:local="clr-namespace:PatientsFomsRepository.Views"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-            
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary  Source="/PatientsFomsRepository;component/Views/Styles/DefaultStyle.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid >
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+
+        <CheckBox Grid.Row="0" Content="Применить форматирование столбцов файла пациентов " HorizontalAlignment="Left" Margin="0,0,0,5" Width="790"/>
+        <DataGrid Grid.Row="1" Height="300">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Название столбца" Binding="{Binding Path=name}"/>
+                <DataGridTextColumn Header="Понятное название" Binding="{Binding Path=altName}"/>
+                <DataGridCheckBoxColumn Header="Скрыть" Binding="{Binding Path=hide}"/>
+                <DataGridCheckBoxColumn Header="Удалить" Binding="{Binding Path=delete}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+        <StackPanel Grid.Row="2" Orientation="Horizontal" >
+            <Button Content="Сохранить"/>
+            <Button Content="Отмена"/>
+        </StackPanel>
     </Grid>
 </UserControl>
