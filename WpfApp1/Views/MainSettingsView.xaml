@@ -17,8 +17,8 @@
     
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition MinWidth="250" Width="auto"/>
         </Grid.ColumnDefinitions>
 
         <Grid.RowDefinitions>
@@ -51,13 +51,13 @@
         <TextBlock Grid.Row="4" Grid.Column="0" Text="Количество потоков"/>
         <TextBox   Grid.Row="4" Grid.Column="1"/>
         <TextBlock Grid.Row="5" Grid.Column="0" Text="Доступ к учетным записям"/>
-        <ComboBox Grid.Row="5" Grid.Column="1"/>
+        <ComboBox  Grid.Row="5" Grid.Column="1"/>
         <TextBlock Grid.Row="6" Grid.Column="0" Text="Учетные записи"/>
-        <DataGrid Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2">
+        <DataGrid  Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" MinHeight="200">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Логин" Binding="{Binding Path=Login}" Width="2*"/>
-                <DataGridTextColumn Header="Пароль" Binding="{Binding Path=Password}" Width="2*"/>
-                <DataGridTextColumn Header="Лимит запросов" Binding="{Binding Path=RequestsLimit}" Width="*"/>
+                <DataGridTextColumn Header="Логин" Binding="{Binding Path=Login}" Width="2*" MinWidth="150" />
+                <DataGridTextColumn Header="Пароль" Binding="{Binding Path=Password}" Width="2*"  MinWidth="150" />
+                <DataGridTextColumn Header="Лимит запросов" Binding="{Binding Path=RequestsLimit}" Width="*" MinWidth="100" />
             </DataGrid.Columns>
 
         </DataGrid>
