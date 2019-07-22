@@ -6,7 +6,7 @@
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
              xmlns:local="clr-namespace:PatientsFomsRepository.Views"
              mc:Ignorable="d"
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="500" d:DesignWidth="800">
 
     <UserControl.Resources>
         <ResourceDictionary>
@@ -18,9 +18,11 @@
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition/>
-            <ColumnDefinition/>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="auto"/>
         </Grid.ColumnDefinitions>
+        
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
@@ -31,24 +33,24 @@
             <RowDefinition Height="20"/>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
-        <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Text="Подставить полные ФИО в файл пациентов"/>
+        <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Text="Подставить полные ФИО в файл пациентов" Style="{StaticResource TextBlockHeader}"/>
         <TextBlock Grid.Row="1" Grid.Column="0" Text="Скачать новый файл"/>
-        <TextBlock Grid.Row="2" Grid.Column="0" Text="Файл на дату"/>
-        <CheckBox  Grid.Row="2" Grid.Column="1" Name="CheckBox1" IsChecked="True"/>
+        <CheckBox  Grid.Row="1" Grid.Column="1" Name="CheckBox1" IsChecked="True"/>
         <TextBlock Grid.Row="3" Grid.Column="0" Text="Файл на дату"/>
-        <DatePicker Grid.Row="3" Grid.Column="1" Visibility="{Binding IsChecked, ElementName=CheckBox1}" SelectedDate="{x:Static sys:DateTime.Now}" />
+        <DatePicker Grid.Row="3" Grid.Column="1" Visibility="{Binding IsChecked, ElementName=CheckBox1}" SelectedDate="{x:Static sys:DateTime.Now}"  />
         <TextBlock Grid.Row="4" Grid.Column="0" Text="Путь к файлу: "/>
         <StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal" >
-            <TextBox Width="150" />
+            <TextBox Width="350"  />
             <Button Content="Выбрать"/>
         </StackPanel>
         <Button Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Content="ОК" Width="100" HorizontalAlignment="Left"/>
 
-        <TextBlock Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" Text="Загрузить полные ФИО из файла в базу данных"></TextBlock>
+        <TextBlock Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" Text="Загрузить полные ФИО из файла в базу данных" Style="{StaticResource TextBlockHeader}"></TextBlock>
         <StackPanel Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" >
-            <Button Content="Загрузить в базу данных" />
-            <Button Content="Скачать шаблон файла"/>
+            <Button Content="Загрузить" />
+            <Button Content="Шаблон файла"/>
         </StackPanel>
     </Grid>
 

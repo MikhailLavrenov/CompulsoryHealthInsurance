@@ -79,13 +79,16 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Views\AdditionalSettingsView.xaml.cs">
-      <DependentUpon>AdditionalSettingsView.xaml</DependentUpon>
+    <Compile Include="Infrastructure\RelayCommand.cs" />
+    <Compile Include="Models\Settings.cs" />
+    <Compile Include="ViewModels\WebSiteSRZSettingsViewModel.cs" />
+    <Compile Include="Views\PatientsFileSettingsView.xaml.cs">
+      <DependentUpon>PatientsFileSettingsView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\MainSettingsView.xaml.cs">
-      <DependentUpon>MainSettingsView.xaml</DependentUpon>
+    <Compile Include="Views\WebSiteSRZSettingsView.xaml.cs">
+      <DependentUpon>WebSiteSRZSettingsView.xaml</DependentUpon>
     </Compile>
-    <Page Include="Views\AdditionalSettingsView.xaml">
+    <Page Include="Views\PatientsFileSettingsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -93,7 +96,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\MainWindow.xaml">
+    <Page Include="Views\MainWindowView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -104,11 +107,11 @@
     <Compile Include="Views\AttachedPatientsView.xaml.cs">
       <DependentUpon>AttachedPatientsView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\MainWindow.xaml.cs">
-      <DependentUpon>MainWindow.xaml</DependentUpon>
+    <Compile Include="Views\MainWindowView.xaml.cs">
+      <DependentUpon>MainWindowView.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="Views\MainSettingsView.xaml">
+    <Page Include="Views\WebSiteSRZSettingsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -149,10 +152,7 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Infrastructure\" />
-    <Folder Include="ViewModels\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>
