@@ -1,62 +1,85 @@
-﻿using System;
+﻿using PatientsFomsRepository.Models;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FomsPatientsDB.Models
+{
+    public class Credential : BindableBase
     {
-    public class Credential
-        {        
-        public string Login { get; set; }
-        public string Password { get; set; }
+        #region Fields
+        private readonly object locker = new object();
+        private string login;
+        private string password;
         private int requestsLimit;
-        public int RequestsLimit
-            { get
-                {
-                return requestsLimit;
-                }
-            set
-                {
-                requestsLimit = value;
-                requestsLeft = value;
-                }
-            }
         private int requestsLeft;
-        private readonly object locker = new object();      
+        #endregion
 
-        public Credential Copy()
+        #region Properties
+        public string Login { get => login; set => SetProperty(ref login, value); }
+        public string Password { get => password; set => SetProperty(ref password, value); }
+        public int RequestsLimit
+        {
+            get => requestsLimit;
+            set
             {
-            return MemberwiseClone() as Credential;
+                SetProperty(ref requestsLimit, value);
+                requestsLeft = value;
             }
+        }
+        #endregion
+
+        #region Creator
+        //создает копию экземпляра класса
+        public Credential Copy()
+        {
+            return MemberwiseClone() as Credential;
+        }
+        #endregion
+
+        #region Methods
+        //попытка зарезервировать разрешение на запрос к серверу
         public bool TryReserveRequest()
+        {
+            lock (locker)
             {
-            lock(locker)
-                {
                 if (requestsLeft != 0)
-                    {
+                {
                     requestsLeft--;
                     return true;
-                    }
+                }
                 else
                     return false;
-                }
             }
+        }
+        //возвращает учетные данные по кругу пока лимит запросов не исчерпан
+        #endregion
 
-
-        //возввращает учтеные данные по кругу пока лимит запросов не исчерпан
         public class RoundRobinCredentials
         {
+            #region Fields
             private readonly object locker = new object();
-            private List<Credential> credentials;
             private int currentIndex;
+            private List<Credential> credentials;
+            #endregion
 
+            #region Creator
             public RoundRobinCredentials(List<Credential> credentials)
             {
                 this.credentials = new List<Credential>();
                 credentials.ForEach(item => this.credentials.Add(item.Copy()));
                 currentIndex = -1;
             }
+            #endregion
+
+            #region Methods
+            //следующий элемент
+            private void MoveNext()
+            {
+                if (currentIndex + 1 < credentials.Count)
+                    currentIndex++;
+                else
+                    currentIndex = 0;
+            }
+            //попытка найти следующие учетные данные где лимит запросов не исчерпан
             public bool TryGetNext(out Credential credential)
             {
                 lock (locker)
@@ -76,13 +99,7 @@ namespace FomsPatientsDB.Models
                     return false;
                 }
             }
-            private void MoveNext()
-            {
-                if (currentIndex + 1 < credentials.Count)
-                    currentIndex++;
-                else
-                    currentIndex = 0;
-            }
+            #endregion
         }
     }
-    }
+}

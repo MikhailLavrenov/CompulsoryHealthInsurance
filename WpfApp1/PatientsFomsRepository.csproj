@@ -80,7 +80,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Infrastructure\RelayCommand.cs" />
-    <Compile Include="Models\BaseModel.cs" />
+    <Compile Include="Infrastructure\BindableBase.cs" />
     <Compile Include="Models\Settings.cs" />
     <Compile Include="ViewModels\WebSiteSRZSettingsViewModel.cs" />
     <Compile Include="Views\PatientsFileSettingsView.xaml.cs">

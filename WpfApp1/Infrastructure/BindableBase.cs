@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 
 namespace PatientsFomsRepository.Models
     {
-    public abstract class  BaseModel : INotifyPropertyChanged
+    public abstract class BindableBase : INotifyPropertyChanged
         {
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -13,12 +13,12 @@ namespace PatientsFomsRepository.Models
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
             }
 
-        protected void SetField<T>(ref T field, T value, [CallerMemberName]string propertyName = "")
+        protected void SetProperty<T>(ref T field, T value, [CallerMemberName]string propertyName = "")
             {
             if (EqualityComparer<T>.Default.Equals(field, value) == false)
                 {
                 field = value;
-                OnPropertyChanged(propertyName));
+                OnPropertyChanged(propertyName);
                 }
             }
         }
