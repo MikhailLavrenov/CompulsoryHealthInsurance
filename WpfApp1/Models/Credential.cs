@@ -2,7 +2,7 @@
 using PatientsFomsRepository.Models;
 using System.Collections.Generic;
 
-namespace FomsPatientsDB.Models
+namespace PatientsFomsRepository.Models
 {
     public class Credential : BindableBase
     {

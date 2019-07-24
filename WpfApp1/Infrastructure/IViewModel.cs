@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PatientsFomsRepository.Infrastructure
     {
-    interface IViewModel
+    public interface IViewModel
         {
         string ViewModelHeader { get; set; }
         }

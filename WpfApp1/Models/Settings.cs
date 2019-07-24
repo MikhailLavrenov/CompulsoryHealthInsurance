@@ -6,7 +6,7 @@ using System.Xml.Serialization;
 
 namespace PatientsFomsRepository.Models
 {
-    class Settings : BindableBase
+    public class Settings : BindableBase
     {
         #region Fields
         private string siteAddress;

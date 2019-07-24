@@ -6,7 +6,7 @@ using System.IO;
 
 namespace PatientsFomsRepository.ViewModels
 {
-    class WebSiteSRZSettingsViewModel:BindableBase, IViewModel
+    public class WebSiteSRZSettingsViewModel:BindableBase, IViewModel
     {
         //https://rachel53461.wordpress.com/2011/12/18/navigation-with-mvvm-2/
 
@@ -26,29 +26,24 @@ namespace PatientsFomsRepository.ViewModels
         public WebSiteSRZSettingsViewModel()
         {
             ViewModelHeader = "Настройки подключения к web-сайту СРЗ ХК ФОМС";
-            SaveCommand = new RelayCommand(ExecuteSaveCommand);
-            CancelCommand = new RelayCommand(ExecuteCancelCommand);
-            SetDefaultCommand = new RelayCommand(ExecuteSetDefaultCommand);
+            SaveCommand = new RelayCommand(ExecuteSave);
+            CancelCommand = new RelayCommand(ExecuteCancel, CanExecuteCancel);
+            SetDefaultCommand = new RelayCommand(ExecuteSetDefault);
             CurrentSettings = Settings.Load();
         }
         #endregion
 
         #region Methods
-        public void ExecuteSaveCommand(object parameter)
+        public void ExecuteSave(object parameter)
         {
             CurrentSettings.Save();
         }        
-        public void ExecuteCancelCommand(object parameter)
+        public void ExecuteCancel(object parameter)
         {
             CurrentSettings = Settings.Load();
         }
-        public bool CanExecuteCancelCommand(object parameter)
+        public void ExecuteSetDefault(object parameter)
         {
-            return File.Exists(Settings.thisFileName);
-        }        
-        public void ExecuteSetDefaultCommand(object parameter)
-        {
-
             CurrentSettings.SiteAddress = @"http://11.0.0.1/";
             CurrentSettings.UseProxy = false;
             CurrentSettings.ProxyAddress = "";
@@ -57,11 +52,15 @@ namespace PatientsFomsRepository.ViewModels
             CurrentSettings.EncryptLevel = 0;
             CurrentSettings.Credentials = new List<Credential>()
              {
-                    new FomsPatientsDB.Models.Credential{Login="МойЛогин1", Password="МойПароль1", RequestsLimit=400},
-                    new FomsPatientsDB.Models.Credential{Login="МойЛогин2", Password="МойПароль2", RequestsLimit=300},
-                    new FomsPatientsDB.Models.Credential{Login="МойЛогин3", Password="МойПароль3", RequestsLimit=500}
+                    new Models.Credential{Login="МойЛогин1", Password="МойПароль1", RequestsLimit=400},
+                    new Models.Credential{Login="МойЛогин2", Password="МойПароль2", RequestsLimit=300},
+                    new Models.Credential{Login="МойЛогин3", Password="МойПароль3", RequestsLimit=500}
              };
         }
+        public bool CanExecuteCancel(object parameter)
+        {
+            return File.Exists(Settings.thisFileName);
+        }                
         #endregion
     }
 }
