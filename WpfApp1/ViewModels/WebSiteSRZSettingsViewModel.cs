@@ -6,7 +6,7 @@ using System.IO;
 
 namespace PatientsFomsRepository.ViewModels
 {
-    class WebSiteSRZSettingsViewModel:BindableBase
+    class WebSiteSRZSettingsViewModel:BindableBase, IViewModel
     {
         //https://rachel53461.wordpress.com/2011/12/18/navigation-with-mvvm-2/
 
@@ -15,6 +15,7 @@ namespace PatientsFomsRepository.ViewModels
         #endregion
 
         #region Properties
+        public string ViewModelHeader { get; set; }
         public Settings CurrentSettings { get => currentSettings; set => SetProperty(ref currentSettings, value); }
         public RelayCommand SaveCommand { get; }
         public RelayCommand CancelCommand { get; }
@@ -24,6 +25,7 @@ namespace PatientsFomsRepository.ViewModels
         #region Creators
         public WebSiteSRZSettingsViewModel()
         {
+            ViewModelHeader = "Настройки подключения к web-сайту СРЗ ХК ФОМС";
             SaveCommand = new RelayCommand(ExecuteSaveCommand);
             CancelCommand = new RelayCommand(ExecuteCancelCommand);
             SetDefaultCommand = new RelayCommand(ExecuteSetDefaultCommand);

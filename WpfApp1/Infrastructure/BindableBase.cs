@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace PatientsFomsRepository.Models
+namespace PatientsFomsRepository.Infrastructure
     {
     public abstract class BindableBase : INotifyPropertyChanged
         {

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using PatientsFomsRepository.Infrastructure;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 namespace PatientsFomsRepository.Models

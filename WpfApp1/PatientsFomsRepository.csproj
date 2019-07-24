@@ -79,9 +79,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Infrastructure\IViewModel.cs" />
     <Compile Include="Infrastructure\RelayCommand.cs" />
     <Compile Include="Infrastructure\BindableBase.cs" />
     <Compile Include="Models\Settings.cs" />
+    <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Compile Include="ViewModels\WebSiteSRZSettingsViewModel.cs" />
     <Compile Include="Views\PatientsFileSettingsView.xaml.cs">
       <DependentUpon>PatientsFileSettingsView.xaml</DependentUpon>

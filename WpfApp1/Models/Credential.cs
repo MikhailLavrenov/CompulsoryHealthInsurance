@@ -1,4 +1,5 @@
-﻿using PatientsFomsRepository.Models;
+﻿using PatientsFomsRepository.Infrastructure;
+using PatientsFomsRepository.Models;
 using System.Collections.Generic;
 
 namespace FomsPatientsDB.Models
