@@ -14,15 +14,15 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace PatientsFomsRepository.Views
-{
-    /// <summary>
-    /// Логика взаимодействия для AdditionalSettingsView.xaml
-    /// </summary>
-    public partial class AdditionalSettingsView : UserControl
     {
-        public AdditionalSettingsView()
+    /// <summary>
+    /// Логика взаимодействия для SettingsView.xaml
+    /// </summary>
+    public partial class WebSiteSRZSettingsView : UserControl
         {
+        public WebSiteSRZSettingsView()
+            {
             InitializeComponent();
+            }
         }
     }
-}
