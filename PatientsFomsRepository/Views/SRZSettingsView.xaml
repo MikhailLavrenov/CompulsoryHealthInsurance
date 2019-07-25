@@ -32,17 +32,14 @@
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
-            <RowDefinition Height="auto"/>
-            <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Text="Настройки подключения к СРЗ" Style="{StaticResource TextBlockHeader}"/>
-        <TextBlock Grid.Row="1" Grid.Column="0" Text="Адрес сайта СРЗ"/>
-        <TextBox   Grid.Row="1" Grid.Column="1"/>
-        <TextBlock Grid.Row="2" Grid.Column="0" Text="Использовать прокси-сервер"/>
-        <CheckBox  Grid.Row="2" Grid.Column="1" Name="CheckBox1"/>
-        <TextBlock Grid.Row="3" Grid.Column="0" Text="Прокси-сервер адрес:порт" Visibility="{Binding IsChecked, ElementName=CheckBox1}"/>
-        <Grid      Grid.Row="3" Grid.Column="1" Visibility="{Binding IsChecked, ElementName=CheckBox1}">
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="Адрес сайта СРЗ"/>
+        <TextBox   Grid.Row="0" Grid.Column="1"/>
+        <TextBlock Grid.Row="1" Grid.Column="0" Text="Использовать прокси-сервер"/>
+        <CheckBox  Grid.Row="1" Grid.Column="1" Name="CheckBox1"/>
+        <TextBlock Grid.Row="2" Grid.Column="0" Text="Прокси-сервер адрес:порт" Visibility="{Binding IsChecked, ElementName=CheckBox1}"/>
+        <Grid      Grid.Row="2" Grid.Column="1" Visibility="{Binding IsChecked, ElementName=CheckBox1}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="3*"/>
                 <ColumnDefinition Width="1*"/>
@@ -51,12 +48,12 @@
             <TextBox Grid.Column="1"/>
         </Grid>
 
-        <TextBlock Grid.Row="5" Grid.Column="0" Text="Количество потоков"/>
-        <TextBox   Grid.Row="5" Grid.Column="1"/>
-        <TextBlock Grid.Row="6" Grid.Column="0" Text="Доступ к учетным записям"/>
-        <ComboBox  Grid.Row="6" Grid.Column="1"/>
-        <TextBlock Grid.Row="7" Grid.Column="0" Text="Учетные записи"/>
-        <DataGrid  Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2" MinHeight="200" MinWidth="500" HorizontalAlignment="Stretch">
+        <TextBlock Grid.Row="3" Grid.Column="0" Text="Количество потоков"/>
+        <TextBox   Grid.Row="3" Grid.Column="1"/>
+        <TextBlock Grid.Row="4" Grid.Column="0" Text="Доступ к учетным записям"/>
+        <ComboBox  Grid.Row="4" Grid.Column="1"/>
+        <TextBlock Grid.Row="5" Grid.Column="0" Text="Учетные записи"/>
+        <DataGrid  Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" MinHeight="200" MinWidth="500" HorizontalAlignment="Stretch">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Логин" Binding="{Binding Path=Login}" Width="3*" MinWidth="100" />
                 <DataGridTextColumn Header="Пароль" Binding="{Binding Path=Password}" Width="3*" MinWidth="100"  />
@@ -75,7 +72,7 @@
                 <DataGridTextColumn Header="Лимит запросов" Binding="{Binding Path=RequestsLimit}" Width="*" MinWidth="100"  />
             </DataGrid.Columns>
         </DataGrid>
-        <StackPanel Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal">
+        <StackPanel Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal">
             <Button Content="Тестировать"/>
             <Button Content="Сохранить"/>
             <Button Content="Отмена"/>

@@ -6,16 +6,15 @@
         xmlns:local="clr-namespace:PatientsFomsRepository"
         xmlns:v="clr-namespace:PatientsFomsRepository.Views"
         xmlns:vm="clr-namespace:PatientsFomsRepository.ViewModels"
-        xmlns:m="clr-namespace:PatientsFomsRepository.Models"
         mc:Ignorable="d"
-        Title="Утилита для загрузки прикрепленных пациентов" Height="450" Width="800">
+        Title="Утилита для загрузки прикрепленных пациентов" Height="600" Width="600">
 
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary  Source="/PatientsFomsRepository;component/Views/Styles/DefaultStyle.xaml" />
                 <ResourceDictionary>
-                    <DataTemplate  DataType="{x:Type vm:MainWindowViewModel}">
+                    <DataTemplate  DataType="{x:Type vm:SRZSettingsViewModel}">
                         <v:SRZSettingsView />
                     </DataTemplate>
                 </ResourceDictionary>
@@ -40,7 +39,7 @@
             </ItemsControl.ItemTemplate>
         </ItemsControl>
 
-        <TextBlock Grid.Row="1" Style="{StaticResource TextBlockHeader}" Text="{Binding FullCaption}"/>
+        <TextBlock Grid.Row="1" Style="{StaticResource TextBlockHeader}" Text="{Binding CurrentViewModel.FullCaption}"/>
         <ContentControl Grid.Row="2" Content="{Binding CurrentViewModel}" />
     </Grid>
         
