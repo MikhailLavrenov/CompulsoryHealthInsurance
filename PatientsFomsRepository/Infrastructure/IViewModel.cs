@@ -8,6 +8,7 @@ namespace PatientsFomsRepository.Infrastructure
     {
     public interface IViewModel
         {
-        string ViewModelHeader { get; set; }
+        string FullCaption { get; set; }
+        string ShortCaption { get; set; }
         }
     }

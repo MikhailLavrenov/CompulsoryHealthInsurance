@@ -1,35 +1,36 @@
-﻿using FomsPatientsDB.Models;
-using PatientsFomsRepository.Infrastructure;
+﻿using PatientsFomsRepository.Infrastructure;
 using PatientsFomsRepository.Models;
 using System.Collections.Generic;
 using System.IO;
 
 namespace PatientsFomsRepository.ViewModels
 {
-    public class WebSiteSRZSettingsViewModel:BindableBase, IViewModel
+    public class WebSRZSettingsViewModel:BindableBase, IViewModel
     {
         //https://rachel53461.wordpress.com/2011/12/18/navigation-with-mvvm-2/
 
         #region Fields
-        private Settings currentSettings;
+        private WebSRZ.Settings currentSettings;
         #endregion
 
         #region Properties
-        public string ViewModelHeader { get; set; }
-        public Settings CurrentSettings { get => currentSettings; set => SetProperty(ref currentSettings, value); }
+        public string FullCaption { get; set; }
+        public string ShortCaption { get; set; }
+        public WebSRZ.Settings CurrentSettings { get => currentSettings; set => SetProperty(ref currentSettings, value); }
         public RelayCommand SaveCommand { get; }
-        public RelayCommand CancelCommand { get; }
+        public RelayCommand LoadCommand { get; }
         public RelayCommand SetDefaultCommand { get; }
         #endregion
 
         #region Creators
-        public WebSiteSRZSettingsViewModel()
+        public WebSRZSettingsViewModel()
         {
-            ViewModelHeader = "Настройки подключения к web-сайту СРЗ ХК ФОМС";
+            FullCaption = "Настройки подключения к web-сайту СРЗ ХК ФОМС";
+            ShortCaption = "Настройки подключения";
             SaveCommand = new RelayCommand(ExecuteSave);
-            CancelCommand = new RelayCommand(ExecuteCancel, CanExecuteCancel);
+            LoadCommand = new RelayCommand(ExecuteLoad, CanExecuteLoad);
             SetDefaultCommand = new RelayCommand(ExecuteSetDefault);
-            CurrentSettings = Settings.Load();
+            CurrentSettings = WebSRZ.Settings.Load();
         }
         #endregion
 
@@ -38,7 +39,7 @@ namespace PatientsFomsRepository.ViewModels
         {
             CurrentSettings.Save();
         }        
-        public void ExecuteCancel(object parameter)
+        public void ExecuteLoad(object parameter)
         {
             CurrentSettings = Settings.Load();
         }
@@ -50,14 +51,14 @@ namespace PatientsFomsRepository.ViewModels
             CurrentSettings.ProxyPort = 0;
             CurrentSettings.ThreadsLimit = 20;
             CurrentSettings.EncryptLevel = 0;
-            CurrentSettings.Credentials = new List<Credential>()
+            CurrentSettings.Credentials = new List<WebSRZ.Credential>()
              {
-                    new Models.Credential{Login="МойЛогин1", Password="МойПароль1", RequestsLimit=400},
-                    new Models.Credential{Login="МойЛогин2", Password="МойПароль2", RequestsLimit=300},
-                    new Models.Credential{Login="МойЛогин3", Password="МойПароль3", RequestsLimit=500}
+                    new WebSRZ.Credential{Login="МойЛогин1", Password="МойПароль1", RequestsLimit=400},
+                    new WebSRZ.Credential{Login="МойЛогин2", Password="МойПароль2", RequestsLimit=300},
+                    new WebSRZ.Credential{Login="МойЛогин3", Password="МойПароль3", RequestsLimit=500}
              };
         }
-        public bool CanExecuteCancel(object parameter)
+        public bool CanExecuteLoad(object parameter)
         {
             return File.Exists(Settings.thisFileName);
         }                
