@@ -18,9 +18,9 @@ namespace PatientsFomsRepository.Views
     /// <summary>
     /// Логика взаимодействия для SettingsView.xaml
     /// </summary>
-    public partial class WebSiteSRZSettingsView : UserControl
+    public partial class SRZSettingsView : UserControl
         {
-        public WebSiteSRZSettingsView()
+        public SRZSettingsView()
             {
             InitializeComponent();
             }

@@ -12,7 +12,7 @@
 
     <Window.Resources>
         <DataTemplate  DataType="{x:Type vm:MainWindowViewModel}">
-            <v:WebSiteSRZSettingsView />
+            <v:SRZSettingsView />
         </DataTemplate>
     </Window.Resources>
 

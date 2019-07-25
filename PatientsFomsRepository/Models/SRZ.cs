@@ -16,14 +16,14 @@ namespace PatientsFomsRepository.Models
     /// <summary>
     /// Работа с веб-порталом СРЗ
     /// </summary>
-    public class WebSiteSRZ : IDisposable
+    public class SRZ : IDisposable
         {
         public bool Authorized { get; private set; }
 
         private HttpClient client;
         private Credential credential;
 
-        public WebSiteSRZ(string URL, string proxyAddress = null, int proxyPort = 0)
+        public SRZ(string URL, string proxyAddress = null, int proxyPort = 0)
             {
             Authorized = false;
             var clientHandler = new HttpClientHandler();
@@ -196,9 +196,9 @@ namespace PatientsFomsRepository.Models
 
             var robinRoundCredentials = new Credential.RoundRobinCredentials(credentials);
             var verifiedPatients = new ConcurrentBag<Patient>();
-            var tasks = new Task<WebSiteSRZ>[threadsLimit];
+            var tasks = new Task<SRZ>[threadsLimit];
             for (int i = 0; i < threadsLimit; i++)
-                tasks[i] = Task.Run(() => { return (WebSiteSRZ)null; });
+                tasks[i] = Task.Run(() => { return (SRZ)null; });
 
             for (int i = 0; i < insuranceNumbers.Length; i++)
                 {
@@ -219,7 +219,7 @@ namespace PatientsFomsRepository.Models
 
                             if (credential.TryReserveRequest())
                                 {
-                                site = new WebSiteSRZ(URL, proxyAddress, proxyPort);
+                                site = new SRZ(URL, proxyAddress, proxyPort);
                                 if (site.TryAuthorize(credential))
                                     break;
                                 }
