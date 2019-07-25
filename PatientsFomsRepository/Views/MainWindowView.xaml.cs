@@ -65,7 +65,7 @@ namespace PatientsFomsRepository.Views
             var file = new PatientsFile();
             await file.Open(@"C:\Users\ЛавреновМВ\Desktop\attmo.xlsx");
             var unverifiedPatients = await file.GetUnverifiedInsuaranceNumbersAsync(20);
-            var verifiedPatients = WebSRZ.GetPatients("http://11.0.0.28/", "10.10.45.43",  3128, unverifiedPatients, credentialList, 2);
+            var verifiedPatients = WebSiteSRZ.GetPatients("http://11.0.0.28/", "10.10.45.43",  3128, unverifiedPatients, credentialList, 2);
 
 
             /*
