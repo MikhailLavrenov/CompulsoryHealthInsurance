@@ -11,30 +11,37 @@
         Title="Утилита для загрузки прикрепленных пациентов" Height="450" Width="800">
 
     <Window.Resources>
-        <DataTemplate  DataType="{x:Type vm:MainWindowViewModel}">
-            <v:SRZSettingsView />
-        </DataTemplate>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary  Source="/PatientsFomsRepository;component/Views/Styles/DefaultStyle.xaml" />
+                <ResourceDictionary>
+                    <DataTemplate  DataType="{x:Type vm:MainWindowViewModel}">
+                        <v:SRZSettingsView />
+                    </DataTemplate>
+                </ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Window.Resources>
 
-    <Grid ShowGridLines="True">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="40"></RowDefinition>
             <RowDefinition Height="40"></RowDefinition>
             <RowDefinition></RowDefinition>
         </Grid.RowDefinitions>
 
-        <ItemsControl Grid.Row="0" ItemsSource="{Binding PageViewModels}">
+        <ItemsControl Grid.Row="0" ItemsSource="{Binding ViewModels}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Button Content="{Binding Name}"
-                                Command="{Binding ChangePageCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
-                                CommandParameter="{Binding }"
-                                Margin="2,5"/>
+                    <Button Content="{Binding ShortCaption}"
+                                Command="{Binding ChangeViewCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
+                                CommandParameter="{Binding }" />
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
 
-        <ContentControl Grid.Row="2" Content="{Binding CurrentPageViewModel}" />
+        <TextBlock Grid.Row="1" Style="{StaticResource TextBlockHeader}" Text="{Binding FullCaption}"/>
+        <ContentControl Grid.Row="2" Content="{Binding CurrentViewModel}" />
     </Grid>
         
     

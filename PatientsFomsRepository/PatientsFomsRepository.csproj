@@ -83,6 +83,7 @@
     <Compile Include="Infrastructure\RelayCommand.cs" />
     <Compile Include="Infrastructure\BindableBase.cs" />
     <Compile Include="Models\ColumnAttribute.cs" />
+    <Compile Include="Models\RoundRobinCredentials.cs" />
     <Compile Include="Models\Settings.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Compile Include="ViewModels\SRZSettingsViewModel.cs" />

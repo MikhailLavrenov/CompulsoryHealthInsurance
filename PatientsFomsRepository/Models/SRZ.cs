@@ -193,7 +193,7 @@ namespace PatientsFomsRepository.Models
             if (insuranceNumbers.Length < threadsLimit)
                 threadsLimit = insuranceNumbers.Length;
 
-            var robinRoundCredentials = new Credential.RoundRobinCredentials(credentials);
+            var robinRoundCredentials = new RoundRobinCredentials(credentials);
             var verifiedPatients = new ConcurrentBag<Patient>();
             var tasks = new Task<SRZ>[threadsLimit];
             for (int i = 0; i < threadsLimit; i++)

@@ -7,13 +7,13 @@ namespace PatientsFomsRepository.ViewModels
     public class MainWindowViewModel : BindableBase
         {
         #region Fields
-        private IViewModel currentPageViewModel;
+        private IViewModel currentViewModel;
         #endregion
 
         #region Properties 
         public RelayCommand ChangeViewCommand { get; }
         public List<IViewModel> ViewModels { get; }
-        public IViewModel CurrentViewModel { get => currentPageViewModel; set => SetProperty(ref currentPageViewModel, value); }
+        public IViewModel CurrentViewModel { get => currentViewModel; set => SetProperty(ref currentViewModel, value); }
         #endregion
 
         #region Creator

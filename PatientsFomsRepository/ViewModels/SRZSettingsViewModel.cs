@@ -2,6 +2,7 @@
 using PatientsFomsRepository.Infrastructure;
 using PatientsFomsRepository.Models;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 
 namespace PatientsFomsRepository.ViewModels
@@ -51,8 +52,8 @@ namespace PatientsFomsRepository.ViewModels
             CurrentSettings.ProxyAddress = "";
             CurrentSettings.ProxyPort = 0;
             CurrentSettings.ThreadsLimit = 20;
-            CurrentSettings.EncryptLevel = 0;
-            CurrentSettings.Credentials = new List<Credential>()
+            CurrentSettings.EncryptLevel = 0;            
+            CurrentSettings.Credentials = new ObservableCollection<Credential>()
              {
                     new Models.Credential{Login="МойЛогин1", Password="МойПароль1", RequestsLimit=400},
                     new Models.Credential{Login="МойЛогин2", Password="МойПароль2", RequestsLimit=300},
@@ -61,7 +62,7 @@ namespace PatientsFomsRepository.ViewModels
         }
         public bool CanExecuteCancel(object parameter)
         {
-            return File.Exists(Settings.thisFileName);
+            return File.Exists(Settings.ThisFileName);
         }                
         #endregion
     }
