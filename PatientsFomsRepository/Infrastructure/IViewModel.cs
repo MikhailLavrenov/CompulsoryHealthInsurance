@@ -6,8 +6,14 @@ using System.Threading.Tasks;
 
 namespace PatientsFomsRepository.Infrastructure
     {
+    /// <summary>
+    /// Общие свойства для всех ViewModel
+    /// </summary>
     public interface IViewModel
         {
-        string ViewModelHeader { get; set; }
+        #region Properties
+        string ShortCaption { get; set; }
+        string FullCaption { get; set; }
+        #endregion
         }
     }

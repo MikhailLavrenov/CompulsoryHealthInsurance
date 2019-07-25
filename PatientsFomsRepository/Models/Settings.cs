@@ -18,7 +18,7 @@ namespace PatientsFomsRepository.Models
         private int encryptLevel;
         private List<Credential> credentials;
         private bool formatPatientsFile;
-        private List<PatientsFile.ColumnAttribute> columnAttributes;
+        private List<ColumnAttribute> columnAttributes;
         #endregion
 
         #region Properties        
@@ -32,7 +32,7 @@ namespace PatientsFomsRepository.Models
         public int EncryptLevel { get => encryptLevel; set => SetProperty(ref encryptLevel, value); }
         public List<Credential> Credentials { get => credentials; set => SetProperty(ref credentials, value); }
         public bool FormatPatientsFile { get => formatPatientsFile; set => SetProperty(ref formatPatientsFile, value); }
-        public List<PatientsFile.ColumnAttribute> ColumnAttributes { get => columnAttributes; set => SetProperty(ref columnAttributes, value); }
+        public List<ColumnAttribute> ColumnAttributes { get => columnAttributes; set => SetProperty(ref columnAttributes, value); }
         [XmlIgnoreAttribute] public bool TestPassed { get; set; }
         #endregion
 

@@ -15,7 +15,8 @@ namespace PatientsFomsRepository.ViewModels
         #endregion
 
         #region Properties
-        public string ViewModelHeader { get; set; }
+        public string ShortCaption { get; set; }
+        public string FullCaption { get; set; }
         public Settings CurrentSettings { get => currentSettings; set => SetProperty(ref currentSettings, value); }
         public RelayCommand SaveCommand { get; }
         public RelayCommand CancelCommand { get; }
@@ -25,7 +26,8 @@ namespace PatientsFomsRepository.ViewModels
         #region Creators
         public SRZSettingsViewModel()
         {
-            ViewModelHeader = "Настройки подключения к web-сайту СРЗ ХК ФОМС";
+            ShortCaption = "Настройки подключения к СРЗ";
+            FullCaption = "Настройки подключения к web-сайту СРЗ ХК ФОМС";
             SaveCommand = new RelayCommand(ExecuteSave);
             CancelCommand = new RelayCommand(ExecuteCancel, CanExecuteCancel);
             SetDefaultCommand = new RelayCommand(ExecuteSetDefault);

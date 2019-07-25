@@ -18,11 +18,16 @@ namespace PatientsFomsRepository.Models
     /// </summary>
     public class SRZ : IDisposable
         {
-        public bool Authorized { get; private set; }
-
+        #region Fields
         private HttpClient client;
         private Credential credential;
+        #endregion
 
+        #region Properties
+        public bool Authorized { get; private set; }
+        #endregion
+
+        #region Creators
         public SRZ(string URL, string proxyAddress = null, int proxyPort = 0)
             {
             Authorized = false;
@@ -36,89 +41,9 @@ namespace PatientsFomsRepository.Models
             client = new HttpClient(clientHandler);
             client.BaseAddress = new Uri(URL);
             }
+        #endregion
 
-        //авторизация на сайте
-        public bool TryAuthorize(Credential credential)
-            {
-            this.credential = credential;
-            var content = new FormUrlEncodedContent(new[]
-                {
-                new KeyValuePair<string, string>("lg", credential.Login),
-                new KeyValuePair<string, string>("pw", credential.Password),
-                });
-            try
-                {
-                var response = client.PostAsync("data/user.ajax.logon.php", content).Result;
-                response.EnsureSuccessStatusCode();
-                var responseText = response.Content.ReadAsStringAsync().Result;
-
-                if (responseText == "")
-                    {
-                    Authorized = true;
-                    return Authorized;
-                    }
-                else
-                    throw new Exception();
-                }
-            catch (Exception)
-                {
-                Authorized = false;
-                return Authorized;
-                }
-            }
-
-        //выход с сайта
-        public void Logout()
-            {
-            Authorized = false;
-            var response = client.GetAsync("?show=logoff").Result;
-            response.EnsureSuccessStatusCode();
-            }
-
-        //запрашивает данные пациента
-        public bool TryGetPatient(string insuranceNumber, out Patient patient)
-            {
-            var content = new FormUrlEncodedContent(new[]
-                {
-                new KeyValuePair<string, string>("mode", "1"),
-                new KeyValuePair<string, string>("person_enp", insuranceNumber),
-                });
-
-            try
-                {
-                var response = client.PostAsync("data/reg.person.polis.search.php", content).Result;
-                response.EnsureSuccessStatusCode();
-                var responseText = response.Content.ReadAsStringAsync().Result;
-                var responseLines = responseText.Split(new string[] { "||" }, 7, StringSplitOptions.None);
-
-                if (responseLines[0] != "0")
-                    {
-                    patient = new Patient(responseLines[2], responseLines[3], responseLines[4], responseLines[5]);
-                    return true;
-                    }
-                else
-                    throw new Exception();
-                }
-            catch (Exception)
-                {
-                patient = null;
-                return false;
-                }
-            }
-
-        //получает excel файл прикрепленных пациентов на дату
-        public async Task GetPatientsFile(string excelFile, DateTime onDate)
-            {
-            var fileReference = await GetFileReference(onDate);
-            var dbfFile = await GetDbfFile(fileReference);
-            DbfToExcel(dbfFile, excelFile);
-            }
-
-        public void Dispose()
-            {
-            client.Dispose();
-            }
-
+        #region Methods
         //получает ссылку на файл заданной даты
         private async Task<string> GetFileReference(DateTime fileDate)
             {
@@ -137,7 +62,6 @@ namespace PatientsFomsRepository.Models
 
             return responseText.Substring(begin, end);
             }
-
         //получает dbf файл прикрепленных пацентов
         private async Task<Stream> GetDbfFile(string downloadReference)
             {
@@ -154,7 +78,6 @@ namespace PatientsFomsRepository.Models
 
             return dbfFile;
             }
-
         //преобразует dbf в excel
         private void DbfToExcel(Stream dbfFile, string excelFilePath)
             {
@@ -187,7 +110,83 @@ namespace PatientsFomsRepository.Models
                 excel.SaveAs(new FileInfo(excelFilePath));
                 }
             }
+        //авторизация на сайте
+        public bool TryAuthorize(Credential credential)
+            {
+            this.credential = credential;
+            var content = new FormUrlEncodedContent(new[]
+                {
+                new KeyValuePair<string, string>("lg", credential.Login),
+                new KeyValuePair<string, string>("pw", credential.Password),
+                });
+            try
+                {
+                var response = client.PostAsync("data/user.ajax.logon.php", content).Result;
+                response.EnsureSuccessStatusCode();
+                var responseText = response.Content.ReadAsStringAsync().Result;
 
+                if (responseText == "")
+                    {
+                    Authorized = true;
+                    return Authorized;
+                    }
+                else
+                    throw new Exception();
+                }
+            catch (Exception)
+                {
+                Authorized = false;
+                return Authorized;
+                }
+            }
+        //выход с сайта
+        public void Logout()
+            {
+            Authorized = false;
+            var response = client.GetAsync("?show=logoff").Result;
+            response.EnsureSuccessStatusCode();
+            }
+        //запрашивает данные пациента
+        public bool TryGetPatient(string insuranceNumber, out Patient patient)
+            {
+            var content = new FormUrlEncodedContent(new[]
+                {
+                new KeyValuePair<string, string>("mode", "1"),
+                new KeyValuePair<string, string>("person_enp", insuranceNumber),
+                });
+
+            try
+                {
+                var response = client.PostAsync("data/reg.person.polis.search.php", content).Result;
+                response.EnsureSuccessStatusCode();
+                var responseText = response.Content.ReadAsStringAsync().Result;
+                var responseLines = responseText.Split(new string[] { "||" }, 7, StringSplitOptions.None);
+
+                if (responseLines[0] != "0")
+                    {
+                    patient = new Patient(responseLines[2], responseLines[3], responseLines[4], responseLines[5]);
+                    return true;
+                    }
+                else
+                    throw new Exception();
+                }
+            catch (Exception)
+                {
+                patient = null;
+                return false;
+                }
+            }
+        //получает excel файл прикрепленных пациентов на дату
+        public async Task GetPatientsFile(string excelFile, DateTime onDate)
+            {
+            var fileReference = await GetFileReference(onDate);
+            var dbfFile = await GetDbfFile(fileReference);
+            DbfToExcel(dbfFile, excelFile);
+            }
+        public void Dispose()
+            {
+            client.Dispose();
+            }
         //запускает многопоточно запросы к сайту для поиска пациентов
         public static Patient[] GetPatients(string URL, string proxyAddress, int proxyPort, string[] insuranceNumbers, List<Credential> credentials, int threadsLimit)
             {
@@ -236,10 +235,8 @@ namespace PatientsFomsRepository.Models
 
             return verifiedPatients.ToArray();
             }
-
+        #endregion
         }
-
-
     }
 
 
