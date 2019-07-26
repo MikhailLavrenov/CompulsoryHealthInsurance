@@ -82,8 +82,8 @@
     <Compile Include="Infrastructure\IViewModel.cs" />
     <Compile Include="Infrastructure\RelayCommand.cs" />
     <Compile Include="Infrastructure\BindableBase.cs" />
-    <Compile Include="Models\ColumnAttribute.cs" />
-    <Compile Include="Models\RoundRobinCredentials.cs" />
+    <Compile Include="Models\PatientsFile\ColumnAttribute.cs" />
+    <Compile Include="Models\PatientsFile\RoundRobinCredentials.cs" />
     <Compile Include="Models\Settings.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Compile Include="ViewModels\SRZSettingsViewModel.cs" />
@@ -126,8 +126,8 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Models\PatientsFile.cs" />
-    <Compile Include="Models\Credential.cs" />
+    <Compile Include="Models\PatientsFile\PatientsFile.cs" />
+    <Compile Include="Models\PatientsFile\Credential.cs" />
     <Compile Include="Models\Patient.cs" />
     <Compile Include="Models\Database.cs" />
     <Compile Include="Models\SRZ.cs" />

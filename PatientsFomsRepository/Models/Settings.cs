@@ -23,14 +23,14 @@ namespace PatientsFomsRepository.Models
         public string SiteAddress { get => siteAddress; set => SetProperty(ref siteAddress, value); }
         public bool UseProxy { get => useProxy; set => SetProperty(ref useProxy, value); }
         public string ProxyAddress { get => proxyAddress; set => SetProperty(ref proxyAddress, value); }
-        public int ProxyPort { get => proxyPort; set => SetProperty(ref proxyPort, value); }
-        public string PatientsFileFullPath { get => patientsFileFullPath; set => SetProperty(ref patientsFileFullPath, value); }
+        public int ProxyPort { get => proxyPort; set => SetProperty(ref proxyPort, value); }        
         public int ThreadsLimit { get => threadsLimit; set => SetProperty(ref threadsLimit, value); }
         public int EncryptLevel { get => encryptLevel; set => SetProperty(ref encryptLevel, value); }
         public ObservableCollection<Credential> Credentials { get; set; }
-        public bool FormatPatientsFile { get => formatPatientsFile; set => SetProperty(ref formatPatientsFile, value); }
-        public ObservableCollection<ColumnAttribute> ColumnAttributes { get; set; }
         [XmlIgnoreAttribute] public bool TestPassed { get; set; }
+        public string PatientsFileFullPath { get => patientsFileFullPath; set => SetProperty(ref patientsFileFullPath, value); }
+        public bool FormatPatientsFile { get => formatPatientsFile; set => SetProperty(ref formatPatientsFile, value); }
+        public ObservableCollection<ColumnAttribute> ColumnAttributes { get; set; }        
         #endregion
 
         #region Methods

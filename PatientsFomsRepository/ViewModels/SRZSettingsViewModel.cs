@@ -21,7 +21,7 @@ namespace PatientsFomsRepository.ViewModels
         public Settings CurrentSettings { get => currentSettings; set => SetProperty(ref currentSettings, value); }
         public RelayCommand SaveCommand { get; }
         public RelayCommand LoadCommand { get; }
-        public RelayCommand DefaultCommand { get; }
+        public RelayCommand ByDefaultCommand { get; }
         public RelayCommand TestCommand { get; }
         #endregion
 
@@ -32,7 +32,7 @@ namespace PatientsFomsRepository.ViewModels
             FullCaption = "Настройки подключения к web-сайту СРЗ ХК ФОМС";
             SaveCommand = new RelayCommand(ExecuteSave);
             LoadCommand = new RelayCommand(ExecuteLoad);
-            DefaultCommand = new RelayCommand(ExecuteDefault);
+            ByDefaultCommand = new RelayCommand(ExecuteByDefault);
             TestCommand = new RelayCommand(ExecuteTest);
             CurrentSettings = Settings.Load();
         }
@@ -47,7 +47,7 @@ namespace PatientsFomsRepository.ViewModels
         {
             CurrentSettings = Settings.Load();
         }
-        public void ExecuteDefault(object parameter)
+        public void ExecuteByDefault(object parameter)
         {
             CurrentSettings.SiteAddress = @"http://11.0.0.1/";
             CurrentSettings.UseProxy = false;
