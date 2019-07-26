@@ -12,9 +12,9 @@
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary  Source="/PatientsFomsRepository;component/Views/Styles/DefaultStyle.xaml" />
-                <ResourceDictionary>
-                    <DataTemplate  DataType="{x:Type vm:SRZSettingsViewModel}">
+                <ResourceDictionary  Source="/PatientsFomsRepository;component/Views/Resources/DefaultStyle.xaml" />
+                <ResourceDictionary >
+                    <DataTemplate DataType="{x:Type vm:SRZSettingsViewModel}">
                         <v:SRZSettingsView />
                     </DataTemplate>
                 </ResourceDictionary>

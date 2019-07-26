@@ -7,18 +7,21 @@ namespace PatientsFomsRepository.Models
     {
     public class Settings : BindableBase
         {
-        #region Fields
+        #region Поля
         private string siteAddress;
         private bool useProxy;
         private string proxyAddress;
-        private int proxyPort;
-        private string patientsFileFullPath;
+        private int proxyPort;        
         private int threadsLimit;
         private int encryptLevel;
-        private bool formatPatientsFile;
+        private ObservableCollection<Credential> credentials;
+        private bool testPassed;
+        private string patientsFileFullPath;
+        private bool formatPatientsFile;        
+        private ObservableCollection<ColumnProperties> columnProperties;
         #endregion
 
-        #region Properties        
+        #region Свойства        
         public static string ThisFileName { get; } = "Settings.xml";
         public string SiteAddress { get => siteAddress; set => SetProperty(ref siteAddress, value); }
         public bool UseProxy { get => useProxy; set => SetProperty(ref useProxy, value); }
@@ -26,14 +29,22 @@ namespace PatientsFomsRepository.Models
         public int ProxyPort { get => proxyPort; set => SetProperty(ref proxyPort, value); }        
         public int ThreadsLimit { get => threadsLimit; set => SetProperty(ref threadsLimit, value); }
         public int EncryptLevel { get => encryptLevel; set => SetProperty(ref encryptLevel, value); }
-        public ObservableCollection<Credential> Credentials { get; set; }
-        [XmlIgnoreAttribute] public bool TestPassed { get; set; }
+        public ObservableCollection<Credential> Credentials { get => credentials; set => SetProperty(ref credentials, value); }
+        [XmlIgnoreAttribute] public bool TestPassed { get => testPassed; set => SetProperty(ref testPassed, value); }
         public string PatientsFileFullPath { get => patientsFileFullPath; set => SetProperty(ref patientsFileFullPath, value); }
         public bool FormatPatientsFile { get => formatPatientsFile; set => SetProperty(ref formatPatientsFile, value); }
-        public ObservableCollection<ColumnAttribute> ColumnAttributes { get; set; }        
+        public ObservableCollection<ColumnProperties> ColumnProperties { get => columnProperties; set => SetProperty(ref columnProperties, value); }
         #endregion
 
-        #region Methods
+        #region Конструкторы
+        public Settings()
+        {
+            Credentials = new ObservableCollection<Credential>();
+            ColumnProperties = new ObservableCollection<ColumnProperties>();
+        }
+        #endregion
+
+        #region Методы
         //сохраняет настройки в xml
         public void Save()
             {

@@ -12,7 +12,7 @@ namespace PatientsFomsRepository.Models
     /// Аттрибуты столбца файла пациентов
     /// </summary>
     [Serializable]
-    public class ColumnAttribute : BindableBase
+    public class ColumnProperties : BindableBase
         {
         #region Fields
         private string name;

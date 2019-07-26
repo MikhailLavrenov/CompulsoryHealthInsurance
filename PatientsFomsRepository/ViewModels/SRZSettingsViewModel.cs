@@ -7,7 +7,7 @@ using System.IO;
 
 namespace PatientsFomsRepository.ViewModels
 {
-    public class SRZSettingsViewModel:BindableBase, IViewModel
+    public class SRZSettingsViewModel : BindableBase, IViewModel
     {
         //https://rachel53461.wordpress.com/2011/12/18/navigation-with-mvvm-2/
 

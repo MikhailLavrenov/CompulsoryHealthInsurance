@@ -19,7 +19,7 @@ namespace FomsPatientsDB.Models
         private static readonly object locker = new object();
         private ExcelPackage excel;
         private ExcelWorksheet sheet;
-        private ColumnAttribute[] columnsAttributes;
+        private ColumnProperties[] columnsAttributes;
         private int maxRow;
         private int maxCol;
         private int headerIndex = 1;
@@ -42,13 +42,13 @@ namespace FomsPatientsDB.Models
             return altName;
         }
         //возвращает атрибуты столбца по имени, если такого нет - возвращает новый экземпляр с таким именем
-        private ColumnAttribute GetColumnAttribute(string name)
+        private ColumnProperties GetColumnAttribute(string name)
         {
             foreach (var attribute in columnsAttributes)
                 if ((attribute.Name == name) || (attribute.AltName == name))
                     return attribute;
 
-            return new ColumnAttribute { Name = name, AltName = name, Hide = false, Delete = false };
+            return new ColumnProperties { Name = name, AltName = name, Hide = false, Delete = false };
         }
         //проверяет структуру файла, при необходимости добавляет столбцы Фамилия, Имя, Отчество
         private void CheckStructure()
@@ -96,7 +96,7 @@ namespace FomsPatientsDB.Models
             return -1;
         }
         //ищет номер столбца по заголовку или его алтернативному названию, если столбец не найден возвращает -1
-        private int GetColumnIndex(ColumnAttribute column)
+        private int GetColumnIndex(ColumnProperties column)
         {
             for (int col = 1; col <= maxCol; col++)
             {
@@ -112,13 +112,13 @@ namespace FomsPatientsDB.Models
             return -1;
         }
         //открывает файл
-        public async Task Open(string filePath, ColumnAttribute[] columnsAttributes = null)
+        public async Task Open(string filePath, ColumnProperties[] columnsAttributes = null)
         {
             await Task.Run(() =>
                 {
                     excel = new ExcelPackage(new FileInfo(filePath));
                     sheet = excel.Workbook.Worksheets[1];
-                    this.columnsAttributes = columnsAttributes ?? new ColumnAttribute[0];
+                    this.columnsAttributes = columnsAttributes ?? new ColumnProperties[0];
                     maxRow = sheet.Dimension.Rows;
                     maxCol = sheet.Dimension.Columns;
                     insuranceColumn = GetColumnIndex("ENP");
@@ -201,7 +201,7 @@ namespace FomsPatientsDB.Models
             await Task.Run(() =>
             {
                 string name;
-                ColumnAttribute synonim;
+                ColumnProperties synonim;
 
                 for (int i = 1; i <= maxCol; i++)
                 {
