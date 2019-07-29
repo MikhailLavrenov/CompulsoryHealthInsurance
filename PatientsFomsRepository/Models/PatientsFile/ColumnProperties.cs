@@ -15,6 +15,7 @@ namespace PatientsFomsRepository.Models
     public class ColumnProperties : BindableBase
         {
         #region Fields
+        private int order;
         private string name;
         private string altName;
         private bool hide;
@@ -22,6 +23,7 @@ namespace PatientsFomsRepository.Models
         #endregion
 
         #region Properties
+        public int Order { get => order; set => SetProperty(ref order, value); }
         public string Name { get => name; set => SetProperty(ref name, value); }
         public string AltName { get => altName; set => SetProperty(ref altName, value); }
         public bool Hide { get => hide; set => SetProperty(ref hide, value); }

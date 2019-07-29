@@ -79,11 +79,15 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Infrastructure\BoolToVisibleConverterExtension.cs" />
+    <Compile Include="Infrastructure\EnumHelper.cs" />
+    <Compile Include="Infrastructure\EnumToCollectionConverterExtension.cs" />
     <Compile Include="Infrastructure\IViewModel.cs" />
     <Compile Include="Infrastructure\RelayCommand.cs" />
     <Compile Include="Infrastructure\BindableBase.cs" />
     <Compile Include="Models\PatientsFile\ColumnProperties.cs" />
-    <Compile Include="Models\PatientsFile\RoundRobinCredentials.cs" />
+    <Compile Include="Models\SRZ\CredentialScope.cs" />
+    <Compile Include="Models\SRZ\RoundRobinCredentials.cs" />
     <Compile Include="Models\Settings.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Compile Include="ViewModels\SRZSettingsViewModel.cs" />
@@ -116,10 +120,6 @@
       <DependentUpon>MainWindowView.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="Views\Resources\Converters.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Views\SRZSettingsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -131,10 +131,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Models\PatientsFile\PatientsFile.cs" />
-    <Compile Include="Models\PatientsFile\Credential.cs" />
+    <Compile Include="Models\SRZ\Credential.cs" />
     <Compile Include="Models\Patient.cs" />
     <Compile Include="Models\Database.cs" />
-    <Compile Include="Models\SRZ.cs" />
+    <Compile Include="Models\SRZ\SRZ.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

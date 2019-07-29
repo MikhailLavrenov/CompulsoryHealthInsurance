@@ -10,6 +10,7 @@
     <Style TargetType="Button" BasedOn="{StaticResource ControlBaseStyle}">
         <Setter Property="MinHeight" Value="25"/>
         <Setter Property="MinWidth" Value="100"/>
+        
     </Style>
 
     <Style TargetType="CheckBox" BasedOn="{StaticResource ControlBaseStyle}">
@@ -36,7 +37,7 @@
     <Style TargetType="DatePicker" BasedOn="{StaticResource ControlBaseStyle}">
         <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Style.Resources>
-            <!-- Стиль button применяется к кнопке календаря и элемент некрасиво расползается поэтому сбрасываем стиль button -->
+            <!-- Cбрасываем стиль button Стиль button применяется к кнопке календаря и элемент некрасиво расползается поэтому  -->
             <Style TargetType="{x:Type Button}">
                 <Setter Property="MinHeight" Value="19" />
                 <Setter Property="MinWidth" Value="0" />
@@ -45,6 +46,8 @@
     </Style>
 
     <Style TargetType="ComboBox" BasedOn="{StaticResource ControlBaseStyle}">
+        <Setter Property="MinHeight" Value="25"/>
+        <Setter Property="HorizontalAlignment" Value="Stretch"/>
     </Style>
 
 </ResourceDictionary>

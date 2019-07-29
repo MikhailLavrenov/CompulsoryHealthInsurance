@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:PatientsFomsRepository.Views"
-             xmlns:vm="clr-namespace:PatientsFomsRepository.ViewModels"
+             xmlns:i="clr-namespace:PatientsFomsRepository.Infrastructure"
              mc:Ignorable="d" 
              d:DesignHeight="500" d:DesignWidth="800" >
 
@@ -12,7 +12,6 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary  Source="/PatientsFomsRepository;component/Views/Resources/DefaultStyle.xaml" />
-                <ResourceDictionary  Source="/PatientsFomsRepository;component/Views/Resources/Converters.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
@@ -34,16 +33,18 @@
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0" Grid.Column="0" Text="Адрес сайта СРЗ"/>
-        <TextBox   Grid.Row="0" Grid.Column="1" Text="{Binding CurrentSettings.SiteAddress}"/>
+        <TextBlock Grid.Row="1" Grid.Column="0" Text="Адрес сайта СРЗ"/>
+        <TextBox   Grid.Row="1" Grid.Column="1" Text="{Binding CurrentSettings.SiteAddress}"/>
         
-        <TextBlock Grid.Row="1" Grid.Column="0" Text="Использовать прокси-сервер"/>
-        <CheckBox  Grid.Row="1" Grid.Column="1" Name="CheckBoxUseProxy" IsChecked="{Binding CurrentSettings.UseProxy}"/>
+        <TextBlock Grid.Row="2" Grid.Column="0" Text="Использовать прокси-сервер"/>
+        <CheckBox  Grid.Row="2" Grid.Column="1" Name="CheckBoxUseProxy" IsChecked="{Binding CurrentSettings.UseProxy}"/>
         
-        <TextBlock Grid.Row="2" Grid.Column="0" Name="TextBlockProxy" Text="Прокси-сервер адрес:порт" Visibility="{Binding Path=IsChecked,ElementName=CheckBoxUseProxy, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-        <Grid      Grid.Row="2" Grid.Column="1" Visibility="{Binding Path=Visibility,ElementName=TextBlockProxy}" >
+        <TextBlock Grid.Row="3" Grid.Column="0" Name="TextBlockProxy" Text="Прокси-сервер адрес:порт" 
+                   Visibility="{Binding Path=IsChecked, ElementName=CheckBoxUseProxy, Converter={i:BoolToVisibleConverter}}"/>
+        <Grid      Grid.Row="3" Grid.Column="1" Visibility="{Binding Path=Visibility,ElementName=TextBlockProxy}" >
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="3*"/>
                 <ColumnDefinition Width="1*"/>
@@ -52,14 +53,15 @@
             <TextBox Grid.Column="1" Text="{Binding CurrentSettings.ProxyPort}"/>
         </Grid>
         
-        <TextBlock Grid.Row="3" Grid.Column="0" Text="Количество потоков"/>
-        <TextBox   Grid.Row="3" Grid.Column="1" Text="{Binding CurrentSettings.ThreadsLimit}"/>
+        <TextBlock Grid.Row="4" Grid.Column="0" Text="Количество потоков"/>
+        <TextBox   Grid.Row="4" Grid.Column="1" Text="{Binding CurrentSettings.ThreadsLimit}"/>
         
-        <TextBlock Grid.Row="4" Grid.Column="0" Text="Доступ к учетным записям"/>
-        <ComboBox  Grid.Row="4" Grid.Column="1"/>
+        <TextBlock Grid.Row="5" Grid.Column="0" Text="Доступ к учетным записям"/>
+        <ComboBox  Grid.Row="5" Grid.Column="1" ItemsSource="{Binding Path=CurrentSettings.CredentialsScope, Converter={i:EnumToCollectionConverter}, Mode=OneTime}"
+          SelectedValuePath="Key" DisplayMemberPath="Value" SelectedValue="{Binding Path=CurrentSettings.CredentialsScope}" />
         
-        <TextBlock Grid.Row="5" Grid.Column="0" Text="Учетные записи"/>
-        <DataGrid  Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" Height="200" HorizontalAlignment="Stretch" 
+        <TextBlock Grid.Row="6" Grid.Column="0" Text="Учетные записи"/>
+        <DataGrid  Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" Height="200" HorizontalAlignment="Stretch" 
                    CanUserAddRows="True" AutoGenerateColumns="False" ItemsSource="{Binding CurrentSettings.Credentials}" VerticalScrollBarVisibility="Visible" >
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Логин"  Binding="{Binding Login}" Width="3*" MinWidth="100" />
@@ -79,13 +81,13 @@
                 <DataGridTextColumn Header="Лимит запросов" Binding="{Binding RequestsLimit}" Width="*" MinWidth="100"  />
             </DataGrid.Columns>
         </DataGrid>
-        
-        <StackPanel Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal">
+
+        <StackPanel Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal">
             <Button Content="Тестировать" Command="{Binding TestCommand}"/>
             <Button Content="Сохранить" Command="{Binding SaveCommand}"/>
             <Button Content="Отмена" Command="{Binding LoadCommand}"/>
             <Button Content="По умолчанию" Command="{Binding ByDefaultCommand}" />
         </StackPanel>
-        
+
     </Grid>
 </UserControl>

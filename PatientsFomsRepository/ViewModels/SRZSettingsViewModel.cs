@@ -49,18 +49,7 @@ namespace PatientsFomsRepository.ViewModels
         }
         public void ExecuteByDefault(object parameter)
         {
-            CurrentSettings.SiteAddress = @"http://11.0.0.1/";
-            CurrentSettings.UseProxy = false;
-            CurrentSettings.ProxyAddress = "";
-            CurrentSettings.ProxyPort = 0;
-            CurrentSettings.ThreadsLimit = 20;
-            CurrentSettings.EncryptLevel = 0;            
-            CurrentSettings.Credentials = new ObservableCollection<Credential>()
-             {
-                    new Models.Credential{Login="МойЛогин1", Password="МойПароль1", RequestsLimit=400},
-                    new Models.Credential{Login="МойЛогин2", Password="МойПароль2", RequestsLimit=300},
-                    new Models.Credential{Login="МойЛогин3", Password="МойПароль3", RequestsLimit=500}
-             };
+            currentSettings.SRZSetDefault();
         }
         public void ExecuteTest(object parameter)
         {
