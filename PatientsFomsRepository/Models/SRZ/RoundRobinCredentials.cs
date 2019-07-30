@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace PatientsFomsRepository.Models
     {
+    /// <summary>
+    /// возвращает учетные данные по кругу пока лимит запросов не исчерпан
+    /// </summary>
     public class RoundRobinCredentials
         {
         #region Fields

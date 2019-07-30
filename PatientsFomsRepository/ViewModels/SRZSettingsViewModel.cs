@@ -53,6 +53,7 @@ namespace PatientsFomsRepository.ViewModels
         }
         public void ExecuteTest(object parameter)
         {
+            currentSettings.TestConnection();
         }
 
         #endregion

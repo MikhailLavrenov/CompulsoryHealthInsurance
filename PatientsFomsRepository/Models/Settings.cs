@@ -1,6 +1,11 @@
 ﻿using PatientsFomsRepository.Infrastructure;
+using System;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
+using System.Net;
+using System.Net.Sockets;
+using System.Threading.Tasks;
 using System.Xml.Serialization;
 
 namespace PatientsFomsRepository.Models
@@ -11,29 +16,40 @@ namespace PatientsFomsRepository.Models
         private string siteAddress;
         private bool useProxy;
         private string proxyAddress;
-        private int proxyPort;
-        private int threadsLimit;
+        private ushort proxyPort;
+        private byte threadsLimit;
         private СredentialScope credentialsScope;
         private ObservableCollection<Credential> credentials;
-        private bool testPassed;
+
         private string patientsFileFullPath;
         private bool formatPatientsFile;
         private ObservableCollection<ColumnProperties> columnProperties;
+
+        private bool siteAddressIsNotValid;
+        private bool proxyIsNotValid;
+        private bool credentialsIsNotValid;
+        private bool connectionIsValid;
         #endregion
 
         #region Свойства        
         public static string ThisFileName { get; } = "Settings.xml";
+
         public string SiteAddress { get => siteAddress; set => SetProperty(ref siteAddress, value); }
         public bool UseProxy { get => useProxy; set => SetProperty(ref useProxy, value); }
         public string ProxyAddress { get => proxyAddress; set => SetProperty(ref proxyAddress, value); }
-        public int ProxyPort { get => proxyPort; set => SetProperty(ref proxyPort, value); }
-        public int ThreadsLimit { get => threadsLimit; set => SetProperty(ref threadsLimit, value); }
+        public ushort ProxyPort { get => proxyPort; set => SetProperty(ref proxyPort, value); }
+        public byte ThreadsLimit { get => threadsLimit; set => SetProperty(ref threadsLimit, value); }
         public СredentialScope CredentialsScope { get => credentialsScope; set => SetProperty(ref credentialsScope, value); }
         public ObservableCollection<Credential> Credentials { get => credentials; set => SetProperty(ref credentials, value); }
-        [XmlIgnoreAttribute] public bool TestPassed { get => testPassed; set => SetProperty(ref testPassed, value); }
+
         public string PatientsFileFullPath { get => patientsFileFullPath; set => SetProperty(ref patientsFileFullPath, value); }
         public bool FormatPatientsFile { get => formatPatientsFile; set => SetProperty(ref formatPatientsFile, value); }
         public ObservableCollection<ColumnProperties> ColumnProperties { get => columnProperties; set => SetProperty(ref columnProperties, value); }
+
+        [XmlIgnore] public bool SiteAddressIsNotValid { get => siteAddressIsNotValid; set => SetProperty(ref siteAddressIsNotValid, value); }
+        [XmlIgnore] public bool ProxyIsNotValid { get => proxyIsNotValid; set => SetProperty(ref proxyIsNotValid, value); }
+        [XmlIgnore] public bool CredentialsIsNotValid { get => credentialsIsNotValid; set => SetProperty(ref credentialsIsNotValid, value); }
+        [XmlIgnore] public bool ConnectionIsValid { get => connectionIsValid; set => SetProperty(ref connectionIsValid, value); }
         #endregion
 
         #region Конструкторы
@@ -45,10 +61,72 @@ namespace PatientsFomsRepository.Models
         #endregion
 
         #region Методы
+        //проверяет настройки прокси-сервера
+        private void TestProxy()
+        {
+            if (UseProxy)
+            {
+                var client = new TcpClient();
+                var connected = client.ConnectAsync(ProxyAddress, ProxyPort).Wait(10000);
+                ProxyIsNotValid = !connected;
+                client.Close();
+            }
+            else
+                ProxyIsNotValid = false;
+        }
+        //проверяет доступность сайта
+        private void TestSite()
+        {
+            if (ProxyIsNotValid==false)
+            {
+                try
+                {
+                    var webRequest = (HttpWebRequest)WebRequest.Create(SiteAddress);
+                    webRequest.Timeout = 10000;
+                    if (useProxy)
+                        webRequest.Proxy = new WebProxy(ProxyAddress + ":" + ProxyPort);
+
+                    webRequest.GetResponse();
+                    webRequest.Abort();
+                }
+                catch (Exception)
+                {
+                    SiteAddressIsNotValid = true;
+                    return;
+                }
+            }
+
+            SiteAddressIsNotValid = false;
+        }
+        //проверяет учетные данные
+        private void TestCredentials()
+        {
+            if (SiteAddressIsNotValid==false)
+            {
+                Parallel.ForEach(Credentials, credential =>
+                {
+                    using (SRZ site = new SRZ(SiteAddress, ProxyAddress, ProxyPort))
+                    {
+                        credential.IsNotValid = site.TryAuthorize(credential);
+                    }
+                });
+                CredentialsIsNotValid = Credentials.FirstOrDefault(x => x.IsNotValid == true) != null;
+            }
+            else
+                CredentialsIsNotValid = false;
+        }
+        //проверить настройки
+        public void TestConnection()
+        {
+            TestProxy();
+            TestSite();
+            TestCredentials();
+            ConnectionIsValid =  SiteAddressIsNotValid && ProxyIsNotValid && CredentialsIsNotValid && false;
+        }
         //сохраняет настройки в xml
         public void Save()
         {
-            TestPassed = false;
+            ConnectionIsValid = false;
             using (var stream = new FileStream(ThisFileName, FileMode.Create))
             {
                 var formatter = new XmlSerializer(GetType());
