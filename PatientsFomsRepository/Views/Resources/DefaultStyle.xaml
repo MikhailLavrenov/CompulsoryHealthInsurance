@@ -21,6 +21,9 @@
         <Setter Property="HorizontalAlignment" Value="Stretch"/>
         <Setter Property="VerticalAlignment" Value="Stretch"/>
         <Setter Property="AutoGenerateColumns" Value="False"/>
+        <Setter Property="CanUserSortColumns" Value="False"/>
+        <Setter Property="CanUserReorderColumns" Value="False"/>
+        <Setter Property="CanUserResizeRows" Value="False"/>
     </Style>
 
     <Style TargetType="TextBlock" BasedOn="{StaticResource ControlBaseStyle}">

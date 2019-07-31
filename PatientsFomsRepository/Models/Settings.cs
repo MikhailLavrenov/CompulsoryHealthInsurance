@@ -213,26 +213,18 @@ namespace PatientsFomsRepository.Models
              };
             }
         //сдвигает вверх элемент коллекции ColumnsProperty
-        public void MoveUp(ColumnProperty item)
+        public void MoveColumnPropertyUp(ColumnProperty item)
             {
             var itemIndex = ColumnsProperty.IndexOf(item);
             if (itemIndex > 0)
-                {
-                var previousItem = ColumnsProperty[itemIndex - 1];
-                ColumnsProperty[itemIndex - 1] = item;
-                ColumnsProperty[itemIndex] = previousItem;
-                }
+                ColumnsProperty.Move(itemIndex,itemIndex - 1 );
             }
         //сдвигает вниз элемент коллекции ColumnsProperty
-        public void MoveDown(ColumnProperty item)
+        public void MoveColumnPropertyDown(ColumnProperty item)
             {
             var itemIndex = ColumnsProperty.IndexOf(item);
-            if (itemIndex != -1 && itemIndex < ColumnsProperty.Count - 1)
-                {
-                var nextItem = ColumnsProperty[itemIndex + 1];
-                ColumnsProperty[itemIndex + 1] = item;
-                ColumnsProperty[itemIndex] = nextItem;
-                }
+            if (itemIndex >=0 && itemIndex < ColumnsProperty.Count - 1)
+                ColumnsProperty.Move(itemIndex,itemIndex + 1);
             }
         #endregion
         }
