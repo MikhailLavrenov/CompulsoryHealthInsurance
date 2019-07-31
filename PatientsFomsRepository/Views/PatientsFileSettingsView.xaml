@@ -25,37 +25,61 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
-            <RowDefinition />
+            <RowDefinition Height="auto"/>
+            <RowDefinition>
+            <RowDefinition.Style>
+                <Style TargetType="{x:Type RowDefinition}">
+                    <Setter Property="Height" Value="*"/>
+                    <Style.Triggers>
+                            <DataTrigger Binding="{Binding ElementName=CheckBoxFormat, Path=IsChecked}" Value="false">
+                            <Setter Property="Height" Value="0"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </RowDefinition.Style>
+            </RowDefinition>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
+            
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0" Grid.Column="0" Text="Путь к файлу"/>
-        <DockPanel  Grid.Row="0" Grid.Column="1" >
-            <Button  DockPanel.Dock="Right" Content="Выбрать"/>
-            <TextBox  Text="{Binding Path=Settings.PatientsFilePath}" />
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="Скачать новый файл"/>
+        <CheckBox  Grid.Row="0" Grid.Column="1" Name="CheckBoxDowloadNewFile" IsChecked="{Binding Path=Settings.DownloadNewPatientsFile}"/>
+
+        <TextBlock Grid.Row="1" Grid.Column="0" Text="Путь к файлу"/>
+        <DockPanel Grid.Row="1" Grid.Column="1" >
+            <Button  DockPanel.Dock="Right" Content="Выбрать" Click="Button_Click"/>
+            <TextBox  Text="{Binding Path=Settings.PatientsFilePath}" Name="TextBoxFilePath" />
         </DockPanel>
 
-        <TextBlock Grid.Row="1" Grid.Column="0" Text="Применить форматирование"/>
-        <CheckBox  Grid.Row="1" Grid.Column="1" Name="CheckBoxFormat" IsChecked="True"/>
-                   
-        <DataGrid  Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" MinHeight="300" MinWidth="500" Name="Datagrid1"
-                   Visibility="{Binding Path=IsChecked, ElementName=CheckBoxFormat, Converter={i:BoolToVisibleConverter}}"
-                   ItemsSource="{Binding Settings.ColumnsProperty}">
+        <TextBlock Grid.Row="2" Grid.Column="0" Text="Применить форматирование"/>
+        <CheckBox  Grid.Row="2" Grid.Column="1" Name="CheckBoxFormat" IsChecked="{Binding Path=Settings.FormatPatientsFile}"/>
+
+        <StackPanel Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal"
+                    Visibility="{Binding Path=IsChecked, ElementName=CheckBoxFormat, Converter={i:BoolToVisibleConverter}}">
+        <DataGrid   MinHeight="300" MinWidth="450" Name="Datagrid1" ItemsSource="{Binding Settings.ColumnsProperty}" SelectionMode="Single">
                 <DataGrid.Columns>
-                <DataGridTextColumn     Header="Название столбца" Binding="{Binding Path=Name}"     Width="2*" MinWidth="150"/>
-                <DataGridTextColumn     Header="Понятное название" Binding="{Binding Path=AltName}" Width="2*" MinWidth="150"/>
-                <DataGridCheckBoxColumn Header="Скрыть" Binding="{Binding Path=Hide}"               Width="*"  MinWidth="70"/>
-                <DataGridCheckBoxColumn Header="Удалить" Binding="{Binding Path=Delete}"            Width="*"  MinWidth="70"/>
-            </DataGrid.Columns>
-        </DataGrid>
+                    <DataGridTextColumn     Header="Название столбца" Binding="{Binding Path=Name}"      MinWidth="120"/>
+                    <DataGridTextColumn     Header="Понятное название" Binding="{Binding Path=AltName}"  MinWidth="150"/>
+                    <DataGridCheckBoxColumn Header="Скрыть" Binding="{Binding Path=Hide}"                MinWidth="60"/>
+                    <DataGridCheckBoxColumn Header="Удалить" Binding="{Binding Path=Delete}"             MinWidth="60"/>
+                </DataGrid.Columns>
+            </DataGrid>
+            
+            <StackPanel  VerticalAlignment="Center" >
+                <Button Content="Вверх тест" Command="{Binding MoveUpTestCommand}" CommandParameter="{Binding SelectedItems, ElementName=Datagrid1}" />
+                <Button Content="Вверх" Command="{Binding MoveUpCommand}" CommandParameter="{Binding SelectedItem, ElementName=Datagrid1}" />
+                <Button Content="Вниз" Command="{Binding MoveDownCommand}" CommandParameter="{Binding SelectedItem, ElementName=Datagrid1}" />
+            </StackPanel>
+        </StackPanel>
         
-        <StackPanel Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" >
+
+        
+        <StackPanel Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal"  VerticalAlignment="Top">
             <Button Content="Сохранить" Command="{Binding SaveCommand}"/>
             <Button Content="Отмена" Command="{Binding LoadCommand}"/>
             <Button Content="По умолчанию" Command="{Binding SetDefaultCommand}" />
-            <Button Content="Вверх" Command="{Binding MoveUpCommand}" CommandParameter="{Binding SelectedItem, ElementName=Datagrid1}" />
-            <Button Content="Вниз" Command="{Binding MoveDownCommand}" CommandParameter="{Binding SelectedItem, ElementName=Datagrid1}" />
+
         </StackPanel>
     </Grid>
 </UserControl>

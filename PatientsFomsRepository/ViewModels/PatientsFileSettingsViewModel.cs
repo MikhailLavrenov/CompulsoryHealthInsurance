@@ -1,6 +1,7 @@
 ﻿using FomsPatientsDB.Models;
 using PatientsFomsRepository.Infrastructure;
 using PatientsFomsRepository.Models;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -22,6 +23,7 @@ namespace PatientsFomsRepository.ViewModels
         public RelayCommand SetDefaultCommand { get; }
         public RelayCommand MoveUpCommand { get; }
         public RelayCommand MoveDownCommand { get; }
+        public RelayCommand MoveUpTestCommand { get; }
         #endregion
 
         #region Creators
@@ -32,6 +34,7 @@ namespace PatientsFomsRepository.ViewModels
             SaveCommand = new RelayCommand(x => Settings.Save());
             LoadCommand = new RelayCommand(x => Settings = Settings.Load());            
             SetDefaultCommand = new RelayCommand(x => Settings.PatiensFileSetDefault());
+            MoveUpTestCommand = new RelayCommand(MoveUpTestExecute);
             MoveUpCommand = new RelayCommand(x=> Settings.MoveUp(x as ColumnProperty));
             MoveDownCommand = new RelayCommand(x => Settings.MoveDown(x as ColumnProperty));
 
@@ -40,6 +43,10 @@ namespace PatientsFomsRepository.ViewModels
         #endregion
 
         #region Methods
+        public void MoveUpTestExecute(object parameter)
+        {
+            //var ind = (int)parameter;
+        }
         #endregion
         }
     }

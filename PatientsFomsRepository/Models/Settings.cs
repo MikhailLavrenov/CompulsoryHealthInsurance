@@ -29,6 +29,7 @@ namespace PatientsFomsRepository.Models
         private bool connectionIsValid;
 
         //PatientsFile
+        private bool downloadNewPAtientsFile;
         private string patientsFilePath;
         private bool formatPatientsFile;
         private ObservableCollection<ColumnProperty> columnsProperty;
@@ -53,6 +54,7 @@ namespace PatientsFomsRepository.Models
         [XmlIgnore] public bool ConnectionIsValid { get => connectionIsValid; set => SetProperty(ref connectionIsValid, value); }
 
         //PatientsFile
+        public bool DownloadNewPatientsFile { get => downloadNewPAtientsFile; set => SetProperty(ref downloadNewPAtientsFile, value); }
         public string PatientsFilePath { get => patientsFilePath; set => SetProperty(ref patientsFilePath, value); }
         public bool FormatPatientsFile { get => formatPatientsFile; set => SetProperty(ref formatPatientsFile, value); }
         public ObservableCollection<ColumnProperty> ColumnsProperty { get => columnsProperty; set => SetProperty(ref columnsProperty, value); }
@@ -154,6 +156,7 @@ namespace PatientsFomsRepository.Models
         //устанавливает по-умолчанию настройки для файла пациентов
         public void PatiensFileSetDefault()
             {
+            DownloadNewPatientsFile = true;
             PatientsFilePath = "Прикрепленные пациенты выгрузка.xlsx";
             FormatPatientsFile = true;
             ColumnsProperty = new ObservableCollection<ColumnProperty>()

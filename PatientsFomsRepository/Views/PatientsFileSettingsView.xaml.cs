@@ -1,17 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.Win32;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace PatientsFomsRepository.Views
 {
@@ -23,6 +13,29 @@ namespace PatientsFomsRepository.Views
         public PatientsFileSettingsView()
         {
             InitializeComponent();
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            FileDialog fileDialog;
+
+            if (CheckBoxDowloadNewFile.IsChecked == true)
+                fileDialog = new SaveFileDialog();
+            else
+                fileDialog = new OpenFileDialog();
+
+            if (string.IsNullOrEmpty(TextBoxFilePath.Text))
+                fileDialog.InitialDirectory = Directory.GetCurrentDirectory();
+            else
+                fileDialog.InitialDirectory = Path.GetDirectoryName(TextBoxFilePath.Text);
+
+            fileDialog.Filter = "xlsx files (*.xslx)|*.xlsx";
+
+            if (fileDialog.ShowDialog()==true)
+            {
+                TextBoxFilePath.Text = fileDialog.FileName;
+            }
+
         }
     }
 }

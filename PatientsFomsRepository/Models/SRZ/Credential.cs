@@ -40,14 +40,15 @@ namespace PatientsFomsRepository.Models
         #endregion
 
         #region Creators
-        //создает копию экземпляра класса
-        public Credential Copy()
-        {
-            return MemberwiseClone() as Credential;            
-        }
+
         #endregion
 
         #region Methods
+        //создает копию экземпляра класса
+        public Credential Copy()
+        {
+            return MemberwiseClone() as Credential;
+        }
         //попытка зарезервировать разрешение на запрос к серверу
         public bool TryReserveRequest()
         {
