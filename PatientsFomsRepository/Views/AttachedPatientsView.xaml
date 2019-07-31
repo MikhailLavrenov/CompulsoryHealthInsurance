@@ -11,7 +11,7 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary  Source="/PatientsFomsRepository;component/Views/Styles/DefaultStyle.xaml" />
+                <ResourceDictionary  Source="/PatientsFomsRepository;component/Views/Resources/DefaultStyle.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
@@ -19,7 +19,7 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="auto"/>
-            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="400"/>
             <ColumnDefinition Width="auto"/>
         </Grid.ColumnDefinitions>
         
@@ -41,10 +41,10 @@
         <TextBlock Grid.Row="3" Grid.Column="0" Text="Файл на дату"/>
         <DatePicker Grid.Row="3" Grid.Column="1" Visibility="{Binding IsChecked, ElementName=CheckBox1}" SelectedDate="{x:Static sys:DateTime.Now}"  />
         <TextBlock Grid.Row="4" Grid.Column="0" Text="Путь к файлу: "/>
-        <StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal" >
-            <TextBox Width="350"  />
-            <Button Content="Выбрать"/>
-        </StackPanel>
+        <DockPanel  Grid.Row="4" Grid.Column="1" >
+            <Button  DockPanel.Dock="Right" Content="Выбрать"/>
+            <TextBox  Text="{Binding Path=Settings.PatientsFilePath}" />
+        </DockPanel>
         <Button Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Content="ОК" Width="100" HorizontalAlignment="Left"/>
 
         <TextBlock Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" Text="Загрузить полные ФИО из файла в базу данных" Style="{StaticResource TextBlockHeader}"></TextBlock>

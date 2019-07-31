@@ -7,7 +7,7 @@
         xmlns:v="clr-namespace:PatientsFomsRepository.Views"
         xmlns:vm="clr-namespace:PatientsFomsRepository.ViewModels"
         mc:Ignorable="d"
-        Title="Утилита для загрузки прикрепленных пациентов" Height="600" Width="600">
+        Title="Утилита для загрузки прикрепленных пациентов" Height="600" Width="600" >
 
     <Window.Resources>
         <ResourceDictionary>
@@ -16,6 +16,9 @@
                 <ResourceDictionary >
                     <DataTemplate DataType="{x:Type vm:SRZSettingsViewModel}">
                         <v:SRZSettingsView />
+                    </DataTemplate>
+                    <DataTemplate DataType="{x:Type vm:PatientsFileSettingsViewModel}">
+                        <v:PatientsFileSettingsView />
                     </DataTemplate>
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>

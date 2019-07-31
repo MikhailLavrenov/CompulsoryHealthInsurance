@@ -21,8 +21,11 @@ namespace PatientsFomsRepository.Models
         #endregion
 
         #region Properties
+        public static CredentialScope Scope { get; set; }
         [XmlIgnore] public string Login { get => login; set => SetProperty(ref login, value); }
+        public string ProtectedLogin { get => Encrypt(Login); set => Login=Decrypt(value); }
         [XmlIgnore] public string Password { get => password; set => SetProperty(ref password, value); }
+        public string ProtectedPassword { get => Encrypt(Password); set => Password = Decrypt(value); }
         public int RequestsLimit
         {
             get => requestsLimit;
@@ -40,7 +43,7 @@ namespace PatientsFomsRepository.Models
         //создает копию экземпляра класса
         public Credential Copy()
         {
-            return MemberwiseClone() as Credential;
+            return MemberwiseClone() as Credential;            
         }
         #endregion
 
@@ -60,13 +63,13 @@ namespace PatientsFomsRepository.Models
             }
         }
         //шифрует текст в соответствии с видимостью
-        private string Encrypt(string text, СredentialScope сredentialScope)   
+        private static string Encrypt(string text)
         {
-            if (сredentialScope== СredentialScope.Все)
+            if (Scope== CredentialScope.Все)
                 return text;           
 
             DataProtectionScope scope;
-            if (сredentialScope == СredentialScope.ТекущийПользователь)
+            if (Scope == CredentialScope.ТекущийПользователь)
                 scope = DataProtectionScope.CurrentUser;
             else
                 scope = DataProtectionScope.LocalMachine;
@@ -77,13 +80,13 @@ namespace PatientsFomsRepository.Models
             return Convert.ToBase64String(protectedText);
         }
         //расшифровывает текст в соответствии с видимостью
-        private string Decrypt(string text, СredentialScope сredentialScope)
+        private static string Decrypt(string text)
         {
-            if (сredentialScope == СredentialScope.Все)
+            if (Scope == CredentialScope.Все)
                 return text;          
 
             DataProtectionScope scope;
-            if (сredentialScope == СredentialScope.ТекущийПользователь)
+            if (Scope == CredentialScope.ТекущийПользователь)
                 scope = DataProtectionScope.CurrentUser;
             else
                 scope = DataProtectionScope.LocalMachine;
@@ -100,16 +103,16 @@ namespace PatientsFomsRepository.Models
             }
         }
         //пытается расшифровывает текст в соответствии с видимостью
-        private bool TryDecrypt(string text, СredentialScope сredentialScope, out string decryptedText)
+        private static bool TryDecrypt(string text, CredentialScope сredentialScope, out string decryptedText)
         {
-            if (сredentialScope == СredentialScope.Все)
+            if (сredentialScope == CredentialScope.Все)
             {
                 decryptedText = text;
                 return true;
             }
 
             DataProtectionScope scope;
-            if (сredentialScope == СredentialScope.ТекущийПользователь)
+            if (сredentialScope == CredentialScope.ТекущийПользователь)
                 scope = DataProtectionScope.CurrentUser;
             else
                 scope = DataProtectionScope.LocalMachine;
@@ -128,6 +131,5 @@ namespace PatientsFomsRepository.Models
             }
         }
         #endregion
-
     }
 }

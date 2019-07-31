@@ -85,11 +85,12 @@
     <Compile Include="Infrastructure\IViewModel.cs" />
     <Compile Include="Infrastructure\RelayCommand.cs" />
     <Compile Include="Infrastructure\BindableBase.cs" />
-    <Compile Include="Models\PatientsFile\ColumnProperties.cs" />
+    <Compile Include="Models\PatientsFile\ColumnProperty.cs" />
     <Compile Include="Models\SRZ\CredentialScope.cs" />
     <Compile Include="Models\SRZ\RoundRobinCredentials.cs" />
     <Compile Include="Models\Settings.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
+    <Compile Include="ViewModels\PatientsFileSettingsViewModel.cs" />
     <Compile Include="ViewModels\SRZSettingsViewModel.cs" />
     <Compile Include="Views\PatientsFileSettingsView.xaml.cs">
       <DependentUpon>PatientsFileSettingsView.xaml</DependentUpon>

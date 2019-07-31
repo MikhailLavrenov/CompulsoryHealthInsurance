@@ -10,7 +10,7 @@ namespace PatientsFomsRepository.Models
     /// <summary>
     /// Перечисление кто может видеть учетные данные
     /// </summary>
-    public enum СredentialScope : byte
+    public enum CredentialScope : byte
     {
         [Description("Текущий пользователь")]     ТекущийПользователь = 0,
         [Description("Пользователи компьютера")]  ПользователиКомпьютера = 1,

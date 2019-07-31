@@ -12,16 +12,16 @@ namespace PatientsFomsRepository.ViewModels
         //https://rachel53461.wordpress.com/2011/12/18/navigation-with-mvvm-2/
 
         #region Fields
-        private Settings currentSettings;
+        private Settings settings;
         #endregion
 
         #region Properties
         public string ShortCaption { get; set; }
         public string FullCaption { get; set; }
-        public Settings CurrentSettings { get => currentSettings; set => SetProperty(ref currentSettings, value); }
+        public Settings Settings { get => settings; set => SetProperty(ref settings, value); }
         public RelayCommand SaveCommand { get; }
         public RelayCommand LoadCommand { get; }
-        public RelayCommand ByDefaultCommand { get; }
+        public RelayCommand SetDefaultCommand { get; }
         public RelayCommand TestCommand { get; }
         #endregion
 
@@ -30,32 +30,15 @@ namespace PatientsFomsRepository.ViewModels
         {
             ShortCaption = "Настройки подключения к СРЗ";
             FullCaption = "Настройки подключения к web-сайту СРЗ ХК ФОМС";
-            SaveCommand = new RelayCommand(ExecuteSave);
-            LoadCommand = new RelayCommand(ExecuteLoad);
-            ByDefaultCommand = new RelayCommand(ExecuteByDefault);
-            TestCommand = new RelayCommand(ExecuteTest);
-            CurrentSettings = Settings.Load();
+            SaveCommand = new RelayCommand(x=> Settings.Save());
+            LoadCommand = new RelayCommand(x=> Settings = Settings.Load());
+            SetDefaultCommand = new RelayCommand(x=> Settings.SRZSetDefault());
+            TestCommand = new RelayCommand(x=> Settings.TestConnection());
+            Settings = Settings.Load();
         }
         #endregion
 
         #region Methods
-        public void ExecuteSave(object parameter)
-        {
-            CurrentSettings.Save();
-        }        
-        public void ExecuteLoad(object parameter)
-        {
-            CurrentSettings = Settings.Load();
-        }
-        public void ExecuteByDefault(object parameter)
-        {
-            currentSettings.SRZSetDefault();
-        }
-        public void ExecuteTest(object parameter)
-        {
-            currentSettings.TestConnection();
-        }
-
         #endregion
     }
 }
