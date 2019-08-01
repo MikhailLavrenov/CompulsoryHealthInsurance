@@ -13,16 +13,21 @@ namespace PatientsFomsRepository.ViewModels
 
         #region Поля
         private Settings settings;
+        private bool showTextPassword;
+        private bool showProtectedPassword;
         #endregion
 
         #region Свойства
         public string ShortCaption { get; set; }
         public string FullCaption { get; set; }
         public Settings Settings { get => settings; set => SetProperty(ref settings, value); }
+        public bool ShowTextPassword { get => showTextPassword; set => SetProperty(ref showTextPassword, value); }
+        public bool ShowProtectedPassword { get => showProtectedPassword; set => SetProperty(ref showProtectedPassword, value); }
         public RelayCommand SaveCommand { get; }
         public RelayCommand LoadCommand { get; }
         public RelayCommand SetDefaultCommand { get; }
         public RelayCommand TestCommand { get; }
+        public RelayCommand SwitchShowPassword { get; }
         #endregion
 
         #region Конструкторы
@@ -34,11 +39,20 @@ namespace PatientsFomsRepository.ViewModels
             LoadCommand = new RelayCommand(x=> Settings = Settings.Load());
             SetDefaultCommand = new RelayCommand(x=> Settings.SRZSetDefault());
             TestCommand = new RelayCommand(x=> Settings.TestConnection());
+            SwitchShowPassword = new RelayCommand(ExecuteSwitchShowPassword);
+
             Settings = Settings.Load();
+            ShowTextPassword = true;
+            ShowProtectedPassword = !ShowTextPassword;
         }
         #endregion
 
         #region Методы
+        private void ExecuteSwitchShowPassword(object parameter)
+        {
+            ShowTextPassword = !ShowTextPassword;
+            ShowProtectedPassword = !ShowProtectedPassword;
+        }
         #endregion
     }
 }

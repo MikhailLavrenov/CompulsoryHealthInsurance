@@ -23,8 +23,9 @@ namespace PatientsFomsRepository.ViewModels
             {
             ChangeViewCommand = new RelayCommand(ExecuteChangeView);
             ViewModels = new List<IViewModel>();
-            ViewModels.Add(new PatientsFileSettingsViewModel());
             ViewModels.Add(new SRZSettingsViewModel());
+            ViewModels.Add(new PatientsFileSettingsViewModel());
+            
             
             CurrentViewModel = ViewModels[0];
             }

@@ -83,6 +83,7 @@
     <Compile Include="Infrastructure\EnumHelper.cs" />
     <Compile Include="Infrastructure\EnumToCollectionConverterExtension.cs" />
     <Compile Include="Infrastructure\IViewModel.cs" />
+    <Compile Include="Infrastructure\PasswordBoxHelper.cs" />
     <Compile Include="Infrastructure\RelayCommand.cs" />
     <Compile Include="Infrastructure\BindableBase.cs" />
     <Compile Include="Models\PatientsFile\ColumnProperty.cs" />
@@ -162,7 +163,9 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Views\Resources\Images\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

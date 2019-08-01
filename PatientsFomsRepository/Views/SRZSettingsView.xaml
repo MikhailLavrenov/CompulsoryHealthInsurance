@@ -37,10 +37,10 @@
         </Grid.RowDefinitions>
 
         <TextBlock Grid.Row="1" Grid.Column="0" Text="Адрес сайта СРЗ"/>
-        <TextBox   Grid.Row="1" Grid.Column="1" Text="{Binding CurrentSettings.SiteAddress}"/>
+        <TextBox   Grid.Row="1" Grid.Column="1" Text="{Binding Settings.SiteAddress}"/>
         
         <TextBlock Grid.Row="2" Grid.Column="0" Text="Использовать прокси-сервер"/>
-        <CheckBox  Grid.Row="2" Grid.Column="1" Name="CheckBoxUseProxy" IsChecked="{Binding CurrentSettings.UseProxy}"/>
+        <CheckBox  Grid.Row="2" Grid.Column="1" Name="CheckBoxUseProxy" IsChecked="{Binding Settings.UseProxy}"/>
         
         <TextBlock Grid.Row="3" Grid.Column="0" Name="TextBlockProxy" Text="Прокси-сервер адрес:порт" 
                    Visibility="{Binding Path=IsChecked, ElementName=CheckBoxUseProxy, Converter={i:BoolToVisibleConverter}}"/>
@@ -49,35 +49,54 @@
                 <ColumnDefinition Width="3*"/>
                 <ColumnDefinition Width="1*"/>
             </Grid.ColumnDefinitions>
-            <TextBox Grid.Column="0" Text="{Binding CurrentSettings.ProxyAddress}"/>
-            <TextBox Grid.Column="1" Text="{Binding CurrentSettings.ProxyPort}"/>
+            <TextBox Grid.Column="0" Text="{Binding Settings.ProxyAddress}"/>
+            <TextBox Grid.Column="1" Text="{Binding Settings.ProxyPort}"/>
         </Grid>
         
         <TextBlock Grid.Row="4" Grid.Column="0" Text="Количество потоков"/>
-        <TextBox   Grid.Row="4" Grid.Column="1" Text="{Binding CurrentSettings.ThreadsLimit}"/>
+        <TextBox   Grid.Row="4" Grid.Column="1" Text="{Binding Settings.ThreadsLimit}"
+                   Visibility="{Binding ShowProtectedPassword,  Converter={i:BoolToVisibleConverter}}"/>
         
         <TextBlock Grid.Row="5" Grid.Column="0" Text="Доступ к учетным записям"/>
-        <ComboBox  Grid.Row="5" Grid.Column="1" ItemsSource="{Binding Path=CurrentSettings.CredentialsScope, Converter={i:EnumToCollectionConverter}, Mode=OneTime}"
-          SelectedValuePath="Key" DisplayMemberPath="Value" SelectedValue="{Binding Path=CurrentSettings.CredentialsScope}" />
+        <ComboBox  Grid.Row="5" Grid.Column="1" ItemsSource="{Binding Path=Settings.CredentialsScope, Converter={i:EnumToCollectionConverter}, Mode=OneTime}"
+          SelectedValuePath="Key" DisplayMemberPath="Value" SelectedValue="{Binding Path=Settings.CredentialsScope}" />
         
         <TextBlock Grid.Row="6" Grid.Column="0" Text="Учетные записи"/>
-        <DataGrid  Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" MinHeight="200" ItemsSource="{Binding Settings.ColumnProperties}" >
+
+        <FrameworkElement Grid.Row="6" Grid.Column="1"  x:Name="proxyElement"  />
+
+        <DataGrid Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" MinHeight="200" ItemsSource="{Binding Settings.Credentials}" >
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Логин"  Binding="{Binding Login}" Width="3*" MinWidth="100" />
-                <DataGridTextColumn Header="Пароль" Binding="{Binding Password}" Width="3*" MinWidth="100"  />
-                <!--<DataGridTemplateColumn Header="Пароль" Width="3*" MinWidth="100">
-                    <DataGridTemplateColumn.HeaderStyle>
-                        <Style TargetType="{x:Type DataGridColumnHeader}">
-                            <Setter Property="HorizontalContentAlignment" Value="Center"/>
-                        </Style>
-                    </DataGridTemplateColumn.HeaderStyle>
+                
+                <DataGridTextColumn  Binding="{Binding Password}" Width="3*" MinWidth="100" 
+                                     Visibility="{Binding DataContext.ShowTextPassword, Source={x:Reference proxyElement}, Converter={i:BoolToVisibleConverter}}">
+                    <DataGridTextColumn.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Пароль"/>
+                            <Button MinHeight="15" MinWidth="15"  Command="{Binding DataContext.SwitchShowPassword, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"/>
+                        </StackPanel>
+                        </DataGridTextColumn.Header>
+                </DataGridTextColumn>
+                
+                <DataGridTemplateColumn Width="3*" MinWidth="100" 
+                                        Visibility="{Binding DataContext.ShowProtectedPassword, Source={x:Reference proxyElement}, Converter={i:BoolToVisibleConverter}}">
+                    <DataGridTemplateColumn.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Пароль"/>
+                            <Button MinHeight="15" MinWidth="15"  Command="{Binding DataContext.SwitchShowPassword, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"/>
+                        </StackPanel>
+                    </DataGridTemplateColumn.Header>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <PasswordBox Binding="{Binding Path=RequestsLimit}"/>
+                            <PasswordBox BorderThickness="0" 
+                                         i:PasswordBoxHelper.BindPassword="true"  i:PasswordBoxHelper.BoundPassword="{Binding Path=Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>-->
+                </DataGridTemplateColumn>
+                
                 <DataGridTextColumn Header="Лимит запросов" Binding="{Binding RequestsLimit}" Width="*" MinWidth="100"  />
+                
             </DataGrid.Columns>
         </DataGrid>
 
