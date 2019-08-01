@@ -17,16 +17,16 @@ namespace PatientsFomsRepository.Models
     /// </summary>
     public class SRZ : IDisposable
     {
-        #region Fields
+        #region Поля
         private HttpClient client;
         private Credential credential;
         #endregion
 
-        #region Properties
+        #region Свойства
         public bool Authorized { get; private set; }
         #endregion
 
-        #region Creators
+        #region Конструкторы
         public SRZ(string URL)
         {
             Initialize(URL, null, 0);
@@ -37,7 +37,7 @@ namespace PatientsFomsRepository.Models
         }
         #endregion
 
-        #region Methods
+        #region Методы
         // инициализация класса
         private void Initialize(string URL, string proxyAddress = null, int proxyPort = 0)
         {

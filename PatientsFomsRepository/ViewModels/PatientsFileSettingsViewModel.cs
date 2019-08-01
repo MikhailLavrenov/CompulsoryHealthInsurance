@@ -9,11 +9,11 @@ namespace PatientsFomsRepository.ViewModels
     {
     public class PatientsFileSettingsViewModel : BindableBase, IViewModel
         {
-        #region Fields
+        #region Поля
         private Settings settings;
         #endregion
 
-        #region Properties
+        #region Свойства
         public string ShortCaption { get; set; }
         public string FullCaption { get; set; }
         public Settings Settings { get => settings; set => SetProperty(ref settings, value); }
@@ -24,7 +24,7 @@ namespace PatientsFomsRepository.ViewModels
         public RelayCommand MoveDownCommand { get; }
         #endregion
 
-        #region Creators
+        #region Конструкторы
         public PatientsFileSettingsViewModel()
             {
             ShortCaption = "Настройки файла пациентов";
@@ -39,7 +39,7 @@ namespace PatientsFomsRepository.ViewModels
             }
         #endregion
 
-        #region Methods
+        #region Методы
         #endregion
         }
     }

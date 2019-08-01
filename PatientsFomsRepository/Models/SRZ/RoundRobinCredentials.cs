@@ -11,13 +11,13 @@ namespace PatientsFomsRepository.Models
     /// </summary>
     public class RoundRobinCredentials
         {
-        #region Fields
+        #region Поля
         private readonly object locker = new object();
         private int currentIndex;
         private List<Credential> credentials;
         #endregion
 
-        #region Creator
+        #region Конструкторы
         public RoundRobinCredentials(List<Credential> credentials)
             {
             this.credentials = new List<Credential>();
@@ -26,7 +26,7 @@ namespace PatientsFomsRepository.Models
             }
         #endregion
 
-        #region Methods
+        #region Методы
         //следующий элемент
         private void MoveNext()
             {

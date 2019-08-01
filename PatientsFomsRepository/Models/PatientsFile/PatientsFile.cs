@@ -15,7 +15,7 @@ namespace FomsPatientsDB.Models
     /// </summary>
     public class PatientsFile : IDisposable
     {
-        #region Fields
+        #region Поля
         private static readonly object locker = new object();
         private ExcelPackage excel;
         private ExcelWorksheet sheet;
@@ -30,7 +30,7 @@ namespace FomsPatientsDB.Models
         private int patronymicColumn;
         #endregion
 
-        #region Methods
+        #region Методы
         //возвращает альтернативное название столбца, если синонима нет возвращает это же название
         private string GetColumnAlternativeName(string columnName)
         {

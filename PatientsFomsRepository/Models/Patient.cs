@@ -6,7 +6,7 @@ namespace PatientsFomsRepository.Models
 {
     public class Patient : BindableBase
     {
-        #region Fields
+        #region Поля
         private string insuranceNumber;
         private string initials;
         private string surname;
@@ -15,7 +15,7 @@ namespace PatientsFomsRepository.Models
         private bool fullNameExist;
         #endregion
 
-        #region Properties
+        #region Свойства
         //[Key]
         //[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         //public int PatientId { get; set; }
@@ -28,7 +28,7 @@ namespace PatientsFomsRepository.Models
         public bool FullNameExist { get => fullNameExist; set => SetProperty(ref fullNameExist, value); }
         #endregion
 
-        #region Creators
+        #region Конструкторы
         public Patient(string insuranceNumber, string surname, string name, string patronymic)
         {
             InsuranceNumber = insuranceNumber;
@@ -47,7 +47,7 @@ namespace PatientsFomsRepository.Models
         public Patient() { }
         #endregion
 
-        #region Methods
+        #region Методы
         //определяет инициалы по ФИО
         private void SetInitialsFromFullName()
         {

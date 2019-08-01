@@ -6,17 +6,19 @@ namespace PatientsFomsRepository.ViewModels
     {
     public class MainWindowViewModel : BindableBase
         {
-        #region Fields
+        //https://rachel53461.wordpress.com/2011/12/18/navigation-with-mvvm-2/
+
+        #region Поля
         private IViewModel currentViewModel;
         #endregion
 
-        #region Properties 
+        #region Свойства 
         public RelayCommand ChangeViewCommand { get; }
         public List<IViewModel> ViewModels { get; }
         public IViewModel CurrentViewModel { get => currentViewModel; set => SetProperty(ref currentViewModel, value); }
         #endregion
 
-        #region Creator
+        #region Конструкторы
         public MainWindowViewModel()
             {
             ChangeViewCommand = new RelayCommand(ExecuteChangeView);
@@ -28,7 +30,7 @@ namespace PatientsFomsRepository.ViewModels
             }
         #endregion
 
-        #region Methods
+        #region Методы
         public void ExecuteChangeView(object parameter)
             {
             var viewModel = parameter as IViewModel;

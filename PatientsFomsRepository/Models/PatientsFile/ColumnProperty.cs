@@ -14,14 +14,14 @@ namespace PatientsFomsRepository.Models
     [Serializable]
     public class ColumnProperty : BindableBase
         {
-        #region Fields
+        #region Поля
         private string name;
         private string altName;
         private bool hide;
         private bool delete;
         #endregion
 
-        #region Properties
+        #region Свойства
         public string Name { get => name; set => SetProperty(ref name, value); }
         public string AltName { get => altName; set => SetProperty(ref altName, value); }
         public bool Hide { get => hide; set => SetProperty(ref hide, value); }

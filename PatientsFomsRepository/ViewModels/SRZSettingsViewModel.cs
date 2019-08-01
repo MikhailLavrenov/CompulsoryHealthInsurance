@@ -9,13 +9,13 @@ namespace PatientsFomsRepository.ViewModels
 {
     public class SRZSettingsViewModel : BindableBase, IViewModel
     {
-        //https://rachel53461.wordpress.com/2011/12/18/navigation-with-mvvm-2/
+        
 
-        #region Fields
+        #region Поля
         private Settings settings;
         #endregion
 
-        #region Properties
+        #region Свойства
         public string ShortCaption { get; set; }
         public string FullCaption { get; set; }
         public Settings Settings { get => settings; set => SetProperty(ref settings, value); }
@@ -25,7 +25,7 @@ namespace PatientsFomsRepository.ViewModels
         public RelayCommand TestCommand { get; }
         #endregion
 
-        #region Creators
+        #region Конструкторы
         public SRZSettingsViewModel()
         {
             ShortCaption = "Настройки подключения к СРЗ";
@@ -38,7 +38,7 @@ namespace PatientsFomsRepository.ViewModels
         }
         #endregion
 
-        #region Methods
+        #region Методы
         #endregion
     }
 }

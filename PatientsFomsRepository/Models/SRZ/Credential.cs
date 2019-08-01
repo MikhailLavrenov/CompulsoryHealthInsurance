@@ -10,7 +10,7 @@ namespace PatientsFomsRepository.Models
 {
     public class Credential : BindableBase
     {
-        #region Fields
+        #region Поля
         private readonly object locker = new object();
         private string login;
         private string password;
@@ -20,7 +20,7 @@ namespace PatientsFomsRepository.Models
         private bool isNotValid;
         #endregion
 
-        #region Properties
+        #region Свойства
         public static CredentialScope Scope { get; set; }
         [XmlIgnore] public string Login { get => login; set => SetProperty(ref login, value); }
         public string ProtectedLogin { get => Encrypt(Login); set => Login=Decrypt(value); }
@@ -39,11 +39,10 @@ namespace PatientsFomsRepository.Models
         [XmlIgnore] public bool IsNotValid { get => isNotValid; set => SetProperty(ref isNotValid, value); }
         #endregion
 
-        #region Creators
-
+        #region Конструкторы
         #endregion
 
-        #region Methods
+        #region Методы
         //создает копию экземпляра класса
         public Credential Copy()
         {
