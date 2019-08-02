@@ -13,14 +13,15 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/PatientsFomsRepository;component/Views/Resources/DefaultStyle.xaml" />
+                <ResourceDictionary Source="/PatientsFomsRepository;component/Views/Resources/Icons.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="auto" />
-            <ColumnDefinition Width="300" />
+            <ColumnDefinition Width="180" />
+            <ColumnDefinition Width="260" />
             <ColumnDefinition Width="auto" />
         </Grid.ColumnDefinitions>
 
@@ -104,23 +105,56 @@
 
                 <DataGridTextColumn Header="Логин"
                                     Binding="{Binding Login}"
-                                    Width="3*"
-                                    MinWidth="100" />
+                                    
+                                    MinWidth="150" />
 
-                <DataGridTemplateColumn Width="3*"
-                                        MinWidth="100">
+                <DataGridTemplateColumn 
+                                        MinWidth="150">
+                    <DataGridTemplateColumn.HeaderStyle>
+                        <Style TargetType="{x:Type DataGridColumnHeader}">
+                            <Setter Property="HorizontalContentAlignment"
+                                    Value="Stretch" />
+                        </Style>
+                    </DataGridTemplateColumn.HeaderStyle>
                     <DataGridTemplateColumn.Header>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Пароль" />
-                            <Button MinHeight="15"
-                                    MinWidth="15"
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition />
+                                <ColumnDefinition Width="auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Grid.Column="0"
+                                       Text="Пароль"
+                                       Margin="0" />
+
+                            <Button Grid.Column="2"
+                                    MinHeight="0"
+                                    MinWidth="0"
+                                    
                                     Command="{Binding DataContext.SwitchShowPassword, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}">
-                                <Path Data="F1 M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></Path>
-                                <Ellipse  cx="12"
-                                        cy="12"
-                                        r="3"></Ellipse>
+                                <!--Переопределяем стиль чтобы при наведении мыши на кнопку не было фона-->
+                                <Button.Style>
+                                    <Style TargetType="{x:Type Button}">
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="{x:Type Button}">
+                                                    <Border Background="Transparent">
+                                                        <ContentPresenter />
+                                                    </Border>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </Button.Style>
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
+                                    <ContentControl Content="{Binding Source={StaticResource eyehidden}}"
+                                                    Visibility="{Binding DataContext.ShowTextPassword, Source={x:Reference proxyElement}, Converter={i:BoolToVisibleConverter}}" />
+                                    <ContentControl Content="{Binding Source={StaticResource eyeshown}}"
+                                                    Visibility="{Binding DataContext.ShowProtectedPassword, Source={x:Reference proxyElement}, Converter={i:BoolToVisibleConverter}}" />
+                                </StackPanel>
                             </Button>
-                        </StackPanel>
+                        </Grid>
                     </DataGridTemplateColumn.Header>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
