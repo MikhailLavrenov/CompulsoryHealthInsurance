@@ -20,29 +20,28 @@ namespace PatientsFomsRepository.ViewModels
 
         #region Конструкторы
         public MainWindowViewModel()
-            {
-            ChangeViewCommand = new RelayCommand(ExecuteChangeView);
+            {            
             ViewModels = new List<IViewModel>();
             ViewModels.Add(new SRZSettingsViewModel());
             ViewModels.Add(new PatientsFileSettingsViewModel());
-            
-            
+                        
             CurrentViewModel = ViewModels[0];
-            }
+            ChangeViewCommand = new RelayCommand(ExecuteChangeView, CanExecuteChangeView);
+        }
         #endregion
 
         #region Методы
         public void ExecuteChangeView(object parameter)
             {
             var viewModel = parameter as IViewModel;
-            if (!ViewModels.Contains(viewModel))
+            if (ViewModels.Contains(viewModel)==false)
                 ViewModels.Add(viewModel);
-            CurrentViewModel = ViewModels.FirstOrDefault(vm => vm == viewModel);
+            CurrentViewModel = ViewModels.FirstOrDefault(x=> x == viewModel);
             }
-        //public bool CanExecuteChangeView(object parameter)
-        //    {
-        //    return parameter is IViewModel;
-        //    }
-        #endregion
+        public bool CanExecuteChangeView(object parameter)
+        {
+            return parameter is IViewModel;
         }
+        #endregion
+    }
     }

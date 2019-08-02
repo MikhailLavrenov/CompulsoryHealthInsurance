@@ -12,6 +12,7 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary  Source="/PatientsFomsRepository;component/Views/Resources/DefaultStyle.xaml" />
+                <ResourceDictionary Source="/PatientsFomsRepository;component/Views/Resources/Icons.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
@@ -19,7 +20,7 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="180" />
-            <ColumnDefinition Width="400" />
+            <ColumnDefinition Width="350" />
             <ColumnDefinition Width="auto" />
         </Grid.ColumnDefinitions>
 
@@ -60,8 +61,8 @@
                    Text="Путь к файлу" />
         <DockPanel Grid.Row="1"
                    Grid.Column="1">
-                <!--Файловый диалог сделан через CodeBehind-->
-                <Button  DockPanel.Dock="Right"
+            <!--Файловый диалог сделан через CodeBehind-->
+            <Button  DockPanel.Dock="Right"
                      Content="Выбрать"
                      Click="Button_Click" />
             <TextBox  Text="{Binding Path=Settings.PatientsFilePath}"
@@ -76,42 +77,55 @@
                    Name="CheckBoxFormat"
                    IsChecked="{Binding Path=Settings.FormatPatientsFile}" />
 
-        <DockPanel Grid.Row="3"
-                   Grid.Column="0"
-                   Grid.ColumnSpan="2"
-                   Visibility="{Binding Path=IsChecked, ElementName=CheckBoxFormat, Converter={i:BoolToVisibleConverter}}">
-            <StackPanel DockPanel.Dock="Right"
-                        VerticalAlignment="Center">
-                <Button Content="Вверх"
-                        Command="{Binding MoveUpCommand}"
-                        CommandParameter="{Binding SelectedItem, ElementName=Datagrid1}" />
-                <Button Content="Вниз"
-                        Command="{Binding MoveDownCommand}"
-                        CommandParameter="{Binding SelectedItem, ElementName=Datagrid1}" />
-            </StackPanel>
+        <DataGrid Grid.Row="3"
+                  Grid.Column="0"
+                  Grid.ColumnSpan="2"
+                  MinHeight="200"
+                  Name="Datagrid1"
+                  Visibility="{Binding Path=IsChecked, ElementName=CheckBoxFormat, Converter={i:BoolToVisibleConverter}}"
+                  ItemsSource="{Binding Settings.ColumnsProperty}"
+                  SelectionMode="Single">
+            <DataGrid.Columns>
+                <DataGridTextColumn     Header="Название столбца"
+                                        Binding="{Binding Path=Name}"
+                                        MinWidth="150" />
+                <DataGridTextColumn     Header="Понятное название"
+                                        Binding="{Binding Path=AltName}"
+                                        MinWidth="150" />
+                <DataGridCheckBoxColumn Header="Скрыть"
+                                        Binding="{Binding Path=Hide}"
+                                        MinWidth="65" />
+                <DataGridCheckBoxColumn Header="Удалить"
+                                        Binding="{Binding Path=Delete}"
+                                        MinWidth="65" />
+            </DataGrid.Columns>
+        </DataGrid>
 
-            <DataGrid  MinHeight="200"
-                       Name="Datagrid1"
-                       ItemsSource="{Binding Settings.ColumnsProperty}"
-                       SelectionMode="Single">
-                <DataGrid.Columns>
-                    <DataGridTextColumn     Header="Название столбца"
-                                            Binding="{Binding Path=Name}"
-                                            MinWidth="150" />
-                    <DataGridTextColumn     Header="Понятное название"
-                                            Binding="{Binding Path=AltName}"
-                                            MinWidth="150" />
-                    <DataGridCheckBoxColumn Header="Скрыть"
-                                            Binding="{Binding Path=Hide}"
-                                            MinWidth="65" />
-                    <DataGridCheckBoxColumn Header="Удалить"
-                                            Binding="{Binding Path=Delete}"
-                                            MinWidth="65" />
-                </DataGrid.Columns>
-            </DataGrid>
-
-
-        </DockPanel>
+        <StackPanel  Grid.Row="3"
+                     Grid.Column="2"
+                     Visibility="{Binding Path=IsChecked, ElementName=CheckBoxFormat, Converter={i:BoolToVisibleConverter}}"
+                     VerticalAlignment="Center">
+            <Button Command="{Binding MoveUpCommand}"
+                    CommandParameter="{Binding SelectedItem, ElementName=Datagrid1}"
+                    MinWidth="0"
+                    MinHeight="0"
+                    Width="20"
+                    Height="30"
+                    BorderThickness="0"
+                    Background="Transparent">
+                <ContentControl Content="{Binding Source={StaticResource arrowup}}" />
+            </Button>
+            <Button Command="{Binding MoveDownCommand}"
+                    CommandParameter="{Binding SelectedItem, ElementName=Datagrid1}"
+                    MinWidth="0"
+                    MinHeight="0"
+                    Width="20"
+                    Height="30"
+                    BorderThickness="0"
+                    Background="Transparent">
+                <ContentControl Content="{Binding Source={StaticResource arrowdown}}" />
+            </Button>
+        </StackPanel>
 
         <StackPanel Grid.Row="4"
                     Grid.Column="0"

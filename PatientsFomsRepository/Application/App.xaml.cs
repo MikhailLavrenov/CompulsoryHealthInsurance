@@ -13,8 +13,7 @@ namespace PatientsFomsRepository
             {
             base.OnStartup(e);
             var view = new MainWindowView();
-            var viewModel = new MainWindowViewModel();
-            view.DataContext = viewModel;
+            view.DataContext = new MainWindowViewModel();
             view.Show();
             }
         }

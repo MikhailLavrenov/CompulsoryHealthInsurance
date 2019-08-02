@@ -7,13 +7,15 @@
         xmlns:v="clr-namespace:PatientsFomsRepository.Views"
         xmlns:vm="clr-namespace:PatientsFomsRepository.ViewModels"
         mc:Ignorable="d"
-        Title="Утилита для загрузки прикрепленных пациентов" Height="600" Width="600" >
+        Title="Утилита для загрузки прикрепленных пациентов"
+        Height="600"
+        Width="600">
 
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary  Source="/PatientsFomsRepository;component/Views/Resources/DefaultStyle.xaml" />
-                <ResourceDictionary >
+                <ResourceDictionary>
                     <DataTemplate DataType="{x:Type vm:SRZSettingsViewModel}">
                         <v:SRZSettingsView />
                     </DataTemplate>
@@ -27,24 +29,29 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="40"></RowDefinition>
-            <RowDefinition Height="40"></RowDefinition>
-            <RowDefinition></RowDefinition>
+            <RowDefinition Height="80" />
+            <RowDefinition Height="40" />
+            <RowDefinition />
         </Grid.RowDefinitions>
 
-        <ItemsControl Grid.Row="0" ItemsSource="{Binding ViewModels}">
+        <FrameworkElement x:Name="proxyElement" />
+        <ItemsControl Grid.Row="0"
+                      ItemsSource="{Binding ViewModels}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <Button Content="{Binding ShortCaption}"
-                                Command="{Binding DataContext.ChangeViewCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
-                                CommandParameter="{Binding }" />
+                            Command="{Binding DataContext.ChangeViewCommand, Source={x:Reference proxyElement}}"
+                            CommandParameter="{Binding }" />
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
 
-        <TextBlock Grid.Row="1" Style="{StaticResource TextBlockHeader}" Text="{Binding CurrentViewModel.FullCaption}"/>
-        <ContentControl Grid.Row="2" Content="{Binding CurrentViewModel}" />
+        <TextBlock Grid.Row="1"
+                   Style="{StaticResource TextBlockHeader}"
+                   Text="{Binding CurrentViewModel.FullCaption}" />
+        <ContentControl Grid.Row="2"
+                        Content="{Binding CurrentViewModel}" />
     </Grid>
-        
-    
+
+
 </Window>
