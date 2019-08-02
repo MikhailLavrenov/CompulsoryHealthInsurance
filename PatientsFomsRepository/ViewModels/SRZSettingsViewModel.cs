@@ -42,7 +42,7 @@ namespace PatientsFomsRepository.ViewModels
             SwitchShowPassword = new RelayCommand(ExecuteSwitchShowPassword);
 
             Settings = Settings.Load();
-            ShowTextPassword = true;
+            ShowTextPassword = false;
             ShowProtectedPassword = !ShowTextPassword;
         }
         #endregion
@@ -51,7 +51,7 @@ namespace PatientsFomsRepository.ViewModels
         private void ExecuteSwitchShowPassword(object parameter)
         {
             ShowTextPassword = !ShowTextPassword;
-            ShowProtectedPassword = !ShowProtectedPassword;
+            ShowProtectedPassword = !ShowTextPassword;
         }
         #endregion
     }
