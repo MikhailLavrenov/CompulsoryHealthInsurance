@@ -90,20 +90,29 @@
     <Compile Include="Models\SRZ\CredentialScope.cs" />
     <Compile Include="Models\SRZ\RoundRobinCredentials.cs" />
     <Compile Include="Models\Settings.cs" />
+    <Compile Include="ViewModels\ImportPatientsViewModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Compile Include="ViewModels\PatientsFileSettingsViewModel.cs" />
+    <Compile Include="ViewModels\PatientsFileViewModel.cs" />
     <Compile Include="ViewModels\SRZSettingsViewModel.cs" />
+    <Compile Include="Views\ImportPatientsView.xaml.cs">
+      <DependentUpon>ImportPatientsView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\PatientsFileSettingsView.xaml.cs">
       <DependentUpon>PatientsFileSettingsView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\SRZSettingsView.xaml.cs">
       <DependentUpon>SRZSettingsView.xaml</DependentUpon>
     </Compile>
+    <Page Include="Views\ImportPatientsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\PatientsFileSettingsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\AttachedPatientsView.xaml">
+    <Page Include="Views\PatientsFileView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -115,8 +124,8 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Views\AttachedPatientsView.xaml.cs">
-      <DependentUpon>AttachedPatientsView.xaml</DependentUpon>
+    <Compile Include="Views\PatientsFileView.xaml.cs">
+      <DependentUpon>PatientsFileView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\MainWindowView.xaml.cs">
       <DependentUpon>MainWindowView.xaml</DependentUpon>

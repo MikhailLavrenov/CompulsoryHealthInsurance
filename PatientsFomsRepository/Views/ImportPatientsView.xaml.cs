@@ -14,15 +14,15 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace PatientsFomsRepository.Views
-    {
+{
     /// <summary>
-    /// Логика взаимодействия для AttachedPatientsView.xaml
+    /// Логика взаимодействия для ImportPatientsView.xaml
     /// </summary>
-    public partial class AttachedPatientsView : UserControl
+    public partial class ImportPatientsView : UserControl
+    {
+        public ImportPatientsView()
         {
-        public AttachedPatientsView()
-            {
             InitializeComponent();
-            }
         }
     }
+}

@@ -27,7 +27,7 @@ namespace PatientsFomsRepository.ViewModels
         public RelayCommand LoadCommand { get; }
         public RelayCommand SetDefaultCommand { get; }
         public RelayCommand TestCommand { get; }
-        public RelayCommand SwitchShowPassword { get; }
+        public RelayCommand SwitchShowPasswordCommand { get; }
         #endregion
 
         #region Конструкторы
@@ -39,7 +39,7 @@ namespace PatientsFomsRepository.ViewModels
             LoadCommand = new RelayCommand(x=> Settings = Settings.Load());
             SetDefaultCommand = new RelayCommand(x=> Settings.SRZSetDefault());
             TestCommand = new RelayCommand(x=> Settings.TestConnection());
-            SwitchShowPassword = new RelayCommand(ExecuteSwitchShowPassword);
+            SwitchShowPasswordCommand = new RelayCommand(ExecuteSwitchShowPassword);
 
             Settings = Settings.Load();
             ShowTextPassword = false;

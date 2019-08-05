@@ -61,7 +61,7 @@
                    Text="Путь к файлу" />
         <DockPanel Grid.Row="1"
                    Grid.Column="1">
-            <!--Файловый диалог сделан через CodeBehind-->
+            <!--Файловый диалог в CodeBehind-->
             <Button  DockPanel.Dock="Right"
                      Content="Выбрать"
                      Click="Button_Click" />
@@ -110,7 +110,7 @@
                     MinWidth="0"
                     MinHeight="0"
                     Width="20"
-                    Height="30"
+                    Height="25"
                     BorderThickness="0"
                     Background="Transparent">
                 <ContentControl Content="{Binding Source={StaticResource arrowup}}" />
@@ -120,7 +120,7 @@
                     MinWidth="0"
                     MinHeight="0"
                     Width="20"
-                    Height="30"
+                    Height="25"
                     BorderThickness="0"
                     Background="Transparent">
                 <ContentControl Content="{Binding Source={StaticResource arrowdown}}" />

@@ -132,7 +132,7 @@
                                     MinHeight="0"
                                     MinWidth="0"
                                     
-                                    Command="{Binding DataContext.SwitchShowPassword, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}">
+                                    Command="{Binding DataContext.SwitchShowPasswordCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}">
                                 <!--Переопределяем стиль чтобы при наведении мыши на кнопку не было фона-->
                                 <Button.Style>
                                     <Style TargetType="{x:Type Button}">
