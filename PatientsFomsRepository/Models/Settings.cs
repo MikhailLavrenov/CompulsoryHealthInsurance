@@ -35,8 +35,9 @@ namespace PatientsFomsRepository.Models
         private ObservableCollection<ColumnProperty> columnsProperty;
         #endregion
 
-        #region Свойства        
-        public static string ThisFileName { get; } = "Settings.xml";
+        #region Свойства       
+        [XmlIgnore] public static string ThisFileName { get; } = "Settings.xml";
+        public static Settings Instance { get; private set; }
 
         //SRZ
         public string SiteAddress { get => siteAddress; set => SetProperty(ref siteAddress, value); }
@@ -61,10 +62,16 @@ namespace PatientsFomsRepository.Models
         #endregion
 
         #region Конструкторы
+        static Settings()
+        {
+            Instance = Load();
+        }
+
         public Settings()
             {
             Credentials = new ObservableCollection<Credential>();
             ColumnsProperty = new ObservableCollection<ColumnProperty>();
+            Instance = this;
             }
         #endregion
 

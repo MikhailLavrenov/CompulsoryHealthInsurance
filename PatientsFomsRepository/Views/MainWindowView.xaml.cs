@@ -33,20 +33,7 @@ namespace PatientsFomsRepository.Views
         public static async void Test()
             {
             /*
-            var file = new PatientsFile();
-            await file.Open(@"C:\Users\ЛавреновМВ\Desktop\myattmo.xlsx");
-            var newPatients = await file.GetVerifedPatients();
 
-            var db = new CacheDB();
-            db.Patients.Load();
-            var existenInsuaranceNumbers=db.Patients.Select(x => x.InsuranceNumber).ToHashSet();
-            var newUniqPatients = newPatients
-            .Where(x=>!existenInsuaranceNumbers.Contains(x.InsuranceNumber))
-            .GroupBy(x=>x.InsuranceNumber)
-            .Select(x=>x.First())
-            .ToList();
-            db.Patients.AddRange(newUniqPatients);
-            db.SaveChanges();
             */
             var credentialList = new List<Credential>
                     {

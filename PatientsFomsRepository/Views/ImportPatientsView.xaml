@@ -25,7 +25,8 @@
                 Orientation="Horizontal">
         <Button Content="Загрузить"
                 Command=""
-                />
-        <Button Content="Шаблон файла" />
+                Click="Button_Click_1" />
+        <Button Content="Шаблон файла"
+                Click="Button_Click" />
     </StackPanel>
 </UserControl>
