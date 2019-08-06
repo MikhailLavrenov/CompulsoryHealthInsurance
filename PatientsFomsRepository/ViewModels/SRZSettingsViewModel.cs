@@ -33,8 +33,8 @@ namespace PatientsFomsRepository.ViewModels
         #region Конструкторы
         public SRZSettingsViewModel()
         {
-            ShortCaption = "Настройки подключения к СРЗ";
-            FullCaption = "Настройки подключения к web-сайту СРЗ ХК ФОМС";
+            ShortCaption = "Настройки СРЗ";
+            FullCaption = "Настройки подключения к СРЗ ХК ФОМС";
             SaveCommand = new RelayCommand(x=> Settings.Save());
             LoadCommand = new RelayCommand(x=> Settings = Settings.Load());
             SetDefaultCommand = new RelayCommand(x=> Settings.SRZSetDefault());

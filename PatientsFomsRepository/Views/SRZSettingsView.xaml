@@ -105,11 +105,9 @@
 
                 <DataGridTextColumn Header="Логин"
                                     Binding="{Binding Login}"
-                                    
                                     MinWidth="150" />
 
-                <DataGridTemplateColumn 
-                                        MinWidth="150">
+                <DataGridTemplateColumn MinWidth="150">
                     <DataGridTemplateColumn.HeaderStyle>
                         <Style TargetType="{x:Type DataGridColumnHeader}">
                             <Setter Property="HorizontalContentAlignment"
@@ -119,7 +117,7 @@
                     <DataGridTemplateColumn.Header>
                         <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="auto" />
                                 <ColumnDefinition />
                                 <ColumnDefinition Width="auto" />
                             </Grid.ColumnDefinitions>
@@ -129,28 +127,13 @@
                                        Margin="0" />
 
                             <Button Grid.Column="2"
-                                    MinHeight="0"
-                                    MinWidth="0"
-                                    
+                                    Style="{StaticResource PictureTransparentButton}"
                                     Command="{Binding DataContext.SwitchShowPasswordCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}">
-                                <!--Переопределяем стиль чтобы при наведении мыши на кнопку не было фона-->
-                                <Button.Style>
-                                    <Style TargetType="{x:Type Button}">
-                                        <Setter Property="Template">
-                                            <Setter.Value>
-                                                <ControlTemplate TargetType="{x:Type Button}">
-                                                    <Border Background="Transparent">
-                                                        <ContentPresenter />
-                                                    </Border>
-                                                </ControlTemplate>
-                                            </Setter.Value>
-                                        </Setter>
-                                    </Style>
-                                </Button.Style>
-                                <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
-                                    <ContentControl Content="{Binding Source={StaticResource eyehidden}}"
+                                <StackPanel Orientation="Horizontal"
+                                            VerticalAlignment="Bottom">
+                                    <ContentControl Content="{Binding Source={StaticResource PassowrdHide}}"
                                                     Visibility="{Binding DataContext.ShowTextPassword, Source={x:Reference proxyElement}, Converter={i:BoolToVisibleConverter}}" />
-                                    <ContentControl Content="{Binding Source={StaticResource eyeshown}}"
+                                    <ContentControl Content="{Binding Source={StaticResource PasswordShow}}"
                                                     Visibility="{Binding DataContext.ShowProtectedPassword, Source={x:Reference proxyElement}, Converter={i:BoolToVisibleConverter}}" />
                                 </StackPanel>
                             </Button>

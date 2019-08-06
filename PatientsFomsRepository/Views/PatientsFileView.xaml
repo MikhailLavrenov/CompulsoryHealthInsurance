@@ -55,10 +55,12 @@
         <DockPanel  Grid.Row="2"
                     Grid.Column="1">
                 <!--Файловый диалог в CodeBehind-->
-                <Button  DockPanel.Dock="Right"
-                         Content="Выбрать"
-                         Click="Button_Click" />
-                <TextBox  Text="{Binding Path=Settings.PatientsFilePath}"
+            <Button  DockPanel.Dock="Right"
+                     Style="{StaticResource PictureButton}"
+                     Click="Button_Click">
+                <ContentControl Content="{Binding Source={StaticResource FileDialog}}" />
+            </Button>
+            <TextBox  Text="{Binding Path=Settings.PatientsFilePath}"
                           Name="TextBoxFilePath" />
             </DockPanel>
             <Button Grid.Row="3"

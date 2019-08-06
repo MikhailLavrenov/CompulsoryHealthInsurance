@@ -18,8 +18,8 @@ namespace PatientsFomsRepository.ViewModels
         #region Конструкторы
         public PatientsFileViewModel()
         {
-            ShortCaption = "Обработать файл пациентов";
-            FullCaption = "Найти и подставить полные ФИО пациентов в файл";
+            ShortCaption = "Получить полные ФИО";
+            FullCaption = "Получить полные ФИО пациентов";
             ProcessFileCommand = new RelayCommand(x => throw new NotImplementedException("еще не реализовано"));
 
 

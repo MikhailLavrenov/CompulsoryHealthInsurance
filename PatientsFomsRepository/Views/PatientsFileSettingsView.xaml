@@ -63,8 +63,10 @@
                    Grid.Column="1">
             <!--Файловый диалог в CodeBehind-->
             <Button  DockPanel.Dock="Right"
-                     Content="Выбрать"
-                     Click="Button_Click" />
+                     Style="{StaticResource PictureButton}"
+                     Click="Button_Click">
+                <ContentControl Content="{Binding Source={StaticResource FileDialog}}" />
+            </Button>
             <TextBox  Text="{Binding Path=Settings.PatientsFilePath}"
                       Name="TextBoxFilePath" />
         </DockPanel>
@@ -77,13 +79,33 @@
                    Name="CheckBoxFormat"
                    IsChecked="{Binding Path=Settings.FormatPatientsFile}" />
 
-        <DataGrid Grid.Row="3"
-                  Grid.Column="0"
-                  Grid.ColumnSpan="2"
+        <DockPanel 
+            Grid.Row="3"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2">
+            <StackPanel  DockPanel.Dock="Right" Margin="4"
+                         Visibility="{Binding Path=IsChecked, ElementName=CheckBoxFormat, Converter={i:BoolToVisibleConverter}}"
+                         VerticalAlignment="Center">
+                <Button Style="{StaticResource PictureButton}"
+                        Width="20"
+                        Height="25"
+                        Command="{Binding MoveUpCommand}"
+                        CommandParameter="{Binding SelectedItem, ElementName=Datagrid1}">
+                    <ContentControl Content="{Binding Source={StaticResource ArrowUp}}" />
+                </Button>
+                <Button Style="{StaticResource PictureButton}"
+                        Width="20"
+                        Height="25"
+                        Command="{Binding MoveDownCommand}"
+                        CommandParameter="{Binding SelectedItem, ElementName=Datagrid1}">
+                    <ContentControl Content="{Binding Source={StaticResource ArrowDown}}" />
+                </Button>
+            </StackPanel>
+            <DataGrid 
                   MinHeight="200"
                   Name="Datagrid1"
                   Visibility="{Binding Path=IsChecked, ElementName=CheckBoxFormat, Converter={i:BoolToVisibleConverter}}"
-                  ItemsSource="{Binding Settings.ColumnsProperty}"
+                  ItemsSource="{Binding Settings.ColumnProperties}"
                   SelectionMode="Single">
             <DataGrid.Columns>
                 <DataGridTextColumn     Header="Название столбца"
@@ -101,31 +123,9 @@
             </DataGrid.Columns>
         </DataGrid>
 
-        <StackPanel  Grid.Row="3"
-                     Grid.Column="2"
-                     Visibility="{Binding Path=IsChecked, ElementName=CheckBoxFormat, Converter={i:BoolToVisibleConverter}}"
-                     VerticalAlignment="Center">
-            <Button Command="{Binding MoveUpCommand}"
-                    CommandParameter="{Binding SelectedItem, ElementName=Datagrid1}"
-                    MinWidth="0"
-                    MinHeight="0"
-                    Width="20"
-                    Height="25"
-                    BorderThickness="0"
-                    Background="Transparent">
-                <ContentControl Content="{Binding Source={StaticResource arrowup}}" />
-            </Button>
-            <Button Command="{Binding MoveDownCommand}"
-                    CommandParameter="{Binding SelectedItem, ElementName=Datagrid1}"
-                    MinWidth="0"
-                    MinHeight="0"
-                    Width="20"
-                    Height="25"
-                    BorderThickness="0"
-                    Background="Transparent">
-                <ContentControl Content="{Binding Source={StaticResource arrowdown}}" />
-            </Button>
-        </StackPanel>
+        </DockPanel>
+
+        
 
         <StackPanel Grid.Row="4"
                     Grid.Column="0"

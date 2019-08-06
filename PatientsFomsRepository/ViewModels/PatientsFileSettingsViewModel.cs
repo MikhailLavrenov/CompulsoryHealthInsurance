@@ -1,14 +1,10 @@
-﻿using FomsPatientsDB.Models;
-using PatientsFomsRepository.Infrastructure;
+﻿using PatientsFomsRepository.Infrastructure;
 using PatientsFomsRepository.Models;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.IO;
 
 namespace PatientsFomsRepository.ViewModels
-    {
+{
     public class PatientsFileSettingsViewModel : BindableBase, IViewModel
-        {
+    {
         #region Поля
         private Settings settings;
         #endregion
@@ -26,21 +22,20 @@ namespace PatientsFomsRepository.ViewModels
 
         #region Конструкторы
         public PatientsFileSettingsViewModel()
-            {
+        {
             ShortCaption = "Настройки файла пациентов";
-            FullCaption = "Настройка выгрузки файла пациентов";
+            FullCaption = "Настройки  файла пациентов";
             SaveCommand = new RelayCommand(x => Settings.Save());
-            LoadCommand = new RelayCommand(x => Settings = Settings.Load());            
+            LoadCommand = new RelayCommand(x => Settings = Settings.Load());
             SetDefaultCommand = new RelayCommand(x => Settings.PatiensFileSetDefault());
-            MoveUpCommand = new RelayCommand(x=> Settings.MoveColumnPropertyUp(x as ColumnProperty));
+            MoveUpCommand = new RelayCommand(x => Settings.MoveColumnPropertyUp(x as ColumnProperty));
             MoveDownCommand = new RelayCommand(x => Settings.MoveColumnPropertyDown(x as ColumnProperty));
 
             Settings = Settings.Load();
-            }
+        }
         #endregion
 
         #region Методы
         #endregion
-        }
     }
-;
+}
