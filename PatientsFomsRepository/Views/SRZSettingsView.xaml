@@ -160,8 +160,8 @@
 
                 <DataGridTextColumn Header="Лимит запросов"
                                     Binding="{Binding RequestsLimit}"
-                                    Width="*"
-                                    MinWidth="100" />
+                                    MinWidth="100"
+                                    Width="*" />
 
             </DataGrid.Columns>
         </DataGrid>

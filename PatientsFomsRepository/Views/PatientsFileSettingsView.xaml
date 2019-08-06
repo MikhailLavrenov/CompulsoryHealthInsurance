@@ -79,11 +79,11 @@
                    Name="CheckBoxFormat"
                    IsChecked="{Binding Path=Settings.FormatPatientsFile}" />
 
-        <DockPanel 
-            Grid.Row="3"
-                    Grid.Column="0"
-                    Grid.ColumnSpan="2">
-            <StackPanel  DockPanel.Dock="Right" Margin="4"
+        <DockPanel Grid.Row="3"
+                   Grid.Column="0"
+                   Grid.ColumnSpan="2">
+            <StackPanel  DockPanel.Dock="Right"
+                         Margin="4"
                          Visibility="{Binding Path=IsChecked, ElementName=CheckBoxFormat, Converter={i:BoolToVisibleConverter}}"
                          VerticalAlignment="Center">
                 <Button Style="{StaticResource PictureButton}"
@@ -101,31 +101,31 @@
                     <ContentControl Content="{Binding Source={StaticResource ArrowDown}}" />
                 </Button>
             </StackPanel>
-            <DataGrid 
-                  MinHeight="200"
-                  Name="Datagrid1"
-                  Visibility="{Binding Path=IsChecked, ElementName=CheckBoxFormat, Converter={i:BoolToVisibleConverter}}"
-                  ItemsSource="{Binding Settings.ColumnProperties}"
-                  SelectionMode="Single">
-            <DataGrid.Columns>
-                <DataGridTextColumn     Header="Название столбца"
-                                        Binding="{Binding Path=Name}"
-                                        MinWidth="150" />
-                <DataGridTextColumn     Header="Понятное название"
-                                        Binding="{Binding Path=AltName}"
-                                        MinWidth="150" />
-                <DataGridCheckBoxColumn Header="Скрыть"
-                                        Binding="{Binding Path=Hide}"
-                                        MinWidth="65" />
-                <DataGridCheckBoxColumn Header="Удалить"
-                                        Binding="{Binding Path=Delete}"
-                                        MinWidth="65" />
-            </DataGrid.Columns>
-        </DataGrid>
+            <DataGrid MinHeight="200"
+                      Name="Datagrid1"
+                      Visibility="{Binding Path=IsChecked, ElementName=CheckBoxFormat, Converter={i:BoolToVisibleConverter}}"
+                      ItemsSource="{Binding Settings.ColumnProperties}"
+                      SelectionMode="Single">
+                <DataGrid.Columns>
+                    <DataGridTextColumn     Header="Название столбца"
+                                            Binding="{Binding Path=Name}"
+                                            MinWidth="160" />
+                    <DataGridTextColumn     Header="Понятное название"
+                                            Binding="{Binding Path=AltName}"
+                                            MinWidth="160" />
+                    <DataGridCheckBoxColumn Header="Скрыть"
+                                            Binding="{Binding Path=Hide}"
+                                            MinWidth="70" />
+                    <DataGridCheckBoxColumn Header="Удалить"
+                                            Binding="{Binding Path=Delete}"
+                                            MinWidth="65"
+                                            Width="*" />
+                </DataGrid.Columns>
+            </DataGrid>
 
         </DockPanel>
 
-        
+
 
         <StackPanel Grid.Row="4"
                     Grid.Column="0"
