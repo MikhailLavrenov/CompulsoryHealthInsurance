@@ -32,7 +32,7 @@ namespace PatientsFomsRepository.Models
         private bool downloadNewPAtientsFile;
         private string patientsFilePath;
         private bool formatPatientsFile;
-        private ObservableCollection<ColumnProperty> columnsProperty;
+        private ObservableCollection<ColumnProperty> columnProperties;
         #endregion
 
         #region Свойства       
@@ -58,7 +58,7 @@ namespace PatientsFomsRepository.Models
         public bool DownloadNewPatientsFile { get => downloadNewPAtientsFile; set => SetProperty(ref downloadNewPAtientsFile, value); }
         public string PatientsFilePath { get => patientsFilePath; set => SetProperty(ref patientsFilePath, value); }
         public bool FormatPatientsFile { get => formatPatientsFile; set => SetProperty(ref formatPatientsFile, value); }
-        public ObservableCollection<ColumnProperty> ColumnsProperty { get => columnsProperty; set => SetProperty(ref columnsProperty, value); }
+        public ObservableCollection<ColumnProperty> ColumnProperties { get => columnProperties; set => SetProperty(ref columnProperties, value); }
         #endregion
 
         #region Конструкторы
@@ -70,7 +70,7 @@ namespace PatientsFomsRepository.Models
         public Settings()
             {
             Credentials = new ObservableCollection<Credential>();
-            ColumnsProperty = new ObservableCollection<ColumnProperty>();
+            ColumnProperties = new ObservableCollection<ColumnProperty>();
             Instance = this;
             }
         #endregion
@@ -166,7 +166,7 @@ namespace PatientsFomsRepository.Models
             DownloadNewPatientsFile = true;
             PatientsFilePath = "Прикрепленные пациенты выгрузка.xlsx";
             FormatPatientsFile = true;
-            ColumnsProperty = new ObservableCollection<ColumnProperty>()
+            ColumnProperties = new ObservableCollection<ColumnProperty>()
              {
                     new ColumnProperty{Name="ENP",         AltName="Номер полис",           Hide=false,  Delete=false},
                     new ColumnProperty{Name="FIO",         AltName="ФИО",                   Hide=false,  Delete=false},
@@ -222,16 +222,16 @@ namespace PatientsFomsRepository.Models
         //сдвигает вверх элемент коллекции ColumnsProperty
         public void MoveColumnPropertyUp(ColumnProperty item)
             {
-            var itemIndex = ColumnsProperty.IndexOf(item);
+            var itemIndex = ColumnProperties.IndexOf(item);
             if (itemIndex > 0)
-                ColumnsProperty.Move(itemIndex,itemIndex - 1 );
+                ColumnProperties.Move(itemIndex,itemIndex - 1 );
             }
         //сдвигает вниз элемент коллекции ColumnsProperty
         public void MoveColumnPropertyDown(ColumnProperty item)
             {
-            var itemIndex = ColumnsProperty.IndexOf(item);
-            if (itemIndex >=0 && itemIndex < ColumnsProperty.Count - 1)
-                ColumnsProperty.Move(itemIndex,itemIndex + 1);
+            var itemIndex = ColumnProperties.IndexOf(item);
+            if (itemIndex >=0 && itemIndex < ColumnProperties.Count - 1)
+                ColumnProperties.Move(itemIndex,itemIndex + 1);
             }
         #endregion
         }

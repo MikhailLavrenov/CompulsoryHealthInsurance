@@ -22,6 +22,7 @@ namespace PatientsFomsRepository.Views
             var fileDialog = new SaveFileDialog();
             fileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
             fileDialog.Filter = "xlsx files (*.xslx)|*.xlsx";
+            fileDialog.FileName = "Пример для загрузки ФИО";
 
             if (fileDialog.ShowDialog() == true)
             {

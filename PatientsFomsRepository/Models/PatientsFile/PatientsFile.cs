@@ -19,7 +19,7 @@ namespace FomsPatientsDB.Models
         private static readonly object locker = new object();
         private ExcelPackage excel;
         private ExcelWorksheet sheet;
-        private ColumnProperty[] columnsAttributes;
+        private ColumnProperty[] columnProperties;
         private int maxRow;
         private int maxCol;
         private int headerIndex = 1;
@@ -34,7 +34,7 @@ namespace FomsPatientsDB.Models
         //возвращает альтернативное название столбца, если синонима нет возвращает это же название
         private string GetColumnAlternativeName(string columnName)
         {
-            string altName = columnsAttributes.Where(x => x.Name == columnName).FirstOrDefault().AltName;
+            string altName = columnProperties.Where(x => x.Name == columnName).FirstOrDefault().AltName;
 
             if (altName == null)
                 altName = columnName;
@@ -42,9 +42,9 @@ namespace FomsPatientsDB.Models
             return altName;
         }
         //возвращает атрибуты столбца по имени, если такого нет - возвращает новый экземпляр с таким именем
-        private ColumnProperty GetColumnAttribute(string name)
+        private ColumnProperty GetColumnProperty(string name)
         {
-            foreach (var attribute in columnsAttributes)
+            foreach (var attribute in columnProperties)
                 if ((attribute.Name == name) || (attribute.AltName == name))
                     return attribute;
 
@@ -112,13 +112,13 @@ namespace FomsPatientsDB.Models
             return -1;
         }
         //открывает файл
-        public async Task Open(string filePath, ColumnProperty[] columnsAttributes = null)
+        public async Task Open(string filePath, ColumnProperty[] columnProperties = null)
         {
             await Task.Run(() =>
                 {
                     excel = new ExcelPackage(new FileInfo(filePath));
                     sheet = excel.Workbook.Worksheets[1];
-                    this.columnsAttributes = columnsAttributes ?? new ColumnProperty[0];
+                    this.columnProperties = columnProperties ?? new ColumnProperty[0];
                     maxRow = sheet.Dimension.Rows;
                     maxCol = sheet.Dimension.Columns;
                     insuranceColumn = GetColumnIndex("ENP");
@@ -209,7 +209,7 @@ namespace FomsPatientsDB.Models
                         continue;
 
                     name = sheet.Cells[1, i].Value.ToString();
-                    synonim = GetColumnAttribute(name);
+                    synonim = GetColumnProperty(name);
                     if (name != synonim.AltName)
                         sheet.Cells[1, i].Value = synonim.AltName;
 

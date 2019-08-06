@@ -26,7 +26,7 @@
         <Button Content="Загрузить"
                 Command=""
                 Click="Button_Click_1" />
-        <Button Content="Шаблон файла"
+        <Button Content="Скачать пример"
                 Click="Button_Click" />
     </StackPanel>
 </UserControl>
