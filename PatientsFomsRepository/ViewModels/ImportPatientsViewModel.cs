@@ -61,6 +61,7 @@ namespace PatientsFomsRepository.ViewModels
             };
             sheet.Cells.LoadFromCollection(c);
             sheet.Cells.AutoFitColumns();
+            sheet.SelectedRange[1, 1, 1, 4].Style.Font.Bold = true;
             excel.SaveAs(new FileInfo(destinationFile));
         }
         private async void ImportExecute(object parameter)
