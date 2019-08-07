@@ -37,6 +37,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="5" />
             <RowDefinition Height="auto" />
+            <RowDefinition Height="20" />
             <RowDefinition Height="40" />
             <RowDefinition />
         </Grid.RowDefinitions>
@@ -57,10 +58,12 @@
             </ItemsControl.ItemsPanel>
         </ItemsControl>
 
-        <TextBlock Grid.Row="2"
+        <Separator Grid.Row="2"  />
+
+        <TextBlock Grid.Row="3"
                    Style="{StaticResource TextBlockHeader}"
                    Text="{Binding CurrentViewModel.FullCaption}" />
-        <ContentControl Grid.Row="3"
+        <ContentControl Grid.Row="4"
                         Content="{Binding CurrentViewModel}" />
     </Grid>
 

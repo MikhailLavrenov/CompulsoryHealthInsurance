@@ -55,13 +55,14 @@
         <Setter Property="MinWidth"
                 Value="0" />
         <Setter Property="Foreground"
-                Value="#FF007ACC" />
+                Value="#FF3980C5" />
         <Setter Property="FontWeight"
                 Value="DemiBold" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Button}">
-                    <TextBlock TextDecorations="Underline">
+                    <TextBlock >
+                        <!--TextDecorations="Underline"-->
                         <ContentPresenter />
                     </TextBlock>
                 </ControlTemplate>
