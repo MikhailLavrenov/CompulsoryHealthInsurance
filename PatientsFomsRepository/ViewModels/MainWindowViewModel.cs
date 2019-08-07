@@ -6,8 +6,6 @@ namespace PatientsFomsRepository.ViewModels
     {
     public class MainWindowViewModel : BindableBase
         {
-        //https://rachel53461.wordpress.com/2011/12/18/navigation-with-mvvm-2/
-
         #region Поля
         private IViewModel currentViewModel;
         #endregion

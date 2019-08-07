@@ -8,7 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace FomsPatientsDB.Models
+namespace PatientsFomsRepository.Models
 {
     /// <summary>
     /// Работа с excel файлом пациентов
@@ -34,9 +34,9 @@ namespace FomsPatientsDB.Models
         //возвращает альтернативное название столбца, если синонима нет возвращает это же название
         private string GetColumnAlternativeName(string columnName)
         {
-            string altName = columnProperties.Where(x => x.Name == columnName).FirstOrDefault().AltName;
+            string altName = columnProperties.Where(x => x.Name == columnName).FirstOrDefault()?.AltName;
 
-            if (altName == null)
+            if (string.IsNullOrEmpty(altName))
                 altName = columnName;
 
             return altName;
@@ -223,32 +223,7 @@ namespace FomsPatientsDB.Models
                 }
             });
         }
-        //преобразует строки из файла в список пациентов
-        public async Task<List<Patient>> GetVerifedPatientsAsync()
-        {
-            return await Task.Run(() =>
-            {
-                var patients = new List<Patient>();
-                for (int row = headerIndex + 1; row < maxRow; row++)
-                {
-                    var insuranceValue = sheet.Cells[row, insuranceColumn].Value;
-                    var surnameValue = sheet.Cells[row, surnameColumn].Value;
-                    var nameValue = sheet.Cells[row, nameColumn].Value;
-                    var patronymicValue = sheet.Cells[row, patronymicColumn].Value ?? "";
-
-                    if (insuranceValue != null && surnameValue != null && nameValue != null)
-                    {
-                        var patient = new Patient(insuranceValue.ToString(), surnameValue.ToString(), nameValue.ToString(), patronymicValue.ToString());
-                        patient.Normalize();
-
-                        patients.Add(patient);
-                    }
-                }
-
-                return patients;
-            });
-        }
-        //Находит строки без полных ФИО
+        //Возвращае полиса паицентов без полных ФИО
         public async Task<string[]> GetUnverifiedInsuaranceNumbersAsync(int limitCount)
         {
             if (initialsColumn == -1)
@@ -281,7 +256,7 @@ namespace FomsPatientsDB.Models
             });
         }
         //вставляет полные ФИО в файл
-        public async Task SetFullNames(List<Patient> cachedPatients)
+        public async Task SetFullNames(IEnumerable<Patient> cachedPatients)
         {
             await Task.Run(() =>
                 {

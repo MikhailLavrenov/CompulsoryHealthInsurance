@@ -35,12 +35,13 @@
 
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="5" />
             <RowDefinition Height="auto" />
             <RowDefinition Height="40" />
             <RowDefinition />
         </Grid.RowDefinitions>
 
-        <ItemsControl Grid.Row="0"
+        <ItemsControl Grid.Row="1"
                       ItemsSource="{Binding ViewModels}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
@@ -56,10 +57,10 @@
             </ItemsControl.ItemsPanel>
         </ItemsControl>
 
-        <TextBlock Grid.Row="1"
+        <TextBlock Grid.Row="2"
                    Style="{StaticResource TextBlockHeader}"
                    Text="{Binding CurrentViewModel.FullCaption}" />
-        <ContentControl Grid.Row="2"
+        <ContentControl Grid.Row="3"
                         Content="{Binding CurrentViewModel}" />
     </Grid>
 

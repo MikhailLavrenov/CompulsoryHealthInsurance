@@ -19,10 +19,10 @@ namespace PatientsFomsRepository.Models
     {
         #region Поля
         private HttpClient client;
-        private Credential credential;
         #endregion
 
         #region Свойства
+        public Credential Credential { get; private set; }
         public bool Authorized { get; private set; }
         #endregion
 
@@ -121,7 +121,7 @@ namespace PatientsFomsRepository.Models
         //авторизация на сайте
         public bool TryAuthorize(Credential credential)
         {
-            this.credential = credential;
+            this.Credential = credential;
             var content = new FormUrlEncodedContent(new[]
                 {
                 new KeyValuePair<string, string>("lg", credential.Login),
@@ -194,54 +194,6 @@ namespace PatientsFomsRepository.Models
         public void Dispose()
         {
             client.Dispose();
-        }
-        //запускает многопоточно запросы к сайту для поиска пациентов
-        public static Patient[] GetPatients(string URL, string proxyAddress, int proxyPort, string[] insuranceNumbers, List<Credential> credentials, int threadsLimit)
-        {
-            if (insuranceNumbers.Length < threadsLimit)
-                threadsLimit = insuranceNumbers.Length;
-
-            var robinRoundCredentials = new RoundRobinCredentials(credentials);
-            var verifiedPatients = new ConcurrentBag<Patient>();
-            var tasks = new Task<SRZ>[threadsLimit];
-            for (int i = 0; i < threadsLimit; i++)
-                tasks[i] = Task.Run(() => { return (SRZ)null; });
-
-            for (int i = 0; i < insuranceNumbers.Length; i++)
-            {
-                var insuranceNumber = insuranceNumbers[i];
-                var index = Task.WaitAny(tasks);
-                tasks[index] = tasks[index].ContinueWith((task) =>
-                {
-                    var site = task.Result;
-                    if (site == null || site.credential.TryReserveRequest() == false)
-                    {
-                        if (site != null)
-                            site.Logout();
-
-                        while (true)
-                        {
-                            if (robinRoundCredentials.TryGetNext(out Credential credential) == false)
-                                return null;
-
-                            if (credential.TryReserveRequest())
-                            {
-                                site = new SRZ(URL, proxyAddress, proxyPort);
-                                if (site.TryAuthorize(credential))
-                                    break;
-                            }
-                        }
-                    }
-
-                    if (site.TryGetPatient(insuranceNumber, out Patient patient))
-                        verifiedPatients.Add(patient);
-
-                    return site;
-                });
-            }
-            Task.WaitAll(tasks);
-
-            return verifiedPatients.ToArray();
         }
         #endregion
     }

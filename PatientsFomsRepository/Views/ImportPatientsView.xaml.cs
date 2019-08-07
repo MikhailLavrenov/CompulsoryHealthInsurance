@@ -28,14 +28,14 @@ namespace PatientsFomsRepository.Views
             {
                 var file = fileDialog.FileName;
                 var viewModel = (ImportPatientsViewModel)DataContext;
-                if (viewModel.GetExampleCommand.CanExecute(file))
-                    viewModel.GetExampleCommand.Execute(file);
+                if (viewModel.SaveExampleCommand.CanExecute(file))
+                    viewModel.SaveExampleCommand.Execute(file);
             }
         }
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
-            var fileDialog = new SaveFileDialog();
+            var fileDialog = new OpenFileDialog();
             fileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
             fileDialog.Filter = "xlsx files (*.xslx)|*.xlsx";
 

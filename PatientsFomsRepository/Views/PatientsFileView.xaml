@@ -40,34 +40,34 @@
         <CheckBox  Grid.Row="0"
                    Grid.Column="1"
                    Name="CheckBoxDowloadNewFile"
-                   IsChecked="True" />
+                   IsChecked="{Binding Settings.DownloadNewPatientsFile}" />
         <TextBlock Grid.Row="1"
                    Grid.Column="0"
                    Text="Файл на дату"
-                   Visibility="{Binding IsChecked, ElementName=CheckBoxDowloadNewFile, Converter={i:BoolToVisibleConverter}}"/>
+                   Visibility="{Binding IsChecked, ElementName=CheckBoxDowloadNewFile, Converter={i:BoolToVisibleConverter}}" />
         <DatePicker Grid.Row="1"
                     Grid.Column="1"
                     Visibility="{Binding IsChecked, ElementName=CheckBoxDowloadNewFile, Converter={i:BoolToVisibleConverter}}"
-                    SelectedDate="{x:Static sys:DateTime.Now}" />
+                    SelectedDate="{Binding FileDate}" />
         <TextBlock Grid.Row="2"
                    Grid.Column="0"
                    Text="Путь к файлу: " />
         <DockPanel  Grid.Row="2"
                     Grid.Column="1">
-                <!--Файловый диалог в CodeBehind-->
+            <!--Файловый диалог в CodeBehind-->
             <Button  DockPanel.Dock="Right"
                      Style="{StaticResource PictureButton}"
                      Click="Button_Click">
                 <ContentControl Content="{Binding Source={StaticResource FileDialog}}" />
             </Button>
             <TextBox  Text="{Binding Path=Settings.PatientsFilePath}"
-                          Name="TextBoxFilePath" />
-            </DockPanel>
-            <Button Grid.Row="3"
+                      Name="TextBoxFilePath" />
+        </DockPanel>
+        <Button Grid.Row="3"
                 Grid.Column="0"
                 Grid.ColumnSpan="2"
                 Content="ОК"
-                Command="{Binding ProcessFileCommand}" />
+                Command="{Binding ProcessFileCommand}"/>
 
     </Grid>
 

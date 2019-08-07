@@ -1,4 +1,5 @@
 ﻿using Microsoft.Win32;
+using System;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
@@ -24,15 +25,21 @@ namespace PatientsFomsRepository.Views
             else
                 fileDialog = new OpenFileDialog();
 
-            if (string.IsNullOrEmpty(TextBoxFilePath.Text))
-                fileDialog.InitialDirectory = Directory.GetCurrentDirectory();
-            else
+            if (string.IsNullOrEmpty(TextBoxFilePath.Text) == false)
+            {
                 fileDialog.InitialDirectory = Path.GetDirectoryName(TextBoxFilePath.Text);
+                fileDialog.FileName = Path.GetFileName(TextBoxFilePath.Text);
+            }
 
             fileDialog.Filter = "xlsx files (*.xslx)|*.xlsx";
 
             if (fileDialog.ShowDialog() == true)
                 TextBoxFilePath.Text = fileDialog.FileName;
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

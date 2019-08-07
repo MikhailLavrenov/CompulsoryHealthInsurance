@@ -24,15 +24,18 @@ namespace PatientsFomsRepository.Views
             else
                 fileDialog = new OpenFileDialog();
 
-            if (string.IsNullOrEmpty(TextBoxFilePath.Text))
-                fileDialog.InitialDirectory = Directory.GetCurrentDirectory();
-            else
+            if (string.IsNullOrEmpty(TextBoxFilePath.Text) == false)
+            {
                 fileDialog.InitialDirectory = Path.GetDirectoryName(TextBoxFilePath.Text);
+                fileDialog.FileName = Path.GetFileName(TextBoxFilePath.Text);
+            }
 
             fileDialog.Filter = "xlsx files (*.xslx)|*.xlsx";
 
-            if (fileDialog.ShowDialog()==true)
+            if (fileDialog.ShowDialog() == true)
                 TextBoxFilePath.Text = fileDialog.FileName;
         }
+
+
     }
 }

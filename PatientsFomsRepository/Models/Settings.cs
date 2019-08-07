@@ -168,7 +168,7 @@ namespace PatientsFomsRepository.Models
             FormatPatientsFile = true;
             ColumnProperties = new ObservableCollection<ColumnProperty>()
              {
-                    new ColumnProperty{Name="ENP",         AltName="Номер полис",           Hide=false,  Delete=false},
+                    new ColumnProperty{Name="ENP",         AltName="Полис",                 Hide=false,  Delete=false},
                     new ColumnProperty{Name="FIO",         AltName="ФИО",                   Hide=false,  Delete=false},
                     new ColumnProperty{Name="SEX",         AltName="Пол",                   Hide=false,  Delete=false},
                     new ColumnProperty{Name="BIRTHDAY",    AltName="Дата рождения",         Hide=false,  Delete=false},
