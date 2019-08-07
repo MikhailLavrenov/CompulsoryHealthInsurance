@@ -44,7 +44,7 @@
                       ItemsSource="{Binding ViewModels}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Button Content="{Binding ShortCaption}"
+                    <Button Content="{Binding ShortCaption}" Style="{StaticResource ReferenceButton}"
                             Command="{Binding DataContext.ChangeViewCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
                             CommandParameter="{Binding }" />
                 </DataTemplate>

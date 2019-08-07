@@ -49,6 +49,32 @@
         </Setter>
     </Style>
 
+    <Style TargetType="Button"
+           x:Key="ReferenceButton"
+           BasedOn="{StaticResource ControlBaseStyle}">
+        <Setter Property="MinWidth"
+                Value="0" />
+        <Setter Property="Foreground"
+                Value="#FF007ACC" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <TextBlock TextDecorations="Underline">
+                        <ContentPresenter />
+                    </TextBlock>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver"
+                     Value="true">
+                <Setter Property="FontWeight"
+                        Value="Bold" />
+            </Trigger>
+        </Style.Triggers>
+
+    </Style>
+
     <Style TargetType="CheckBox"
            BasedOn="{StaticResource ControlBaseStyle}">
     </Style>
