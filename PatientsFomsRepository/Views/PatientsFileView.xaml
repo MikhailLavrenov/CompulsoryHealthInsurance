@@ -77,7 +77,8 @@
         <TextBlock Grid.Row="4"
                    Grid.Column="0"
                    Grid.ColumnSpan="2"
-                   Text="{Binding Path=Progress}" />
+                   Text="{Binding Path=Progress}"
+                   TextWrapping="Wrap"/>
 
     </Grid>
 

@@ -16,7 +16,7 @@ namespace PatientsFomsRepository.Models
         private static readonly object locker = new object();
         private ExcelPackage excel;
         private ExcelWorksheet sheet;
-        private ColumnProperty[] columnProperties;
+        private List<ColumnProperty> columnProperties;
         private int maxRow;
         private int maxCol;
         private int headerIndex = 1;
@@ -29,11 +29,11 @@ namespace PatientsFomsRepository.Models
 
         #region Методы
         //открывает файл
-        public void Open(string filePath, ColumnProperty[] columnProperties = null)
+        public void Open(string filePath, IEnumerable<ColumnProperty> columnProperties)
         {
             excel = new ExcelPackage(new FileInfo(filePath));
             sheet = excel.Workbook.Worksheets[1];
-            this.columnProperties = columnProperties ?? new ColumnProperty[0];
+            this.columnProperties = columnProperties.ToList();
             maxRow = sheet.Dimension.Rows;
             maxCol = sheet.Dimension.Columns;
             insuranceColumn = GetColumnIndex("ENP");
@@ -49,35 +49,25 @@ namespace PatientsFomsRepository.Models
         {
             excel.Save();
         }
-        //Возвращае полиса пациентов без полных ФИО
+        //Возвращает полиса пациентов без полных ФИО
         public List<string> GetUnknownInsuaranceNumbers(int limitCount)
         {
             var patients = new List<string>();
 
-            Parallel.For(headerIndex + 1, maxRow + 1, (row, state) =>
+            for (int row = headerIndex + 1; row <= maxRow; row++)
             {
-                object insuranceValue;
-                object initialsValue;
-                object surnameValue;
+                var insuranceValue = sheet.Cells[row, insuranceColumn].Value;
+                var initialsValue = sheet.Cells[row, initialsColumn].Value;
+                var surnameValue = sheet.Cells[row, surnameColumn].Value;
 
-                //lock (locker)
-                {
-                    insuranceValue = sheet.Cells[row, insuranceColumn].Value;
-                    initialsValue = sheet.Cells[row, initialsColumn].Value;
-                    surnameValue = sheet.Cells[row, surnameColumn].Value;
-                }
+                if (insuranceValue == null || initialsValue == null || surnameValue != null)
+                    continue;
 
-                if (insuranceValue != null && initialsValue != null && surnameValue == null)
-                {
-                    lock (locker)
-                    {
-                        if (patients.Count < limitCount)
-                            patients.Add(insuranceValue.ToString());
-                        else
-                            state.Break();
-                    }
-                }
-            });
+                if (patients.Count < limitCount)
+                    patients.Add(insuranceValue.ToString());
+                else
+                    break;
+            }
 
             return patients;
         }
@@ -90,24 +80,26 @@ namespace PatientsFomsRepository.Models
                 object initialsValue;
                 object surnameValue;
 
-                //lock (locker)
+                lock (locker)
                 {
                     insuranceValue = sheet.Cells[row, insuranceColumn].Value;
                     initialsValue = sheet.Cells[row, initialsColumn].Value;
                     surnameValue = sheet.Cells[row, surnameColumn].Value;
                 }
 
-                if (insuranceValue != null && initialsValue != null && surnameValue == null)
-                {
-                    var patient = cachedPatients.Where(x => x.InsuranceNumber == insuranceValue.ToString() && x.Initials == initialsValue.ToString()).FirstOrDefault();
+                if (insuranceValue == null || initialsValue == null || surnameValue != null)
+                    return;
 
-                    if (patient != null)
-                        lock (locker)
-                        {
-                            sheet.Cells[row, surnameColumn].Value = patient.Surname;
-                            sheet.Cells[row, nameColumn].Value = patient.Name;
-                            sheet.Cells[row, patronymicColumn].Value = patient.Patronymic;
-                        }
+                var patient = cachedPatients.Where(x => x.InsuranceNumber == insuranceValue.ToString() && x.Initials == initialsValue.ToString()).FirstOrDefault();
+
+                if (patient == null)
+                    return;
+
+                lock (locker)
+                {
+                    sheet.Cells[row, surnameColumn].Value = patient.Surname;
+                    sheet.Cells[row, nameColumn].Value = patient.Name;
+                    sheet.Cells[row, patronymicColumn].Value = patient.Patronymic;
                 }
             });
         }
@@ -130,7 +122,7 @@ namespace PatientsFomsRepository.Models
         private int GetColumnIndex(string columnName)
         {
             var columnProperty = columnProperties
-                .Where(x => x.Name == columnName || x.AltName == columnName)
+                .Where(x=>string.Equals(x.Name, columnName, StringComparison.OrdinalIgnoreCase) || string.Equals(x.AltName, columnName, StringComparison.OrdinalIgnoreCase))
                 .FirstOrDefault();
 
             if (columnProperty == null)
@@ -157,7 +149,7 @@ namespace PatientsFomsRepository.Models
         private ColumnProperty GetColumnProperty(string name)
         {
             foreach (var attribute in columnProperties)
-                if ((attribute.Name == name) || (attribute.AltName == name))
+                if (string.Equals(attribute.Name,name, StringComparison.OrdinalIgnoreCase)    || string.Equals(attribute.AltName, name, StringComparison.OrdinalIgnoreCase))
                     return attribute;
 
             return new ColumnProperty { Name = name, AltName = name, Hide = false, Delete = false };
@@ -176,6 +168,7 @@ namespace PatientsFomsRepository.Models
                 surnameColumn = initialsColumn + 1;
                 sheet.InsertColumn(surnameColumn, 1);
                 sheet.Cells[headerIndex, surnameColumn].Value = "Фамилия";
+                maxCol++;
             }
 
             if (nameColumn == -1)
@@ -183,6 +176,7 @@ namespace PatientsFomsRepository.Models
                 nameColumn = surnameColumn + 1;
                 sheet.InsertColumn(nameColumn, 1);
                 sheet.Cells[headerIndex, nameColumn].Value = "Имя";
+                maxCol++;
             }
 
             if (patronymicColumn == -1)
@@ -190,6 +184,7 @@ namespace PatientsFomsRepository.Models
                 patronymicColumn = nameColumn + 1;
                 sheet.InsertColumn(patronymicColumn, 1);
                 sheet.Cells[headerIndex, patronymicColumn].Value = "Отчество";
+                maxCol++;
             }
         }
         //изменяет порядок столбоцов в соотвествии с порядком следования ColumnProperties
@@ -228,26 +223,10 @@ namespace PatientsFomsRepository.Models
             var cells = sheet.Cells[headerIndex + 1, sexColumn, maxRow, sexColumn]
                 .Where(x => x.Value != null);
 
-            foreach (var item in cells)
-                item.ToString()
+            foreach (var cell in cells)
+                cell.Value=cell.Value.ToString()
                     .Replace("1", "Мужской")
                     .Replace("2", "Женский");
-
-
-            //if (sexColumn != -1)
-            //    for (int i = 1; i <= maxRow; i++)
-            //    {
-            //        var cellValue = sheet.Cells[i, sexColumn].Value;
-
-            //        if (cellValue == null)
-            //            continue;
-
-            //        var str = cellValue.ToString();
-            //        if (str == "1")
-            //            sheet.Cells[i, sexColumn].Value = "Мужской";
-            //        else if (str == "2")
-            //            sheet.Cells[i, sexColumn].Value = "Женский";
-            //    }
         }
         //применяет свойства столбца к таблице: заменяет названия столбцов на русские, скрывает и удаляет столбцы
         private void ApplyColumnProperty()
@@ -260,15 +239,15 @@ namespace PatientsFomsRepository.Models
                     continue;
 
                 var name = cellValue.ToString();
-                var synonim = GetColumnProperty(name);
+                var columnProperty = GetColumnProperty(name);
 
-                if (name != synonim.AltName)
-                    sheet.Cells[headerIndex, i].Value = synonim.AltName;
+                if (name != columnProperty.AltName)
+                    sheet.Cells[headerIndex, i].Value = columnProperty.AltName;
 
-                if (synonim.Hide)
+                if (columnProperty.Hide)
                     sheet.Column(i).Hidden = true;
 
-                if (synonim.Delete)
+                if (columnProperty.Delete)
                 {
                     sheet.DeleteColumn(i);
                     maxCol--;

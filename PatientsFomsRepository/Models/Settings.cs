@@ -14,6 +14,7 @@ namespace PatientsFomsRepository.Models
     {
         #region Поля
         //SRZ
+        private readonly int timeoutConnection = 5000;
         private string siteAddress;
         private bool useProxy;
         private string proxyAddress;
@@ -75,67 +76,13 @@ namespace PatientsFomsRepository.Models
         #endregion
 
         #region Методы
-        //проверяет настройки прокси-сервера
-        private void TestProxy()
-        {
-            if (UseProxy)
-            {
-                var client = new TcpClient();
-                var connected = client.ConnectAsync(ProxyAddress, ProxyPort).Wait(10000);
-                ProxyIsNotValid = !connected;
-                client.Close();
-            }
-            else
-                ProxyIsNotValid = false;
-        }
-        //проверяет доступность сайта
-        private void TestSite()
-        {
-            if (ProxyIsNotValid == false)
-            {
-                try
-                {
-                    var webRequest = (HttpWebRequest)WebRequest.Create(SiteAddress);
-                    webRequest.Timeout = 10000;
-                    if (useProxy)
-                        webRequest.Proxy = new WebProxy(ProxyAddress + ":" + ProxyPort);
-
-                    webRequest.GetResponse();
-                    webRequest.Abort();
-                }
-                catch (Exception)
-                {
-                    SiteAddressIsNotValid = true;
-                    return;
-                }
-            }
-
-            SiteAddressIsNotValid = false;
-        }
-        //проверяет учетные данные
-        private void TestCredentials()
-        {
-            if (SiteAddressIsNotValid == false)
-            {
-                Parallel.ForEach(Credentials, credential =>
-                {
-                    using (SRZ site = new SRZ(SiteAddress, ProxyAddress, ProxyPort))
-                    {
-                        credential.IsNotValid = site.TryAuthorize(credential)==false;
-                    }
-                });
-                CredentialsIsNotValid = Credentials.FirstOrDefault(x => x.IsNotValid == true) != null;
-            }
-            else
-                CredentialsIsNotValid = false;
-        }
         //проверить настройки
         public void TestConnection()
         {
             TestProxy();
             TestSite();
             TestCredentials();
-            ConnectionIsValid = SiteAddressIsNotValid == ProxyIsNotValid == CredentialsIsNotValid == false;
+            ConnectionIsValid = SiteAddressIsNotValid == false && ProxyIsNotValid == false && CredentialsIsNotValid == false;
         }
         //сохраняет настройки в xml
         public void Save()
@@ -169,6 +116,9 @@ namespace PatientsFomsRepository.Models
              {
                     new ColumnProperty{Name="ENP",         AltName="Полис",                 Hide=false,  Delete=false},
                     new ColumnProperty{Name="FIO",         AltName="ФИО",                   Hide=false,  Delete=false},
+                    new ColumnProperty{Name="Фамилия",     AltName="Фамилия",               Hide=false,  Delete=false},
+                    new ColumnProperty{Name="Имя",         AltName="Имя",                   Hide=false,  Delete=false},
+                    new ColumnProperty{Name="Отчество",    AltName="Отчество",              Hide=false,  Delete=false},
                     new ColumnProperty{Name="SEX",         AltName="Пол",                   Hide=false,  Delete=false},
                     new ColumnProperty{Name="BIRTHDAY",    AltName="Дата рождения",         Hide=false,  Delete=false},
                     new ColumnProperty{Name="SNILS",       AltName="СНИЛС",                 Hide=false,  Delete=false},
@@ -200,6 +150,7 @@ namespace PatientsFomsRepository.Models
                     new ColumnProperty{Name="LDR_CODE",    AltName="LDR_CODE",              Hide=false,  Delete=true},
                     new ColumnProperty{Name="LDR_NAME",    AltName="LDR_NAME",              Hide=false,  Delete=true},
                     new ColumnProperty{Name="PC_IDATE",    AltName="PC_IDATE",              Hide=false,  Delete=true},
+                    new ColumnProperty{Name="PRV_TYPE",    AltName="PRV_TYPE",              Hide=false,  Delete=true},
              };
         }
         //устанавливает по-умолчанию настройки для СРЗ-сайта
@@ -231,6 +182,71 @@ namespace PatientsFomsRepository.Models
             var itemIndex = ColumnProperties.IndexOf(item);
             if (itemIndex >= 0 && itemIndex < ColumnProperties.Count - 1)
                 ColumnProperties.Move(itemIndex, itemIndex + 1);
+        }
+        //проверяет настройки прокси-сервера
+        private void TestProxy()
+        {
+            if (UseProxy)
+            {
+                var client = new TcpClient();
+
+                try
+                {
+                    var connected = client.ConnectAsync(ProxyAddress, ProxyPort).Wait(timeoutConnection);
+                    ProxyIsNotValid = !connected;
+                }
+                catch (Exception)
+                {
+                    ProxyIsNotValid = true;
+                }
+                finally
+                {
+                    client.Close();
+                }
+            }
+            else
+                ProxyIsNotValid = false;
+        }
+        //проверяет доступность сайта
+        private void TestSite()
+        {
+            if (ProxyIsNotValid == false)
+            {
+                try
+                {
+                    var webRequest = (HttpWebRequest)WebRequest.Create(SiteAddress);
+                    webRequest.Timeout = timeoutConnection;
+                    if (useProxy)
+                        webRequest.Proxy = new WebProxy(ProxyAddress + ":" + ProxyPort);
+
+                    webRequest.GetResponse();
+                    webRequest.Abort();
+                }
+                catch (Exception)
+                {
+                    SiteAddressIsNotValid = true;
+                    return;
+                }
+            }
+
+            SiteAddressIsNotValid = false;
+        }
+        //проверяет учетные данные
+        private void TestCredentials()
+        {
+            if (SiteAddressIsNotValid == false)
+            {
+                Parallel.ForEach(Credentials, credential =>
+                {
+                    using (SRZ site = new SRZ(SiteAddress, ProxyAddress, ProxyPort))
+                    {
+                        credential.IsNotValid = site.TryAuthorize(credential) == false;
+                    }
+                });
+                CredentialsIsNotValid = Credentials.FirstOrDefault(x => x.IsNotValid == true) != null;
+            }
+            else
+                CredentialsIsNotValid = false;
         }
         #endregion
     }
