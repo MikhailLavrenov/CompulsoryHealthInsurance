@@ -2,6 +2,7 @@
 using PatientsFomsRepository.Models;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.IO;
 using System.Linq;
@@ -41,11 +42,11 @@ namespace PatientsFomsRepository.ViewModels
 
         #region Методы
         //запускает многопоточно запросы к сайту для поиска пациентов
-        private Patient[] GetPatients(string[] insuranceNumbers)
+        private Patient[] GetPatients(List<string> insuranceNumbers)
         {
             int threadsLimit = Settings.ThreadsLimit;
-            if (insuranceNumbers.Length < threadsLimit)
-                threadsLimit = insuranceNumbers.Length;
+            if (insuranceNumbers.Count < threadsLimit)
+                threadsLimit = insuranceNumbers.Count;
 
             var robinRoundCredentials = new RoundRobinCredentials(Settings.Credentials);
             var verifiedPatients = new ConcurrentBag<Patient>();
@@ -53,7 +54,7 @@ namespace PatientsFomsRepository.ViewModels
             for (int i = 0; i < threadsLimit; i++)
                 tasks[i] = Task.Run(() => { return (SRZ)null; });
 
-            for (int i = 0; i < insuranceNumbers.Length; i++)
+            for (int i = 0; i < insuranceNumbers.Count; i++)
             {
                 var insuranceNumber = insuranceNumbers[i];
                 var index = Task.WaitAny(tasks);
@@ -96,6 +97,14 @@ namespace PatientsFomsRepository.ViewModels
         }
         private async void ProcessFileExecute(object parameter)
         {
+            Progress = "Проверка подключения к СРЗ";
+            await Task.Run(() => Settings.TestConnection());
+            if (Settings.ConnectionIsValid == false)
+            {
+                Progress = "Подключение к СРЗ отсутствует";
+                return;
+            }
+
             if (Settings.DownloadNewPatientsFile)
             {
                 Progress = "Загрузка файла из СРЗ";
@@ -126,12 +135,12 @@ namespace PatientsFomsRepository.ViewModels
 
             Progress = "Поиск пациентов без ФИО в файле";
             var limitCount = 0;
-            var unverifiedInsuaranceNumbers = new string[0];
+            var unverifiedInsuaranceNumbers = new List<string>();
 
             await Task.Run(() =>
             {
                 limitCount = Settings.Credentials.Sum(x => x.RequestsLimit);
-                unverifiedInsuaranceNumbers = file.GetUnverifiedInsuaranceNumbersAsync(limitCount);
+                unverifiedInsuaranceNumbers = file.GetUnknownInsuaranceNumbers(limitCount);
             });
 
             Progress = "Поиск ФИО в СРЗ";
@@ -150,8 +159,14 @@ namespace PatientsFomsRepository.ViewModels
             Progress = "Добавление в кэш ФИО найденных в СРЗ";
             await Task.Run(() =>
             {
-                db.Patients.AddRange(verifiedPatients);
-                db.SaveChanges();
+                //db.Patients.AddRange(verifiedPatients);
+                //db.SaveChanges();
+                foreach (var item in verifiedPatients)
+
+                {
+                    db.Patients.Add(item);
+                    db.SaveChanges();
+                }
             });
 
             Progress = $"Завершено, из СРЗ загружено {verifiedPatients.Count()} из разрешенных {limitCount}";
