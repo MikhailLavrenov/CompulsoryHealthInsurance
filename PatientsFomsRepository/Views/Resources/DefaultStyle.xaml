@@ -55,13 +55,13 @@
         <Setter Property="MinWidth"
                 Value="0" />
         <Setter Property="Foreground"
-                Value="#FF3980C5" />
+                Value="#FF019BE2" />
         <Setter Property="FontWeight"
                 Value="DemiBold" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Button}">
-                    <TextBlock >
+                    <TextBlock>                        
                         <!--TextDecorations="Underline"-->
                         <ContentPresenter />
                     </TextBlock>
@@ -128,7 +128,7 @@
         <Setter Property="VerticalContentAlignment"
                 Value="Center" />
         <Style.Resources>
-            <!-- Cбрасываем стиль button Стиль button применяется к кнопке календаря и элемент некрасиво расползается поэтому  -->
+            <!-- Cбрасываем стиль button. Стиль button применяется к кнопке календаря и элемент некрасиво расползается-->
             <Style TargetType="{x:Type Button}">
                 <Setter Property="MinHeight"
                         Value="19" />
