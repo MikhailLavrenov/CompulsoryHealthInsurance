@@ -1,4 +1,5 @@
 ﻿using Microsoft.Win32;
+using PatientsFomsRepository.ViewModels;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
@@ -33,7 +34,10 @@ namespace PatientsFomsRepository.Views
             fileDialog.Filter = "xlsx files (*.xslx)|*.xlsx";
 
             if (fileDialog.ShowDialog() == true)
-                TextBoxFilePath.Text = fileDialog.FileName;
+            {
+                var viewModel=(PatientsFileSettingsViewModel)DataContext;
+                viewModel.Settings.PatientsFilePath= fileDialog.FileName;
+            }
         }
 
 

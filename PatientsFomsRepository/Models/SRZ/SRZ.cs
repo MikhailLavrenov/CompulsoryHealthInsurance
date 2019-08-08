@@ -53,7 +53,7 @@ namespace PatientsFomsRepository.Models
             client.BaseAddress = new Uri(URL);
         }
         //получает ссылку на файл заданной даты
-        private async Task<string> GetFileReference(DateTime fileDate)
+        private  string GetFileReference(DateTime fileDate)
         {
             string shortFileDate = fileDate.ToShortDateString();
             var content = new FormUrlEncodedContent(new[]
@@ -61,7 +61,7 @@ namespace PatientsFomsRepository.Models
                 new KeyValuePair<string, string>("export_date_on", shortFileDate),
                 new KeyValuePair<string, string>("exportlist_id", "25"),
                 });
-            var response = await client.PostAsync("data/dbase.export.php", content);
+            var response = client.PostAsync("data/dbase.export.php", content).Result;
             response.EnsureSuccessStatusCode();
             string responseText = response.Content.ReadAsStringAsync().Result;
 
@@ -71,12 +71,12 @@ namespace PatientsFomsRepository.Models
             return responseText.Substring(begin, end);
         }
         //получает dbf файл прикрепленных пацентов
-        private async Task<Stream> GetDbfFile(string downloadReference)
+        private  Stream GetDbfFile(string downloadReference)
         {
             //скачиваем zip архив
-            var response = await client.GetAsync(downloadReference);
+            var response = client.GetAsync(downloadReference).Result;
             response.EnsureSuccessStatusCode();
-            var zipFile = await response.Content.ReadAsStreamAsync();
+            var zipFile = response.Content.ReadAsStreamAsync().Result;
 
             //извлекаем dbf файл
             Stream dbfFile = new MemoryStream();
@@ -185,10 +185,10 @@ namespace PatientsFomsRepository.Models
             }
         }
         //получает excel файл прикрепленных пациентов на дату
-        public async Task GetPatientsFile(string excelFile, DateTime onDate)
+        public void GetPatientsFile(string excelFile, DateTime onDate)
         {
-            var fileReference = await GetFileReference(onDate);
-            var dbfFile = await GetDbfFile(fileReference);
+            var fileReference = GetFileReference(onDate);
+            var dbfFile = GetDbfFile(fileReference);
             DbfToExcel(dbfFile, excelFile);
         }
         public void Dispose()

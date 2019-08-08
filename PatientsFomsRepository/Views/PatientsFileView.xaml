@@ -20,6 +20,7 @@
     </UserControl.Resources>
 
     <Grid>
+        
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="130" />
             <ColumnDefinition Width="400" />
@@ -32,8 +33,9 @@
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
-
+            <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
+        
         <TextBlock Grid.Row="0"
                    Grid.Column="0"
                    Text="Скачать новый файл" />
@@ -41,6 +43,7 @@
                    Grid.Column="1"
                    Name="CheckBoxDowloadNewFile"
                    IsChecked="{Binding Settings.DownloadNewPatientsFile}" />
+        
         <TextBlock Grid.Row="1"
                    Grid.Column="0"
                    Text="Файл на дату"
@@ -49,6 +52,7 @@
                     Grid.Column="1"
                     Visibility="{Binding IsChecked, ElementName=CheckBoxDowloadNewFile, Converter={i:BoolToVisibleConverter}}"
                     SelectedDate="{Binding FileDate}" />
+        
         <TextBlock Grid.Row="2"
                    Grid.Column="0"
                    Text="Путь к файлу: " />
@@ -63,11 +67,17 @@
             <TextBox  Text="{Binding Path=Settings.PatientsFilePath}"
                       Name="TextBoxFilePath" />
         </DockPanel>
+        
         <Button Grid.Row="3"
                 Grid.Column="0"
                 Grid.ColumnSpan="2"
                 Content="ОК"
                 Command="{Binding ProcessFileCommand}"/>
+
+        <TextBlock Grid.Row="4"
+                   Grid.Column="0"
+                   Grid.ColumnSpan="2"
+                   Text="{Binding Path=Progress}" />
 
     </Grid>
 

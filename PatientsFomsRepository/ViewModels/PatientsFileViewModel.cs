@@ -2,11 +2,9 @@
 using PatientsFomsRepository.Models;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Data.Entity;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace PatientsFomsRepository.ViewModels
@@ -16,11 +14,13 @@ namespace PatientsFomsRepository.ViewModels
         #region Поля
         private Settings settings;
         private DateTime fileDate;
+        private string progress;
         #endregion
 
         #region Свойства
         public string ShortCaption { get; set; }
         public string FullCaption { get; set; }
+        public string Progress { get => progress; set => SetProperty(ref progress, value); }
         public RelayCommand ProcessFileCommand { get; }
         public Settings Settings { get => settings; set => SetProperty(ref settings, value); }
         public DateTime FileDate { get => fileDate; set => SetProperty(ref fileDate, value); }
@@ -33,8 +33,8 @@ namespace PatientsFomsRepository.ViewModels
             FullCaption = "Получить полные ФИО пациентов";
             Settings = Settings.Instance;
             FileDate = DateTime.Today;
-            ProcessFileCommand = new RelayCommand(ProcessFileExecute, ProcessFileCanEcecute);
-
+            ProcessFileCommand = new RelayCommand(ProcessFileExecute, ProcessFileCanExecute);
+            Progress = "";
 
         }
         #endregion
@@ -96,31 +96,67 @@ namespace PatientsFomsRepository.ViewModels
         }
         private async void ProcessFileExecute(object parameter)
         {
-            SRZ site;
-            if (Settings.UseProxy)
-             site = new SRZ(Settings.SiteAddress, Settings.ProxyAddress, Settings.ProxyPort);
-            else 
-                site= new SRZ(Settings.SiteAddress);
-
             if (Settings.DownloadNewPatientsFile)
             {
-                site.TryAuthorize(Settings.Credentials.First(x => x.RequestsLimit > 0));
-                await site.GetPatientsFile(Settings.PatientsFilePath, FileDate);
+                Progress = "Загрузка файла из СРЗ";
+                await Task.Run(() =>
+                {
+                    SRZ site;
+                    if (Settings.UseProxy)
+                        site = new SRZ(Settings.SiteAddress, Settings.ProxyAddress, Settings.ProxyPort);
+                    else
+                        site = new SRZ(Settings.SiteAddress);
+
+                    var credential = Settings.Credentials.First(x => x.RequestsLimit > 0);
+                    site.TryAuthorize(credential);
+                    site.GetPatientsFile(Settings.PatientsFilePath, FileDate);
+                });
             }
 
+            Progress = "Подстановка ФИО из кэша";
             var db = new Models.Database();
-            db.Patients.Load();
             var file = new PatientsFile();
-            await file.Open(@"C:\Users\ЛавреновМВ\Desktop\attmo.xlsx");
-            await file.SetFullNames(db.Patients);
-            var limitCount = Settings.Credentials.Sum(x => x.RequestsLimit);
-            var unverifiedInsuaranceNumbers = await file.GetUnverifiedInsuaranceNumbersAsync(limitCount);
-            var verifiedPatients = GetPatients(unverifiedInsuaranceNumbers);
-            db.Patients.AddRange(verifiedPatients);
-            db.SaveChanges();
-            await file.SetFullNames(db.Patients);                   
+
+            await Task.Run(() =>
+            {
+                db.Patients.Load();
+                file.Open(Settings.PatientsFilePath);
+                file.SetFullNames(db.Patients.ToList());
+            });
+
+            Progress = "Поиск пациентов без ФИО в файле";
+            var limitCount = 0;
+            var unverifiedInsuaranceNumbers = new string[0];
+
+            await Task.Run(() =>
+            {
+                limitCount = Settings.Credentials.Sum(x => x.RequestsLimit);
+                unverifiedInsuaranceNumbers = file.GetUnverifiedInsuaranceNumbersAsync(limitCount);
+            });
+
+            Progress = "Поиск ФИО в СРЗ";
+            var verifiedPatients = new Patient[0];
+
+            await Task.Run(() =>
+            verifiedPatients = GetPatients(unverifiedInsuaranceNumbers));
+
+            Progress = "Подстановка в файл ФИО найденных в СРЗ";
+            await Task.Run(() =>
+            {
+                file.SetFullNames(verifiedPatients);
+                file.Save();
+            });
+
+            Progress = "Добавление в кэш ФИО найденных в СРЗ";
+            await Task.Run(() =>
+            {
+                db.Patients.AddRange(verifiedPatients);
+                db.SaveChanges();
+            });
+
+            Progress = $"Завершено, из СРЗ загружено {verifiedPatients.Count()} из разрешенных {limitCount}";
         }
-        private bool ProcessFileCanEcecute (object parameter)
+        private bool ProcessFileCanExecute(object parameter)
         {
             if (Settings.DownloadNewPatientsFile == false && File.Exists(Settings.PatientsFilePath) == false)
                 return false;

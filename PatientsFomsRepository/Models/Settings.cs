@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 using System.Xml.Serialization;
 
 namespace PatientsFomsRepository.Models
-    {
+{
     public class Settings : BindableBase
-        {
+    {
         #region Поля
         //SRZ
         private string siteAddress;
@@ -66,36 +66,35 @@ namespace PatientsFomsRepository.Models
         {
             Instance = Load();
         }
-
         public Settings()
-            {
+        {
             Credentials = new ObservableCollection<Credential>();
             ColumnProperties = new ObservableCollection<ColumnProperty>();
             Instance = this;
-            }
+        }
         #endregion
 
         #region Методы
         //проверяет настройки прокси-сервера
         private void TestProxy()
-            {
+        {
             if (UseProxy)
-                {
+            {
                 var client = new TcpClient();
                 var connected = client.ConnectAsync(ProxyAddress, ProxyPort).Wait(10000);
                 ProxyIsNotValid = !connected;
                 client.Close();
-                }
+            }
             else
                 ProxyIsNotValid = false;
-            }
+        }
         //проверяет доступность сайта
         private void TestSite()
-            {
+        {
             if (ProxyIsNotValid == false)
-                {
+            {
                 try
-                    {
+                {
                     var webRequest = (HttpWebRequest)WebRequest.Create(SiteAddress);
                     webRequest.Timeout = 10000;
                     if (useProxy)
@@ -103,66 +102,66 @@ namespace PatientsFomsRepository.Models
 
                     webRequest.GetResponse();
                     webRequest.Abort();
-                    }
+                }
                 catch (Exception)
-                    {
+                {
                     SiteAddressIsNotValid = true;
                     return;
-                    }
                 }
+            }
 
             SiteAddressIsNotValid = false;
-            }
+        }
         //проверяет учетные данные
         private void TestCredentials()
-            {
+        {
             if (SiteAddressIsNotValid == false)
-                {
+            {
                 Parallel.ForEach(Credentials, credential =>
                 {
                     using (SRZ site = new SRZ(SiteAddress, ProxyAddress, ProxyPort))
-                        {
-                        credential.IsNotValid = site.TryAuthorize(credential);
-                        }
+                    {
+                        credential.IsNotValid = site.TryAuthorize(credential)==false;
+                    }
                 });
                 CredentialsIsNotValid = Credentials.FirstOrDefault(x => x.IsNotValid == true) != null;
-                }
+            }
             else
                 CredentialsIsNotValid = false;
-            }
+        }
         //проверить настройки
         public void TestConnection()
-            {
+        {
             TestProxy();
             TestSite();
             TestCredentials();
-            ConnectionIsValid = SiteAddressIsNotValid && ProxyIsNotValid && CredentialsIsNotValid && false;
-            }
+            ConnectionIsValid = SiteAddressIsNotValid == ProxyIsNotValid == CredentialsIsNotValid == false;
+        }
         //сохраняет настройки в xml
         public void Save()
-            {
+        {
             ConnectionIsValid = false;
             using (var stream = new FileStream(ThisFileName, FileMode.Create))
-                {
+            {
                 var formatter = new XmlSerializer(GetType());
                 formatter.Serialize(stream, this);
-                }
             }
+        }
         //загружает настройки из xml
         public static Settings Load()
-            {
+        {
             if (File.Exists(ThisFileName))
                 using (var stream = new FileStream(ThisFileName, FileMode.Open))
-                    {
+                {
                     var formatter = new XmlSerializer(typeof(Settings));
                     return formatter.Deserialize(stream) as Settings;
-                    }
+                }
             else
                 return new Settings();
-            }
+        }
         //устанавливает по-умолчанию настройки для файла пациентов
         public void PatiensFileSetDefault()
-            {
+        {
             DownloadNewPatientsFile = true;
             PatientsFilePath = "Прикрепленные пациенты выгрузка.xlsx";
             FormatPatientsFile = true;
@@ -202,10 +201,10 @@ namespace PatientsFomsRepository.Models
                     new ColumnProperty{Name="LDR_NAME",    AltName="LDR_NAME",              Hide=false,  Delete=true},
                     new ColumnProperty{Name="PC_IDATE",    AltName="PC_IDATE",              Hide=false,  Delete=true},
              };
-            }
+        }
         //устанавливает по-умолчанию настройки для СРЗ-сайта
         public void SRZSetDefault()
-            {
+        {
             SiteAddress = @"http://11.0.0.1/";
             UseProxy = false;
             ProxyAddress = "";
@@ -218,21 +217,21 @@ namespace PatientsFomsRepository.Models
                     new Credential{Login="МойЛогин2", Password="МойПароль2", RequestsLimit=300},
                     new Credential{Login="МойЛогин3", Password="МойПароль3", RequestsLimit=500}
              };
-            }
+        }
         //сдвигает вверх элемент коллекции ColumnsProperty
         public void MoveColumnPropertyUp(ColumnProperty item)
-            {
+        {
             var itemIndex = ColumnProperties.IndexOf(item);
             if (itemIndex > 0)
-                ColumnProperties.Move(itemIndex,itemIndex - 1 );
-            }
+                ColumnProperties.Move(itemIndex, itemIndex - 1);
+        }
         //сдвигает вниз элемент коллекции ColumnsProperty
         public void MoveColumnPropertyDown(ColumnProperty item)
-            {
+        {
             var itemIndex = ColumnProperties.IndexOf(item);
-            if (itemIndex >=0 && itemIndex < ColumnProperties.Count - 1)
-                ColumnProperties.Move(itemIndex,itemIndex + 1);
-            }
-        #endregion
+            if (itemIndex >= 0 && itemIndex < ColumnProperties.Count - 1)
+                ColumnProperties.Move(itemIndex, itemIndex + 1);
         }
+        #endregion
     }
+}

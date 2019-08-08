@@ -1,6 +1,4 @@
 ﻿using OfficeOpenXml;
-using PatientsFomsRepository.Infrastructure;
-using PatientsFomsRepository.Models;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -112,40 +110,35 @@ namespace PatientsFomsRepository.Models
             return -1;
         }
         //открывает файл
-        public async Task Open(string filePath, ColumnProperty[] columnProperties = null)
+        public void Open(string filePath, ColumnProperty[] columnProperties = null)
         {
-            await Task.Run(() =>
-                {
-                    excel = new ExcelPackage(new FileInfo(filePath));
-                    sheet = excel.Workbook.Worksheets[1];
-                    this.columnProperties = columnProperties ?? new ColumnProperty[0];
-                    maxRow = sheet.Dimension.Rows;
-                    maxCol = sheet.Dimension.Columns;
-                    insuranceColumn = GetColumnIndex("ENP");
-                    initialsColumn = GetColumnIndex("FIO");
-                    surnameColumn = GetColumnIndex("Фамилия");
-                    nameColumn = GetColumnIndex("Имя");
-                    patronymicColumn = GetColumnIndex("Отчество");
+            excel = new ExcelPackage(new FileInfo(filePath));
+            sheet = excel.Workbook.Worksheets[1];
+            this.columnProperties = columnProperties ?? new ColumnProperty[0];
+            maxRow = sheet.Dimension.Rows;
+            maxCol = sheet.Dimension.Columns;
+            insuranceColumn = GetColumnIndex("ENP");
+            initialsColumn = GetColumnIndex("FIO");
+            surnameColumn = GetColumnIndex("Фамилия");
+            nameColumn = GetColumnIndex("Имя");
+            patronymicColumn = GetColumnIndex("Отчество");
 
-                    CheckStructure();
-                });
-
-
+            CheckStructure();
         }
         //сохраняет изменения в файл
-        public async Task Save()
+        public void Save()
         {
-            await Task.Run(() => excel.Save());
+            excel.Save();
         }
         //добавляет фильтр
-        public async Task SetAutoFilter()
+        public void SetAutoFilter()
         {
-            await Task.Run(() => sheet.Cells[sheet.Dimension.Address].AutoFilter = true);
+            sheet.Cells[sheet.Dimension.Address].AutoFilter = true;
         }
         //подстраивает ширину столбцов под содержимое
-        public async Task FitColumnWidth()
+        public void FitColumnWidth()
         {
-            await Task.Run(() => sheet.Cells.AutoFitColumns());
+            sheet.Cells.AutoFitColumns();
         }
         //изменяет порядок столбоц
         //public async Task SetColumnsOrder()
@@ -174,122 +167,110 @@ namespace PatientsFomsRepository.Models
         //    }
 
         //переименовывает цифры с полом в нормальные названия
-        public async Task RenameSex()
+        public void RenameSex()
         {
-            await Task.Run(() =>
-            {
-                string str;
-                int columnSex = GetColumnIndex("SEX");
+            int columnSex = GetColumnIndex("SEX");
 
-                if (columnSex != -1)
-                    for (int i = 1; i <= maxRow; i++)
-                    {
-                        if (sheet.Cells[i, columnSex].Value == null)
-                            continue;
-
-                        str = sheet.Cells[i, columnSex].Value.ToString();
-                        if (str == "1")
-                            sheet.Cells[i, columnSex].Value = "Мужской";
-                        else if (str == "2")
-                            sheet.Cells[i, columnSex].Value = "Женский";
-                    }
-            });
-        }
-        //переименовывает названия столбцов в нормальные названия, скрывает и удаляет столбцы
-        public async Task ProcessColumns()
-        {
-            await Task.Run(() =>
-            {
-                string name;
-                ColumnProperty synonim;
-
-                for (int i = 1; i <= maxCol; i++)
+            if (columnSex != -1)
+                for (int i = 1; i <= maxRow; i++)
                 {
-                    if (sheet.Cells[1, i].Value == null)
+                    if (sheet.Cells[i, columnSex].Value == null)
                         continue;
 
-                    name = sheet.Cells[1, i].Value.ToString();
-                    synonim = GetColumnProperty(name);
-                    if (name != synonim.AltName)
-                        sheet.Cells[1, i].Value = synonim.AltName;
-
-                    sheet.Column(i).Hidden = synonim.Hide;
-                    if (synonim.Delete)
-                    {
-                        sheet.DeleteColumn(i);
-                        maxCol--;
-                        i--;
-                    }
+                    var str = sheet.Cells[i, columnSex].Value.ToString();
+                    if (str == "1")
+                        sheet.Cells[i, columnSex].Value = "Мужской";
+                    else if (str == "2")
+                        sheet.Cells[i, columnSex].Value = "Женский";
                 }
-            });
+        }
+        //переименовывает названия столбцов в нормальные названия, скрывает и удаляет столбцы
+        public void ProcessColumns()
+        {
+            for (int i = 1; i <= maxCol; i++)
+            {
+                if (sheet.Cells[1, i].Value == null)
+                    continue;
+
+                var name = sheet.Cells[1, i].Value.ToString();
+                var synonim = GetColumnProperty(name);
+                if (name != synonim.AltName)
+                    sheet.Cells[1, i].Value = synonim.AltName;
+
+                sheet.Column(i).Hidden = synonim.Hide;
+                if (synonim.Delete)
+                {
+                    sheet.DeleteColumn(i);
+                    maxCol--;
+                    i--;
+                }
+            }
         }
         //Возвращае полиса паицентов без полных ФИО
-        public async Task<string[]> GetUnverifiedInsuaranceNumbersAsync(int limitCount)
+        public string[] GetUnverifiedInsuaranceNumbersAsync(int limitCount)
         {
             if (initialsColumn == -1)
                 throw new Exception("Не найден столбец с инициалами ФИО");
 
-            return await Task.Run(() =>
+            var patients = new ConcurrentBag<string>();
+
+            Parallel.For(headerIndex + 1, maxRow + 1, (row, state) =>
             {
-                var patients = new ConcurrentBag<string>();
+                var insuranceValue = sheet.Cells[row, insuranceColumn].Value;
+                var initialsValue = sheet.Cells[row, initialsColumn].Value;
+                var surnameValue = sheet.Cells[row, surnameColumn].Value;
 
-                Parallel.For(headerIndex + 1, maxRow + 1, (row, state) =>
+                if (insuranceValue != null && initialsValue != null && surnameValue == null)
                 {
-                    var insuranceValue = sheet.Cells[row, insuranceColumn].Value;
-                    var initialsValue = sheet.Cells[row, initialsColumn].Value;
-                    var surnameValue = sheet.Cells[row, surnameColumn].Value;
-
-                    if (insuranceValue != null && initialsValue != null && surnameValue == null)
-                    {
-                        if (patients.Count < limitCount)
-                            patients.Add(insuranceValue.ToString());
-                        else
-                            state.Break();
-                    }
-                });
-
-                //из-за асинхронного выполнения, размер стэка может получиться больше чем надо, выкидываем лишнее
-                while (patients.Count > limitCount)
-                    patients.TryTake(out string _);
-
-                return patients.ToArray();
+                    if (patients.Count < limitCount)
+                        patients.Add(insuranceValue.ToString());
+                    else
+                        state.Break();
+                }
             });
+
+            //из-за асинхронного выполнения, размер стэка может получиться больше чем надо, выкидываем лишнее
+            while (patients.Count > limitCount)
+                patients.TryTake(out string _);
+
+            return patients.ToArray();
         }
         //вставляет полные ФИО в файл
-        public async Task SetFullNames(IEnumerable<Patient> cachedPatients)
+        public void SetFullNames(IEnumerable<Patient> cachedPatients)
         {
-            await Task.Run(() =>
+            Parallel.For(headerIndex + 1, maxRow + 1, (row, state) =>
+            {
+                object insuranceValue;
+                object initialsValue;
+                object surnameValue;
+
+                lock (locker)
                 {
-                    Parallel.For(headerIndex + 1, maxRow + 1, (row, state) =>
+                    insuranceValue = sheet.Cells[row, insuranceColumn].Value;
+                    initialsValue = sheet.Cells[row, initialsColumn].Value;
+                    surnameValue = sheet.Cells[row, surnameColumn].Value;
+                }
+
+                if (insuranceValue != null && initialsValue != null && surnameValue == null)
+                {
+                    var patient = cachedPatients.Where(x => x.InsuranceNumber == insuranceValue.ToString() && x.Initials == initialsValue.ToString()).FirstOrDefault();
+
+                    if (patient != null)
+                        lock (locker)
                         {
-                            var insuranceValue = sheet.Cells[row, insuranceColumn].Value;
-                            var initialsValue = sheet.Cells[row, initialsColumn].Value;
-                            var surnameValue = sheet.Cells[row, surnameColumn].Value;
-
-                            if (insuranceValue != null && initialsValue != null && surnameValue == null)
-                            {
-                                var patient = cachedPatients.Where(x => x.InsuranceNumber == insuranceValue.ToString() && x.Initials == initialsValue.ToString()).FirstOrDefault();
-
-                                if (patient != null)
-                                    lock (locker)
-                                    {
-                                        sheet.Cells[row, surnameColumn].Value = patient.Surname;
-                                        sheet.Cells[row, nameColumn].Value = patient.Name;
-                                        sheet.Cells[row, patronymicColumn].Value = patient.Patronymic;
-                                    }
-                            }
-                        });
-                });
+                            sheet.Cells[row, surnameColumn].Value = patient.Surname;
+                            sheet.Cells[row, nameColumn].Value = patient.Name;
+                            sheet.Cells[row, patronymicColumn].Value = patient.Patronymic;
+                        }
+                }
+            });
         }
         public void Dispose()
         {
-            if (sheet != null)
-                sheet.Dispose();
-            if (excel != null)
-                excel.Dispose();
+                sheet?.Dispose();
+                excel?.Dispose();
         }
         #endregion
-
     }
 
 
