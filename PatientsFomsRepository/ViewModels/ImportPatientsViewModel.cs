@@ -4,6 +4,7 @@ using PatientsFomsRepository.Models;
 using System.Data.Entity;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace PatientsFomsRepository.ViewModels
 {
@@ -32,22 +33,28 @@ namespace PatientsFomsRepository.ViewModels
         #region Методы
         private async void ImportExecute(object parameter)
         {
-            string filePath = (string)parameter;
-            var file = new ImportPatientsFile();
-            await file.OpenAsync(filePath);
-            var newPatients = await file.GetPatientsAsync();
-            file.Dispose();
 
-            var db = new Models.Database();
-            db.Patients.Load();
-            var existenInsuaranceNumbers = db.Patients.Select(x => x.InsuranceNumber).ToHashSet();
-            var newUniqPatients = newPatients
-            .Where(x => !existenInsuaranceNumbers.Contains(x.InsuranceNumber))
-            .GroupBy(x => x.InsuranceNumber)
-            .Select(x => x.First())
-            .ToList();
-            db.Patients.AddRange(newUniqPatients);
-            db.SaveChanges();
+
+            await Task.Run(() =>
+            {
+                string filePath = (string)parameter;
+                var file = new ImportPatientsFile();
+                await file.Open(filePath);
+                var newPatients = await file.GetPatients();
+                file.Dispose();
+
+
+                var db = new Models.Database();
+                db.Patients.Load();
+                var existenInsuaranceNumbers = db.Patients.Select(x => x.InsuranceNumber).ToHashSet();
+                var newUniqPatients = newPatients
+                .Where(x => !existenInsuaranceNumbers.Contains(x.InsuranceNumber))
+                .GroupBy(x => x.InsuranceNumber)
+                .Select(x => x.First())
+                .ToList();
+                db.Patients.AddRange(newUniqPatients);
+                db.SaveChanges();
+            });
         }
         private bool ImportCanExecute(object parameter)
         {

@@ -1,12 +1,7 @@
 ﻿using OfficeOpenXml;
-using PatientsFomsRepository.Infrastructure;
-using PatientsFomsRepository.Models;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace PatientsFomsRepository.Models
 {
@@ -28,83 +23,42 @@ namespace PatientsFomsRepository.Models
         #endregion
 
         #region Методы
-
-        //проверяет структуру файла, вызывает исключение если структура не правильная
-        private void CheckStructure()
-        {
-            if (insuranceColumn == -1)
-                throw new Exception("Не найден столбец  \"Полис\"");
-
-            if (surnameColumn == -1)
-                throw new Exception("Не найден столбец  \"Фамилия\"");
-
-            if (nameColumn == -1)
-                throw new Exception("Не найден столбец  \"Имя\"");
-
-            if (patronymicColumn == -1)
-                throw new Exception("Не найден столбец  \"Отчество\"");
-        }
-        //ищет номер столбца по названию заголовку, если столбец не найден возвращает -1
-        private int GetColumnIndex(string columnName)
-        {
-            for (int col = 1; col <= maxCol; col++)
-            {
-                var cellValue = sheet.Cells[headerIndex, col].Value;
-
-                if (cellValue == null)
-                    continue;
-
-                string cellText = cellValue.ToString();
-                if (cellText == columnName )
-                    return col;
-            }
-
-            return -1;
-        }
         //открывает файл
-        public async Task OpenAsync(string filePath)
+        public void Open(string filePath)
         {
-            await Task.Run(() =>
-            {
-                excel = new ExcelPackage(new FileInfo(filePath));
-                sheet = excel.Workbook.Worksheets[1];
+            excel = new ExcelPackage(new FileInfo(filePath));
+            sheet = excel.Workbook.Worksheets[1];
 
-                maxRow = sheet.Dimension.Rows;
-                maxCol = sheet.Dimension.Columns;
-                insuranceColumn = GetColumnIndex("Полис");
-                surnameColumn = GetColumnIndex("Фамилия");
-                nameColumn = GetColumnIndex("Имя");
-                patronymicColumn = GetColumnIndex("Отчество");
+            maxRow = sheet.Dimension.Rows;
+            maxCol = sheet.Dimension.Columns;
+            insuranceColumn = GetColumnIndex("Полис");
+            surnameColumn = GetColumnIndex("Фамилия");
+            nameColumn = GetColumnIndex("Имя");
+            patronymicColumn = GetColumnIndex("Отчество");
 
-                CheckStructure();
-            });
-
-
+            CheckStructure();
         }
         //преобразует строки из файла в список пациентов
-        public async Task<List<Patient>> GetPatientsAsync()
+        public  List<Patient> GetPatients()
         {
-            return await Task.Run(() =>
+            var patients = new List<Patient>();
+            for (int row = headerIndex + 1; row < maxRow; row++)
             {
-                var patients = new List<Patient>();
-                for (int row = headerIndex + 1; row < maxRow; row++)
+                var insuranceValue = sheet.Cells[row, insuranceColumn].Value;
+                var surnameValue = sheet.Cells[row, surnameColumn].Value;
+                var nameValue = sheet.Cells[row, nameColumn].Value;
+                var patronymicValue = sheet.Cells[row, patronymicColumn].Value ?? "";
+
+                if (insuranceValue != null && surnameValue != null && nameValue != null)
                 {
-                    var insuranceValue = sheet.Cells[row, insuranceColumn].Value;
-                    var surnameValue = sheet.Cells[row, surnameColumn].Value;
-                    var nameValue = sheet.Cells[row, nameColumn].Value;
-                    var patronymicValue = sheet.Cells[row, patronymicColumn].Value ?? "";
+                    var patient = new Patient(insuranceValue.ToString(), surnameValue.ToString(), nameValue.ToString(), patronymicValue.ToString());
+                    patient.Normalize();
 
-                    if (insuranceValue != null && surnameValue != null && nameValue != null)
-                    {
-                        var patient = new Patient(insuranceValue.ToString(), surnameValue.ToString(), nameValue.ToString(), patronymicValue.ToString());
-                        patient.Normalize();
-
-                        patients.Add(patient);
-                    }
+                    patients.Add(patient);
                 }
+            }
 
-                return patients;
-            });
+            return patients;
         }
         //Сорханяет пример файла для загрузки
         public static void SaveExample(string path)
@@ -138,12 +92,45 @@ namespace PatientsFomsRepository.Models
             sheet.SelectedRange[1, 1, 1, 4].Style.Font.Bold = true;
             excel.SaveAs(new FileInfo(path));
         }
+        //освобождает неуправляемые ресурсы
         public void Dispose()
         {
             if (sheet != null)
                 sheet.Dispose();
             if (excel != null)
                 excel.Dispose();
+        }
+        //проверяет структуру файла, вызывает исключение если структура не правильная
+        private void CheckStructure()
+        {
+            if (insuranceColumn == -1)
+                throw new Exception("Не найден столбец  \"Полис\"");
+
+            if (surnameColumn == -1)
+                throw new Exception("Не найден столбец  \"Фамилия\"");
+
+            if (nameColumn == -1)
+                throw new Exception("Не найден столбец  \"Имя\"");
+
+            if (patronymicColumn == -1)
+                throw new Exception("Не найден столбец  \"Отчество\"");
+        }
+        //ищет номер столбца по названию заголовку, если столбец не найден возвращает -1
+        private int GetColumnIndex(string columnName)
+        {
+            for (int col = 1; col <= maxCol; col++)
+            {
+                var cellValue = sheet.Cells[headerIndex, col].Value;
+
+                if (cellValue == null)
+                    continue;
+
+                string cellText = cellValue.ToString();
+                if (cellText == columnName)
+                    return col;
+            }
+
+            return -1;
         }
         #endregion
 

@@ -41,6 +41,108 @@ namespace PatientsFomsRepository.ViewModels
         #endregion
 
         #region Методы
+        private async void ProcessFileExecute(object parameter)
+        {
+            Progress = "Проверка подключения к СРЗ";
+            await Task.Run(() => Settings.TestConnection());
+
+            if (Settings.DownloadNewPatientsFile)
+            {
+                if (Settings.ConnectionIsValid == false)
+                {
+                    Progress = "Не удалось подключиться к СРЗ, проверьте настройки и работоспособность сайта. Без подключения к СРЗ возможно только подставить ФИО из кэша в существующий файл.";
+                    return;
+                }
+
+                Progress = "Загрузка файла из СРЗ";
+                await Task.Run(() =>
+                {
+                    SRZ site;
+                    if (Settings.UseProxy)
+                        site = new SRZ(Settings.SiteAddress, Settings.ProxyAddress, Settings.ProxyPort);
+                    else
+                        site = new SRZ(Settings.SiteAddress);
+
+                    var credential = Settings.Credentials.First(x => x.RequestsLimit > 0);
+                    site.TryAuthorize(credential);
+                    site.GetPatientsFile(Settings.PatientsFilePath, FileDate);
+                });
+            }
+
+            Progress = "Подстановка ФИО из кэша";
+            var db = new Models.Database();
+            var file = new PatientsFile();
+
+            await Task.Run(() =>
+            {
+                db.Patients.Load();
+                file.Open(Settings.PatientsFilePath,Settings.ColumnProperties);
+                file.SetFullNames(db.Patients.ToList());
+            });
+
+            string resultReport;
+
+            if (Settings.ConnectionIsValid)
+            {
+                Progress = "Поиск пациентов без ФИО в файле";
+                var limitCount = 0;
+                var unknownInsuaranceNumbers = new List<string>();
+
+                await Task.Run(() =>
+                {
+                    limitCount = Settings.Credentials.Sum(x => x.RequestsLimit);
+                    unknownInsuaranceNumbers = file.GetUnknownInsuaranceNumbers(limitCount);
+                });
+
+                Progress = "Поиск ФИО в СРЗ";
+                var verifiedPatients = new Patient[0];
+
+                await Task.Run(() =>
+                verifiedPatients = GetPatients(unknownInsuaranceNumbers));
+
+                Progress = "Подстановка в файл ФИО найденных в СРЗ";
+                await Task.Run(() => file.SetFullNames(verifiedPatients));
+
+                Progress = "Добавление в кэш ФИО найденных в СРЗ";
+                await Task.Run(() =>
+                {
+                    var duplicateInsuranceNumber= verifiedPatients.Select(x => x.InsuranceNumber).ToHashSet();
+                    var duplicatePatients = db.Patients.Where(x => duplicateInsuranceNumber.Contains(x.InsuranceNumber)).ToArray();
+                    db.Patients.RemoveRange(duplicatePatients);
+                    db.SaveChanges();
+
+                    db.Patients.AddRange(verifiedPatients);
+                    db.SaveChanges();
+                });
+
+                resultReport = $"Завершено. В СРЗ найдено {verifiedPatients.Count()} человек, лимит {limitCount}. ";
+            }
+            else
+                resultReport = $"Завершено. ФИО подставлены только из кэша.  Не удалось подключиться к СРЗ, проверьте настройки и работоспособность сайта.";
+
+            Progress = "Подсчет человек без ФИО";
+            var unknownPatients = new List<string>();
+            await Task.Run(() => unknownPatients = file.GetUnknownInsuaranceNumbers(int.MaxValue));
+
+
+            if (unknownPatients.Count == 0)
+            {
+                Progress = "Форматирование файла";
+                await Task.Run(() => file.Format());
+            }
+
+            Progress = "Сохранение изменений";
+            await Task.Run(() => file.Save());
+
+            Progress = $"{ resultReport} Осталось найти {unknownPatients.Count} ФИО.";
+        }
+        private bool ProcessFileCanExecute(object parameter)
+        {
+            if (Settings.DownloadNewPatientsFile == false && File.Exists(Settings.PatientsFilePath) == false)
+                return false;
+            else
+                return true;
+        }
         //запускает многопоточно запросы к сайту для поиска пациентов
         private Patient[] GetPatients(List<string> insuranceNumbers)
         {
@@ -73,7 +175,6 @@ namespace PatientsFomsRepository.ViewModels
 
                             if (credential.TryReserveRequest())
                             {
-
                                 if (Settings.UseProxy)
                                     site = new SRZ(Settings.SiteAddress, Settings.ProxyAddress, Settings.ProxyPort);
                                 else
@@ -94,110 +195,6 @@ namespace PatientsFomsRepository.ViewModels
             Task.WaitAll(tasks);
 
             return verifiedPatients.ToArray();
-        }
-        private async void ProcessFileExecute(object parameter)
-        {
-            Progress = "Проверка подключения к СРЗ";
-            await Task.Run(() => Settings.TestConnection());
-
-            if (Settings.ConnectionIsValid == false && Settings.DownloadNewPatientsFile == true)
-            {
-                Progress = "Не удалось подключиться к СРЗ, проверьте настройки и работоспособность сайта. Без подключения к СРЗ возможно только подставить ФИО из кэша в существующий файл.";
-                return;
-            }
-
-            if (Settings.DownloadNewPatientsFile)
-            {
-                Progress = "Загрузка файла из СРЗ";
-                await Task.Run(() =>
-                {
-                    SRZ site;
-                    if (Settings.UseProxy)
-                        site = new SRZ(Settings.SiteAddress, Settings.ProxyAddress, Settings.ProxyPort);
-                    else
-                        site = new SRZ(Settings.SiteAddress);
-
-                    var credential = Settings.Credentials.First(x => x.RequestsLimit > 0);
-                    site.TryAuthorize(credential);
-                    site.GetPatientsFile(Settings.PatientsFilePath, FileDate);
-                });
-            }
-
-            Progress = "Подстановка ФИО из кэша";
-            var db = new Models.Database();
-            var file = new PatientsFile();
-
-            await Task.Run(() =>
-            {
-                db.Patients.Load();
-                file.Open(Settings.PatientsFilePath,Settings.ColumnProperties);
-                file.SetFullNames(db.Patients.ToList());
-
-
-            });
-
-            string resultReport;
-            if (Settings.ConnectionIsValid)
-            {
-
-                Progress = "Поиск пациентов без ФИО в файле";
-                var limitCount = 0;
-                var unverifiedInsuaranceNumbers = new List<string>();
-
-                await Task.Run(() =>
-                {
-                    limitCount = Settings.Credentials.Sum(x => x.RequestsLimit);
-                    unverifiedInsuaranceNumbers = file.GetUnknownInsuaranceNumbers(limitCount);
-                });
-
-                Progress = "Поиск ФИО в СРЗ";
-                var verifiedPatients = new Patient[0];
-
-                await Task.Run(() =>
-                verifiedPatients = GetPatients(unverifiedInsuaranceNumbers));
-
-                Progress = "Подстановка в файл ФИО найденных в СРЗ";
-                await Task.Run(() => file.SetFullNames(verifiedPatients));
-
-                Progress = "Добавление в кэш ФИО найденных в СРЗ";
-                await Task.Run(() =>
-                {
-                    //db.Patients.AddRange(verifiedPatients);
-                    //db.SaveChanges();
-                    foreach (var item in verifiedPatients)
-                    {
-                        db.Patients.Add(item);
-                        db.SaveChanges();
-                    }
-                });
-
-                resultReport = $"Завершено, из СРЗ загружено {verifiedPatients.Count()}, лимит {limitCount}. ";
-            }
-            else
-                resultReport = $"Завершено. Не удалось подключиться к СРЗ, проверьте настройки и работоспособность сайта. ФИО подставлены только из кэша. ";
-
-            Progress = "Подсчет не найденных ФИО";
-            var unknownPatients = new List<string>();
-            await Task.Run(() => unknownPatients = file.GetUnknownInsuaranceNumbers(int.MaxValue));
-
-
-            if (unknownPatients.Count > 0)
-            {
-                Progress = "Форматирование файла";
-                await Task.Run(() => file.Format());
-            }
-
-            Progress = "Сохранение изменений";
-            await Task.Run(() => file.Save());
-
-            Progress = $"{ resultReport} Осталось загрузить {unknownPatients.Count} ФИО.";
-        }
-        private bool ProcessFileCanExecute(object parameter)
-        {
-            if (Settings.DownloadNewPatientsFile == false && File.Exists(Settings.PatientsFilePath) == false)
-                return false;
-            else
-                return true;
         }
 
         #endregion
