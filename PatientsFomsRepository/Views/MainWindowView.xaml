@@ -39,7 +39,7 @@
             <RowDefinition Height="auto" />
             <RowDefinition Height="20" />
             <RowDefinition Height="40" />
-            <RowDefinition />
+            <RowDefinition Height="*"/>
             <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
 
@@ -64,11 +64,12 @@
         <TextBlock Grid.Row="3"
                    Style="{StaticResource TextBlockHeader}"
                    Text="{Binding CurrentViewModel.FullCaption}" />
+        
         <ContentControl Grid.Row="4"
                         Content="{Binding CurrentViewModel}" />
 
-        <TextBlock Grid.Row="4"
-                   TextWrapping="Wrap"
+        <TextBlock Grid.Row="5"
+                   TextWrapping="Wrap"                   
                    Text="{Binding CurrentViewModel.Progress}" />
     </Grid>
 

@@ -25,8 +25,8 @@ namespace PatientsFomsRepository.ViewModels
         #region Конструкторы
         public ImportPatientsViewModel()
         {
-            ShortCaption = "Загрузить полные ФИО";
-            FullCaption = "Загрузить полные ФИО в кэш";
+            ShortCaption = "Загрузить в БД";
+            FullCaption = "Загрузить известные ФИО из файла в базу данных";
             Progress = "";
             ImportCommand = new RelayCommand(ImportExecute, ImportCanExecute);
             SaveExampleCommand = new RelayCommand(x => ImportPatientsFile.SaveExample((string)x));

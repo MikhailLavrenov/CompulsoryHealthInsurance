@@ -32,8 +32,7 @@
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
-            <RowDefinition Height="auto" />
-            <RowDefinition Height="auto" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         
         <TextBlock Grid.Row="0"
@@ -73,12 +72,6 @@
                 Grid.ColumnSpan="2"
                 Content="ОК"
                 Command="{Binding ProcessFileCommand}"/>
-
-        <TextBlock Grid.Row="4"
-                   Grid.Column="0"
-                   Grid.ColumnSpan="2"
-                   Text="{Binding Path=Progress}"
-                   TextWrapping="Wrap"/>
 
     </Grid>
 

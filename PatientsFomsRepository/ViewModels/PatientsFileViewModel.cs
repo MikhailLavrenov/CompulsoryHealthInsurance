@@ -19,24 +19,24 @@ namespace PatientsFomsRepository.ViewModels
         #endregion
 
         #region Свойства
-        public string ShortCaption { get; set; }
+        public string ShortCaption { get; set; } 
         public string FullCaption { get; set; }
-        public string Progress { get => progress; set => SetProperty(ref progress, value); }
-        public RelayCommand ProcessFileCommand { get; }
+        public string Progress { get => progress; set => SetProperty(ref progress, value); }         
         public Settings Settings { get => settings; set => SetProperty(ref settings, value); }
         public DateTime FileDate { get => fileDate; set => SetProperty(ref fileDate, value); }
+        public RelayCommand ProcessFileCommand { get; }
         #endregion
 
         #region Конструкторы
         public PatientsFileViewModel()
         {
-            ShortCaption = "Получить полные ФИО";
+            ShortCaption = "Получить ФИО";
             FullCaption = "Получить полные ФИО пациентов";
             Progress = "";
             Settings = Settings.Instance;
             FileDate = DateTime.Today;
             ProcessFileCommand = new RelayCommand(ProcessFileExecute, ProcessFileCanExecute);
-            
+
 
         }
         #endregion
@@ -77,7 +77,7 @@ namespace PatientsFomsRepository.ViewModels
             await Task.Run(() =>
             {
                 db.Patients.Load();
-                file.Open(Settings.PatientsFilePath,Settings.ColumnProperties);
+                file.Open(Settings.PatientsFilePath, Settings.ColumnProperties);
                 file.SetFullNames(db.Patients.ToList());
             });
 
@@ -107,7 +107,7 @@ namespace PatientsFomsRepository.ViewModels
                 Progress = "Добавление в кэш ФИО найденных в СРЗ";
                 await Task.Run(() =>
                 {
-                    var duplicateInsuranceNumber= verifiedPatients.Select(x => x.InsuranceNumber).ToHashSet();
+                    var duplicateInsuranceNumber = verifiedPatients.Select(x => x.InsuranceNumber).ToHashSet();
                     var duplicatePatients = db.Patients.Where(x => duplicateInsuranceNumber.Contains(x.InsuranceNumber)).ToArray();
                     db.Patients.RemoveRange(duplicatePatients);
                     db.SaveChanges();
