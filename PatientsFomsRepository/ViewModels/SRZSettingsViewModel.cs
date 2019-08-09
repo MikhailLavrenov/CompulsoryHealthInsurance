@@ -14,11 +14,13 @@ namespace PatientsFomsRepository.ViewModels
         private Settings settings;
         private bool showTextPassword;
         private bool showProtectedPassword;
+        private string progress;
         #endregion
 
         #region Свойства
         public string ShortCaption { get; set; }
         public string FullCaption { get; set; }
+        public string Progress { get => progress; set => SetProperty(ref progress, value); }
         public Settings Settings { get => settings; set => SetProperty(ref settings, value); }
         public bool ShowTextPassword { get => showTextPassword; set => SetProperty(ref showTextPassword, value); }
         public bool ShowProtectedPassword { get => showProtectedPassword; set => SetProperty(ref showProtectedPassword, value); }

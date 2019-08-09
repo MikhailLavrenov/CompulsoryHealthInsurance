@@ -32,10 +32,11 @@ namespace PatientsFomsRepository.ViewModels
         {
             ShortCaption = "Получить полные ФИО";
             FullCaption = "Получить полные ФИО пациентов";
+            Progress = "";
             Settings = Settings.Instance;
             FileDate = DateTime.Today;
             ProcessFileCommand = new RelayCommand(ProcessFileExecute, ProcessFileCanExecute);
-            Progress = "";
+            
 
         }
         #endregion

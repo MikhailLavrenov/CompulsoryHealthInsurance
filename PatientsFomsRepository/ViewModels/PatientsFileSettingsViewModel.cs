@@ -7,11 +7,13 @@ namespace PatientsFomsRepository.ViewModels
     {
         #region Поля
         private Settings settings;
+        private string progress;
         #endregion
 
         #region Свойства
         public string ShortCaption { get; set; }
         public string FullCaption { get; set; }
+        public string Progress { get => progress; set => SetProperty(ref progress, value); }
         public Settings Settings { get => settings; set => SetProperty(ref settings, value); }
         public RelayCommand SaveCommand { get; }
         public RelayCommand LoadCommand { get; }

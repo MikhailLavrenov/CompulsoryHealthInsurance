@@ -14,6 +14,8 @@ namespace PatientsFomsRepository.Infrastructure
         #region Properties
         string ShortCaption { get; set; }
         string FullCaption { get; set; }
+
+        string Progress { get; set; }
         #endregion
-        }
+    }
     }

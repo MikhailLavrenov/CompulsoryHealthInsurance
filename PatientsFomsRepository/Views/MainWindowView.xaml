@@ -40,6 +40,7 @@
             <RowDefinition Height="20" />
             <RowDefinition Height="40" />
             <RowDefinition />
+            <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
 
         <ItemsControl Grid.Row="1"
@@ -65,6 +66,10 @@
                    Text="{Binding CurrentViewModel.FullCaption}" />
         <ContentControl Grid.Row="4"
                         Content="{Binding CurrentViewModel}" />
+
+        <TextBlock Grid.Row="4"
+                   TextWrapping="Wrap"
+                   Text="{Binding CurrentViewModel.Progress}" />
     </Grid>
 
 

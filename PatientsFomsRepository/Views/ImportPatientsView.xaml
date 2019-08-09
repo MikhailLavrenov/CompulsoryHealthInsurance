@@ -8,7 +8,7 @@
              mc:Ignorable="d"
              d:DesignHeight="600"
              d:DesignWidth="800">
-    
+
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -17,9 +17,7 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <StackPanel 
-        VerticalAlignment="Top"
-        Grid.Row="8"
+    <StackPanel VerticalAlignment="Top"
                 Grid.Column="0"
                 Grid.ColumnSpan="2"
                 Orientation="Horizontal">
@@ -29,4 +27,5 @@
         <Button Content="Скачать пример"
                 Click="Button_Click" />
     </StackPanel>
+
 </UserControl>
