@@ -36,15 +36,15 @@ namespace PatientsFomsRepository.ViewModels
         {
             ShortCaption = "Настройки СРЗ";
             FullCaption = "Настройки подключения к СРЗ ХК ФОМС";
-            SaveCommand = new RelayCommand(x=> Settings.Save());
-            LoadCommand = new RelayCommand(x=> Settings = Settings.Load());
-            SetDefaultCommand = new RelayCommand(x=> Settings.SRZSetDefault());
-            TestCommand = new RelayCommand(x=> Settings.TestConnection());
-            SwitchShowPasswordCommand = new RelayCommand(ExecuteSwitchShowPassword);
-
-            Settings = Settings.Load();
+            Progress = "";
+            Settings = Settings.Instance;
             ShowTextPassword = false;
             ShowProtectedPassword = !ShowTextPassword;
+            SaveCommand = new RelayCommand(x=> Settings.Save());
+            LoadCommand = new RelayCommand(x=> Settings = Settings.Load());
+            SetDefaultCommand = new RelayCommand(x=> Settings.SetDefaultSRZ());
+            TestCommand = new RelayCommand(x=> Settings.TestConnection());
+            SwitchShowPasswordCommand = new RelayCommand(ExecuteSwitchShowPassword);           
         }
         #endregion
 

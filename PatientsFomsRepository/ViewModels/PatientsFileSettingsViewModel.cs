@@ -27,13 +27,13 @@ namespace PatientsFomsRepository.ViewModels
         {
             ShortCaption = "Настройки файла пациентов";
             FullCaption = "Настройки  файла пациентов";
+            Progress = "";
+            Settings = Settings.Instance;
             SaveCommand = new RelayCommand(x => Settings.Save());
             LoadCommand = new RelayCommand(x => Settings = Settings.Load());
-            SetDefaultCommand = new RelayCommand(x => Settings.PatiensFileSetDefault());
-            MoveUpCommand = new RelayCommand(x => Settings.MoveColumnPropertyUp(x as ColumnProperty));
-            MoveDownCommand = new RelayCommand(x => Settings.MoveColumnPropertyDown(x as ColumnProperty));
-
-            Settings = Settings.Load();
+            SetDefaultCommand = new RelayCommand(x => Settings.SetDefaultPatiensFile());
+            MoveUpCommand = new RelayCommand(x => Settings.MoveUpColumnProperty(x as ColumnProperty));
+            MoveDownCommand = new RelayCommand(x => Settings.MoveDownColumnProperty(x as ColumnProperty));            
         }
         #endregion
 

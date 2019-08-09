@@ -30,7 +30,7 @@ namespace PatientsFomsRepository.Models
         private bool connectionIsValid;
 
         //PatientsFile
-        private bool downloadNewPAtientsFile;
+        private bool downloadNewPatientsFile;
         private string patientsFilePath;
         private bool formatPatientsFile;
         private ObservableCollection<ColumnProperty> columnProperties;
@@ -56,7 +56,7 @@ namespace PatientsFomsRepository.Models
         [XmlIgnore] public bool ConnectionIsValid { get => connectionIsValid; set => SetProperty(ref connectionIsValid, value); }
 
         //PatientsFile
-        public bool DownloadNewPatientsFile { get => downloadNewPAtientsFile; set => SetProperty(ref downloadNewPAtientsFile, value); }
+        public bool DownloadNewPatientsFile { get => downloadNewPatientsFile; set => SetProperty(ref downloadNewPatientsFile, value); }
         public string PatientsFilePath { get => patientsFilePath; set => SetProperty(ref patientsFilePath, value); }
         public bool FormatPatientsFile { get => formatPatientsFile; set => SetProperty(ref formatPatientsFile, value); }
         public ObservableCollection<ColumnProperty> ColumnProperties { get => columnProperties; set => SetProperty(ref columnProperties, value); }
@@ -107,7 +107,7 @@ namespace PatientsFomsRepository.Models
                 return new Settings();
         }
         //устанавливает по-умолчанию настройки для файла пациентов
-        public void PatiensFileSetDefault()
+        public void SetDefaultPatiensFile()
         {
             DownloadNewPatientsFile = true;
             PatientsFilePath = "Прикрепленные пациенты выгрузка.xlsx";
@@ -154,7 +154,7 @@ namespace PatientsFomsRepository.Models
              };
         }
         //устанавливает по-умолчанию настройки для СРЗ-сайта
-        public void SRZSetDefault()
+        public void SetDefaultSRZ()
         {
             SiteAddress = @"http://11.0.0.1/";
             UseProxy = false;
@@ -169,15 +169,15 @@ namespace PatientsFomsRepository.Models
                     new Credential{Login="МойЛогин3", Password="МойПароль3", RequestsLimit=500}
              };
         }
-        //сдвигает вверх элемент коллекции ColumnsProperty
-        public void MoveColumnPropertyUp(ColumnProperty item)
+        //сдвигает вверх элемент коллекции ColumnProperties
+        public void MoveUpColumnProperty(ColumnProperty item)
         {
             var itemIndex = ColumnProperties.IndexOf(item);
             if (itemIndex > 0)
                 ColumnProperties.Move(itemIndex, itemIndex - 1);
         }
-        //сдвигает вниз элемент коллекции ColumnsProperty
-        public void MoveColumnPropertyDown(ColumnProperty item)
+        //сдвигает вниз элемент коллекции ColumnProperties
+        public void MoveDownColumnProperty(ColumnProperty item)
         {
             var itemIndex = ColumnProperties.IndexOf(item);
             if (itemIndex >= 0 && itemIndex < ColumnProperties.Count - 1)
