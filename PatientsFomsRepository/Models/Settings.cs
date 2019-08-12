@@ -37,7 +37,7 @@ namespace PatientsFomsRepository.Models
         #endregion
 
         #region Свойства       
-        [XmlIgnore] public static string ThisFileName { get; } = "Settings.xml";
+        public static string ThisFileName { get; } 
         public static Settings Instance { get; private set; }
 
         //SRZ
@@ -65,6 +65,7 @@ namespace PatientsFomsRepository.Models
         #region Конструкторы
         static Settings()
         {
+            ThisFileName = "Settings.xml";
             Instance = Load();
         }
         public Settings()
