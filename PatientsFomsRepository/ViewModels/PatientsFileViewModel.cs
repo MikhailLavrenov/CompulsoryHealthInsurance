@@ -86,7 +86,7 @@ namespace PatientsFomsRepository.ViewModels
             if (Settings.ConnectionIsValid)
             {
                 Progress = "Поиск пациентов без ФИО в файле";
-                var limitCount = 0;
+                long limitCount = 0;
                 var unknownInsuaranceNumbers = new List<string>();
 
                 await Task.Run(() =>

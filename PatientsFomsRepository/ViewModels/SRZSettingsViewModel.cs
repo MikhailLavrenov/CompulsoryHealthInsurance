@@ -60,7 +60,7 @@ namespace PatientsFomsRepository.ViewModels
         private void LoadCommandExecute(object parameter)
         {
             Settings = Settings.Load();
-            Progress = "Измнения настроек отменены.";
+            Progress = "Изменения настроек отменены.";
         }
         private void SetDefaultExecute(object parameter)
         {

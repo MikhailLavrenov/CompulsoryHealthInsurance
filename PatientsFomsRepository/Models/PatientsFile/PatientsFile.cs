@@ -50,7 +50,7 @@ namespace PatientsFomsRepository.Models
             excel.Save();
         }
         //Возвращает полиса пациентов без полных ФИО
-        public List<string> GetUnknownInsuaranceNumbers(int limitCount)
+        public List<string> GetUnknownInsuaranceNumbers(long limitCount)
         {
             var patients = new List<string>();
 

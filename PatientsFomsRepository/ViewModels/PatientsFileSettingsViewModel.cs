@@ -29,15 +29,30 @@ namespace PatientsFomsRepository.ViewModels
             FullCaption = "Настройки  файла пациентов";
             Progress = "";
             Settings = Settings.Instance;
-            SaveCommand = new RelayCommand(x => Settings.Save());
-            LoadCommand = new RelayCommand(x => Settings = Settings.Load());
-            SetDefaultCommand = new RelayCommand(x => Settings.SetDefaultPatiensFile());
+            SaveCommand = new RelayCommand(SaveExecute);
+            LoadCommand = new RelayCommand(LoadExecute);
+            SetDefaultCommand = new RelayCommand(SetDefaultExecute);
             MoveUpCommand = new RelayCommand(x => Settings.MoveUpColumnProperty(x as ColumnProperty));
             MoveDownCommand = new RelayCommand(x => Settings.MoveDownColumnProperty(x as ColumnProperty));            
         }
         #endregion
 
         #region Методы
+        private void SaveExecute(object parameter)
+        {
+            Settings.Save();
+            Progress = "Настройки сохранены.";
+        }
+        private void LoadExecute(object parameter)
+        {
+            Settings = Settings.Load();
+            Progress = "Изменения настроек отменены.";
+        }
+        private void SetDefaultExecute(object parameter)
+        {
+            Settings.SetDefaultPatiensFile();
+            Progress = "Настройки установлены по умолчанию.";
+        }
         #endregion
     }
 }

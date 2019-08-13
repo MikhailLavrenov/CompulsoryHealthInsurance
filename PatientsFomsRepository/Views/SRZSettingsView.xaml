@@ -170,7 +170,7 @@
                     Grid.Column="0"
                     Grid.ColumnSpan="2"
                     Orientation="Horizontal">
-            <Button Content="Тестировать"
+            <Button Content="Проверить"
                     Command="{Binding TestCommand}" />
             <Button Content="Сохранить"
                     Command="{Binding SaveCommand}" />

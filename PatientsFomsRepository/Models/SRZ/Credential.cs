@@ -14,8 +14,8 @@ namespace PatientsFomsRepository.Models
         private readonly object locker = new object();
         private string login;
         private string password;
-        private int requestsLimit;
-        private int requestsLeft;
+        private uint requestsLimit;
+        private uint requestsLeft;
 
         private bool isNotValid;
         #endregion
@@ -26,7 +26,7 @@ namespace PatientsFomsRepository.Models
         public string ProtectedLogin { get => Encrypt(Login); set => Login=Decrypt(value); }
         [XmlIgnore] public string Password { get => password; set => SetProperty(ref password, value); }
         public string ProtectedPassword { get => Encrypt(Password); set => Password = Decrypt(value); }
-        public int RequestsLimit
+        public uint RequestsLimit
         {
             get => requestsLimit;
             set

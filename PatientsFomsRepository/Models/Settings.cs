@@ -37,13 +37,50 @@ namespace PatientsFomsRepository.Models
         #endregion
 
         #region Свойства       
-        public static string ThisFileName { get; } 
+        public static string ThisFileName { get; }
         public static Settings Instance { get; private set; }
 
         //SRZ
-        public string SiteAddress { get => siteAddress; set => SetProperty(ref siteAddress, value); }
-        public bool UseProxy { get => useProxy; set => SetProperty(ref useProxy, value); }
-        public string ProxyAddress { get => proxyAddress; set => SetProperty(ref proxyAddress, value); }
+        public string SiteAddress
+        {
+            get => siteAddress;
+            set
+            {
+                var compare = StringComparison.OrdinalIgnoreCase;
+
+                value = value.Trim();
+
+                if (value.StartsWith(@"http://", compare) == false && value.StartsWith(@"https://", compare) == false)
+                    value = $@"http://{value}";
+
+                if (value.EndsWith(@"/") == false)
+                    value = $@"{value}/";
+
+                SetProperty(ref siteAddress, value);
+            }
+        }
+        public bool UseProxy
+        {
+            get => useProxy;
+            set
+            {
+                if (value == false)
+                {
+                    ProxyAddress = "";
+                    ProxyPort = 0;
+                }
+                SetProperty(ref useProxy, value);
+            }
+        }
+        public string ProxyAddress
+        {
+            get => proxyAddress;
+            set
+            {
+                value = value.Trim();
+                SetProperty(ref proxyAddress, value);
+            }
+        }
         public ushort ProxyPort { get => proxyPort; set => SetProperty(ref proxyPort, value); }
         public byte ThreadsLimit { get => threadsLimit; set => SetProperty(ref threadsLimit, value); }
         public CredentialScope CredentialsScope { get => credentialsScope; set { Credential.Scope = value; SetProperty(ref credentialsScope, value); } }
@@ -256,37 +293,13 @@ namespace PatientsFomsRepository.Models
         //проверяет корректность и исправляет значения свойств
         private void CorrectProperties()
         {
-            var compare = StringComparison.OrdinalIgnoreCase;
-
-            SiteAddress = SiteAddress.Trim();
-
-            if (SiteAddress.StartsWith(@"http://", compare) == false && SiteAddress.StartsWith(@"https://", compare) == false)
-                SiteAddress = $@"http://{SiteAddress}";
-
-            if (SiteAddress.EndsWith(@"/") == false )
-                SiteAddress = $@"{SiteAddress}/";
-
-            if (useProxy==false)
-            {
-                ProxyAddress="";
-                ProxyPort = 0;
-            }
-            else if (useProxy)
-            {
-                ProxyAddress = ProxyAddress.Trim();
-
-                if (ProxyPort < 0 || ProxyPort > 65535)
-                    ProxyPort = 80;
-            }
-
-            if (ThreadsLimit < 1 )
+            if (ThreadsLimit < 1)
                 ThreadsLimit = 10;
 
             Credentials
                 .Where(x => x.RequestsLimit < 0)
                 .ToList()
                 .ForEach(x => x.RequestsLimit = 0);
-
         }
         #endregion
     }
