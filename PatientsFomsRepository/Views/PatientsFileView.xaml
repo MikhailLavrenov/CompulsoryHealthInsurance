@@ -23,7 +23,7 @@
         
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="130" />
-            <ColumnDefinition Width="400" />
+            <ColumnDefinition Width="350" />
             <ColumnDefinition Width="auto" />
         </Grid.ColumnDefinitions>
 
@@ -49,7 +49,7 @@
                    Visibility="{Binding IsChecked, ElementName=CheckBoxDowloadNewFile, Converter={i:BoolToVisibleConverter}}" />
         <DatePicker Grid.Row="1"
                     Grid.Column="1"
-                    Visibility="{Binding IsChecked, ElementName=CheckBoxDowloadNewFile, Converter={i:BoolToVisibleConverter}}"
+                    Visibility="{Binding IsChecked, ElementName=CheckBoxDowloadNewFile, Converter={i:BoolToVisibleConverter}, ValidatesOnDataErrors=True}"
                     SelectedDate="{Binding FileDate}" />
         
         <TextBlock Grid.Row="2"
@@ -63,7 +63,7 @@
                      Click="Button_Click">
                 <ContentControl Content="{Binding Source={StaticResource FileDialog}}" />
             </Button>
-            <TextBox  Text="{Binding Path=Settings.PatientsFilePath}"
+            <TextBox  Text="{Binding Path=Settings.PatientsFilePath, ValidatesOnDataErrors=True}"
                       Name="TextBoxFilePath" />
         </DockPanel>
         

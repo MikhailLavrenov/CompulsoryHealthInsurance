@@ -43,7 +43,7 @@
                    Text="Адрес сайта СРЗ" />
         <TextBox Grid.Row="1"
                  Grid.Column="1"
-                 Text="{Binding Settings.SiteAddress}" />
+                 Text="{Binding Settings.SiteAddress, ValidatesOnDataErrors=True}" />
 
         <TextBlock Grid.Row="2"
                    Grid.Column="0"
@@ -66,7 +66,7 @@
                 <ColumnDefinition Width="1*" />
             </Grid.ColumnDefinitions>
             <TextBox Grid.Column="0"
-                     Text="{Binding Settings.ProxyAddress}" />
+                     Text="{Binding Settings.ProxyAddress,ValidatesOnDataErrors=True}" />
             <TextBox Grid.Column="1"
                      Text="{Binding Settings.ProxyPort}" />
         </Grid>
@@ -76,7 +76,7 @@
                    Text="Количество потоков" />
         <TextBox Grid.Row="4"
                  Grid.Column="1"
-                 Text="{Binding Settings.ThreadsLimit}" />
+                 Text="{Binding Settings.ThreadsLimit, ValidatesOnDataErrors=True}" />
 
         <TextBlock Grid.Row="5"
                    Grid.Column="0"
@@ -104,7 +104,7 @@
             <DataGrid.Columns>
 
                 <DataGridTextColumn Header="Логин"
-                                    Binding="{Binding Login}"
+                                    Binding="{Binding Login, ValidatesOnDataErrors=True}"
                                     MinWidth="150" />
 
                 <DataGridTemplateColumn MinWidth="150">
@@ -132,7 +132,7 @@
                                 <StackPanel Orientation="Horizontal"
                                             VerticalAlignment="Bottom">
                                     <ContentControl Content="{Binding Source={StaticResource PassowrdHide}}"
-                                                    Visibility="{Binding DataContext.ShowTextPassword, Source={x:Reference proxyElement}, Converter={i:BoolToVisibleConverter}}" />
+                                                    Visibility="{Binding DataContext.ShowTextPassword, Source={x:Reference proxyElement}, Converter={i:BoolToVisibleConverter} }" />
                                     <ContentControl Content="{Binding Source={StaticResource PasswordShow}}"
                                                     Visibility="{Binding DataContext.ShowProtectedPassword, Source={x:Reference proxyElement}, Converter={i:BoolToVisibleConverter}}" />
                                 </StackPanel>
@@ -141,25 +141,25 @@
                     </DataGridTemplateColumn.Header>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <StackPanel>
+                            <Grid>
                                 <PasswordBox BorderThickness="0"
                                              i:PasswordBoxHelper.BindPassword="true"
-                                             i:PasswordBoxHelper.BoundPassword="{Binding Path=Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             i:PasswordBoxHelper.BoundPassword="{Binding Path=Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
                                              Visibility="{Binding DataContext.ShowProtectedPassword, Source={x:Reference proxyElement}, Converter={i:BoolToVisibleConverter}}">
                                 </PasswordBox>
-                                <TextBox Text="{Binding Password}"
+                                <TextBox Text="{Binding Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged,  ValidatesOnDataErrors=True}"
                                          BorderThickness="0"
                                          Margin="0"
                                          MinHeight="0"
                                          MinWidth="0"
                                          Visibility="{Binding DataContext.ShowTextPassword, Source={x:Reference proxyElement}, Converter={i:BoolToVisibleConverter}}" />
-                            </StackPanel>
+                            </Grid>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
                 <DataGridTextColumn Header="Лимит запросов"
-                                    Binding="{Binding RequestsLimit}"
+                                    Binding="{Binding RequestsLimit, ValidatesOnDataErrors=True}"
                                     MinWidth="100"
                                     Width="*" />
 

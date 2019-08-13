@@ -67,7 +67,7 @@
                      Click="Button_Click">
                 <ContentControl Content="{Binding Source={StaticResource FileDialog}}" />
             </Button>
-            <TextBox  Text="{Binding Path=Settings.PatientsFilePath}"
+            <TextBox  Text="{Binding Path=Settings.PatientsFilePath, ValidatesOnDataErrors=True}"
                       Name="TextBoxFilePath" />
         </DockPanel>
 
@@ -108,10 +108,10 @@
                       SelectionMode="Single">
                 <DataGrid.Columns>
                     <DataGridTextColumn     Header="Название столбца"
-                                            Binding="{Binding Path=Name}"
+                                            Binding="{Binding Path=Name, ValidatesOnDataErrors=True}"
                                             MinWidth="160" />
                     <DataGridTextColumn     Header="Понятное название"
-                                            Binding="{Binding Path=AltName}"
+                                            Binding="{Binding Path=AltName, ValidatesOnDataErrors=True}"
                                             MinWidth="160" />
                     <DataGridCheckBoxColumn Header="Скрыть"
                                             Binding="{Binding Path=Hide}"

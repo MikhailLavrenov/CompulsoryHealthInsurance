@@ -1,6 +1,7 @@
 ﻿using PatientsFomsRepository.Infrastructure;
 using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -10,7 +11,7 @@ using System.Xml.Serialization;
 
 namespace PatientsFomsRepository.Models
 {
-    public class Settings : BindableBase
+    public class Settings : BindableBase, IDataErrorInfo
     {
         #region Поля
         //SRZ
@@ -97,6 +98,34 @@ namespace PatientsFomsRepository.Models
         public string PatientsFilePath { get => patientsFilePath; set => SetProperty(ref patientsFilePath, value); }
         public bool FormatPatientsFile { get => formatPatientsFile; set => SetProperty(ref formatPatientsFile, value); }
         public ObservableCollection<ColumnProperty> ColumnProperties { get => columnProperties; set => SetProperty(ref columnProperties, value); }
+
+        //IDataErrorInfo
+        [XmlIgnore] public string Error { get => ""; }
+        [XmlIgnore] public string this[string columnName]
+        {
+            get
+            {
+                string error = "";
+
+                if (columnName == nameof(ThreadsLimit))
+                    if (ThreadsLimit < 1)
+                        error = "Кол-во потоков не может быть меньше 1";
+
+                if (columnName == nameof(SiteAddress))
+                    if (string.IsNullOrEmpty(SiteAddress) || SiteAddress == @"http://" )
+                        error = "Адрес сайта не может быть пустым";
+
+                if (columnName == nameof(ProxyAddress))
+                    if (string.IsNullOrEmpty(ProxyAddress) && UseProxy )
+                        error = "Адрес прокси-сервера не может быть пустым";
+
+                if (columnName == nameof(PatientsFilePath))
+                    if (string.IsNullOrEmpty(PatientsFilePath))
+                        error = "Путь к файлу не может быть пустым";
+
+                return error;
+            }
+        }
         #endregion
 
         #region Конструкторы

@@ -2,13 +2,14 @@
 using PatientsFomsRepository.Models;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Security.Cryptography;
 using System.Text;
 using System.Xml.Serialization;
 
 namespace PatientsFomsRepository.Models
 {
-    public class Credential : BindableBase
+    public class Credential : BindableBase,IDataErrorInfo
     {
         #region Поля
         private readonly object locker = new object();
@@ -37,6 +38,27 @@ namespace PatientsFomsRepository.Models
         }
 
         [XmlIgnore] public bool IsNotValid { get => isNotValid; set => SetProperty(ref isNotValid, value); }
+
+        //IDataErrorInfo
+        [XmlIgnore] public string Error { get => ""; }
+        [XmlIgnore]
+        public string this[string columnName]
+        {
+            get
+            {
+                string error = "";
+
+                if (columnName == nameof(Login))
+                    if (string.IsNullOrEmpty(Login))
+                        error = "Логин не может быть пустым";
+
+                if (columnName == nameof(Password))
+                    if (string.IsNullOrEmpty(Password))
+                        error = "Пароль не может быть пустым";
+
+                return error;
+            }
+        }
         #endregion
 
         #region Конструкторы
