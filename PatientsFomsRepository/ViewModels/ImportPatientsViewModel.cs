@@ -29,7 +29,7 @@ namespace PatientsFomsRepository.ViewModels
             FullCaption = "Загрузить известные ФИО из файла в базу данных";
             Progress = "";
             ImportCommand = new RelayCommand(ImportExecute, ImportCanExecute);
-            SaveExampleCommand = new RelayCommand(x => ImportPatientsFile.SaveExample((string)x));
+            SaveExampleCommand = new RelayCommand(SaveExampleExecute);
         }
         #endregion
 
@@ -57,13 +57,22 @@ namespace PatientsFomsRepository.ViewModels
                 Progress = "Ожидайте. Сохранение в кэш...";
                 db.Patients.AddRange(newUniqPatients);
                 db.SaveChanges();
+
+                int total = existenInsuaranceNumbers.Count + newUniqPatients.Count;
+                Progress = $"Завершено. В файле найдено {newPatients.Count} человек(а). В БД добавлено {newUniqPatients.Count}  человек(а). Итого в БД {total} человек(а).";
             });
-            Progress = "Завершено.";
+            
         }
         private bool ImportCanExecute(object parameter)
         {
             string filePath = parameter as string;
             return File.Exists(filePath);
+        }
+        private void SaveExampleExecute(object parameter)
+        {
+            var path = (string)parameter;
+            ImportPatientsFile.SaveExample(path);
+            Progress = $"Завершено. Файл сохранен: {path}";
         }
         #endregion
     }

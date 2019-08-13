@@ -3,6 +3,9 @@ using PatientsFomsRepository.Models;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Text;
+using System.Threading.Tasks;
+using System.Linq;
 
 namespace PatientsFomsRepository.ViewModels
 {
@@ -40,16 +43,57 @@ namespace PatientsFomsRepository.ViewModels
             Settings = Settings.Instance;
             ShowTextPassword = false;
             ShowProtectedPassword = !ShowTextPassword;
-            SaveCommand = new RelayCommand(x=> Settings.Save());
-            LoadCommand = new RelayCommand(x=> Settings = Settings.Load());
-            SetDefaultCommand = new RelayCommand(x=> Settings.SetDefaultSRZ());
-            TestCommand = new RelayCommand(x=> Settings.TestConnection());
-            SwitchShowPasswordCommand = new RelayCommand(ExecuteSwitchShowPassword);           
+            SaveCommand = new RelayCommand(SaveCommandExecute);
+            LoadCommand = new RelayCommand(LoadCommandExecute);
+            SetDefaultCommand = new RelayCommand(SetDefaultExecute);
+            TestCommand = new RelayCommand(TestExecute);
+            SwitchShowPasswordCommand = new RelayCommand(SwitchShowPasswordExecute);           
         }
         #endregion
 
-        #region Методы
-        private void ExecuteSwitchShowPassword(object parameter)
+        #region Методы        
+        private void SaveCommandExecute(object parameter)
+        {
+            Settings.Save();
+            Progress = "Настройки сохранены.";
+        }
+        private void LoadCommandExecute(object parameter)
+        {
+            Settings = Settings.Load();
+            Progress = "Измнения настроек отменены.";
+        }
+        private void SetDefaultExecute(object parameter)
+        {
+            Settings.SetDefaultSRZ();
+            Progress = "Настройки установлены по умолчанию.";
+        }
+        private async void TestExecute(object parameter)
+        {
+            Progress = "Ожидайте. Проверка настроек...";
+            await Task.Run(() =>
+            {
+                Settings.TestConnection();
+
+                if (Settings.ConnectionIsValid)
+                    Progress = "Завершено. Настройки корректны.";
+                else if (Settings.ProxyIsNotValid)
+                    Progress = "Завершено. Прокси сервер не доступен.";
+                else if (Settings.SiteAddressIsNotValid)
+                    Progress = "Завершено. Web-сайт СРЗ не доступен.";
+                else if (Settings.CredentialsIsNotValid)
+                {
+                    var logins = new StringBuilder();
+                    Settings.Credentials
+                    .Where(x => x.IsNotValid)
+                    .ToList()
+                    .ForEach(x => logins.Append(x).Append(", "));
+                    logins.Remove(logins.Length - 3, 2);
+
+                    Progress = $"Завершено. Учетные записи не верны: {logins}. ";
+                }
+            });
+        }
+        private void SwitchShowPasswordExecute(object parameter)
         {
             ShowTextPassword = !ShowTextPassword;
             ShowProtectedPassword = !ShowTextPassword;

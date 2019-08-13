@@ -80,14 +80,18 @@ namespace PatientsFomsRepository.Models
         //проверить настройки
         public void TestConnection()
         {
+            CorrectProperties();
+
             TestProxy();
             TestSite();
             TestCredentials();
+
             ConnectionIsValid = SiteAddressIsNotValid == false && ProxyIsNotValid == false && CredentialsIsNotValid == false;
         }
         //сохраняет настройки в xml
         public void Save()
         {
+            CorrectProperties();
             ConnectionIsValid = false;
             using (var stream = new FileStream(ThisFileName, FileMode.Create))
             {
@@ -248,6 +252,41 @@ namespace PatientsFomsRepository.Models
             }
             else
                 CredentialsIsNotValid = false;
+        }
+        //проверяет корректность и исправляет значения свойств
+        private void CorrectProperties()
+        {
+            var compare = StringComparison.OrdinalIgnoreCase;
+
+            SiteAddress = SiteAddress.Trim();
+
+            if (SiteAddress.StartsWith(@"http://", compare) == false && SiteAddress.StartsWith(@"https://", compare) == false)
+                SiteAddress = $@"http://{SiteAddress}";
+
+            if (SiteAddress.EndsWith(@"/") == false )
+                SiteAddress = $@"{SiteAddress}/";
+
+            if (useProxy==false)
+            {
+                ProxyAddress="";
+                ProxyPort = 0;
+            }
+            else if (useProxy)
+            {
+                ProxyAddress = ProxyAddress.Trim();
+
+                if (ProxyPort < 0 || ProxyPort > 65535)
+                    ProxyPort = 80;
+            }
+
+            if (ThreadsLimit < 1 )
+                ThreadsLimit = 10;
+
+            Credentials
+                .Where(x => x.RequestsLimit < 0)
+                .ToList()
+                .ForEach(x => x.RequestsLimit = 0);
+
         }
         #endregion
     }
