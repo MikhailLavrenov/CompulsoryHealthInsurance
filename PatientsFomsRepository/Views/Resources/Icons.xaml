@@ -46,7 +46,7 @@
     <Polygon x:Key="ArrowDown"
              FillRule="NonZero"
              Stretch="Uniform"
-             Points="199.25,0.0 199.25,148.0 264.25,148.0 148.25,297.5 33.25,148.0 100.25,148.0 100.25,0.0" >
+             Points="199.25,0.0 199.25,148.0 264.25,148.0 148.25,297.5 33.25,148.0 100.25,148.0 100.25,0.0">
         <Polygon.Fill>
             <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ScrollBarColorKey}}" />
         </Polygon.Fill>

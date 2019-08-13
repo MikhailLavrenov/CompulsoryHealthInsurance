@@ -6,7 +6,9 @@
         xmlns:local="clr-namespace:PatientsFomsRepository"
         xmlns:v="clr-namespace:PatientsFomsRepository.Views"
         xmlns:vm="clr-namespace:PatientsFomsRepository.ViewModels"
+        WindowStartupLocation="CenterScreen"
         mc:Ignorable="d"
+       
         Title="Утилита для загрузки прикрепленных пациентов"
         Height="600"
         Width="600">
