@@ -17,6 +17,8 @@
                 Value="100" />
         <Setter Property="Height"
                 Value="25" />
+        <Setter Property="HorizontalAlignment"
+                Value="Left" />
 
     </Style>
 
@@ -56,13 +58,10 @@
                 Value="0" />
         <Setter Property="Foreground"
                 Value="#FF019BE2" />
-        <Setter Property="FontWeight"
-                Value="DemiBold" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Button}">
-                    <TextBlock>                        
-                        <!--TextDecorations="Underline"-->
+                    <TextBlock TextDecorations="Underline">                     
                         <ContentPresenter />
                     </TextBlock>
                 </ControlTemplate>
@@ -75,8 +74,21 @@
                         Value="Bold" />
             </Trigger>
         </Style.Triggers>
-
     </Style>
+    
+    <Style TargetType="Button"
+           x:Key="HeaderReferenceButton"
+           BasedOn="{StaticResource ReferenceButton}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                    <TextBlock>                        
+                        <ContentPresenter />
+                        </TextBlock>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
 
     <Style TargetType="CheckBox"
            BasedOn="{StaticResource ControlBaseStyle}">
