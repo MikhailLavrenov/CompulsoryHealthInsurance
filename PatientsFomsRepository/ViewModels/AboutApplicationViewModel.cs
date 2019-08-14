@@ -9,6 +9,7 @@ namespace PatientsFomsRepository.ViewModels
     {
         #region Поля
         private string progress;
+        private string manualPath;
         #endregion
 
         #region Свойства
@@ -30,6 +31,7 @@ namespace PatientsFomsRepository.ViewModels
             ShortCaption = "О программе";
             FullCaption = "О программе";
             Progress = "";
+            manualPath = "Инструкция.docx";
 
             Name = "Хранилище пациентов из СРЗ";
             Version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
@@ -38,7 +40,7 @@ namespace PatientsFomsRepository.ViewModels
             Email = "mvlavrenov@mail.ru";
             Phone = "8-924-213-79-11";
 
-            OpenManualCommand = new RelayCommand(x => Process.Start("Инструкция.docx")) ;
+            OpenManualCommand = new RelayCommand(x => Process.Start(manualPath),x=>File.Exists(manualPath)) ;
         }
         #endregion
 

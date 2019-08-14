@@ -75,20 +75,20 @@
             </Trigger>
         </Style.Triggers>
     </Style>
-    
+
     <Style TargetType="Button"
            x:Key="HeaderReferenceButton"
            BasedOn="{StaticResource ReferenceButton}">
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type Button}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
                     <TextBlock>                        
                         <ContentPresenter />
-                        </TextBlock>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
+                    </TextBlock>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
 
     <Style TargetType="CheckBox"
            BasedOn="{StaticResource ControlBaseStyle}">
@@ -110,6 +110,16 @@
                 Value="False" />
         <Setter Property="CanUserResizeRows"
                 Value="False" />
+        <Setter Property="VerticalGridLinesBrush">
+            <Setter.Value>
+                <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlLightColorKey}}" />
+            </Setter.Value>
+        </Setter>
+        <Setter Property="HorizontalGridLinesBrush">
+            <Setter.Value>
+                <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlLightColorKey}}" />
+            </Setter.Value>
+        </Setter>
     </Style>
 
     <Style TargetType="TextBlock"
