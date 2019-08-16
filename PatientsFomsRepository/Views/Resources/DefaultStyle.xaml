@@ -120,6 +120,8 @@
                 Value="False" />
         <Setter Property="CanUserResizeRows"
                 Value="False" />
+        <Setter Property="SelectionMode"
+                Value="Single" />
         <Setter Property="BorderBrush"
                 Value="LightGray" />
         <Setter Property="VerticalGridLinesBrush">
@@ -161,26 +163,6 @@
                 Value="Stretch" />
         <Setter Property="BorderBrush"
                 Value="LightGray" />
-        <!--<Setter Property="Validation.ErrorTemplate">
-            <Setter.Value>
-                <ControlTemplate>
-                    <Border BorderBrush="Red"
-                            BorderThickness="0">
-                        <AdornedElementPlaceholder />
-                    </Border>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>-->
-
-        <!--<Style.Triggers>
-            <Trigger Property="Validation.HasError"
-                     Value="true">
-                <Setter Property="BorderBrush"
-                        Value="Red" />
-                <Setter Property="BorderThickness"
-                        Value="0" />
-            </Trigger>
-        </Style.Triggers>-->
     </Style>
 
     <!--DatePickers-->
@@ -215,11 +197,6 @@
         <Setter Property="BorderBrush"
                 Value="LightGray" />
     </Style>
-
-
-
-
-
 
 
 

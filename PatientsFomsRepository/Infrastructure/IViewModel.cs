@@ -1,21 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace PatientsFomsRepository.Infrastructure
-    {
+﻿namespace PatientsFomsRepository.Infrastructure
+{
     /// <summary>
-    /// Общие свойства для всех ViewModel
+    /// Интерфейс для всех ViewModel
     /// </summary>
     public interface IViewModel
-        {
+    {
         #region Properties
-        string ShortCaption { get; set; }
-        string FullCaption { get; set; }
-
-        string Progress { get; set; }
+        /// <summary>
+        /// Название представления для кнопки/ссылки
+        /// </summary>
+        string ShortCaption { get; }
+        /// <summary>
+        /// Название представления для заголовка
+        /// </summary>
+        string FullCaption { get; }
+        /// <summary>
+        /// Сообщения о ходе выполнения
+        /// </summary>
+        string Progress { get; }
         #endregion
     }
-    }
+}

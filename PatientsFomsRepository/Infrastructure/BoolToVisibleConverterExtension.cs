@@ -6,6 +6,7 @@ using System.Windows.Markup;
 
 namespace PatientsFomsRepository.Infrastructure
 {
+    //Расширение разметки xaml, конвертирует bool в Visibility
     [ValueConversion(typeof(bool), typeof(Visibility))]
     public class BoolToVisibleConverterExtension : MarkupExtension, IValueConverter
     {
@@ -19,7 +20,6 @@ namespace PatientsFomsRepository.Infrastructure
             var visible = (Visibility)value;
             return visible == Visibility.Visible ? true : false;
         }
-
         public override object ProvideValue(IServiceProvider serviceProvider)
         {
             return this;

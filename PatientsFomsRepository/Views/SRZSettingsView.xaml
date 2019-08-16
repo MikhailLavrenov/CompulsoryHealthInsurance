@@ -103,10 +103,13 @@
                   ItemsSource="{Binding Settings.Credentials}">
             <DataGrid.Columns>
 
+                <!--Столбец Логин-->
                 <DataGridTextColumn Header="Логин"
                                     Binding="{Binding Login, ValidatesOnDataErrors=True}"
                                     MinWidth="150" />
 
+                <!--Столбец Пароль-->
+                <!--Шаблон Заголовка. В заголовок вставляем текст и кнопку для переключения видимсти паролей-->
                 <DataGridTemplateColumn MinWidth="150">
                     <DataGridTemplateColumn.HeaderStyle>
                         <Style TargetType="{x:Type DataGridColumnHeader}">
@@ -129,6 +132,8 @@
                             <Button Grid.Column="2"
                                     Style="{StaticResource PictureTransparentButton}"
                                     Command="{Binding DataContext.SwitchShowPasswordCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}">
+
+                                <!--В кнопку вставляем 2 рисунка - пароль видно и пароль скрыт. Одновременно отображается только один-->
                                 <StackPanel Orientation="Horizontal"
                                             VerticalAlignment="Bottom">
                                     <ContentControl Content="{Binding Source={StaticResource PassowrdHide}}"
@@ -139,25 +144,82 @@
                             </Button>
                         </Grid>
                     </DataGridTemplateColumn.Header>
+
+                    <!--Шаблон ячейки-->
                     <DataGridTemplateColumn.CellTemplate>
+                        <!--Вставляем 2 контрола. Одновременно отображается только один -->
                         <DataTemplate>
                             <Grid>
                                 <PasswordBox BorderThickness="0"
+                                             Margin="0"
+                                             MinHeight="0"
+                                             MinWidth="0"
                                              i:PasswordBoxHelper.BindPassword="true"
                                              i:PasswordBoxHelper.BoundPassword="{Binding Path=Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
                                              Visibility="{Binding DataContext.ShowProtectedPassword, Source={x:Reference proxyElement}, Converter={i:BoolToVisibleConverter}}">
+
+                                    <!--Триггер чтобы при выделении строки фон и цвет текста соответствовал стандартным ячейкам-->
+                                    <PasswordBox.Style>
+                                        <Style TargetType="PasswordBox">
+                                            <Style.Triggers>
+                                                <MultiDataTrigger>
+                                                    <MultiDataTrigger.Conditions>
+                                                        <Condition Binding="{Binding IsSelected, RelativeSource= {RelativeSource AncestorType={x:Type DataGridRow}}}"
+                                                                   Value="True" />
+                                                        <Condition Binding="{Binding  IsFocused, RelativeSource={RelativeSource Self}}"
+                                                                   Value="False" />
+                                                    </MultiDataTrigger.Conditions>
+                                                    <MultiDataTrigger.Setters>
+                                                        <Setter Property="Foreground"
+                                                                Value="White" />
+                                                        <Setter Property="Background"
+                                                                Value="Transparent" />
+                                                    </MultiDataTrigger.Setters>
+                                                </MultiDataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </PasswordBox.Style>
+
                                 </PasswordBox>
+
                                 <TextBox Text="{Binding Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged,  ValidatesOnDataErrors=True}"
                                          BorderThickness="0"
                                          Margin="0"
                                          MinHeight="0"
                                          MinWidth="0"
-                                         Visibility="{Binding DataContext.ShowTextPassword, Source={x:Reference proxyElement}, Converter={i:BoolToVisibleConverter}}" />
+                                         Visibility="{Binding DataContext.ShowTextPassword, Source={x:Reference proxyElement}, Converter={i:BoolToVisibleConverter}}">
+
+                                    <!--Триггер чтобы при выделении строки фон и цвет текста соответствовал стандартным ячейкам-->
+                                    <TextBox.Style>
+                                        <Style TargetType="TextBox">
+                                            <Style.Triggers>
+                                                <MultiDataTrigger>
+                                                    <MultiDataTrigger.Conditions>
+                                                        <Condition Binding="{Binding IsSelected, RelativeSource= {RelativeSource AncestorType={x:Type DataGridRow}}}"
+                                                                   Value="True" />
+                                                        <Condition Binding="{Binding  IsFocused, RelativeSource={RelativeSource Self}}"
+                                                                   Value="False" />
+                                                    </MultiDataTrigger.Conditions>
+                                                    <MultiDataTrigger.Setters>
+                                                        <Setter Property="Foreground"
+                                                                Value="White" />
+                                                        <Setter Property="Background"
+                                                                Value="Transparent" />
+                                                    </MultiDataTrigger.Setters>
+                                                </MultiDataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBox.Style>
+
+                                </TextBox>
+
                             </Grid>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
+
                 </DataGridTemplateColumn>
 
+                <!--Столбец Лимит запросов-->
                 <DataGridTextColumn Header="Лимит запросов"
                                     Binding="{Binding RequestsLimit, ValidatesOnDataErrors=True}"
                                     MinWidth="100"

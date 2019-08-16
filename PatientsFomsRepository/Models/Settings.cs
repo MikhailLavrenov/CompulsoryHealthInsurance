@@ -1,7 +1,6 @@
 ﻿using PatientsFomsRepository.Infrastructure;
 using System;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -11,11 +10,11 @@ using System.Xml.Serialization;
 
 namespace PatientsFomsRepository.Models
 {
-    public class Settings : BindableBase, IDataErrorInfo
+    public class Settings : BindableBase
     {
         #region Поля
         //SRZ
-        private readonly int timeoutConnection = 5000;
+        private readonly int timeoutConnection = 3000;
         private string siteAddress;
         private bool useProxy;
         private string proxyAddress;
@@ -65,12 +64,13 @@ namespace PatientsFomsRepository.Models
             get => useProxy;
             set
             {
+                SetProperty(ref useProxy, value);
                 if (value == false)
                 {
                     ProxyAddress = "";
                     ProxyPort = 0;
                 }
-                SetProperty(ref useProxy, value);
+
             }
         }
         public string ProxyAddress
@@ -82,7 +82,11 @@ namespace PatientsFomsRepository.Models
                 SetProperty(ref proxyAddress, value);
             }
         }
-        public ushort ProxyPort { get => proxyPort; set => SetProperty(ref proxyPort, value); }
+        public ushort ProxyPort
+        {
+            get => proxyPort;
+            set => SetProperty(ref proxyPort, value);
+        }
         public byte ThreadsLimit { get => threadsLimit; set => SetProperty(ref threadsLimit, value); }
         public CredentialScope CredentialsScope { get => credentialsScope; set { Credential.Scope = value; SetProperty(ref credentialsScope, value); } }
         public ObservableCollection<Credential> Credentials { get => credentials; set => SetProperty(ref credentials, value); }
@@ -98,34 +102,6 @@ namespace PatientsFomsRepository.Models
         public string PatientsFilePath { get => patientsFilePath; set => SetProperty(ref patientsFilePath, value); }
         public bool FormatPatientsFile { get => formatPatientsFile; set => SetProperty(ref formatPatientsFile, value); }
         public ObservableCollection<ColumnProperty> ColumnProperties { get => columnProperties; set => SetProperty(ref columnProperties, value); }
-
-        //IDataErrorInfo
-        [XmlIgnore] public string Error { get => ""; }
-        [XmlIgnore] public string this[string columnName]
-        {
-            get
-            {
-                string error = "";
-
-                if (columnName == nameof(ThreadsLimit))
-                    if (ThreadsLimit < 1)
-                        error = "Кол-во потоков не может быть меньше 1";
-
-                if (columnName == nameof(SiteAddress))
-                    if (string.IsNullOrEmpty(SiteAddress) || SiteAddress == @"http://" )
-                        error = "Адрес сайта не может быть пустым";
-
-                if (columnName == nameof(ProxyAddress))
-                    if (string.IsNullOrEmpty(ProxyAddress) && UseProxy )
-                        error = "Адрес прокси-сервера не может быть пустым";
-
-                if (columnName == nameof(PatientsFilePath))
-                    if (string.IsNullOrEmpty(PatientsFilePath))
-                        error = "Путь к файлу не может быть пустым";
-
-                return error;
-            }
-        }
         #endregion
 
         #region Конструкторы
@@ -146,8 +122,6 @@ namespace PatientsFomsRepository.Models
         //проверить настройки
         public void TestConnection()
         {
-            CorrectProperties();
-
             TestProxy();
             TestSite();
             TestCredentials();
@@ -157,7 +131,6 @@ namespace PatientsFomsRepository.Models
         //сохраняет настройки в xml
         public void Save()
         {
-            CorrectProperties();
             ConnectionIsValid = false;
             using (var stream = new FileStream(ThisFileName, FileMode.Create))
             {
@@ -254,6 +227,73 @@ namespace PatientsFomsRepository.Models
             if (itemIndex >= 0 && itemIndex < ColumnProperties.Count - 1)
                 ColumnProperties.Move(itemIndex, itemIndex + 1);
         }
+        //Валидация свойств
+        protected override void Validate(string propertyName)
+        {
+            var message1 = "Значение не может быть пустым";
+            var message2 = "Значение не может быть меньше 1";
+            var message3 = "Не удалось подключиться";
+
+            switch (propertyName)
+            {
+                case nameof(SiteAddress):
+                    if (string.IsNullOrEmpty(SiteAddress) || SiteAddress == @"http://")
+                        AddError(message1, propertyName);
+                    else
+                        RemoveError(message1, propertyName);
+                    break;
+
+                case nameof(UseProxy):
+                    if (UseProxy == false)
+                    {
+                        RemoveErrors(nameof(ProxyAddress));
+                        RemoveErrors(nameof(ProxyPort));
+                    }
+                    break;
+
+                case nameof(ProxyAddress):
+                    if (string.IsNullOrEmpty(ProxyAddress) && UseProxy)
+                        AddError(message1, propertyName);
+                    else
+                        RemoveError(message1, propertyName);
+                    break;
+
+                case nameof(PatientsFilePath):
+                    if (string.IsNullOrEmpty(PatientsFilePath))
+                        AddError(message1, propertyName);
+                    else
+                        RemoveError(message1, propertyName);
+                    break;
+
+                case nameof(ThreadsLimit):
+                    if (ThreadsLimit < 1)
+                        AddError(message2, propertyName);
+                    else
+                        RemoveError(message2, propertyName);
+                    break;
+
+                case nameof(SiteAddressIsNotValid):
+                    if (SiteAddressIsNotValid)
+                        AddError(message3, nameof(SiteAddress));
+                    else
+                        RemoveError(message3, nameof(SiteAddress));
+                    break;
+
+                case nameof(ProxyIsNotValid):
+                    if (ProxyIsNotValid)
+                    {
+                        AddError(message3, nameof(ProxyAddress));
+                        AddError(message3, nameof(ProxyPort));
+                    }
+                    else
+                    {
+                        RemoveError(message3, nameof(ProxyAddress));
+                        RemoveError(message3, nameof(ProxyPort));
+                    }
+                    break;
+
+            }
+        }
         //проверяет настройки прокси-сервера
         private void TestProxy()
         {
@@ -287,25 +327,28 @@ namespace PatientsFomsRepository.Models
                 {
                     var webRequest = (HttpWebRequest)WebRequest.Create(SiteAddress);
                     webRequest.Timeout = timeoutConnection;
-                    if (useProxy)
+                    if (UseProxy)
                         webRequest.Proxy = new WebProxy(ProxyAddress + ":" + ProxyPort);
 
                     webRequest.GetResponse();
                     webRequest.Abort();
+
+                    SiteAddressIsNotValid = false;
                 }
                 catch (Exception)
                 {
                     SiteAddressIsNotValid = true;
-                    return;
                 }
             }
+            else
+                SiteAddressIsNotValid = false;
 
-            SiteAddressIsNotValid = false;
+
         }
         //проверяет учетные данные
         private void TestCredentials()
         {
-            if (SiteAddressIsNotValid == false)
+            if (SiteAddressIsNotValid == false && ProxyIsNotValid == false)
             {
                 Parallel.ForEach(Credentials, credential =>
                 {
@@ -318,17 +361,6 @@ namespace PatientsFomsRepository.Models
             }
             else
                 CredentialsIsNotValid = false;
-        }
-        //проверяет корректность и исправляет значения свойств
-        private void CorrectProperties()
-        {
-            if (ThreadsLimit < 1)
-                ThreadsLimit = 10;
-
-            Credentials
-                .Where(x => x.RequestsLimit < 0)
-                .ToList()
-                .ForEach(x => x.RequestsLimit = 0);
         }
         #endregion
     }

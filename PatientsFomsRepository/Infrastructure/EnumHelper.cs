@@ -22,7 +22,6 @@ namespace PatientsFomsRepository.Infrastructure
 
             return descriptionAttribute.Description;
         }
-
         /// <summary>
         /// Возвращает список всех значений enum и их описаний 
         /// </summary>

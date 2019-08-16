@@ -1,15 +1,12 @@
 ﻿using PatientsFomsRepository.Infrastructure;
-using PatientsFomsRepository.Models;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Security.Cryptography;
 using System.Text;
 using System.Xml.Serialization;
 
 namespace PatientsFomsRepository.Models
 {
-    public class Credential : BindableBase,IDataErrorInfo
+    public class Credential : BindableBase
     {
         #region Поля
         private readonly object locker = new object();
@@ -17,14 +14,13 @@ namespace PatientsFomsRepository.Models
         private string password;
         private uint requestsLimit;
         private uint requestsLeft;
-
         private bool isNotValid;
         #endregion
 
         #region Свойства
         public static CredentialScope Scope { get; set; }
         [XmlIgnore] public string Login { get => login; set => SetProperty(ref login, value); }
-        public string ProtectedLogin { get => Encrypt(Login); set => Login=Decrypt(value); }
+        public string ProtectedLogin { get => Encrypt(Login); set => Login = Decrypt(value); }
         [XmlIgnore] public string Password { get => password; set => SetProperty(ref password, value); }
         public string ProtectedPassword { get => Encrypt(Password); set => Password = Decrypt(value); }
         public uint RequestsLimit
@@ -36,29 +32,7 @@ namespace PatientsFomsRepository.Models
                 requestsLeft = value;
             }
         }
-
         [XmlIgnore] public bool IsNotValid { get => isNotValid; set => SetProperty(ref isNotValid, value); }
-
-        //IDataErrorInfo
-        [XmlIgnore] public string Error { get => ""; }
-        [XmlIgnore]
-        public string this[string columnName]
-        {
-            get
-            {
-                string error = "";
-
-                if (columnName == nameof(Login))
-                    if (string.IsNullOrEmpty(Login))
-                        error = "Логин не может быть пустым";
-
-                if (columnName == nameof(Password))
-                    if (string.IsNullOrEmpty(Password))
-                        error = "Пароль не может быть пустым";
-
-                return error;
-            }
-        }
         #endregion
 
         #region Конструкторы
@@ -84,11 +58,48 @@ namespace PatientsFomsRepository.Models
                     return false;
             }
         }
+        //валидация свойств
+        protected override void Validate(string propertyName)
+        {
+            var message1 = "Значение не может быть пустым";
+            var message2 = "Не удалось подключиться";
+
+            switch (propertyName)
+            {
+                case nameof(Login):
+                    if (string.IsNullOrEmpty(Login))
+                        AddError(message1, propertyName);
+                    else
+                        RemoveError(message1, propertyName);
+                    break;
+
+                case nameof(Password):
+                    if (string.IsNullOrEmpty(Password))
+                        AddError(message1, propertyName);
+                    else
+                        RemoveError(message1, propertyName);
+                    break;
+
+                case nameof(isNotValid):
+                    if (isNotValid)
+                    {
+                        AddError(message2, nameof(Login));
+                        AddError(message2, nameof(Password));
+                    }
+                    else
+                    {
+                        RemoveError(message2, nameof(Login));
+                        RemoveError(message2, nameof(Password));
+                    }
+                    break;
+
+            }
+        }
         //шифрует текст в соответствии с видимостью
         private static string Encrypt(string text)
         {
-            if (Scope== CredentialScope.Все)
-                return text;           
+            if (Scope == CredentialScope.Все)
+                return text;
 
             DataProtectionScope scope;
             if (Scope == CredentialScope.ТекущийПользователь)
@@ -105,14 +116,14 @@ namespace PatientsFomsRepository.Models
         private static string Decrypt(string text)
         {
             if (Scope == CredentialScope.Все)
-                return text;          
+                return text;
 
             DataProtectionScope scope;
             if (Scope == CredentialScope.ТекущийПользователь)
                 scope = DataProtectionScope.CurrentUser;
             else
                 scope = DataProtectionScope.LocalMachine;
-           
+
             try
             {
                 byte[] byteText = Convert.FromBase64String(text);
@@ -143,7 +154,7 @@ namespace PatientsFomsRepository.Models
             {
                 byte[] byteText = Convert.FromBase64String(text);
                 var unprotectedText = ProtectedData.Unprotect(byteText, null, scope);
-                decryptedText= Encoding.Default.GetString(unprotectedText);
+                decryptedText = Encoding.Default.GetString(unprotectedText);
                 return true;
             }
             catch (Exception)

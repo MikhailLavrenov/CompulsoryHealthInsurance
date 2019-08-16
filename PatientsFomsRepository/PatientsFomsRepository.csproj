@@ -101,6 +101,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Infrastructure\BoolToVisibleConverterExtension.cs" />
+    <Compile Include="Infrastructure\DataGridHelper.cs" />
     <Compile Include="Infrastructure\EnumHelper.cs" />
     <Compile Include="Infrastructure\EnumToCollectionConverterExtension.cs" />
     <Compile Include="Infrastructure\IViewModel.cs" />

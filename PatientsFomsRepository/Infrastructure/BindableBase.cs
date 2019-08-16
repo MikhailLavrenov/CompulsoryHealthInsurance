@@ -1,31 +1,105 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
 namespace PatientsFomsRepository.Infrastructure
-    {
+{
     /// <summary>
-    /// Упрощает присваивание свойству значения с уведомлением об измении
+    /// Упрощает присваивание свойству значения с уведомлением об измении и валидацией значения.
     /// </summary>
-    public abstract class BindableBase : INotifyPropertyChanged
-        {
-        #region Properties
-        public event PropertyChangedEventHandler PropertyChanged;
+    public abstract class BindableBase : INotifyPropertyChanged, INotifyDataErrorInfo
+    {
+        #region Поля
+        //Хранить все ошибки экземпляра класса
+        private Dictionary<string, List<string>> errors = new Dictionary<string, List<string>>();
         #endregion
 
-        #region Methods
+        #region Свойства
+        public bool HasErrors { get => errors.Count > 0; }
+        #endregion
+
+        #region События
+        public event PropertyChangedEventHandler PropertyChanged;
+        public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
+        #endregion
+
+        #region Методы
+
+        //INotifyPropertyChanged       
         protected void OnPropertyChanged([CallerMemberName]string prop = "")
-            {
+        {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
-            }
+        }
+        //Установить значение свойства
         protected void SetProperty<T>(ref T field, T value, [CallerMemberName]string propertyName = "")
-            {
+        {
             if (EqualityComparer<T>.Default.Equals(field, value) == false)
-                {
+            {                
                 field = value;
                 OnPropertyChanged(propertyName);
-                }
+                Validate(propertyName);
             }
-        #endregion
         }
+
+        //INotifyDataErrorInfo
+        public void OnErrorsChanged(string propertyName)
+        {
+            ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
+        }
+        public IEnumerable GetErrors(string propertyName)
+        {
+            if (string.IsNullOrEmpty(propertyName) || !errors.ContainsKey(propertyName))
+                return null;
+            return errors[propertyName];
+        }
+        //Выполняет валидацию.Долже быть переопределен в производном классе для автоматического вызова при изменении свойств.
+        protected virtual void Validate(string propertyName)
+        { }
+        //Добавить сообщение об ошибке в значении свойства
+        protected void AddError(string errormessage, [CallerMemberName]string propertyName = "")
+        {
+            if (errors.ContainsKey(propertyName) == false)
+                errors[propertyName] = new List<string>();
+
+            if (errors[propertyName].Contains(errormessage) == false)
+            {
+                errors[propertyName].Add(errormessage);
+                OnErrorsChanged(propertyName);
+            }
+        }
+        //Удалить сообщение об ошибке в значении свойства
+        protected void RemoveError(string errormessage, [CallerMemberName]string propertyName = "")
+        {
+            if (errors.ContainsKey(propertyName) && errors[propertyName].Contains(errormessage))
+            {
+                errors[propertyName].Remove(errormessage);
+
+                if (errors[propertyName].Count == 0)
+                    errors.Remove(propertyName);
+
+                OnErrorsChanged(propertyName);
+            }
+        }
+        //Удалить все сообщения об ошибке  в значении свойства
+        protected void RemoveErrors([CallerMemberName]string propertyName = "")
+        {
+            if (errors.ContainsKey(propertyName))
+            {
+                errors.Remove(propertyName);
+                OnErrorsChanged(propertyName);
+            }
+        }
+        #endregion
+
+
+
+
+
+
+
+
+
     }
+}

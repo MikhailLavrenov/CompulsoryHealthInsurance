@@ -9,6 +9,7 @@ using System.Windows.Markup;
 
 namespace PatientsFomsRepository.Infrastructure
 {
+    //Расширение разметки xaml, конвертирует значение enum в Description
     [ValueConversion(typeof(Enum), typeof(IEnumerable<KeyValuePair<Enum, string>>))]
     public class EnumToCollectionConverterExtension : MarkupExtension,IValueConverter
     {

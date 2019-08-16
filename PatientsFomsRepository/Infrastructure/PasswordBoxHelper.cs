@@ -3,18 +3,43 @@ using System.Windows.Controls;
 
 namespace PatientsFomsRepository.Infrastructure
 {
+    //Для реализации Binding в PasswordBox
     public static class PasswordBoxHelper
     {
-
+        #region Свойства
         public static readonly DependencyProperty BoundPassword =
             DependencyProperty.RegisterAttached("BoundPassword", typeof(string), typeof(PasswordBoxHelper), new PropertyMetadata(string.Empty, OnBoundPasswordChanged));
-
-        public static readonly DependencyProperty BindPassword = 
+        public static readonly DependencyProperty BindPassword =
             DependencyProperty.RegisterAttached("BindPassword", typeof(bool), typeof(PasswordBoxHelper), new PropertyMetadata(false, OnBindPasswordChanged));
-
         private static readonly DependencyProperty UpdatingPassword =
             DependencyProperty.RegisterAttached("UpdatingPassword", typeof(bool), typeof(PasswordBoxHelper), new PropertyMetadata(false));
+        #endregion
 
+        #region Методы
+        public static void SetBindPassword(DependencyObject dp, bool value)
+        {
+            dp.SetValue(BindPassword, value);
+        }
+        public static bool GetBindPassword(DependencyObject dp)
+        {
+            return (bool)dp.GetValue(BindPassword);
+        }
+        public static string GetBoundPassword(DependencyObject dp)
+        {
+            return (string)dp.GetValue(BoundPassword);
+        }
+        public static void SetBoundPassword(DependencyObject dp, string value)
+        {
+            dp.SetValue(BoundPassword, value);
+        }
+        private static bool GetUpdatingPassword(DependencyObject dp)
+        {
+            return (bool)dp.GetValue(UpdatingPassword);
+        }
+        private static void SetUpdatingPassword(DependencyObject dp, bool value)
+        {
+            dp.SetValue(UpdatingPassword, value);
+        }
         private static void OnBoundPasswordChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var box = d as PasswordBox;
@@ -31,7 +56,6 @@ namespace PatientsFomsRepository.Infrastructure
 
             box.PasswordChanged += HandlePasswordChanged;
         }
-
         private static void OnBindPasswordChanged(DependencyObject dp, DependencyPropertyChangedEventArgs e)
         {
             //Когда прикрепленное свойство BindPassword установлено на PasswordBox начинаем прослушивать событие PasswordChanged
@@ -49,7 +73,6 @@ namespace PatientsFomsRepository.Infrastructure
             if (needToBind)
                 box.PasswordChanged += HandlePasswordChanged;
         }
-
         private static void HandlePasswordChanged(object sender, RoutedEventArgs e)
         {
             var box = sender as PasswordBox;
@@ -60,37 +83,6 @@ namespace PatientsFomsRepository.Infrastructure
             SetBoundPassword(box, box.Password);
             SetUpdatingPassword(box, false);
         }
-
-        public static void SetBindPassword(DependencyObject dp, bool value)
-        {
-            dp.SetValue(BindPassword, value);
-        }
-
-        public static bool GetBindPassword(DependencyObject dp)
-        {
-            return (bool)dp.GetValue(BindPassword);
-        }
-
-        public static string GetBoundPassword(DependencyObject dp)
-        {
-            return (string)dp.GetValue(BoundPassword);
-        }
-
-        public static void SetBoundPassword(DependencyObject dp, string value)
-        {
-            dp.SetValue(BoundPassword, value);
-        }
-
-        private static bool GetUpdatingPassword(DependencyObject dp)
-        {
-            return (bool)dp.GetValue(UpdatingPassword);
-        }
-
-        private static void SetUpdatingPassword(DependencyObject dp, bool value)
-        {
-            dp.SetValue(UpdatingPassword, value);
-        }
+        #endregion
     }
-
-
 }
