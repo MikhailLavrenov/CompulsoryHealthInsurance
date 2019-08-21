@@ -96,11 +96,11 @@
         <!--Использование x:Name и FrameworkElement принадлежащего логическому дереву позволяет обойти ограничение используя FrameworkElement как посредника-->
         <FrameworkElement x:Name="proxyElement" />
 
-        <DataGrid Grid.Row="7"
-                  Grid.Column="0"
-                  Grid.ColumnSpan="2"
-                  MinHeight="200"
-                  ItemsSource="{Binding Settings.Credentials}">
+        <i:CustomDataGrid Grid.Row="7"
+                      Grid.Column="0"
+                      Grid.ColumnSpan="2"
+                      MinHeight="200"
+                      ItemsSource="{Binding Settings.Credentials}">
             <DataGrid.Columns>
 
                 <!--Столбец Логин-->
@@ -162,6 +162,20 @@
                                     <PasswordBox.Style>
                                         <Style TargetType="PasswordBox">
                                             <Style.Triggers>
+
+                                                <MultiDataTrigger>
+                                                    <MultiDataTrigger.Conditions>
+                                                        <Condition Binding="{Binding  IsMouseOver, RelativeSource={RelativeSource Self}}"
+                                                                   Value="True" />
+                                                        <Condition Binding="{Binding IsFocused, RelativeSource= {RelativeSource Self}}"
+                                                                   Value="False" />
+                                                    </MultiDataTrigger.Conditions>
+                                                    <MultiDataTrigger.Setters>
+                                                        <Setter Property="Cursor"
+                                                                Value="Arrow" />
+                                                    </MultiDataTrigger.Setters>
+                                                </MultiDataTrigger>
+
                                                 <MultiDataTrigger>
                                                     <MultiDataTrigger.Conditions>
                                                         <Condition Binding="{Binding IsSelected, RelativeSource= {RelativeSource AncestorType={x:Type DataGridRow}}}"
@@ -193,6 +207,20 @@
                                     <TextBox.Style>
                                         <Style TargetType="TextBox">
                                             <Style.Triggers>
+
+                                                <MultiDataTrigger>
+                                                    <MultiDataTrigger.Conditions>
+                                                        <Condition Binding="{Binding  IsMouseOver, RelativeSource={RelativeSource Self}}"
+                                                                   Value="True" />
+                                                        <Condition Binding="{Binding IsFocused, RelativeSource= {RelativeSource Self}}"
+                                                                   Value="False" />
+                                                    </MultiDataTrigger.Conditions>
+                                                    <MultiDataTrigger.Setters>
+                                                        <Setter Property="Cursor"
+                                                                Value="Arrow" />
+                                                    </MultiDataTrigger.Setters>
+                                                </MultiDataTrigger>
+
                                                 <MultiDataTrigger>
                                                     <MultiDataTrigger.Conditions>
                                                         <Condition Binding="{Binding IsSelected, RelativeSource= {RelativeSource AncestorType={x:Type DataGridRow}}}"
@@ -207,6 +235,7 @@
                                                                 Value="Transparent" />
                                                     </MultiDataTrigger.Setters>
                                                 </MultiDataTrigger>
+
                                             </Style.Triggers>
                                         </Style>
                                     </TextBox.Style>
@@ -226,7 +255,7 @@
                                     Width="*" />
 
             </DataGrid.Columns>
-        </DataGrid>
+        </i:CustomDataGrid>
 
         <StackPanel Grid.Row="8"
                     Grid.Column="0"

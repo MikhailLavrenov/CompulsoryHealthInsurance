@@ -101,11 +101,9 @@
                     <ContentControl Content="{Binding Source={StaticResource ArrowDown}}" />
                 </Button>
             </StackPanel>
-            <DataGrid MinHeight="200"
-                      Name="Datagrid1"
-                      Visibility="{Binding Path=IsChecked, ElementName=CheckBoxFormat, Converter={i:BoolToVisibleConverter}}"
-                      ItemsSource="{Binding Settings.ColumnProperties}"
-                      SelectionMode="Single">
+            <i:CustomDataGrid MinHeight="200"
+                              Visibility="{Binding Path=IsChecked, ElementName=CheckBoxFormat, Converter={i:BoolToVisibleConverter}}"
+                              ItemsSource="{Binding Settings.ColumnProperties}">
                 <DataGrid.Columns>
                     <DataGridTextColumn     Header="Название столбца"
                                             Binding="{Binding Path=Name, ValidatesOnDataErrors=True}"
@@ -121,7 +119,7 @@
                                             MinWidth="65"
                                             Width="*" />
                 </DataGrid.Columns>
-            </DataGrid>
+            </i:CustomDataGrid>
 
         </DockPanel>
 

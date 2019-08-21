@@ -15,10 +15,6 @@ namespace PatientsFomsRepository
         {
             base.OnStartup(e);
 
-            //для редактирования ячеек datagrid одним кликом
-            var eventHadler = new RoutedEventHandler(DataGridHelper.DataGridPreviewLeftMouseButtonDownEvent);
-            EventManager.RegisterClassHandler(typeof(DataGrid), DataGrid.PreviewMouseLeftButtonDownEvent, eventHadler);
-
             var view = new MainWindowView();
             view.DataContext = new MainWindowViewModel();
             view.Show();
