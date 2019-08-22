@@ -128,6 +128,8 @@
                 Value="Single" />
         <Setter Property="BorderBrush"
                 Value="LightGray" />
+        <Setter Property="RowHeaderWidth"
+                Value="12" />
         <Setter Property="VerticalGridLinesBrush">
             <Setter.Value>
                 <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlLightColorKey}}" />

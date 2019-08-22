@@ -114,7 +114,7 @@
                                             MinWidth="160" />
                     <DataGridCheckBoxColumn Header="Скрыть"
                                             Binding="{Binding Path=Hide}"
-                                            MinWidth="70" />
+                                            MinWidth="65" />
                     <DataGridCheckBoxColumn Header="Удалить"
                                             Binding="{Binding Path=Delete}"
                                             MinWidth="65"

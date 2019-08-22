@@ -23,6 +23,8 @@ namespace PatientsFomsRepository.Infrastructure
         //Редактирование ячеек одним кликом
         protected override void OnPreviewMouseLeftButtonDown(MouseButtonEventArgs e)
         {
+            base.OnPreviewMouseLeftButtonDown(e);
+
             var mbe = e as MouseButtonEventArgs;
             var clickedElement = mbe.OriginalSource as UIElement;
 
