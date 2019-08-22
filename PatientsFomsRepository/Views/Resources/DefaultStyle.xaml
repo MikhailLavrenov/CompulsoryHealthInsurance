@@ -110,6 +110,8 @@
            BasedOn="{StaticResource ControlBase}">
         <Setter Property="MinHeight"
                 Value="100" />
+        <Setter Property="RowHeight"
+                Value="22" />
         <Setter Property="HorizontalAlignment"
                 Value="Stretch" />
         <Setter Property="VerticalAlignment"

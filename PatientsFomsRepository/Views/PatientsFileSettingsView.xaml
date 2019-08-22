@@ -90,18 +90,19 @@
                         Width="20"
                         Height="25"
                         Command="{Binding MoveUpCommand}"
-                        CommandParameter="{Binding SelectedItem, ElementName=Datagrid1}">
+                        CommandParameter="{Binding SelectedItem, ElementName=DataGrid1}">
                     <ContentControl Content="{Binding Source={StaticResource ArrowUp}}" />
                 </Button>
                 <Button Style="{StaticResource PictureButton}"
                         Width="20"
                         Height="25"
                         Command="{Binding MoveDownCommand}"
-                        CommandParameter="{Binding SelectedItem, ElementName=Datagrid1}">
+                        CommandParameter="{Binding SelectedItem, ElementName=DataGrid1}">
                     <ContentControl Content="{Binding Source={StaticResource ArrowDown}}" />
                 </Button>
             </StackPanel>
-            <i:CustomDataGrid MinHeight="200"
+            <i:CustomDataGrid x:Name="DataGrid1"
+                              MinHeight="200"
                               Visibility="{Binding Path=IsChecked, ElementName=CheckBoxFormat, Converter={i:BoolToVisibleConverter}}"
                               ItemsSource="{Binding Settings.ColumnProperties}">
                 <DataGrid.Columns>

@@ -97,10 +97,10 @@
         <FrameworkElement x:Name="proxyElement" />
 
         <i:CustomDataGrid Grid.Row="7"
-                      Grid.Column="0"
-                      Grid.ColumnSpan="2"
-                      MinHeight="200"
-                      ItemsSource="{Binding Settings.Credentials}">
+                          Grid.Column="0"
+                          Grid.ColumnSpan="2"
+                          MinHeight="200"
+                          ItemsSource="{Binding Settings.Credentials}">
             <DataGrid.Columns>
 
                 <!--Столбец Логин-->
@@ -158,7 +158,7 @@
                                              i:PasswordBoxHelper.BoundPassword="{Binding Path=Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
                                              Visibility="{Binding DataContext.ShowProtectedPassword, Source={x:Reference proxyElement}, Converter={i:BoolToVisibleConverter}}">
 
-                                    <!--Триггер чтобы при выделении строки фон и цвет текста соответствовал стандартным ячейкам-->
+                                    <!--Триггеры чтобы при выделении строки курсор, фон и цвет текста соответствовали стандартным ячейкам-->
                                     <PasswordBox.Style>
                                         <Style TargetType="PasswordBox">
                                             <Style.Triggers>
@@ -203,7 +203,7 @@
                                          MinWidth="0"
                                          Visibility="{Binding DataContext.ShowTextPassword, Source={x:Reference proxyElement}, Converter={i:BoolToVisibleConverter}}">
 
-                                    <!--Триггер чтобы при выделении строки фон и цвет текста соответствовал стандартным ячейкам-->
+                                    <!--Триггеры чтобы при выделении строки курсор, фон и цвет текста соответствовали стандартным ячейкам-->
                                     <TextBox.Style>
                                         <Style TargetType="TextBox">
                                             <Style.Triggers>

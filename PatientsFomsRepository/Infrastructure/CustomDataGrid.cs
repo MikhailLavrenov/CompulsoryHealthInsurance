@@ -1,5 +1,4 @@
-﻿using System;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -25,14 +24,15 @@ namespace PatientsFomsRepository.Infrastructure
         protected override void OnPreviewMouseLeftButtonDown(MouseButtonEventArgs e)
         {
             var mbe = e as MouseButtonEventArgs;
+            var clickedElement = mbe.OriginalSource as UIElement;
 
-            //исключает баг исчезновения пароля в PasswordBox
+            //исключает баг исчезновения пароля в PasswordBox  
             var originalSourceName = mbe.OriginalSource.GetType().Name;
             if (originalSourceName == "Border" || originalSourceName == "DataGridCell")
-                return;
+                if (FindVisualChild<PasswordBox>(clickedElement) != null)
+                    return;
 
-            var element = mbe.OriginalSource as UIElement;
-            var cell = FindVisualParent<DataGridCell>(element);
+            var cell = FindVisualParent<DataGridCell>(clickedElement);
 
             if (cell == null || cell.IsEditing || cell.IsReadOnly)
                 return;
@@ -66,6 +66,29 @@ namespace PatientsFomsRepository.Infrastructure
                     return correctlyTyped;
 
                 element = VisualTreeHelper.GetParent(element) as UIElement;
+            }
+
+            return null;
+        }
+        //Рекурсивно находит дочерний элемент соответствующий типу T 
+        public static T FindVisualChild<T>(UIElement element) where T : UIElement
+        {
+            if (element == null)
+                return null;
+
+            int childrenCount = VisualTreeHelper.GetChildrenCount(element);
+
+            for (int i = 0; i < childrenCount; i++)
+            {
+                var child = VisualTreeHelper.GetChild(element, i) as UIElement;
+
+                if (child is T correctlyTyped)
+                    return correctlyTyped;
+
+                var result = FindVisualChild<T>(child);
+
+                if (result != null)
+                    return result;
             }
 
             return null;
