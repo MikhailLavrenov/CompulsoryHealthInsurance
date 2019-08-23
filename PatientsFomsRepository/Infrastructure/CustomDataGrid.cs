@@ -19,7 +19,7 @@ namespace PatientsFomsRepository.Infrastructure
             // чтобы не делать лишний клик, нужно вручную установить фокус на элемент управления
             if (e.EditingElement.GetType().Name == "ContentPresenter")
             {
-                var control = FindVisualChild<Control>(e.EditingElement);
+                var control = FindVisualVisibleChild<Control>(e.EditingElement);
                 if (control != null && control.IsFocused == false)
                     control.Focus();
             }
@@ -41,7 +41,7 @@ namespace PatientsFomsRepository.Infrastructure
             var originalSourceName = mbe.OriginalSource.GetType().Name;
 
             if (originalSourceName == "Border" || originalSourceName == "DataGridCell")
-                if (FindVisualChild<PasswordBox>(clickedElement) != null)
+                if (FindVisualVisibleChild<PasswordBox>(clickedElement) != null)
                     return;
 
             // Далее редактирование ячеек одним кликом
@@ -87,8 +87,8 @@ namespace PatientsFomsRepository.Infrastructure
 
             return null;
         }
-        // Рекурсивно находит дочерний элемент соответствующий типу T 
-        public static T FindVisualChild<T>(UIElement element) where T : UIElement
+        // Рекурсивно находит дочерний видимый элемент соответствующий типу T 
+        public static T FindVisualVisibleChild<T>(UIElement element) where T : UIElement
         {
             if (element == null)
                 return null;
@@ -100,9 +100,10 @@ namespace PatientsFomsRepository.Infrastructure
                 var child = VisualTreeHelper.GetChild(element, i) as UIElement;
 
                 if (child is T correctlyTyped)
-                    return correctlyTyped;
+                    if (correctlyTyped.IsVisible)
+                        return correctlyTyped;
 
-                var result = FindVisualChild<T>(child);
+                var result = FindVisualVisibleChild<T>(child);
 
                 if (result != null)
                     return result;
