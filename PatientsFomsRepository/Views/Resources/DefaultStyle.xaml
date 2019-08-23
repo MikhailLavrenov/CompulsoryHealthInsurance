@@ -142,6 +142,64 @@
         </Setter>
     </Style>
 
+    <!--Стиль для котролов DataGridTemplateColumn-->
+    <Style TargetType="{x:Type Control}"
+           x:Key="DataGridTemplateColumnControl">
+        <Setter Property="Margin"
+                Value="0" />
+        <Setter Property="MinWidth"
+                Value="0" />
+        <Setter Property="MinHeight"
+                Value="0" />
+        <Setter Property="BorderThickness"
+                Value="0" />
+        
+        <Style.Triggers>
+
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding  IsMouseOver, RelativeSource={RelativeSource Self}}"
+                               Value="True" />
+                    <Condition Binding="{Binding IsFocused, RelativeSource= {RelativeSource Self}}"
+                               Value="False" />
+                </MultiDataTrigger.Conditions>
+                <MultiDataTrigger.Setters>
+                    <Setter Property="Cursor"
+                            Value="Arrow" />
+                </MultiDataTrigger.Setters>
+            </MultiDataTrigger>
+
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding IsKeyboardFocusWithin, RelativeSource= {RelativeSource AncestorType={x:Type DataGrid}}}"
+                               Value="True" />
+                    <Condition Binding="{Binding IsSelected, RelativeSource= {RelativeSource AncestorType={x:Type DataGridRow}}}"
+                               Value="True" />
+                    <Condition Binding="{Binding  IsFocused, RelativeSource={RelativeSource Self}}"
+                               Value="False" />
+                </MultiDataTrigger.Conditions>
+                <MultiDataTrigger.Setters>
+                    <Setter Property="Foreground"
+                            Value="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}" />
+                </MultiDataTrigger.Setters>
+            </MultiDataTrigger>
+
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding IsSelected, RelativeSource= {RelativeSource AncestorType={x:Type DataGridRow}}}"
+                               Value="True" />
+                    <Condition Binding="{Binding  IsFocused, RelativeSource={RelativeSource Self}}"
+                               Value="False" />
+                </MultiDataTrigger.Conditions>
+                <MultiDataTrigger.Setters>
+                    <Setter Property="Background"
+                            Value="Transparent" />
+                </MultiDataTrigger.Setters>
+            </MultiDataTrigger>
+
+        </Style.Triggers>
+    </Style>
+
     <!--TextBlocks-->
 
     <Style TargetType="TextBlock"
@@ -203,6 +261,9 @@
         <Setter Property="BorderBrush"
                 Value="LightGray" />
     </Style>
+
+
+
 
 
 

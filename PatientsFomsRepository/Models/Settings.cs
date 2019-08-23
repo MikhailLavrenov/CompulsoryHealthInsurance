@@ -131,7 +131,6 @@ namespace PatientsFomsRepository.Models
         //сохраняет настройки в xml
         public void Save()
         {
-            ConnectionIsValid = false;
             using (var stream = new FileStream(ThisFileName, FileMode.Create))
             {
                 var formatter = new XmlSerializer(GetType());

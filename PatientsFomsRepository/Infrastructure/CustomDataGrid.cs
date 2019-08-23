@@ -10,17 +10,26 @@ namespace PatientsFomsRepository.Infrastructure
     /// </summary>
     public class CustomDataGrid : DataGrid
     {
-        //Исключает выделение текста при выборе новой ячейки
+        // Возникает перед редактированием ячейки
         protected override void OnPreparingCellForEdit(DataGridPreparingCellForEditEventArgs e)
         {
             base.OnPreparingCellForEdit(e);
 
-            var textBox = e.EditingElement as TextBox;
+            // Когда DataGridTemplateColumn переводится в режим редактирования вручную, 
+            // чтобы не делать лишний клик, нужно вручную установить фокус на элемент управления
+            if (e.EditingElement.GetType().Name == "ContentPresenter")
+            {
+                var control = FindVisualChild<Control>(e.EditingElement);
+                if (control != null && control.IsFocused == false)
+                    control.Focus();
+            }
 
-            if (textBox != null && textBox.SelectionLength != 0)
-                textBox.CaretIndex = textBox.Text.Length;
+            //Исключает выделение текста при выборе ячейки TextBox
+            if (e.EditingElement is TextBox textBox)
+                if (textBox.SelectionLength != 0)
+                    textBox.CaretIndex = textBox.Text.Length;
         }
-        //Редактирование ячеек одним кликом
+        // Возникает при любом клике ЛКМ по DataGrid'у
         protected override void OnPreviewMouseLeftButtonDown(MouseButtonEventArgs e)
         {
             base.OnPreviewMouseLeftButtonDown(e);
@@ -28,38 +37,44 @@ namespace PatientsFomsRepository.Infrastructure
             var mbe = e as MouseButtonEventArgs;
             var clickedElement = mbe.OriginalSource as UIElement;
 
-            //исключает баг исчезновения пароля в PasswordBox  
+            // Исключает баг исчезновения пароля в PasswordBox  
             var originalSourceName = mbe.OriginalSource.GetType().Name;
+
             if (originalSourceName == "Border" || originalSourceName == "DataGridCell")
                 if (FindVisualChild<PasswordBox>(clickedElement) != null)
                     return;
 
+            // Далее редактирование ячеек одним кликом
             var cell = FindVisualParent<DataGridCell>(clickedElement);
 
             if (cell == null || cell.IsEditing || cell.IsReadOnly)
                 return;
 
+            // 1. Нужно установить фокус на выбранной ячейке
             if (cell.IsFocused == false)
                 cell.Focus();
 
-
-            var dataGrid = FindVisualParent<DataGrid>(cell);
-
-            if (dataGrid == null)
-                return;
-
-            if (dataGrid.SelectionUnit == DataGridSelectionUnit.FullRow)
+            // 2. Нужно установить IsSelected на строку или ячейку в зависимости от стиля выделения курсора в DataGrid
+            // Проверка обязательна, тупо выделять ячейку нельзя, возникнет исключение
+            if (SelectionUnit == DataGridSelectionUnit.FullRow)
             {
                 var row = FindVisualParent<DataGridRow>(cell);
 
                 if (row?.IsSelected == false)
                     row.IsSelected = true;
             }
-
             else if (cell.IsSelected == false)
                 cell.IsSelected = true;
+
+            // Исключает баг. Если добавление новой строки начинается c DataGridTemplateColumn, новый элемент коллекции не получит  
+            // нужный тип пока текущая ячейка не будет переведена в режим редактрования вручную. В противном случае могут появиться  
+            // лишние строки и новая строка не попадет в связанную пользовательскую коллекцию
+            var currentItemName = CurrentItem?.GetType().Name;
+
+            if (currentItemName == "NamedObject")
+                BeginEdit();
         }
-        //Находит родительский элемент соответствующий типу T 
+        // Находит родительский элемент соответствующий типу T 
         private static T FindVisualParent<T>(UIElement element) where T : UIElement
         {
             while (element != null)
@@ -72,7 +87,7 @@ namespace PatientsFomsRepository.Infrastructure
 
             return null;
         }
-        //Рекурсивно находит дочерний элемент соответствующий типу T 
+        // Рекурсивно находит дочерний элемент соответствующий типу T 
         public static T FindVisualChild<T>(UIElement element) where T : UIElement
         {
             if (element == null)

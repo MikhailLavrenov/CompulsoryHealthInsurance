@@ -92,7 +92,6 @@ namespace PatientsFomsRepository.Models
                         RemoveError(message2, nameof(Password));
                     }
                     break;
-
             }
         }
         //шифрует текст в соответствии с видимостью

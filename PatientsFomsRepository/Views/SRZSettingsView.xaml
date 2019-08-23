@@ -101,6 +101,7 @@
                           Grid.ColumnSpan="2"
                           MinHeight="200"
                           ItemsSource="{Binding Settings.Credentials}">
+
             <DataGrid.Columns>
 
                 <!--Столбец Логин-->
@@ -109,7 +110,7 @@
                                     MinWidth="150" />
 
                 <!--Столбец Пароль-->
-                <!--Шаблон Заголовка. В заголовок вставляем текст и кнопку для переключения видимсти паролей-->
+                <!--Шаблон Заголовка. В заголовок вставляем текст и кнопку для переключения видимости паролей-->
                 <DataGridTemplateColumn MinWidth="150">
                     <DataGridTemplateColumn.HeaderStyle>
                         <Style TargetType="{x:Type DataGridColumnHeader}">
@@ -150,96 +151,16 @@
                         <!--Вставляем 2 контрола. Одновременно отображается только один -->
                         <DataTemplate>
                             <Grid>
-                                <PasswordBox BorderThickness="0"
-                                             Margin="0"
-                                             MinHeight="0"
-                                             MinWidth="0"
+                                
+                                <PasswordBox Style="{StaticResource  DataGridTemplateColumnControl}"
                                              i:PasswordBoxHelper.BindPassword="true"
                                              i:PasswordBoxHelper.BoundPassword="{Binding Path=Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
                                              Visibility="{Binding DataContext.ShowProtectedPassword, Source={x:Reference proxyElement}, Converter={i:BoolToVisibleConverter}}">
-
-                                    <!--Триггеры чтобы при выделении строки курсор, фон и цвет текста соответствовали стандартным ячейкам-->
-                                    <PasswordBox.Style>
-                                        <Style TargetType="PasswordBox">
-                                            <Style.Triggers>
-
-                                                <MultiDataTrigger>
-                                                    <MultiDataTrigger.Conditions>
-                                                        <Condition Binding="{Binding  IsMouseOver, RelativeSource={RelativeSource Self}}"
-                                                                   Value="True" />
-                                                        <Condition Binding="{Binding IsFocused, RelativeSource= {RelativeSource Self}}"
-                                                                   Value="False" />
-                                                    </MultiDataTrigger.Conditions>
-                                                    <MultiDataTrigger.Setters>
-                                                        <Setter Property="Cursor"
-                                                                Value="Arrow" />
-                                                    </MultiDataTrigger.Setters>
-                                                </MultiDataTrigger>
-
-                                                <MultiDataTrigger>
-                                                    <MultiDataTrigger.Conditions>
-                                                        <Condition Binding="{Binding IsSelected, RelativeSource= {RelativeSource AncestorType={x:Type DataGridRow}}}"
-                                                                   Value="True" />
-                                                        <Condition Binding="{Binding  IsFocused, RelativeSource={RelativeSource Self}}"
-                                                                   Value="False" />
-                                                    </MultiDataTrigger.Conditions>
-                                                    <MultiDataTrigger.Setters>
-                                                        <Setter Property="Foreground"
-                                                                Value="White" />
-                                                        <Setter Property="Background"
-                                                                Value="Transparent" />
-                                                    </MultiDataTrigger.Setters>
-                                                </MultiDataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </PasswordBox.Style>
-
                                 </PasswordBox>
 
-                                <TextBox Text="{Binding Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged,  ValidatesOnDataErrors=True}"
-                                         BorderThickness="0"
-                                         Margin="0"
-                                         MinHeight="0"
-                                         MinWidth="0"
+                                <TextBox Style="{StaticResource  DataGridTemplateColumnControl}"
+                                         Text="{Binding Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged,  ValidatesOnDataErrors=True}"
                                          Visibility="{Binding DataContext.ShowTextPassword, Source={x:Reference proxyElement}, Converter={i:BoolToVisibleConverter}}">
-
-                                    <!--Триггеры чтобы при выделении строки курсор, фон и цвет текста соответствовали стандартным ячейкам-->
-                                    <TextBox.Style>
-                                        <Style TargetType="TextBox">
-                                            <Style.Triggers>
-
-                                                <MultiDataTrigger>
-                                                    <MultiDataTrigger.Conditions>
-                                                        <Condition Binding="{Binding  IsMouseOver, RelativeSource={RelativeSource Self}}"
-                                                                   Value="True" />
-                                                        <Condition Binding="{Binding IsFocused, RelativeSource= {RelativeSource Self}}"
-                                                                   Value="False" />
-                                                    </MultiDataTrigger.Conditions>
-                                                    <MultiDataTrigger.Setters>
-                                                        <Setter Property="Cursor"
-                                                                Value="Arrow" />
-                                                    </MultiDataTrigger.Setters>
-                                                </MultiDataTrigger>
-
-                                                <MultiDataTrigger>
-                                                    <MultiDataTrigger.Conditions>
-                                                        <Condition Binding="{Binding IsSelected, RelativeSource= {RelativeSource AncestorType={x:Type DataGridRow}}}"
-                                                                   Value="True" />
-                                                        <Condition Binding="{Binding  IsFocused, RelativeSource={RelativeSource Self}}"
-                                                                   Value="False" />
-                                                    </MultiDataTrigger.Conditions>
-                                                    <MultiDataTrigger.Setters>
-                                                        <Setter Property="Foreground"
-                                                                Value="White" />
-                                                        <Setter Property="Background"
-                                                                Value="Transparent" />
-                                                    </MultiDataTrigger.Setters>
-                                                </MultiDataTrigger>
-
-                                            </Style.Triggers>
-                                        </Style>
-                                    </TextBox.Style>
-
                                 </TextBox>
 
                             </Grid>
