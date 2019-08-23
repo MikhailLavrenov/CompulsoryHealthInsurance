@@ -59,44 +59,34 @@ namespace PatientsFomsRepository.Models
             }
         }
         //валидация свойств
-        protected override void Validate(string propertyName)
+        public override void Validate(string propertyName = null)
         {
-            var message1 = "Значение не может быть пустым";
-            var message2 = "Не удалось подключиться";
+            if (propertyName == nameof(Login) || propertyName == null)
+                ValidateIsNullOrEmptyString(nameof(Login), Login);
 
-            switch (propertyName)
+            if (propertyName == nameof(Password) || propertyName == null)
+                ValidateIsNullOrEmptyString(nameof(Password), Password);
+
+            if (isNotValid)
             {
-                case nameof(Login):
-                    if (string.IsNullOrEmpty(Login))
-                        AddError(message1, propertyName);
-                    else
-                        RemoveError(message1, propertyName);
-                    break;
-
-                case nameof(Password):
-                    if (string.IsNullOrEmpty(Password))
-                        AddError(message1, propertyName);
-                    else
-                        RemoveError(message1, propertyName);
-                    break;
-
-                case nameof(isNotValid):
-                    if (isNotValid)
-                    {
-                        AddError(message2, nameof(Login));
-                        AddError(message2, nameof(Password));
-                    }
-                    else
-                    {
-                        RemoveError(message2, nameof(Login));
-                        RemoveError(message2, nameof(Password));
-                    }
-                    break;
+                if (isNotValid)
+                {
+                    AddError(ConnectionErrorMessage, nameof(Login));
+                    AddError(ConnectionErrorMessage, nameof(Password));
+                }
+                else
+                {
+                    RemoveError(ConnectionErrorMessage, nameof(Login));
+                    RemoveError(ConnectionErrorMessage, nameof(Password));
+                }
             }
         }
         //шифрует текст в соответствии с видимостью
         private static string Encrypt(string text)
         {
+            if (text == null)
+                text = "";
+
             if (Scope == CredentialScope.Все)
                 return text;
 
@@ -114,6 +104,9 @@ namespace PatientsFomsRepository.Models
         //расшифровывает текст в соответствии с видимостью
         private static string Decrypt(string text)
         {
+            if (text == null)
+                text = "";
+
             if (Scope == CredentialScope.Все)
                 return text;
 

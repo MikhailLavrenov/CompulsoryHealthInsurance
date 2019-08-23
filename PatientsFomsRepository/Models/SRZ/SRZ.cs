@@ -38,86 +38,6 @@ namespace PatientsFomsRepository.Models
         #endregion
 
         #region Методы
-        // инициализация класса
-        private void Initialize(string URL, string proxyAddress = null, int proxyPort = 0)
-        {
-            Authorized = false;
-            var clientHandler = new HttpClientHandler();
-            clientHandler.CookieContainer = new CookieContainer();
-            if (proxyAddress != null && proxyPort != 0)
-            {
-                clientHandler.UseProxy = true;
-                clientHandler.Proxy = new WebProxy($"{proxyAddress}:{proxyPort}");
-            }
-            client = new HttpClient(clientHandler);
-            client.BaseAddress = new Uri(URL);
-        }
-        //получает ссылку на файл заданной даты
-        private  string GetFileReference(DateTime fileDate)
-        {
-            string shortFileDate = fileDate.ToShortDateString();
-            var content = new FormUrlEncodedContent(new[]
-                {
-                new KeyValuePair<string, string>("export_date_on", shortFileDate),
-                new KeyValuePair<string, string>("exportlist_id", "25"),
-                });
-            var response = client.PostAsync("data/dbase.export.php", content).Result;
-            response.EnsureSuccessStatusCode();
-            string responseText = response.Content.ReadAsStringAsync().Result;
-
-            int begin = responseText.IndexOf(@"<a href='") + 9;
-            int end = responseText.IndexOf(@"' ", begin) - begin;
-
-            return responseText.Substring(begin, end);
-        }
-        //получает dbf файл прикрепленных пацентов
-        private  Stream GetDbfFile(string downloadReference)
-        {
-            //скачиваем zip архив
-            var response = client.GetAsync(downloadReference).Result;
-            response.EnsureSuccessStatusCode();
-            var zipFile = response.Content.ReadAsStreamAsync().Result;
-
-            //извлекаем dbf файл
-            Stream dbfFile = new MemoryStream();
-            var archive = new ZipArchive(zipFile, ZipArchiveMode.Read);
-            archive.Entries[0].Open().CopyTo(dbfFile);
-            dbfFile.Position = 0;
-
-            return dbfFile;
-        }
-        //преобразует dbf в excel
-        private void DbfToExcel(Stream dbfFile, string excelFilePath)
-        {
-            using (var table = NDbfReader.Table.Open(dbfFile))
-            using (var excel = new ExcelPackage())
-            {
-                var reader = table.OpenReader(Encoding.GetEncoding(866));
-                var sheet = excel.Workbook.Worksheets.Add("Лист1");
-
-                //вставляет заголовки и устанавливает формат столбцов
-                for (int column = 0; column < table.Columns.Count; column++)
-                {
-                    sheet.Cells[1, column + 1].Value = table.Columns[column].Name.ToString();
-
-                    var type = table.Columns[column].Type;
-                    type = Nullable.GetUnderlyingType(type) ?? type;
-                    if (type.Name == "DateTime")
-                        sheet.Column(column + 1).Style.Numberformat.Format = "dd.MM.yyyy";
-                }
-
-                //заполняет строки таблицы
-                int row = 2;
-                while (reader.Read())
-                {
-                    for (int column = 0; column < table.Columns.Count; column++)
-                        sheet.Cells[row, column + 1].Value = reader.GetValue(table.Columns[column]);
-                    row++;
-                }
-
-                excel.SaveAs(new FileInfo(excelFilePath));
-            }
-        }
         //авторизация на сайте
         public bool TryAuthorize(Credential credential)
         {
@@ -194,6 +114,86 @@ namespace PatientsFomsRepository.Models
         public void Dispose()
         {
             client.Dispose();
+        }
+        // инициализация класса
+        private void Initialize(string URL, string proxyAddress = null, int proxyPort = 0)
+        {
+            Authorized = false;
+            var clientHandler = new HttpClientHandler();
+            clientHandler.CookieContainer = new CookieContainer();
+            if (proxyAddress != null && proxyPort != 0)
+            {
+                clientHandler.UseProxy = true;
+                clientHandler.Proxy = new WebProxy($"{proxyAddress}:{proxyPort}");
+            }
+            client = new HttpClient(clientHandler);
+            client.BaseAddress = new Uri(URL);
+        }
+        //получает ссылку на файл заданной даты
+        private string GetFileReference(DateTime fileDate)
+        {
+            string shortFileDate = fileDate.ToShortDateString();
+            var content = new FormUrlEncodedContent(new[]
+                {
+                new KeyValuePair<string, string>("export_date_on", shortFileDate),
+                new KeyValuePair<string, string>("exportlist_id", "25"),
+                });
+            var response = client.PostAsync("data/dbase.export.php", content).Result;
+            response.EnsureSuccessStatusCode();
+            string responseText = response.Content.ReadAsStringAsync().Result;
+
+            int begin = responseText.IndexOf(@"<a href='") + 9;
+            int end = responseText.IndexOf(@"' ", begin) - begin;
+
+            return responseText.Substring(begin, end);
+        }
+        //получает dbf файл прикрепленных пацентов
+        private Stream GetDbfFile(string downloadReference)
+        {
+            //скачиваем zip архив
+            var response = client.GetAsync(downloadReference).Result;
+            response.EnsureSuccessStatusCode();
+            var zipFile = response.Content.ReadAsStreamAsync().Result;
+
+            //извлекаем dbf файл
+            Stream dbfFile = new MemoryStream();
+            var archive = new ZipArchive(zipFile, ZipArchiveMode.Read);
+            archive.Entries[0].Open().CopyTo(dbfFile);
+            dbfFile.Position = 0;
+
+            return dbfFile;
+        }
+        //преобразует dbf в excel
+        private void DbfToExcel(Stream dbfFile, string excelFilePath)
+        {
+            using (var table = NDbfReader.Table.Open(dbfFile))
+            using (var excel = new ExcelPackage())
+            {
+                var reader = table.OpenReader(Encoding.GetEncoding(866));
+                var sheet = excel.Workbook.Worksheets.Add("Лист1");
+
+                //вставляет заголовки и устанавливает формат столбцов
+                for (int column = 0; column < table.Columns.Count; column++)
+                {
+                    sheet.Cells[1, column + 1].Value = table.Columns[column].Name.ToString();
+
+                    var type = table.Columns[column].Type;
+                    type = Nullable.GetUnderlyingType(type) ?? type;
+                    if (type.Name == "DateTime")
+                        sheet.Column(column + 1).Style.Numberformat.Format = "dd.MM.yyyy";
+                }
+
+                //заполняет строки таблицы
+                int row = 2;
+                while (reader.Read())
+                {
+                    for (int column = 0; column < table.Columns.Count; column++)
+                        sheet.Cells[row, column + 1].Value = reader.GetValue(table.Columns[column]);
+                    row++;
+                }
+
+                excel.SaveAs(new FileInfo(excelFilePath));
+            }
         }
         #endregion
     }

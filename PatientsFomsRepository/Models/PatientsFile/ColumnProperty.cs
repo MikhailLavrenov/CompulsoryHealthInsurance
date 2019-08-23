@@ -26,26 +26,13 @@ namespace PatientsFomsRepository.Models
 
         #region Методы
         // Валидация свойств
-        protected override void Validate(string propertyName)
+        public override void Validate(string propertyName=null)
         {
-            var message1 = "Значение не может быть пустым";
+            if (propertyName == nameof(Name) || propertyName == null)            
+                ValidateIsNullOrEmptyString(nameof(Name), Name);            
 
-            switch (propertyName)
-            {
-                case nameof(Name):
-                    if (string.IsNullOrEmpty(Name))
-                        AddError(message1, propertyName);
-                    else
-                        RemoveError(message1, propertyName);
-                    break;
-
-                case nameof(AltName):
-                    if (string.IsNullOrEmpty(AltName))
-                        AddError(message1, propertyName);
-                    else
-                        RemoveError(message1, propertyName);
-                    break;
-            }
+            if (propertyName == nameof(AltName) || propertyName == null)
+                ValidateIsNullOrEmptyString(nameof(AltName), AltName);
         }
         #endregion
     }

@@ -18,6 +18,10 @@ namespace PatientsFomsRepository.Infrastructure
 
         #region Свойства
         public bool HasErrors { get => errors.Count > 0; }
+        protected string IsNullOrEmptyErrorMessage = "Значение не может быть пустым";
+        protected string ConnectionErrorMessage = "Не удалось подключиться";
+        protected string LessOneErrorMessage = "Значение не может быть меньше 1";
+        protected string UriFormatErrorMessage = "Не верный формат URI";
         #endregion
 
         #region События
@@ -54,9 +58,17 @@ namespace PatientsFomsRepository.Infrastructure
                 return null;
             return errors[propertyName];
         }
-        //Выполняет валидацию.Долже быть переопределен в производном классе для автоматического вызова при изменении свойств.
-        protected virtual void Validate(string propertyName)
+        //Выполняет валидацию. Должен быть переопределен в производном классе для автоматического вызова при изменении свойств.
+        public virtual void Validate(string propertyName)
         { }
+        //Валидация cвойства типа string на null или пусто
+        protected void ValidateIsNullOrEmptyString(string propertyName, string propertyValue)
+        {
+            if (string.IsNullOrEmpty(propertyValue))
+                AddError(IsNullOrEmptyErrorMessage, propertyName);
+            else
+                RemoveError(IsNullOrEmptyErrorMessage, propertyName);
+        }
         //Добавить сообщение об ошибке в значении свойства
         protected void AddError(string errormessage, [CallerMemberName]string propertyName = "")
         {
@@ -90,7 +102,7 @@ namespace PatientsFomsRepository.Infrastructure
                 errors.Remove(propertyName);
                 OnErrorsChanged(propertyName);
             }
-        }
+        }               
         #endregion
 
 

@@ -47,14 +47,16 @@ namespace PatientsFomsRepository.Models
             set
             {
                 var compare = StringComparison.OrdinalIgnoreCase;
-
                 value = value.Trim();
 
-                if (value.StartsWith(@"http://", compare) == false && value.StartsWith(@"https://", compare) == false)
-                    value = $@"http://{value}";
+                if (string.IsNullOrEmpty(value) == false)
+                {
+                    if (value.StartsWith(@"http://", compare) == false && value.StartsWith(@"https://", compare) == false)
+                        value = $@"http://{value}";
 
-                if (value.EndsWith(@"/") == false)
-                    value = $@"{value}/";
+                    if (value.EndsWith(@"/") == false)
+                        value = $@"{value}/";
+                }
 
                 SetProperty(ref siteAddress, value);
             }
@@ -131,6 +133,14 @@ namespace PatientsFomsRepository.Models
         //сохраняет настройки в xml
         public void Save()
         {
+            // Т.к. при создании экзмпляра класса если свойства не инициализируются - не срабатывает валидация. Поэтому принудительно проверяем все. 
+            // Свойства не инициализируются сразу т.к. иначе сразу после создания на них будут отображаться ошибки, и во View тоже, это плохо.
+            foreach (var item in Credentials)
+                item.Validate();
+
+            foreach (var item in ColumnProperties)
+                item.Validate();
+
             using (var stream = new FileStream(ThisFileName, FileMode.Create))
             {
                 var formatter = new XmlSerializer(GetType());
@@ -227,19 +237,16 @@ namespace PatientsFomsRepository.Models
                 ColumnProperties.Move(itemIndex, itemIndex + 1);
         }
         //Валидация свойств
-        protected override void Validate(string propertyName)
+        public override void Validate(string propertyName)
         {
-            var message1 = "Значение не может быть пустым";
-            var message2 = "Значение не может быть меньше 1";
-            var message3 = "Не удалось подключиться";
-
             switch (propertyName)
             {
                 case nameof(SiteAddress):
-                    if (string.IsNullOrEmpty(SiteAddress) || SiteAddress == @"http://")
-                        AddError(message1, propertyName);
+                    if (string.IsNullOrEmpty(SiteAddress) || Uri.TryCreate(SiteAddress, UriKind.Absolute,out var t)==false)
+                        AddError(UriFormatErrorMessage, propertyName);
                     else
-                        RemoveError(message1, propertyName);
+                        RemoveError(UriFormatErrorMessage, propertyName);
+
                     break;
 
                 case nameof(UseProxy):
@@ -251,46 +258,40 @@ namespace PatientsFomsRepository.Models
                     break;
 
                 case nameof(ProxyAddress):
-                    if (string.IsNullOrEmpty(ProxyAddress) && UseProxy)
-                        AddError(message1, propertyName);
-                    else
-                        RemoveError(message1, propertyName);
+                    if (UseProxy)
+                        ValidateIsNullOrEmptyString(nameof(ProxyAddress), ProxyAddress);
                     break;
 
                 case nameof(PatientsFilePath):
-                    if (string.IsNullOrEmpty(PatientsFilePath))
-                        AddError(message1, propertyName);
-                    else
-                        RemoveError(message1, propertyName);
+                    ValidateIsNullOrEmptyString(nameof(PatientsFilePath), PatientsFilePath);
                     break;
 
                 case nameof(ThreadsLimit):
                     if (ThreadsLimit < 1)
-                        AddError(message2, propertyName);
+                        AddError(LessOneErrorMessage, propertyName);
                     else
-                        RemoveError(message2, propertyName);
+                        RemoveError(LessOneErrorMessage, propertyName);
                     break;
 
                 case nameof(SiteAddressIsNotValid):
                     if (SiteAddressIsNotValid)
-                        AddError(message3, nameof(SiteAddress));
+                        AddError(ConnectionErrorMessage, nameof(SiteAddress));
                     else
-                        RemoveError(message3, nameof(SiteAddress));
+                        RemoveError(ConnectionErrorMessage, nameof(SiteAddress));
                     break;
 
                 case nameof(ProxyIsNotValid):
                     if (ProxyIsNotValid)
                     {
-                        AddError(message3, nameof(ProxyAddress));
-                        AddError(message3, nameof(ProxyPort));
+                        AddError(ConnectionErrorMessage, nameof(ProxyAddress));
+                        AddError(ConnectionErrorMessage, nameof(ProxyPort));
                     }
                     else
                     {
-                        RemoveError(message3, nameof(ProxyAddress));
-                        RemoveError(message3, nameof(ProxyPort));
+                        RemoveError(ConnectionErrorMessage, nameof(ProxyAddress));
+                        RemoveError(ConnectionErrorMessage, nameof(ProxyPort));
                     }
                     break;
-
             }
         }
         //проверяет настройки прокси-сервера
