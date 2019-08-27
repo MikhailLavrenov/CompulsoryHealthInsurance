@@ -1,10 +1,8 @@
-﻿using OfficeOpenXml;
-using PatientsFomsRepository.Infrastructure;
+﻿using PatientsFomsRepository.Infrastructure;
 using PatientsFomsRepository.Models;
 using System.Data.Entity;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace PatientsFomsRepository.ViewModels
 {
@@ -34,34 +32,31 @@ namespace PatientsFomsRepository.ViewModels
         #endregion
 
         #region Методы
-        private async void ImportExecute(object parameter)
+        private void ImportExecute(object parameter)
         {
             Progress = "Ожидайте. Открытие файла...";
-            await Task.Run(() =>
-            {
-                string filePath = (string)parameter;
-                var file = new ImportPatientsFile();
-                file.Open(filePath);
-                var newPatients = file.GetPatients();
-                file.Dispose();
+            string filePath = (string)parameter;
+            var file = new ImportPatientsFile();
+            file.Open(filePath);
+            var newPatients = file.GetPatients();
+            file.Dispose();
 
-                Progress = "Ожидайте. Проверка значений...";
-                var db = new Models.Database();
-                db.Patients.Load();
-                var existenInsuaranceNumbers = db.Patients.Select(x => x.InsuranceNumber).ToHashSet();
-                var newUniqPatients = newPatients
-                .Where(x => !existenInsuaranceNumbers.Contains(x.InsuranceNumber))
-                .GroupBy(x => x.InsuranceNumber)
-                .Select(x => x.First())
-                .ToList();
-                Progress = "Ожидайте. Сохранение в кэш...";
-                db.Patients.AddRange(newUniqPatients);
-                db.SaveChanges();
+            Progress = "Ожидайте. Проверка значений...";
+            var db = new Models.Database();
+            db.Patients.Load();
+            var existenInsuaranceNumbers = db.Patients.Select(x => x.InsuranceNumber).ToHashSet();
+            var newUniqPatients = newPatients
+            .Where(x => !existenInsuaranceNumbers.Contains(x.InsuranceNumber))
+            .GroupBy(x => x.InsuranceNumber)
+            .Select(x => x.First())
+            .ToList();
 
-                int total = existenInsuaranceNumbers.Count + newUniqPatients.Count;
-                Progress = $"Завершено. В файле найдено {newPatients.Count} человек(а). В БД добавлено {newUniqPatients.Count}  человек(а). Итого в БД {total} человек(а).";
-            });
-            
+            Progress = "Ожидайте. Сохранение в кэш...";
+            db.Patients.AddRange(newUniqPatients);
+            db.SaveChanges();
+
+            int total = existenInsuaranceNumbers.Count + newUniqPatients.Count;
+            Progress = $"Завершено. В файле найдено {newPatients.Count} человек(а). В БД добавлено {newUniqPatients.Count}. Итого в БД {total}.";
         }
         private bool ImportCanExecute(object parameter)
         {

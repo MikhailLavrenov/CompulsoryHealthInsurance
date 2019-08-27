@@ -19,9 +19,9 @@ namespace PatientsFomsRepository.ViewModels
         #endregion
 
         #region Свойства
-        public string ShortCaption { get; set; } 
+        public string ShortCaption { get; set; }
         public string FullCaption { get; set; }
-        public string Progress { get => progress; set => SetProperty(ref progress, value); }         
+        public string Progress { get => progress; set => SetProperty(ref progress, value); }
         public Settings Settings { get => settings; set => SetProperty(ref settings, value); }
         public DateTime FileDate { get => fileDate; set => SetProperty(ref fileDate, value); }
         public RelayCommand ProcessFileCommand { get; }
@@ -42,10 +42,10 @@ namespace PatientsFomsRepository.ViewModels
         #endregion
 
         #region Методы
-        private async void ProcessFileExecute(object parameter)
+        private void ProcessFileExecute(object parameter)
         {
             Progress = "Проверка подключения к СРЗ";
-            await Task.Run(() => Settings.TestConnection());
+            Settings.TestConnection();
 
             if (Settings.DownloadNewPatientsFile)
             {
@@ -56,65 +56,48 @@ namespace PatientsFomsRepository.ViewModels
                 }
 
                 Progress = "Загрузка файла из СРЗ";
-                await Task.Run(() =>
-                {
-                    SRZ site;
-                    if (Settings.UseProxy)
-                        site = new SRZ(Settings.SiteAddress, Settings.ProxyAddress, Settings.ProxyPort);
-                    else
-                        site = new SRZ(Settings.SiteAddress);
 
-                    var credential = Settings.Credentials.First(x => x.RequestsLimit > 0);
-                    site.TryAuthorize(credential);
-                    site.GetPatientsFile(Settings.PatientsFilePath, FileDate);
-                });
+                SRZ site;
+                if (Settings.UseProxy)
+                    site = new SRZ(Settings.SiteAddress, Settings.ProxyAddress, Settings.ProxyPort);
+                else
+                    site = new SRZ(Settings.SiteAddress);
+
+                var credential = Settings.Credentials.First(x => x.RequestsLimit > 0);
+                site.TryAuthorize(credential);
+                site.GetPatientsFile(Settings.PatientsFilePath, FileDate);
             }
 
             Progress = "Подстановка ФИО из кэша";
             var db = new Models.Database();
             var file = new PatientsFile();
 
-            await Task.Run(() =>
-            {
-                db.Patients.Load();
-                file.Open(Settings.PatientsFilePath, Settings.ColumnProperties);
-                file.SetFullNames(db.Patients.ToList());
-            });
+            db.Patients.Load();
+            file.Open(Settings.PatientsFilePath, Settings.ColumnProperties);
+            file.SetFullNames(db.Patients.ToList());
 
             string resultReport;
 
             if (Settings.ConnectionIsValid)
             {
                 Progress = "Поиск пациентов без ФИО в файле";
-                long limitCount = 0;
-                var unknownInsuaranceNumbers = new List<string>();
-
-                await Task.Run(() =>
-                {
-                    limitCount = Settings.Credentials.Sum(x => x.RequestsLimit);
-                    unknownInsuaranceNumbers = file.GetUnknownInsuaranceNumbers(limitCount);
-                });
+                var limitCount = Settings.Credentials.Sum(x => x.RequestsLimit);
+                var unknownInsuaranceNumbers = file.GetUnknownInsuaranceNumbers(limitCount);
 
                 Progress = "Поиск ФИО в СРЗ";
-                var verifiedPatients = new Patient[0];
-
-                await Task.Run(() =>
-                verifiedPatients = GetPatients(unknownInsuaranceNumbers));
+                var verifiedPatients = GetPatients(unknownInsuaranceNumbers);
 
                 Progress = "Подстановка в файл ФИО найденных в СРЗ";
-                await Task.Run(() => file.SetFullNames(verifiedPatients));
+                file.SetFullNames(verifiedPatients);
 
                 Progress = "Добавление в кэш ФИО найденных в СРЗ";
-                await Task.Run(() =>
-                {
-                    var duplicateInsuranceNumber = verifiedPatients.Select(x => x.InsuranceNumber).ToHashSet();
-                    var duplicatePatients = db.Patients.Where(x => duplicateInsuranceNumber.Contains(x.InsuranceNumber)).ToArray();
-                    db.Patients.RemoveRange(duplicatePatients);
-                    db.SaveChanges();
+                var duplicateInsuranceNumber = verifiedPatients.Select(x => x.InsuranceNumber).ToHashSet();
+                var duplicatePatients = db.Patients.Where(x => duplicateInsuranceNumber.Contains(x.InsuranceNumber)).ToArray();
+                db.Patients.RemoveRange(duplicatePatients);
+                db.SaveChanges();
 
-                    db.Patients.AddRange(verifiedPatients);
-                    db.SaveChanges();
-                });
+                db.Patients.AddRange(verifiedPatients);
+                db.SaveChanges();
 
                 resultReport = $"Завершено. В СРЗ найдено {verifiedPatients.Count()} человек, лимит {limitCount}. ";
             }
@@ -122,18 +105,16 @@ namespace PatientsFomsRepository.ViewModels
                 resultReport = $"Завершено. ФИО подставлены только из кэша.  Не удалось подключиться к СРЗ, проверьте настройки и работоспособность сайта.";
 
             Progress = "Подсчет человек без ФИО";
-            var unknownPatients = new List<string>();
-            await Task.Run(() => unknownPatients = file.GetUnknownInsuaranceNumbers(int.MaxValue));
-
+            var unknownPatients = file.GetUnknownInsuaranceNumbers(int.MaxValue);
 
             if (unknownPatients.Count == 0)
             {
                 Progress = "Форматирование файла";
-                await Task.Run(() => file.Format());
+                file.Format();
             }
 
             Progress = "Сохранение изменений";
-            await Task.Run(() => file.Save());
+            file.Save();
 
             Progress = $"{ resultReport} Осталось найти {unknownPatients.Count} ФИО.";
         }

@@ -1,17 +1,13 @@
 ﻿using PatientsFomsRepository.Infrastructure;
 using PatientsFomsRepository.Models;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.IO;
-using System.Text;
-using System.Threading.Tasks;
 using System.Linq;
+using System.Text;
 
 namespace PatientsFomsRepository.ViewModels
 {
     public class SRZSettingsViewModel : BindableBase, IViewModel
     {
-        
+
 
         #region Поля
         private Settings settings;
@@ -47,7 +43,7 @@ namespace PatientsFomsRepository.ViewModels
             LoadCommand = new RelayCommand(LoadCommandExecute);
             SetDefaultCommand = new RelayCommand(SetDefaultExecute);
             TestCommand = new RelayCommand(TestExecute);
-            SwitchShowPasswordCommand = new RelayCommand(SwitchShowPasswordExecute);           
+            SwitchShowPasswordCommand = new RelayCommand(SwitchShowPasswordExecute);
         }
         #endregion
 
@@ -67,31 +63,28 @@ namespace PatientsFomsRepository.ViewModels
             Settings.SetDefaultSRZ();
             Progress = "Настройки установлены по умолчанию.";
         }
-        private async void TestExecute(object parameter)
+        private void TestExecute(object parameter)
         {
             Progress = "Ожидайте. Проверка настроек...";
-            await Task.Run(() =>
+            Settings.TestConnection();
+
+            if (Settings.ConnectionIsValid)
+                Progress = "Завершено. Настройки корректны.";
+            else if (Settings.ProxyIsNotValid)
+                Progress = "Завершено. Прокси сервер не доступен.";
+            else if (Settings.SiteAddressIsNotValid)
+                Progress = "Завершено. Web-сайт СРЗ не доступен.";
+            else if (Settings.CredentialsIsNotValid)
             {
-                Settings.TestConnection();
+                var logins = new StringBuilder();
+                Settings.Credentials
+                .Where(x => x.IsNotValid)
+                .ToList()
+                .ForEach(x => logins.Append(x).Append(", "));
+                logins.Remove(logins.Length - 3, 2);
 
-                if (Settings.ConnectionIsValid)
-                    Progress = "Завершено. Настройки корректны.";
-                else if (Settings.ProxyIsNotValid)
-                    Progress = "Завершено. Прокси сервер не доступен.";
-                else if (Settings.SiteAddressIsNotValid)
-                    Progress = "Завершено. Web-сайт СРЗ не доступен.";
-                else if (Settings.CredentialsIsNotValid)
-                {
-                    var logins = new StringBuilder();
-                    Settings.Credentials
-                    .Where(x => x.IsNotValid)
-                    .ToList()
-                    .ForEach(x => logins.Append(x).Append(", "));
-                    logins.Remove(logins.Length - 3, 2);
-
-                    Progress = $"Завершено. Учетные записи не верны: {logins}. ";
-                }
-            });
+                Progress = $"Завершено. Учетные записи не верны: {logins}. ";
+            }
         }
         private void SwitchShowPasswordExecute(object parameter)
         {
