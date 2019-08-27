@@ -153,13 +153,12 @@
                             <Grid>
                                 
                                 <PasswordBox Style="{StaticResource  DataGridTemplateColumnControl}"
-                                             i:PasswordBoxHelper.BindPassword="true"
-                                             i:PasswordBoxHelper.BoundPassword="{Binding Path=Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
+                                             i:PasswordBoxHelper.BoundPassword="{Binding Password, ValidatesOnDataErrors=True}"
                                              Visibility="{Binding DataContext.ShowProtectedPassword, Source={x:Reference proxyElement}, Converter={i:BoolToVisibleConverter}}">
                                 </PasswordBox>
 
                                 <TextBox Style="{StaticResource  DataGridTemplateColumnControl}"
-                                         Text="{Binding Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged,  ValidatesOnDataErrors=True}"
+                                         Text="{Binding Password,  ValidatesOnDataErrors=True}"
                                          Visibility="{Binding DataContext.ShowTextPassword, Source={x:Reference proxyElement}, Converter={i:BoolToVisibleConverter}}">
                                 </TextBox>
 

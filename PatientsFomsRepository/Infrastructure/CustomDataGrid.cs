@@ -15,47 +15,37 @@ namespace PatientsFomsRepository.Infrastructure
         {
             base.OnPreparingCellForEdit(e);
 
-            // Когда DataGridTemplateColumn переводится в режим редактирования вручную, 
-            // чтобы не делать лишний клик, нужно вручную установить фокус на элемент управления
+            // Если редактируется ячейка DataGridTemplateColumn
             if (e.EditingElement.GetType().Name == "ContentPresenter")
             {
                 var control = FindVisualVisibleChild<Control>(e.EditingElement);
+
+                // Установливает фокус на элемент управления, чтобы исключить лишний клик
                 if (control != null && control.IsFocused == false)
                     control.Focus();
             }
 
-            //Исключает выделение текста при выборе ячейки TextBox
-            if (e.EditingElement is TextBox textBox)
+            //Исключает выделение текста при выборе стандартной ячейки DataGridTextColumn
+            else if (e.EditingElement is TextBox textBox)
                 if (textBox.SelectionLength != 0)
                     textBox.CaretIndex = textBox.Text.Length;
         }
-        // Возникает при любом клике ЛКМ по DataGrid'у
+        // Редактирование стандартных ячеек одним кликом (устанавливает фокус на ячейку и IsSelected)
         protected override void OnPreviewMouseLeftButtonDown(MouseButtonEventArgs e)
         {
             base.OnPreviewMouseLeftButtonDown(e);
 
             var mbe = e as MouseButtonEventArgs;
-            var clickedElement = mbe.OriginalSource as UIElement;
-
-            // Исключает баг исчезновения пароля в PasswordBox  
-            var originalSourceName = mbe.OriginalSource.GetType().Name;
-
-            if (originalSourceName == "Border" || originalSourceName == "DataGridCell")
-                if (FindVisualVisibleChild<PasswordBox>(clickedElement) != null)
-                    return;
-
-            // Далее редактирование ячеек одним кликом
+            var clickedElement = mbe.OriginalSource as UIElement;            
             var cell = FindVisualParent<DataGridCell>(clickedElement);
 
             if (cell == null || cell.IsEditing || cell.IsReadOnly)
                 return;
 
-            // 1. Нужно установить фокус на выбранной ячейке
             if (cell.IsFocused == false)
                 cell.Focus();
 
-            // 2. Нужно установить IsSelected на строку или ячейку в зависимости от стиля выделения курсора в DataGrid
-            // Проверка обязательна, тупо выделять ячейку нельзя, возникнет исключение
+            // Условие обязательно, тупо выделять ячейку нельзя, может возникнуть исключение
             if (SelectionUnit == DataGridSelectionUnit.FullRow)
             {
                 var row = FindVisualParent<DataGridRow>(cell);
@@ -66,9 +56,8 @@ namespace PatientsFomsRepository.Infrastructure
             else if (cell.IsSelected == false)
                 cell.IsSelected = true;
 
-            // Исключает баг. Если добавление новой строки начинается c DataGridTemplateColumn, новый элемент коллекции не получит  
-            // нужный тип пока текущая ячейка не будет переведена в режим редактрования вручную. В противном случае могут появиться  
-            // лишние строки и новая строка не попадет в связанную пользовательскую коллекцию
+            // При добавлении новой строки через DataGridTemplateColumn - ячейку нужно переводить в режим редактирования вручную, 
+            // иначе не создастся экземпляр коллекции элементов DataGrid
             var currentItemName = CurrentItem?.GetType().Name;
 
             if (currentItemName == "NamedObject")
