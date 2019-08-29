@@ -109,6 +109,7 @@
     <Compile Include="Infrastructure\PasswordBoxHelper.cs" />
     <Compile Include="Infrastructure\RelayCommand.cs" />
     <Compile Include="Infrastructure\BindableBase.cs" />
+    <Compile Include="Infrastructure\RelayCommandAsync.cs" />
     <Compile Include="Models\ImportPatientsFile.cs" />
     <Compile Include="Models\PatientsFile\ColumnProperty.cs" />
     <Compile Include="Models\SRZ\CredentialScope.cs" />

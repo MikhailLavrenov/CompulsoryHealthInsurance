@@ -11,9 +11,9 @@ namespace PatientsFomsRepository.Infrastructure
     public class RelayCommand : ICommand
     {
         #region Fields
-        private Action<object> execute;
-        private Func<object, bool> canExecute;
-        private bool isExecuting;
+        protected Action<object> execute;
+        protected Func<object, bool> canExecute;
+
         #endregion
 
         #region Properties
@@ -22,15 +22,7 @@ namespace PatientsFomsRepository.Infrastructure
             add { CommandManager.RequerySuggested += value; }
             remove { CommandManager.RequerySuggested -= value; }
         }
-        public bool IsExecuting
-        {
-            get => isExecuting;
-            set
-            {
-                isExecuting = value;
-                CommandManager.InvalidateRequerySuggested();
-            }
-        }
+
         #endregion
 
         #region Creators
@@ -47,21 +39,16 @@ namespace PatientsFomsRepository.Infrastructure
         #endregion
 
         #region Methods
-        public bool CanExecute(object parameter)
+        public virtual bool CanExecute(object parameter)
         {
-            if (IsExecuting)
-                return false;
-
             if (canExecute == null)
                 return true;
 
             return canExecute(parameter);
         }
-        public async void Execute(object parameter)
+        public virtual void Execute(object parameter)
         {
-            IsExecuting = true;
-            await Task.Run(()=> execute(parameter));            
-            IsExecuting = false;
+            execute(parameter);            
         }
         #endregion
     }

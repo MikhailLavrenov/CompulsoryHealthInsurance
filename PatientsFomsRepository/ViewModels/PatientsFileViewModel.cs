@@ -24,7 +24,7 @@ namespace PatientsFomsRepository.ViewModels
         public string Progress { get => progress; set => SetProperty(ref progress, value); }
         public Settings Settings { get => settings; set => SetProperty(ref settings, value); }
         public DateTime FileDate { get => fileDate; set => SetProperty(ref fileDate, value); }
-        public RelayCommand ProcessFileCommand { get; }
+        public RelayCommandAsync ProcessFileCommand { get; }
         #endregion
 
         #region Конструкторы
@@ -35,7 +35,7 @@ namespace PatientsFomsRepository.ViewModels
             Progress = "";
             Settings = Settings.Instance;
             FileDate = DateTime.Today;
-            ProcessFileCommand = new RelayCommand(ProcessFileExecute, ProcessFileCanExecute);
+            ProcessFileCommand = new RelayCommandAsync(ProcessFileExecute, ProcessFileCanExecute);
 
 
         }

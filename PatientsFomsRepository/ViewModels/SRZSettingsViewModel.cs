@@ -26,7 +26,7 @@ namespace PatientsFomsRepository.ViewModels
         public RelayCommand SaveCommand { get; }
         public RelayCommand LoadCommand { get; }
         public RelayCommand SetDefaultCommand { get; }
-        public RelayCommand TestCommand { get; }
+        public RelayCommandAsync TestCommand { get; }
         public RelayCommand SwitchShowPasswordCommand { get; }
         #endregion
 
@@ -42,7 +42,7 @@ namespace PatientsFomsRepository.ViewModels
             SaveCommand = new RelayCommand(SaveCommandExecute);
             LoadCommand = new RelayCommand(LoadCommandExecute);
             SetDefaultCommand = new RelayCommand(SetDefaultExecute);
-            TestCommand = new RelayCommand(TestExecute);
+            TestCommand = new RelayCommandAsync(TestExecute);
             SwitchShowPasswordCommand = new RelayCommand(SwitchShowPasswordExecute);
         }
         #endregion

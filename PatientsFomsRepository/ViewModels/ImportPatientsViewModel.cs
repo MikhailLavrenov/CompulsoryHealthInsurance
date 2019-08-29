@@ -18,8 +18,8 @@ namespace PatientsFomsRepository.ViewModels
         public string Progress { get => progress; set => SetProperty(ref progress, value); }
         public string ImportFilePath { get; set; }
         public string SaveExampleFilePath { get; set; }
-        public RelayCommand ImportPatientsCommand { get; }
-        public RelayCommand SaveExampleCommand { get; }
+        public RelayCommandAsync ImportPatientsCommand { get; }
+        public RelayCommandAsync SaveExampleCommand { get; }
         #endregion
 
         #region Конструкторы
@@ -28,8 +28,8 @@ namespace PatientsFomsRepository.ViewModels
             ShortCaption = "Загрузить в БД";
             FullCaption = "Загрузить известные ФИО из файла в базу данных";
             Progress = "";
-            ImportPatientsCommand = new RelayCommand(ImportPatientsExecute);
-            SaveExampleCommand = new RelayCommand(SaveExampleExecute);
+            ImportPatientsCommand = new RelayCommandAsync(ImportPatientsExecute);
+            SaveExampleCommand = new RelayCommandAsync(SaveExampleExecute);
         }
         #endregion
 

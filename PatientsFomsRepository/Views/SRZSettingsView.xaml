@@ -107,11 +107,11 @@
                 <!--Столбец Логин-->
                 <DataGridTextColumn Header="Логин"
                                     Binding="{Binding Login, ValidatesOnDataErrors=True}"
-                                    MinWidth="150" />
+                                    MinWidth="145" />
 
                 <!--Столбец Пароль-->
                 <!--Шаблон Заголовка. В заголовок вставляем текст и кнопку для переключения видимости паролей-->
-                <DataGridTemplateColumn MinWidth="150">
+                <DataGridTemplateColumn MinWidth="145">
                     <DataGridTemplateColumn.HeaderStyle>
                         <Style TargetType="{x:Type DataGridColumnHeader}">
                             <Setter Property="HorizontalContentAlignment"
