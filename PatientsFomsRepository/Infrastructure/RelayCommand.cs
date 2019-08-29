@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 
 namespace PatientsFomsRepository.Infrastructure
@@ -59,7 +60,7 @@ namespace PatientsFomsRepository.Infrastructure
         public async void Execute(object parameter)
         {
             IsExecuting = true;
-            await Task.Run(()=> execute(parameter));
+            await Task.Run(()=> execute(parameter));            
             IsExecuting = false;
         }
         #endregion

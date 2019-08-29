@@ -5,7 +5,6 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:PatientsFomsRepository.Views"
              xmlns:i="clr-namespace:PatientsFomsRepository.Infrastructure"
-             xmlns:sys="clr-namespace:System;assembly=mscorlib"
              mc:Ignorable="d"
              d:DesignHeight="600"
              d:DesignWidth="800">
@@ -20,7 +19,7 @@
     </UserControl.Resources>
 
     <Grid>
-        
+
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="130" />
             <ColumnDefinition Width="350" />
@@ -34,7 +33,7 @@
             <RowDefinition Height="auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        
+
         <TextBlock Grid.Row="0"
                    Grid.Column="0"
                    Text="Скачать новый файл" />
@@ -42,7 +41,7 @@
                    Grid.Column="1"
                    Name="CheckBoxDowloadNewFile"
                    IsChecked="{Binding Settings.DownloadNewPatientsFile}" />
-        
+
         <TextBlock Grid.Row="1"
                    Grid.Column="0"
                    Text="Файл на дату"
@@ -51,7 +50,7 @@
                     Grid.Column="1"
                     Visibility="{Binding IsChecked, ElementName=CheckBoxDowloadNewFile, Converter={i:BoolToVisibleConverter}, ValidatesOnDataErrors=True}"
                     SelectedDate="{Binding FileDate}" />
-        
+
         <TextBlock Grid.Row="2"
                    Grid.Column="0"
                    Text="Путь к файлу: " />
@@ -60,18 +59,18 @@
             <!--Файловый диалог в CodeBehind-->
             <Button  DockPanel.Dock="Right"
                      Style="{StaticResource PictureButton}"
-                     Click="Button_Click">
+                     Click="ButtonOpenFileDialogClick">
                 <ContentControl Content="{Binding Source={StaticResource FileDialog}}" />
             </Button>
-            <TextBox  Text="{Binding Path=Settings.PatientsFilePath, ValidatesOnDataErrors=True}"
+            <TextBox  Text="{Binding Settings.PatientsFilePath, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
                       Name="TextBoxFilePath" />
         </DockPanel>
-        
+
         <Button Grid.Row="3"
                 Grid.Column="0"
                 Grid.ColumnSpan="2"
                 Content="ОК"
-                Command="{Binding ProcessFileCommand}"/>
+                Command="{Binding ProcessFileCommand}" />
 
     </Grid>
 

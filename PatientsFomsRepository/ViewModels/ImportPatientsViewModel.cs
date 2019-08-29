@@ -1,7 +1,7 @@
 ﻿using PatientsFomsRepository.Infrastructure;
 using PatientsFomsRepository.Models;
+using System.Collections.Generic;
 using System.Data.Entity;
-using System.IO;
 using System.Linq;
 
 namespace PatientsFomsRepository.ViewModels
@@ -18,7 +18,7 @@ namespace PatientsFomsRepository.ViewModels
         public string Progress { get => progress; set => SetProperty(ref progress, value); }
         public string ImportFilePath { get; set; }
         public string SaveExampleFilePath { get; set; }
-        public RelayCommand ImportFileCommand { get; }
+        public RelayCommand ImportPatientsCommand { get; }
         public RelayCommand SaveExampleCommand { get; }
         #endregion
 
@@ -28,19 +28,25 @@ namespace PatientsFomsRepository.ViewModels
             ShortCaption = "Загрузить в БД";
             FullCaption = "Загрузить известные ФИО из файла в базу данных";
             Progress = "";
-            ImportFileCommand = new RelayCommand(ImportExecute);
+            ImportPatientsCommand = new RelayCommand(ImportPatientsExecute);
             SaveExampleCommand = new RelayCommand(SaveExampleExecute);
         }
         #endregion
 
         #region Методы
-        private void ImportExecute(object parameter)
+        private void ImportPatientsExecute(object parameter)
         {
-            Progress = "Ожидайте. Открытие файла...";            
-            var file = new ImportPatientsFile();
-            file.Open(ImportFilePath);
-            var newPatients = file.GetPatients();
-            file.Dispose();
+            if (string.IsNullOrEmpty(ImportFilePath))
+                return;
+
+            Progress = "Ожидайте. Открытие файла...";
+            List<Patient> newPatients;
+            using (var file = new ImportPatientsFile())
+            {
+                file.Open(ImportFilePath);
+                newPatients = file.GetPatients();
+                file.Dispose();
+            }
 
             Progress = "Ожидайте. Проверка значений...";
             var db = new Models.Database();
@@ -61,6 +67,10 @@ namespace PatientsFomsRepository.ViewModels
         }
         private void SaveExampleExecute(object parameter)
         {
+            if (string.IsNullOrEmpty(SaveExampleFilePath))
+                return;
+
+            Progress = "Ожидайте. Открытие файла...";
             ImportPatientsFile.SaveExample(SaveExampleFilePath);
             Progress = $"Завершено. Файл сохранен: {SaveExampleFilePath}";
         }

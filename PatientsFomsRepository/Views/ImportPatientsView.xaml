@@ -22,13 +22,12 @@
                 Grid.ColumnSpan="2"
                 Orientation="Horizontal">
         <Button Content="Загрузить"
-                Click="Button_Click_1"
-                Command="{Binding ImportCommand}"
+                Command="{Binding ImportPatientsCommand}"
+                Click="ButtonImportPatientsClick"
                  />
-        <Button Content="Скачать пример"
-                
+        <Button Content="Скачать пример"                
                 Command="{Binding SaveExampleCommand}"
-                Click="Button_Click"
+                Click="ButtonSaveExampleClick"
                  />
     </StackPanel>
 

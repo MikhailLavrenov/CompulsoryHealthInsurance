@@ -8,6 +8,7 @@
              mc:Ignorable="d"
              d:DesignHeight="600"
              d:DesignWidth="800">
+    
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -25,6 +26,7 @@
         </Grid.ColumnDefinitions>
 
         <Grid.RowDefinitions>
+            
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
@@ -82,10 +84,12 @@
         <DockPanel Grid.Row="3"
                    Grid.Column="0"
                    Grid.ColumnSpan="2">
+            
             <StackPanel  DockPanel.Dock="Right"
                          Margin="4"
                          Visibility="{Binding Path=IsChecked, ElementName=CheckBoxFormat, Converter={i:BoolToVisibleConverter}}"
                          VerticalAlignment="Center">
+                
                 <Button Style="{StaticResource PictureButton}"
                         Width="20"
                         Height="25"
@@ -93,6 +97,7 @@
                         CommandParameter="{Binding SelectedItem, ElementName=DataGrid1}">
                     <ContentControl Content="{Binding Source={StaticResource ArrowUp}}" />
                 </Button>
+                
                 <Button Style="{StaticResource PictureButton}"
                         Width="20"
                         Height="25"
@@ -100,12 +105,16 @@
                         CommandParameter="{Binding SelectedItem, ElementName=DataGrid1}">
                     <ContentControl Content="{Binding Source={StaticResource ArrowDown}}" />
                 </Button>
+                
             </StackPanel>
+            
             <i:CustomDataGrid x:Name="DataGrid1"
                               MinHeight="200"
                               Visibility="{Binding Path=IsChecked, ElementName=CheckBoxFormat, Converter={i:BoolToVisibleConverter}}"
                               ItemsSource="{Binding Settings.ColumnProperties}">
+                
                 <DataGrid.Columns>
+                    
                     <DataGridTextColumn     Header="Название столбца"
                                             Binding="{Binding Path=Name, ValidatesOnDataErrors=True}"
                                             MinWidth="160" />
@@ -119,7 +128,9 @@
                                             Binding="{Binding Path=Delete}"
                                             MinWidth="65"
                                             Width="*" />
+                    
                 </DataGrid.Columns>
+                
             </i:CustomDataGrid>
 
         </DockPanel>
@@ -131,6 +142,7 @@
                     Grid.ColumnSpan="2"
                     Orientation="Horizontal"
                     VerticalAlignment="Top">
+            
             <Button Content="Сохранить"
                     Command="{Binding SaveCommand}" />
             <Button Content="Отмена"

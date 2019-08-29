@@ -16,8 +16,19 @@ namespace PatientsFomsRepository.Views
         {
             InitializeComponent();
         }
+        private void ButtonImportPatientsClick(object sender, RoutedEventArgs e)
+        {
+            var fileDialog = new OpenFileDialog();
+            fileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            fileDialog.Filter = "xlsx files (*.xslx)|*.xlsx";
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+            if (fileDialog.ShowDialog() == true)
+            {
+                var viewModel = (ImportPatientsViewModel)DataContext;
+                viewModel.ImportFilePath = fileDialog.FileName;
+            }
+        }
+        private void ButtonSaveExampleClick(object sender, RoutedEventArgs e)
         {            
             var fileDialog = new SaveFileDialog();
             fileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
@@ -28,19 +39,6 @@ namespace PatientsFomsRepository.Views
             {                
                 var viewModel = (ImportPatientsViewModel)DataContext;
                 viewModel.SaveExampleFilePath = fileDialog.FileName;
-            }
-        }
-
-        private void Button_Click_1(object sender, RoutedEventArgs e)
-        {
-            var fileDialog = new OpenFileDialog();
-            fileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-            fileDialog.Filter = "xlsx files (*.xslx)|*.xlsx";
-
-            if (fileDialog.ShowDialog() == true)
-            {
-                var viewModel = (ImportPatientsViewModel)DataContext;
-                viewModel.ImportFilePath = fileDialog.FileName;
             }
         }
     }
