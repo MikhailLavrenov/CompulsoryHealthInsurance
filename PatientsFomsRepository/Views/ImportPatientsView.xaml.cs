@@ -25,11 +25,9 @@ namespace PatientsFomsRepository.Views
             fileDialog.FileName = "Пример для загрузки ФИО";
 
             if (fileDialog.ShowDialog() == true)
-            {
-                var file = fileDialog.FileName;
+            {                
                 var viewModel = (ImportPatientsViewModel)DataContext;
-                if (viewModel.SaveExampleCommand.CanExecute(file))
-                    viewModel.SaveExampleCommand.Execute(file);
+                viewModel.SaveExampleFilePath = fileDialog.FileName;
             }
         }
 
@@ -41,10 +39,8 @@ namespace PatientsFomsRepository.Views
 
             if (fileDialog.ShowDialog() == true)
             {
-                var file = fileDialog.FileName;
                 var viewModel = (ImportPatientsViewModel)DataContext;
-                if (viewModel.ImportCommand.CanExecute(file))
-                    viewModel.ImportCommand.Execute(file);
+                viewModel.ImportFilePath = fileDialog.FileName;
             }
         }
     }

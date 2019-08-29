@@ -16,7 +16,9 @@ namespace PatientsFomsRepository.ViewModels
         public string ShortCaption { get; set; }
         public string FullCaption { get; set; }
         public string Progress { get => progress; set => SetProperty(ref progress, value); }
-        public RelayCommand ImportCommand { get; }
+        public string ImportFilePath { get; set; }
+        public string SaveExampleFilePath { get; set; }
+        public RelayCommand ImportFileCommand { get; }
         public RelayCommand SaveExampleCommand { get; }
         #endregion
 
@@ -26,7 +28,7 @@ namespace PatientsFomsRepository.ViewModels
             ShortCaption = "Загрузить в БД";
             FullCaption = "Загрузить известные ФИО из файла в базу данных";
             Progress = "";
-            ImportCommand = new RelayCommand(ImportExecute, ImportCanExecute);
+            ImportFileCommand = new RelayCommand(ImportExecute);
             SaveExampleCommand = new RelayCommand(SaveExampleExecute);
         }
         #endregion
@@ -34,10 +36,9 @@ namespace PatientsFomsRepository.ViewModels
         #region Методы
         private void ImportExecute(object parameter)
         {
-            Progress = "Ожидайте. Открытие файла...";
-            string filePath = (string)parameter;
+            Progress = "Ожидайте. Открытие файла...";            
             var file = new ImportPatientsFile();
-            file.Open(filePath);
+            file.Open(ImportFilePath);
             var newPatients = file.GetPatients();
             file.Dispose();
 
@@ -58,16 +59,10 @@ namespace PatientsFomsRepository.ViewModels
             int total = existenInsuaranceNumbers.Count + newUniqPatients.Count;
             Progress = $"Завершено. В файле найдено {newPatients.Count} человек(а). В БД добавлено {newUniqPatients.Count}. Итого в БД {total}.";
         }
-        private bool ImportCanExecute(object parameter)
-        {
-            string filePath = parameter as string;
-            return File.Exists(filePath);
-        }
         private void SaveExampleExecute(object parameter)
         {
-            var path = (string)parameter;
-            ImportPatientsFile.SaveExample(path);
-            Progress = $"Завершено. Файл сохранен: {path}";
+            ImportPatientsFile.SaveExample(SaveExampleFilePath);
+            Progress = $"Завершено. Файл сохранен: {SaveExampleFilePath}";
         }
         #endregion
     }
