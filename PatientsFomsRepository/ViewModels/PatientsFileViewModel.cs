@@ -36,15 +36,13 @@ namespace PatientsFomsRepository.ViewModels
             Settings = Settings.Instance;
             FileDate = DateTime.Today;
             ProcessFileCommand = new RelayCommandAsync(ProcessFileExecute, ProcessFileCanExecute);
-
-
         }
         #endregion
 
         #region Методы
         private void ProcessFileExecute(object parameter)
         {
-            Progress = "Проверка подключения к СРЗ";
+            Progress = "Ожидайте. Проверка подключения к СРЗ...";
             Settings.TestConnection();
 
             if (Settings.DownloadNewPatientsFile)
@@ -55,7 +53,7 @@ namespace PatientsFomsRepository.ViewModels
                     return;
                 }
 
-                Progress = "Загрузка файла из СРЗ";
+                Progress = "Ожидайте. Загрузка файла из СРЗ...";
 
                 SRZ site;
                 if (Settings.UseProxy)
@@ -68,7 +66,7 @@ namespace PatientsFomsRepository.ViewModels
                 site.GetPatientsFile(Settings.PatientsFilePath, FileDate);
             }
 
-            Progress = "Подстановка ФИО из кэша";
+            Progress = "Ожидайте. Подстановка ФИО из кэша...";
             var db = new Models.Database();
             var file = new PatientsFile();
 
@@ -80,17 +78,17 @@ namespace PatientsFomsRepository.ViewModels
 
             if (Settings.ConnectionIsValid)
             {
-                Progress = "Поиск пациентов без ФИО в файле";
+                Progress = "Ожидайте. Поиск пациентов без ФИО в файле...";
                 var limitCount = Settings.Credentials.Sum(x => x.RequestsLimit);
                 var unknownInsuaranceNumbers = file.GetUnknownInsuaranceNumbers(limitCount);
 
-                Progress = "Поиск ФИО в СРЗ";
+                Progress = "Ожидайте. Поиск ФИО в СРЗ...";
                 var verifiedPatients = GetPatients(unknownInsuaranceNumbers);
 
-                Progress = "Подстановка в файл ФИО найденных в СРЗ";
+                Progress = "Ожидайте. Подстановка в файл ФИО найденных в СРЗ...";
                 file.SetFullNames(verifiedPatients);
 
-                Progress = "Добавление в кэш ФИО найденных в СРЗ";
+                Progress = "Ожидайте. Добавление в кэш ФИО найденных в СРЗ...";
                 var duplicateInsuranceNumber = verifiedPatients.Select(x => x.InsuranceNumber).ToHashSet();
                 var duplicatePatients = db.Patients.Where(x => duplicateInsuranceNumber.Contains(x.InsuranceNumber)).ToArray();
                 db.Patients.RemoveRange(duplicatePatients);
@@ -99,21 +97,21 @@ namespace PatientsFomsRepository.ViewModels
                 db.Patients.AddRange(verifiedPatients);
                 db.SaveChanges();
 
-                resultReport = $"Завершено. В СРЗ найдено {verifiedPatients.Count()} человек, лимит {limitCount}. ";
+                resultReport = $"Завершено. В СРЗ запрошено {verifiedPatients.Count()} человек, лимит {limitCount}. ";
             }
             else
                 resultReport = $"Завершено. ФИО подставлены только из кэша.  Не удалось подключиться к СРЗ, проверьте настройки и работоспособность сайта.";
 
-            Progress = "Подсчет человек без ФИО";
+            Progress = "Ожидайте. Подсчет человек без ФИО...";
             var unknownPatients = file.GetUnknownInsuaranceNumbers(int.MaxValue);
 
             if (unknownPatients.Count == 0)
             {
-                Progress = "Форматирование файла";
+                Progress = "Ожидайте. Форматирование файла...";
                 file.Format();
             }
 
-            Progress = "Сохранение изменений";
+            Progress = "Ожидайте. Сохранение изменений...";
             file.Save();
 
             Progress = $"{ resultReport} Осталось найти {unknownPatients.Count} ФИО.";

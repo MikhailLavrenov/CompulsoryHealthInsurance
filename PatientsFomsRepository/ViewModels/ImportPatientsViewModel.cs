@@ -63,7 +63,7 @@ namespace PatientsFomsRepository.ViewModels
             db.SaveChanges();
 
             int total = existenInsuaranceNumbers.Count + newUniqPatients.Count;
-            Progress = $"Завершено. В файле найдено {newPatients.Count} человек(а). В БД добавлено {newUniqPatients.Count}. Итого в БД {total}.";
+            Progress = $"Завершено. В файле найдено {newPatients.Count} человек(а). В БД добавлено {newUniqPatients.Count} новых. Итого в БД {total}.";
         }
         private void SaveExampleExecute(object parameter)
         {
