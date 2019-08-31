@@ -1,7 +1,9 @@
 ﻿using PatientsFomsRepository.Infrastructure;
 using PatientsFomsRepository.Models;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data.Entity;
+using System.IO;
 using System.Linq;
 
 namespace PatientsFomsRepository.ViewModels
@@ -20,6 +22,7 @@ namespace PatientsFomsRepository.ViewModels
         public string SaveExampleFilePath { get; set; }
         public RelayCommandAsync ImportPatientsCommand { get; }
         public RelayCommandAsync SaveExampleCommand { get; }
+        public RelayCommandAsync ClearDatabaseCommand { get; }
         #endregion
 
         #region Конструкторы
@@ -30,6 +33,7 @@ namespace PatientsFomsRepository.ViewModels
             Progress = "";
             ImportPatientsCommand = new RelayCommandAsync(ImportPatientsExecute);
             SaveExampleCommand = new RelayCommandAsync(SaveExampleExecute);
+            ClearDatabaseCommand = new RelayCommandAsync(ClearDatabaseExecute);
         }
         #endregion
 
@@ -73,6 +77,14 @@ namespace PatientsFomsRepository.ViewModels
             Progress = "Ожидайте. Открытие файла...";
             ImportPatientsFile.SaveExample(SaveExampleFilePath);
             Progress = $"Завершено. Файл сохранен: {SaveExampleFilePath}";
+        }
+        private void ClearDatabaseExecute(object parameter)
+        {
+            Progress = "Ожидайте. Очистка базы данных...";
+            var db = new Models.Database();
+            db.Database.Delete();
+            db.Database.Create();
+            Progress = "Завершено. База данных очищена.";
         }
         #endregion
     }

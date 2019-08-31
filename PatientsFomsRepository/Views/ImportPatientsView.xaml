@@ -29,6 +29,10 @@
                 Command="{Binding SaveExampleCommand}"
                 Click="ButtonSaveExampleClick"
                  />
+        <Button Visibility="Hidden" />
+        <Button Content="Очистить БД"
+                Command="{Binding ClearDatabaseCommand}"
+                Background="#FFFF6666" />
     </StackPanel>
 
 </UserControl>
