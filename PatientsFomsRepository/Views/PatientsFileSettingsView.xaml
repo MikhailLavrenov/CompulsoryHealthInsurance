@@ -1,0 +1,155 @@
+﻿<UserControl x:Class="PatientsFomsRepository.Views.PatientsFileSettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:PatientsFomsRepository.Views"
+             xmlns:i="clr-namespace:PatientsFomsRepository.Infrastructure"
+             mc:Ignorable="d"
+             d:DesignHeight="600"
+             d:DesignWidth="800">
+    
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary  Source="/PatientsFomsRepository;component/Views/Resources/DefaultStyle.xaml" />
+                <ResourceDictionary Source="/PatientsFomsRepository;component/Views/Resources/Icons.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="180" />
+            <ColumnDefinition Width="350" />
+            <ColumnDefinition Width="auto" />
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition>
+                <RowDefinition.Style>
+                    <Style TargetType="{x:Type RowDefinition}">
+                        <Setter Property="Height"
+                                Value="*" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ElementName=CheckBoxFormat, Path=IsChecked}"
+                                         Value="false">
+                                <Setter Property="Height"
+                                        Value="0" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </RowDefinition.Style>
+            </RowDefinition>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0"
+                   Grid.Column="0"
+                   Text="Скачать новый файл" />
+        <CheckBox  Grid.Row="0"
+                   Grid.Column="1"
+                   Name="CheckBoxDowloadNewFile"
+                   IsChecked="{Binding Path=Settings.DownloadNewPatientsFile}" />
+
+        <TextBlock Grid.Row="1"
+                   Grid.Column="0"
+                   Text="Путь к файлу" />
+        <DockPanel Grid.Row="1"
+                   Grid.Column="1">
+            <!--Файловый диалог в CodeBehind-->
+            <Button  DockPanel.Dock="Right"
+                     Style="{StaticResource PictureButton}"
+                     Click="Button_Click">
+                <ContentControl Content="{Binding Source={StaticResource FileDialog}}" />
+            </Button>
+            <TextBox  Text="{Binding Path=Settings.PatientsFilePath, ValidatesOnDataErrors=True}"
+                      Name="TextBoxFilePath" />
+        </DockPanel>
+
+        <TextBlock Grid.Row="2"
+                   Grid.Column="0"
+                   Text="Применить форматирование" />
+        <CheckBox  Grid.Row="2"
+                   Grid.Column="1"
+                   Name="CheckBoxFormat"
+                   IsChecked="{Binding Path=Settings.FormatPatientsFile}" />
+
+        <DockPanel Grid.Row="3"
+                   Grid.Column="0"
+                   Grid.ColumnSpan="2">
+            
+            <StackPanel  DockPanel.Dock="Right"
+                         Margin="4"
+                         Visibility="{Binding Path=IsChecked, ElementName=CheckBoxFormat, Converter={i:BoolToVisibleConverter}}"
+                         VerticalAlignment="Center">
+                
+                <Button Style="{StaticResource PictureButton}"
+                        Width="20"
+                        Height="25"
+                        Command="{Binding MoveUpCommand}"
+                        CommandParameter="{Binding SelectedItem, ElementName=DataGrid1}">
+                    <ContentControl Content="{Binding Source={StaticResource ArrowUp}}" />
+                </Button>
+                
+                <Button Style="{StaticResource PictureButton}"
+                        Width="20"
+                        Height="25"
+                        Command="{Binding MoveDownCommand}"
+                        CommandParameter="{Binding SelectedItem, ElementName=DataGrid1}">
+                    <ContentControl Content="{Binding Source={StaticResource ArrowDown}}" />
+                </Button>
+                
+            </StackPanel>
+            
+            <i:CustomDataGrid x:Name="DataGrid1"
+                              MinHeight="200"
+                              Visibility="{Binding Path=IsChecked, ElementName=CheckBoxFormat, Converter={i:BoolToVisibleConverter}}"
+                              ItemsSource="{Binding Settings.ColumnProperties}">
+                
+                <DataGrid.Columns>
+                    
+                    <DataGridTextColumn     Header="Название столбца"
+                                            Binding="{Binding Path=Name, ValidatesOnDataErrors=True}"
+                                            MinWidth="160" />
+                    <DataGridTextColumn     Header="Понятное название"
+                                            Binding="{Binding Path=AltName, ValidatesOnDataErrors=True}"
+                                            MinWidth="160" />
+                    <DataGridCheckBoxColumn Header="Скрыть"
+                                            Binding="{Binding Path=Hide}"
+                                            MinWidth="65" />
+                    <DataGridCheckBoxColumn Header="Удалить"
+                                            Binding="{Binding Path=Delete}"
+                                            MinWidth="65"
+                                            Width="*" />
+                    
+                </DataGrid.Columns>
+                
+            </i:CustomDataGrid>
+
+        </DockPanel>
+
+
+
+        <StackPanel Grid.Row="4"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2"
+                    Orientation="Horizontal"
+                    VerticalAlignment="Top">
+            
+            <Button Content="Сохранить"
+                    Command="{Binding SaveCommand}" />
+            <Button Content="Отмена"
+                    Command="{Binding LoadCommand}" />
+            <Button Content="По умолчанию"
+                    Command="{Binding SetDefaultCommand}" />
+
+        </StackPanel>
+    </Grid>
+</UserControl>
