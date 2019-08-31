@@ -5,10 +5,6 @@ VisualStudioVersion = 16.0.28922.388
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PatientsFomsRepository", "PatientsFomsRepository\PatientsFomsRepository.csproj", "{519989BB-8C1C-4B58-B184-2310F23ED64A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleMVVMExample", "..\SimpleMVVMExample\SimpleMVVMExample\SimpleMVVMExample.csproj", "{0D6370B0-B6A8-4C62-B726-8F8AE51B0880}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DB_attached", "..\БД прикрепленных (утилита для СРЗ)\DB_attached\DB_attached.csproj", "{974EC740-6827-4F39-8FAE-A72909881678}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,20 +21,6 @@ Global
 		{519989BB-8C1C-4B58-B184-2310F23ED64A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{519989BB-8C1C-4B58-B184-2310F23ED64A}.Release|x86.ActiveCfg = Release|Any CPU
 		{519989BB-8C1C-4B58-B184-2310F23ED64A}.Release|x86.Build.0 = Release|Any CPU
-		{0D6370B0-B6A8-4C62-B726-8F8AE51B0880}.Debug|Any CPU.ActiveCfg = Debug|x86
-		{0D6370B0-B6A8-4C62-B726-8F8AE51B0880}.Debug|x86.ActiveCfg = Debug|x86
-		{0D6370B0-B6A8-4C62-B726-8F8AE51B0880}.Debug|x86.Build.0 = Debug|x86
-		{0D6370B0-B6A8-4C62-B726-8F8AE51B0880}.Release|Any CPU.ActiveCfg = Release|x86
-		{0D6370B0-B6A8-4C62-B726-8F8AE51B0880}.Release|x86.ActiveCfg = Release|x86
-		{0D6370B0-B6A8-4C62-B726-8F8AE51B0880}.Release|x86.Build.0 = Release|x86
-		{974EC740-6827-4F39-8FAE-A72909881678}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{974EC740-6827-4F39-8FAE-A72909881678}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{974EC740-6827-4F39-8FAE-A72909881678}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{974EC740-6827-4F39-8FAE-A72909881678}.Debug|x86.Build.0 = Debug|Any CPU
-		{974EC740-6827-4F39-8FAE-A72909881678}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{974EC740-6827-4F39-8FAE-A72909881678}.Release|Any CPU.Build.0 = Release|Any CPU
-		{974EC740-6827-4F39-8FAE-A72909881678}.Release|x86.ActiveCfg = Release|Any CPU
-		{974EC740-6827-4F39-8FAE-A72909881678}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
