@@ -82,7 +82,8 @@ namespace PatientsFomsRepository.ViewModels
         {
             Progress = "Ожидайте. Очистка базы данных...";
             var db = new Models.Database();
-            db.Database.Delete();
+            if (db.Database.Exists())
+                db.Database.Delete();
             db.Database.Create();
             Progress = "Завершено. База данных очищена.";
         }
