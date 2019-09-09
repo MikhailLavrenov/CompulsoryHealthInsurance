@@ -1,0 +1,58 @@
+﻿<Window x:Class="PatientsFomsRepository.Views.ShellView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PatientsFomsRepository"
+        xmlns:i="clr-namespace:PatientsFomsRepository.Infrastructure"
+        xmlns:v="clr-namespace:PatientsFomsRepository.Views"
+        xmlns:vm="clr-namespace:PatientsFomsRepository.ViewModels"
+        xmlns:prism="http://prismlibrary.com/"
+        mc:Ignorable="d"
+        
+        WindowStartupLocation="CenterScreen"
+        Title="Хранилище пациентов из СРЗ"
+        Height="600"
+        Width="600"
+        prism:ViewModelLocator.AutoWireViewModel="True"
+        >
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary  Source="/PatientsFomsRepository;component/Views/Resources/DefaultStyle.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+
+    <DockPanel d:DataContext="{d:DesignInstance vm:ShellViewModel, IsDesignTimeCreatable=True}">
+
+        <WrapPanel DockPanel.Dock="Top">
+            
+            <Button Content="Получить ФИО"
+                    Style="{StaticResource HeaderReferenceButton}"
+                    Command="{Binding ShowSRZSettingsViewCommand}" />
+
+            <Button Content="О программе"
+                    Style="{StaticResource HeaderReferenceButton}"
+                    Command="{Binding ShowAboutApplicationViewCommand}" />
+
+
+        </WrapPanel>
+
+        <Separator DockPanel.Dock="Top" />
+
+        <TextBlock DockPanel.Dock="Top"
+                   Style="{StaticResource TextBlockHeader}"
+                   Text="{Binding CurrentViewModel.FullCaption}" />
+
+        <TextBlock DockPanel.Dock="Bottom"
+                   TextWrapping="Wrap"
+                   Text="{Binding CurrentViewModel.Progress}" />
+
+        <ContentControl prism:RegionManager.RegionName="{x:Static i:RegionNames.MainRegion}" />
+        
+    </DockPanel>
+
+</Window>
