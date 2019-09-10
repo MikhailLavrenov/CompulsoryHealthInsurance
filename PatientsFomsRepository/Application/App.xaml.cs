@@ -22,8 +22,12 @@ namespace PatientsFomsRepository
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
+            containerRegistry.RegisterForNavigation<PatientsFileView>();            
+            containerRegistry.RegisterForNavigation<ImportPatientsView>();
             containerRegistry.RegisterForNavigation<SRZSettingsView>();
+            containerRegistry.RegisterForNavigation<PatientsFileSettingsView>();            
             containerRegistry.RegisterForNavigation<AboutApplicationView>();
+
         }
     }
 }

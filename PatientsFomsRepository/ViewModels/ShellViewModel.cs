@@ -1,6 +1,8 @@
 ﻿using PatientsFomsRepository.Infrastructure;
 using PatientsFomsRepository.Views;
+using Prism.Commands;
 using Prism.Regions;
+using System;
 
 namespace PatientsFomsRepository.ViewModels
 {
@@ -11,8 +13,7 @@ namespace PatientsFomsRepository.ViewModels
         #endregion
 
         #region Свойства 
-        public RelayCommand ShowSRZSettingsViewCommand { get; }
-        public RelayCommand ShowAboutApplicationViewCommand { get; }
+        public DelegateCommand<Type> ShowViewCommand { get; }
         #endregion
 
         #region Конструкторы
@@ -22,27 +23,16 @@ namespace PatientsFomsRepository.ViewModels
 
         public ShellViewModel(IRegionManager regionManager)
         {
-            ShowSRZSettingsViewCommand = new RelayCommand(ShowSRZSettingsViewExecute);
-            ShowAboutApplicationViewCommand = new RelayCommand(ShowAboutApplicationViewExecute);
+            ShowViewCommand = new DelegateCommand<Type>(ShowViewExecute); 
 
             this.regionManager = regionManager;
-
-            //regionManager.RegisterViewWithRegion(RegionNames.MainRegion, () => new SRZSettingsView());
-            //regionManager.RegisterViewWithRegion(RegionNames.MainRegion, () => new AboutApplicationView());
-            //regionManager.RegisterViewWithRegion(RegionNames.MainRegion, typeof(ImportPatientsView));
-            //regionManager.RegisterViewWithRegion(RegionNames.MainRegion, typeof(PatientsFileSettingsView));
-            //regionManager.RegisterViewWithRegion(RegionNames.MainRegion, typeof(PatientsFileView));
         }
         #endregion
 
         #region Методы
-        private void ShowSRZSettingsViewExecute(object parameter)
+        private void ShowViewExecute (Type parameter)
         {
-            regionManager.RequestNavigate(RegionNames.MainRegion, nameof(SRZSettingsView));
-        }
-        private void ShowAboutApplicationViewExecute(object parameter)
-        {
-            regionManager.RequestNavigate(RegionNames.MainRegion, nameof(AboutApplicationView));
+            regionManager.RequestNavigate(RegionNames.MainRegion, parameter.Name);
         }
         #endregion
     }

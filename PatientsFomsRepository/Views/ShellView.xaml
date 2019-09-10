@@ -28,20 +28,35 @@
 
     <DockPanel d:DataContext="{d:DesignInstance vm:ShellViewModel, IsDesignTimeCreatable=True}">
 
-        <WrapPanel DockPanel.Dock="Top">
+        <WrapPanel DockPanel.Dock="Top" Margin="0,2,0,2">
             
             <Button Content="Получить ФИО"
                     Style="{StaticResource HeaderReferenceButton}"
-                    Command="{Binding ShowSRZSettingsViewCommand}" />
+                    Command="{Binding ShowViewCommand}"  CommandParameter="{x:Type v:PatientsFileView}"/>
+
+            <Button Content="Загрузить в БД"
+                    Style="{StaticResource HeaderReferenceButton}"
+                    Command="{Binding ShowViewCommand}"
+                    CommandParameter="{x:Type v:ImportPatientsView}" />
+
+            <Button Content="Настройки СРЗ"
+                    Style="{StaticResource HeaderReferenceButton}"
+                    Command="{Binding ShowViewCommand}"
+                    CommandParameter="{x:Type v:SRZSettingsView}" />
+
+            <Button Content="Настройки файла пациентов"
+                    Style="{StaticResource HeaderReferenceButton}"
+                    Command="{Binding ShowViewCommand}"
+                    CommandParameter="{x:Type v:PatientsFileSettingsView}" />
 
             <Button Content="О программе"
                     Style="{StaticResource HeaderReferenceButton}"
-                    Command="{Binding ShowAboutApplicationViewCommand}" />
-
+                    Command="{Binding ShowViewCommand}"
+                    CommandParameter="{x:Type v:AboutApplicationView}" />
 
         </WrapPanel>
 
-        <Separator DockPanel.Dock="Top" />
+        <Separator DockPanel.Dock="Top"/>
 
         <TextBlock DockPanel.Dock="Top"
                    Style="{StaticResource TextBlockHeader}"

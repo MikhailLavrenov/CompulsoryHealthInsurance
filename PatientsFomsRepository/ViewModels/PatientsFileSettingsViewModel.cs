@@ -26,7 +26,7 @@ namespace PatientsFomsRepository.ViewModels
         public PatientsFileSettingsViewModel()
         {
             ShortCaption = "Настройки файла пациентов";
-            FullCaption = "Настройки  файла пациентов";
+            FullCaption = "Настройки файла пациентов";
             Progress = "";
             Settings = Settings.Instance;
             SaveCommand = new RelayCommand(SaveExecute);
