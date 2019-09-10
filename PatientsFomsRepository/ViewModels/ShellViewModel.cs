@@ -1,8 +1,10 @@
 ﻿using PatientsFomsRepository.Infrastructure;
 using PatientsFomsRepository.Views;
 using Prism.Commands;
+using Prism.Ioc;
 using Prism.Regions;
 using System;
+using System.ComponentModel;
 
 namespace PatientsFomsRepository.ViewModels
 {
@@ -10,6 +12,8 @@ namespace PatientsFomsRepository.ViewModels
     {
         #region Поля
         IRegionManager regionManager;
+        IContainerExtension container;
+        IRegion mainRegion;
         #endregion
 
         #region Свойства 
@@ -20,12 +24,18 @@ namespace PatientsFomsRepository.ViewModels
         public ShellViewModel()
         {
         }
-
-        public ShellViewModel(IRegionManager regionManager)
+        public ShellViewModel(IRegionManager regionManager, IContainerExtension container)
         {
-            ShowViewCommand = new DelegateCommand<Type>(ShowViewExecute); 
+            ShowViewCommand = new DelegateCommand<Type>(ShowViewExecute);
 
+            this.container = container;
             this.regionManager = regionManager;
+
+
+
+            //mainRegion.Activate(view);
+            //mainRegion.RequestNavigate(new Uri("PatientsFileView", UriKind.Relative));
+
         }
         #endregion
 
