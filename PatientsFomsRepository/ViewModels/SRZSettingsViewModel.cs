@@ -9,16 +9,15 @@ namespace PatientsFomsRepository.ViewModels
     {
         #region Поля
         private Settings settings;
-        private string progress;
         private bool showTextPassword;
         private bool showProtectedPassword;
         #endregion
 
         #region Свойства
+        public IStatusBar StatusBar { get; set; }
         public bool KeepAlive { get => false; }
         public string ShortCaption { get; set; }
         public string FullCaption { get; set; }
-        public string Progress { get => progress; set => SetProperty(ref progress, value); }
         public Settings Settings { get => settings; set => SetProperty(ref settings, value); }
         public bool ShowTextPassword { get => showTextPassword; set => SetProperty(ref showTextPassword, value); }
         public bool ShowProtectedPassword { get => showProtectedPassword; set => SetProperty(ref showProtectedPassword, value); }
@@ -32,9 +31,12 @@ namespace PatientsFomsRepository.ViewModels
         #region Конструкторы
         public SRZSettingsViewModel()
         {
+        }
+        public SRZSettingsViewModel(IStatusBar statusBar)
+        {
             ShortCaption = "Настройки СРЗ";
             FullCaption = "Настройки подключения к СРЗ ХК ФОМС";
-            Progress = "";
+            StatusBar = statusBar;
             Settings = Settings.Instance;
             ShowTextPassword = false;
             ShowProtectedPassword = !ShowTextPassword;
@@ -50,29 +52,29 @@ namespace PatientsFomsRepository.ViewModels
         private void SaveCommandExecute(object parameter)
         {
             Settings.Save();
-            Progress = "Настройки сохранены.";
+            StatusBar.StatusText = "Настройки сохранены.";
         }
         private void LoadCommandExecute(object parameter)
         {
             Settings = Settings.Load();
-            Progress = "Изменения настроек отменены.";
+            StatusBar.StatusText = "Изменения настроек отменены.";
         }
         private void SetDefaultExecute(object parameter)
         {
             Settings.SetDefaultSRZ();
-            Progress = "Настройки установлены по умолчанию.";
+            StatusBar.StatusText = "Настройки установлены по умолчанию.";
         }
         private void TestExecute(object parameter)
         {
-            Progress = "Ожидайте. Проверка настроек...";
+            StatusBar.StatusText = "Ожидайте. Проверка настроек...";
             Settings.TestConnection();
 
             if (Settings.ConnectionIsValid)
-                Progress = "Завершено. Настройки корректны.";
+                StatusBar.StatusText = "Завершено. Настройки корректны.";
             else if (Settings.ProxyIsNotValid)
-                Progress = "Завершено. Прокси сервер не доступен.";
+                StatusBar.StatusText = "Завершено. Прокси сервер не доступен.";
             else if (Settings.SiteAddressIsNotValid)
-                Progress = "Завершено. Web-сайт СРЗ не доступен.";
+                StatusBar.StatusText = "Завершено. Web-сайт СРЗ не доступен.";
             else if (Settings.CredentialsIsNotValid)
             {
                 var logins = new StringBuilder();
@@ -82,7 +84,7 @@ namespace PatientsFomsRepository.ViewModels
                 .ForEach(x => logins.Append(x).Append(", "));
                 logins.Remove(logins.Length - 3, 2);
 
-                Progress = $"Завершено. Учетные записи не верны: {logins}. ";
+                StatusBar.StatusText = $"Завершено. Учетные записи не верны: {logins}. ";
             }
         }
         private void SwitchShowPasswordExecute(object parameter)

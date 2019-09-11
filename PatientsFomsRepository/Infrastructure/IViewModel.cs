@@ -16,10 +16,6 @@ namespace PatientsFomsRepository.Infrastructure
         /// Название представления для заголовка
         /// </summary>
         string FullCaption { get; }
-        /// <summary>
-        /// Сообщения о ходе выполнения
-        /// </summary>
-        string Progress { get; }
         #endregion
     }
 }

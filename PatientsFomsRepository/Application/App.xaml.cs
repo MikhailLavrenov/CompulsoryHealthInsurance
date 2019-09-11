@@ -28,6 +28,8 @@ namespace PatientsFomsRepository
         }
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
+            containerRegistry.RegisterSingleton<IStatusBar,StatusBar>();
+
             containerRegistry.RegisterForNavigation<PatientsFileView>();
             containerRegistry.RegisterForNavigation<ImportPatientsView>();
             containerRegistry.RegisterForNavigation<SRZSettingsView>();

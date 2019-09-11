@@ -8,7 +8,6 @@ namespace PatientsFomsRepository.ViewModels
     class AboutApplicationViewModel : BindableBase, IViewModel
     {
         #region Поля
-        private string progress;
         private string manualPath;
         #endregion
 
@@ -16,7 +15,6 @@ namespace PatientsFomsRepository.ViewModels
         public bool KeepAlive { get => true; }
         public string ShortCaption { get; set; }
         public string FullCaption { get; set; }
-        public string Progress { get => progress; set => SetProperty(ref progress, value); }
         public string Name { get; }
         public string Version { get; }
         public string Copyright { get; }
@@ -31,7 +29,6 @@ namespace PatientsFomsRepository.ViewModels
         {
             ShortCaption = "О программе";
             FullCaption = "О программе";
-            Progress = "";
             manualPath = "Инструкция.docx";
 
             Name = "Хранилище пациентов из СРЗ";

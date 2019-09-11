@@ -11,14 +11,13 @@ namespace PatientsFomsRepository.ViewModels
     class ImportPatientsViewModel : BindableBase, IViewModel
     {
         #region Поля
-        private string progress;
         #endregion
 
         #region Свойства
+        public IStatusBar StatusBar { get; set; }
         public bool KeepAlive { get => false; }
         public string ShortCaption { get; set; }
         public string FullCaption { get; set; }
-        public string Progress { get => progress; set => SetProperty(ref progress, value); }
         public string ImportFilePath { get; set; }
         public string SaveExampleFilePath { get; set; }
         public RelayCommandAsync ImportPatientsCommand { get; }
@@ -29,9 +28,12 @@ namespace PatientsFomsRepository.ViewModels
         #region Конструкторы
         public ImportPatientsViewModel()
         {
+        }
+        public ImportPatientsViewModel(IStatusBar statusBar)
+        {
             ShortCaption = "Загрузить в БД";
             FullCaption = "Загрузить известные ФИО из файла в базу данных";
-            Progress = "";
+            StatusBar = statusBar;
             ImportPatientsCommand = new RelayCommandAsync(ImportPatientsExecute);
             SaveExampleCommand = new RelayCommandAsync(SaveExampleExecute);
             ClearDatabaseCommand = new RelayCommandAsync(ClearDatabaseExecute);
@@ -44,7 +46,7 @@ namespace PatientsFomsRepository.ViewModels
             if (string.IsNullOrEmpty(ImportFilePath))
                 return;
 
-            Progress = "Ожидайте. Открытие файла...";
+            StatusBar.StatusText = "Ожидайте. Открытие файла...";
             List<Patient> newPatients;
             using (var file = new ImportPatientsFile())
             {
@@ -53,7 +55,7 @@ namespace PatientsFomsRepository.ViewModels
                 file.Dispose();
             }
 
-            Progress = "Ожидайте. Проверка значений...";
+            StatusBar.StatusText = "Ожидайте. Проверка значений...";
             var db = new Models.Database();
             db.Patients.Load();
             var existenInsuaranceNumbers = db.Patients.Select(x => x.InsuranceNumber).ToHashSet();
@@ -63,30 +65,30 @@ namespace PatientsFomsRepository.ViewModels
             .Select(x => x.First())
             .ToList();
 
-            Progress = "Ожидайте. Сохранение в кэш...";
+            StatusBar.StatusText = "Ожидайте. Сохранение в кэш...";
             db.Patients.AddRange(newUniqPatients);
             db.SaveChanges();
 
             int total = existenInsuaranceNumbers.Count + newUniqPatients.Count;
-            Progress = $"Завершено. В файле найдено {newPatients.Count} человек(а). В БД добавлено {newUniqPatients.Count} новых. Итого в БД {total}.";
+            StatusBar.StatusText = $"Завершено. В файле найдено {newPatients.Count} человек(а). В БД добавлено {newUniqPatients.Count} новых. Итого в БД {total}.";
         }
         private void SaveExampleExecute(object parameter)
         {
             if (string.IsNullOrEmpty(SaveExampleFilePath))
                 return;
 
-            Progress = "Ожидайте. Открытие файла...";
+            StatusBar.StatusText = "Ожидайте. Открытие файла...";
             ImportPatientsFile.SaveExample(SaveExampleFilePath);
-            Progress = $"Завершено. Файл сохранен: {SaveExampleFilePath}";
+            StatusBar.StatusText = $"Завершено. Файл сохранен: {SaveExampleFilePath}";
         }
         private void ClearDatabaseExecute(object parameter)
         {
-            Progress = "Ожидайте. Очистка базы данных...";
+            StatusBar.StatusText = "Ожидайте. Очистка базы данных...";
             var db = new Models.Database();
             if (db.Database.Exists())
                 db.Database.Delete();
             db.Database.Create();
-            Progress = "Завершено. База данных очищена.";
+            StatusBar.StatusText = "Завершено. База данных очищена.";
         }
         #endregion
     }

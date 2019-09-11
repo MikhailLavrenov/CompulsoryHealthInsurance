@@ -64,7 +64,7 @@
 
         <TextBlock DockPanel.Dock="Bottom"
                    TextWrapping="Wrap"
-                   Text="{Binding ViewModel.Progress}" />
+                   Text="{Binding StatusBar.StatusText}" />
 
         <ContentControl prism:RegionManager.RegionName="{x:Static i:RegionNames.MainRegion}" />
         

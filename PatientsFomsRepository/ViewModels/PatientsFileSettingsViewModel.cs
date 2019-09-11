@@ -7,14 +7,13 @@ namespace PatientsFomsRepository.ViewModels
     {
         #region Поля
         private Settings settings;
-        private string progress;
         #endregion
 
         #region Свойства
+        public IStatusBar StatusBar { get; set; }
         public bool KeepAlive { get => false; }
         public string ShortCaption { get; set; }
         public string FullCaption { get; set; }
-        public string Progress { get => progress; set => SetProperty(ref progress, value); }
         public Settings Settings { get => settings; set => SetProperty(ref settings, value); }
         public RelayCommand SaveCommand { get; }
         public RelayCommand LoadCommand { get; }
@@ -26,9 +25,12 @@ namespace PatientsFomsRepository.ViewModels
         #region Конструкторы
         public PatientsFileSettingsViewModel()
         {
+        }
+        public PatientsFileSettingsViewModel(IStatusBar statusBar)
+        {
             ShortCaption = "Настройки файла пациентов";
             FullCaption = "Настройки файла пациентов";
-            Progress = "";
+            StatusBar = statusBar;
             Settings = Settings.Instance;
             SaveCommand = new RelayCommand(SaveExecute);
             LoadCommand = new RelayCommand(LoadExecute);
@@ -42,17 +44,17 @@ namespace PatientsFomsRepository.ViewModels
         private void SaveExecute(object parameter)
         {
             Settings.Save();
-            Progress = "Настройки сохранены.";
+            StatusBar.StatusText = "Настройки сохранены.";
         }
         private void LoadExecute(object parameter)
         {
             Settings = Settings.Load();
-            Progress = "Изменения настроек отменены.";
+            StatusBar.StatusText = "Изменения настроек отменены.";
         }
         private void SetDefaultExecute(object parameter)
         {
             Settings.SetDefaultPatiensFile();
-            Progress = "Настройки установлены по умолчанию.";
+            StatusBar.StatusText = "Настройки установлены по умолчанию.";
         }
         #endregion
     }
