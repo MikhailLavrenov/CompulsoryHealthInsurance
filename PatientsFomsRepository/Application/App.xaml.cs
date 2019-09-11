@@ -1,4 +1,5 @@
 ﻿using PatientsFomsRepository.Infrastructure;
+using PatientsFomsRepository.ViewModels;
 using PatientsFomsRepository.Views;
 using Prism.DryIoc;
 using Prism.Ioc;
@@ -15,14 +16,15 @@ namespace PatientsFomsRepository
     {
         protected override Window CreateShell()
         {
-            return Container.Resolve<ShellView>();
+            Window shellView= Container.Resolve<ShellView>();
+            shellView.Loaded += Loaded;
+            return shellView;
         }
-        protected override void OnInitialized()
+        private void Loaded(object sender, RoutedEventArgs e)
         {
-            base.OnInitialized();
-
-            var regionManager = Container.Resolve<IRegionManager>();
-            regionManager.RequestNavigate(RegionNames.MainRegion, nameof(PatientsFileView));
+            var view=sender as Window;
+            var viewModel = view.DataContext as ShellViewModel;
+            viewModel.ShowViewCommand.Execute(typeof(PatientsFileView));
         }
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {

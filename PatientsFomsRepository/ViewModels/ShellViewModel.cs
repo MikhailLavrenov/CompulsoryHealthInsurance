@@ -44,17 +44,11 @@ namespace PatientsFomsRepository.ViewModels
 
             mainRegion.RequestNavigate(parameter.Name);
 
-            FrameworkElement view =null;
-            foreach (var item in mainRegion.ActiveViews)
-            {
-                view = item as FrameworkElement;
-                break;
-            }
+            var enumeratorViews = mainRegion.ActiveViews.GetEnumerator();
+            enumeratorViews.MoveNext();
+            var view= enumeratorViews.Current as FrameworkElement;
 
             ViewModel = view.DataContext as IViewModel;
-
-            Header = ViewModel.FullCaption;
-            Progress = ViewModel.Progress;
 
             //regionManager.RequestNavigate(RegionNames.MainRegion, parameter.Name);
         }
