@@ -15,6 +15,7 @@ namespace PatientsFomsRepository.ViewModels
         #endregion
 
         #region Свойства
+        public bool KeepAlive { get => false; }
         public string ShortCaption { get; set; }
         public string FullCaption { get; set; }
         public string Progress { get => progress; set => SetProperty(ref progress, value); }

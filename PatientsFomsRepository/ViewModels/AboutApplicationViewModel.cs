@@ -13,6 +13,7 @@ namespace PatientsFomsRepository.ViewModels
         #endregion
 
         #region Свойства
+        public bool KeepAlive { get => true; }
         public string ShortCaption { get; set; }
         public string FullCaption { get; set; }
         public string Progress { get => progress; set => SetProperty(ref progress, value); }
@@ -40,7 +41,7 @@ namespace PatientsFomsRepository.ViewModels
             Email = "mvlavrenov@mail.ru";
             Phone = "8-924-213-79-11";
 
-            OpenManualCommand = new RelayCommand(x => Process.Start(manualPath),x=>File.Exists(manualPath)) ;
+            OpenManualCommand = new RelayCommand(x => Process.Start(manualPath), x => File.Exists(manualPath));
         }
         #endregion
 

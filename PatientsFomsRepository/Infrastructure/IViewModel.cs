@@ -1,9 +1,11 @@
-﻿namespace PatientsFomsRepository.Infrastructure
+﻿using Prism.Regions;
+
+namespace PatientsFomsRepository.Infrastructure
 {
     /// <summary>
     /// Интерфейс для всех ViewModel
     /// </summary>
-    public interface IViewModel
+    public interface IViewModel : IRegionMemberLifetime
     {
         #region Properties
         /// <summary>

@@ -7,16 +7,15 @@ namespace PatientsFomsRepository.ViewModels
 {
     public class SRZSettingsViewModel : BindableBase, IViewModel
     {
-
-
         #region Поля
         private Settings settings;
+        private string progress;
         private bool showTextPassword;
         private bool showProtectedPassword;
-        private string progress;
         #endregion
 
         #region Свойства
+        public bool KeepAlive { get => false; }
         public string ShortCaption { get; set; }
         public string FullCaption { get; set; }
         public string Progress { get => progress; set => SetProperty(ref progress, value); }

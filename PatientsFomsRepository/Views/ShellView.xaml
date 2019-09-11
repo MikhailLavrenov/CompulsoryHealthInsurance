@@ -60,11 +60,11 @@
 
         <TextBlock DockPanel.Dock="Top"
                    Style="{StaticResource TextBlockHeader}"
-                   Text="{Binding CurrentViewModel.FullCaption}" />
+                   Text="{Binding ViewModel.FullCaption}" />
 
         <TextBlock DockPanel.Dock="Bottom"
                    TextWrapping="Wrap"
-                   Text="{Binding CurrentViewModel.Progress}" />
+                   Text="{Binding ViewModel.Progress}" />
 
         <ContentControl prism:RegionManager.RegionName="{x:Static i:RegionNames.MainRegion}" />
         
