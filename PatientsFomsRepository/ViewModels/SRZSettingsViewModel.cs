@@ -1,11 +1,13 @@
 ﻿using PatientsFomsRepository.Infrastructure;
 using PatientsFomsRepository.Models;
+using Prism.Commands;
+using Prism.Regions;
 using System.Linq;
 using System.Text;
 
 namespace PatientsFomsRepository.ViewModels
 {
-    public class SRZSettingsViewModel : BindableBase, IViewModel
+    public class SRZSettingsViewModel : BindableBase, IRegionMemberLifetime
     {
         #region Поля
         private Settings settings;
@@ -14,67 +16,65 @@ namespace PatientsFomsRepository.ViewModels
         #endregion
 
         #region Свойства
-        public IStatusBar StatusBar { get; set; }
+        public IActiveViewModel ActiveViewModel { get; set; }
         public bool KeepAlive { get => false; }
-        public string ShortCaption { get; set; }
-        public string FullCaption { get; set; }
         public Settings Settings { get => settings; set => SetProperty(ref settings, value); }
         public bool ShowTextPassword { get => showTextPassword; set => SetProperty(ref showTextPassword, value); }
         public bool ShowProtectedPassword { get => showProtectedPassword; set => SetProperty(ref showProtectedPassword, value); }
-        public RelayCommand SaveCommand { get; }
-        public RelayCommand LoadCommand { get; }
-        public RelayCommand SetDefaultCommand { get; }
+        public DelegateCommand SaveCommand { get; }
+        public DelegateCommand LoadCommand { get; }
+        public DelegateCommand SetDefaultCommand { get; }
         public RelayCommandAsync TestCommand { get; }
-        public RelayCommand SwitchShowPasswordCommand { get; }
+        public DelegateCommand SwitchShowPasswordCommand { get; }
         #endregion
 
         #region Конструкторы
         public SRZSettingsViewModel()
         {
         }
-        public SRZSettingsViewModel(IStatusBar statusBar)
+        public SRZSettingsViewModel(IActiveViewModel activeViewModel)
         {
-            ShortCaption = "Настройки СРЗ";
-            FullCaption = "Настройки подключения к СРЗ ХК ФОМС";
-            StatusBar = statusBar;
+            ActiveViewModel = activeViewModel;
             Settings = Settings.Instance;
+
+            ActiveViewModel.Header = "Настройки подключения к СРЗ ХК ФОМС";
             ShowTextPassword = false;
             ShowProtectedPassword = !ShowTextPassword;
-            SaveCommand = new RelayCommand(SaveCommandExecute);
-            LoadCommand = new RelayCommand(LoadCommandExecute);
-            SetDefaultCommand = new RelayCommand(SetDefaultExecute);
+            SaveCommand = new DelegateCommand(SaveCommandExecute);
+            LoadCommand = new DelegateCommand(LoadCommandExecute);
+            SetDefaultCommand = new DelegateCommand(SetDefaultExecute);
             TestCommand = new RelayCommandAsync(TestExecute);
-            SwitchShowPasswordCommand = new RelayCommand(SwitchShowPasswordExecute);
+            SwitchShowPasswordCommand = new DelegateCommand(SwitchShowPasswordExecute);
         }
         #endregion
 
         #region Методы        
-        private void SaveCommandExecute(object parameter)
+        private void SaveCommandExecute()
         {
             Settings.Save();
-            StatusBar.StatusText = "Настройки сохранены.";
+            ActiveViewModel.Status = "Настройки сохранены.";
         }
-        private void LoadCommandExecute(object parameter)
+        private void LoadCommandExecute()
         {
             Settings = Settings.Load();
-            StatusBar.StatusText = "Изменения настроек отменены.";
+            ActiveViewModel.Status = "Изменения настроек отменены.";
         }
-        private void SetDefaultExecute(object parameter)
+        private void SetDefaultExecute()
         {
             Settings.SetDefaultSRZ();
-            StatusBar.StatusText = "Настройки установлены по умолчанию.";
+            ActiveViewModel.Status = "Настройки установлены по умолчанию.";
         }
         private void TestExecute(object parameter)
         {
-            StatusBar.StatusText = "Ожидайте. Проверка настроек...";
+            ActiveViewModel.Status = "Ожидайте. Проверка настроек...";
             Settings.TestConnection();
 
             if (Settings.ConnectionIsValid)
-                StatusBar.StatusText = "Завершено. Настройки корректны.";
+                ActiveViewModel.Status = "Завершено. Настройки корректны.";
             else if (Settings.ProxyIsNotValid)
-                StatusBar.StatusText = "Завершено. Прокси сервер не доступен.";
+                ActiveViewModel.Status = "Завершено. Прокси сервер не доступен.";
             else if (Settings.SiteAddressIsNotValid)
-                StatusBar.StatusText = "Завершено. Web-сайт СРЗ не доступен.";
+                ActiveViewModel.Status = "Завершено. Web-сайт СРЗ не доступен.";
             else if (Settings.CredentialsIsNotValid)
             {
                 var logins = new StringBuilder();
@@ -84,10 +84,10 @@ namespace PatientsFomsRepository.ViewModels
                 .ForEach(x => logins.Append(x).Append(", "));
                 logins.Remove(logins.Length - 3, 2);
 
-                StatusBar.StatusText = $"Завершено. Учетные записи не верны: {logins}. ";
+                ActiveViewModel.Status = $"Завершено. Учетные записи не верны: {logins}. ";
             }
         }
-        private void SwitchShowPasswordExecute(object parameter)
+        private void SwitchShowPasswordExecute()
         {
             ShowTextPassword = !ShowTextPassword;
             ShowProtectedPassword = !ShowTextPassword;

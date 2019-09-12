@@ -12,15 +12,10 @@ namespace PatientsFomsRepository.ViewModels
     {
         #region Поля
         private IRegionManager regionManager;
-        IRegion mainRegion;
-        private string header;
-        private IViewModel viewModel;
         #endregion
 
         #region Свойства 
-        public IStatusBar StatusBar { get; set; }
-        public string Header { get => header; set => SetProperty(ref header, value); }
-        public IViewModel ViewModel { get => viewModel; set => SetProperty(ref viewModel, value); }
+        public IActiveViewModel ActiveViewModel { get; set; }
         public DelegateCommand<Type> ShowViewCommand { get; }
         #endregion
 
@@ -28,9 +23,9 @@ namespace PatientsFomsRepository.ViewModels
         public ShellViewModel()
         {
         }
-        public ShellViewModel(IRegionManager regionManager, IStatusBar statusBar)
+        public ShellViewModel(IRegionManager regionManager, IActiveViewModel activeViewMode)
         {            
-            StatusBar = statusBar;
+            ActiveViewModel = activeViewMode;
             this.regionManager = regionManager;
 
             ShowViewCommand = new DelegateCommand<Type>(ShowViewExecute);
@@ -40,18 +35,8 @@ namespace PatientsFomsRepository.ViewModels
         #region Методы
         private void ShowViewExecute(Type parameter)
         {
-            mainRegion = regionManager.Regions[RegionNames.MainRegion];
-
-            mainRegion.RequestNavigate(parameter.Name);
-
-            var enumeratorViews = mainRegion.ActiveViews.GetEnumerator();
-            enumeratorViews.MoveNext();
-            var view= enumeratorViews.Current as FrameworkElement;
-
-            ViewModel = view.DataContext as IViewModel;
-
-            //regionManager.RequestNavigate(RegionNames.MainRegion, parameter.Name);
-            StatusBar.StatusText = "";
+            ActiveViewModel.Status = "";
+            regionManager.RequestNavigate(RegionNames.MainRegion, parameter.Name);            
         }
         #endregion
     }

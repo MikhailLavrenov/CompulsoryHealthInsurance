@@ -1,5 +1,6 @@
 ﻿using PatientsFomsRepository.Infrastructure;
 using PatientsFomsRepository.Models;
+using Prism.Regions;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data.Entity;
@@ -8,16 +9,14 @@ using System.Linq;
 
 namespace PatientsFomsRepository.ViewModels
 {
-    class ImportPatientsViewModel : BindableBase, IViewModel
+    class ImportPatientsViewModel : BindableBase, IRegionMemberLifetime
     {
         #region Поля
         #endregion
 
         #region Свойства
-        public IStatusBar StatusBar { get; set; }
+        public IActiveViewModel ActiveViewModel { get; set; }
         public bool KeepAlive { get => false; }
-        public string ShortCaption { get; set; }
-        public string FullCaption { get; set; }
         public string ImportFilePath { get; set; }
         public string SaveExampleFilePath { get; set; }
         public RelayCommandAsync ImportPatientsCommand { get; }
@@ -29,11 +28,11 @@ namespace PatientsFomsRepository.ViewModels
         public ImportPatientsViewModel()
         {
         }
-        public ImportPatientsViewModel(IStatusBar statusBar)
-        {
-            ShortCaption = "Загрузить в БД";
-            FullCaption = "Загрузить известные ФИО из файла в базу данных";
-            StatusBar = statusBar;
+        public ImportPatientsViewModel(IActiveViewModel activeViewModel)
+        {            
+            ActiveViewModel = activeViewModel;
+
+            ActiveViewModel.Header = "Загрузить известные ФИО из файла в базу данных";
             ImportPatientsCommand = new RelayCommandAsync(ImportPatientsExecute);
             SaveExampleCommand = new RelayCommandAsync(SaveExampleExecute);
             ClearDatabaseCommand = new RelayCommandAsync(ClearDatabaseExecute);
@@ -46,7 +45,7 @@ namespace PatientsFomsRepository.ViewModels
             if (string.IsNullOrEmpty(ImportFilePath))
                 return;
 
-            StatusBar.StatusText = "Ожидайте. Открытие файла...";
+            ActiveViewModel.Status = "Ожидайте. Открытие файла...";
             List<Patient> newPatients;
             using (var file = new ImportPatientsFile())
             {
@@ -55,7 +54,7 @@ namespace PatientsFomsRepository.ViewModels
                 file.Dispose();
             }
 
-            StatusBar.StatusText = "Ожидайте. Проверка значений...";
+            ActiveViewModel.Status = "Ожидайте. Проверка значений...";
             var db = new Models.Database();
             db.Patients.Load();
             var existenInsuaranceNumbers = db.Patients.Select(x => x.InsuranceNumber).ToHashSet();
@@ -65,30 +64,30 @@ namespace PatientsFomsRepository.ViewModels
             .Select(x => x.First())
             .ToList();
 
-            StatusBar.StatusText = "Ожидайте. Сохранение в кэш...";
+            ActiveViewModel.Status = "Ожидайте. Сохранение в кэш...";
             db.Patients.AddRange(newUniqPatients);
             db.SaveChanges();
 
             int total = existenInsuaranceNumbers.Count + newUniqPatients.Count;
-            StatusBar.StatusText = $"Завершено. В файле найдено {newPatients.Count} человек(а). В БД добавлено {newUniqPatients.Count} новых. Итого в БД {total}.";
+            ActiveViewModel.Status = $"Завершено. В файле найдено {newPatients.Count} человек(а). В БД добавлено {newUniqPatients.Count} новых. Итого в БД {total}.";
         }
         private void SaveExampleExecute(object parameter)
         {
             if (string.IsNullOrEmpty(SaveExampleFilePath))
                 return;
 
-            StatusBar.StatusText = "Ожидайте. Открытие файла...";
+            ActiveViewModel.Status = "Ожидайте. Открытие файла...";
             ImportPatientsFile.SaveExample(SaveExampleFilePath);
-            StatusBar.StatusText = $"Завершено. Файл сохранен: {SaveExampleFilePath}";
+            ActiveViewModel.Status = $"Завершено. Файл сохранен: {SaveExampleFilePath}";
         }
         private void ClearDatabaseExecute(object parameter)
         {
-            StatusBar.StatusText = "Ожидайте. Очистка базы данных...";
+            ActiveViewModel.Status = "Ожидайте. Очистка базы данных...";
             var db = new Models.Database();
             if (db.Database.Exists())
                 db.Database.Delete();
             db.Database.Create();
-            StatusBar.StatusText = "Завершено. База данных очищена.";
+            ActiveViewModel.Status = "Завершено. База данных очищена.";
         }
         #endregion
     }

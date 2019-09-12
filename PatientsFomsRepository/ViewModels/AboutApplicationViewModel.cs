@@ -1,20 +1,20 @@
 ﻿using PatientsFomsRepository.Infrastructure;
+using Prism.Regions;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 
 namespace PatientsFomsRepository.ViewModels
 {
-    class AboutApplicationViewModel : BindableBase, IViewModel
+    class AboutApplicationViewModel : BindableBase, IRegionMemberLifetime
     {
         #region Поля
         private string manualPath;
         #endregion
 
         #region Свойства
+        public IActiveViewModel ActiveViewModel { get; set; }
         public bool KeepAlive { get => true; }
-        public string ShortCaption { get; set; }
-        public string FullCaption { get; set; }
         public string Name { get; }
         public string Version { get; }
         public string Copyright { get; }
@@ -25,12 +25,12 @@ namespace PatientsFomsRepository.ViewModels
         #endregion
 
         #region Конструкторы
-        public AboutApplicationViewModel()
+        public AboutApplicationViewModel(IActiveViewModel activeViewModel)
         {
-            ShortCaption = "О программе";
-            FullCaption = "О программе";
-            manualPath = "Инструкция.docx";
+            ActiveViewModel = activeViewModel;
 
+            activeViewModel.Header = "О программе";
+            manualPath = "Инструкция.docx";           
             Name = "Хранилище пациентов из СРЗ";
             Version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
             Copyright = @"©  2019";

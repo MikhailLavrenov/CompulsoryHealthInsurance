@@ -16,19 +16,19 @@ namespace PatientsFomsRepository
     {
         protected override Window CreateShell()
         {
-            Window shellView= Container.Resolve<ShellView>();
-            shellView.Loaded += Loaded;
-            return shellView;
+            return Container.Resolve<ShellView>();
         }
-        private void Loaded(object sender, RoutedEventArgs e)
+        protected override void OnInitialized()
         {
-            var view=sender as Window;
-            var viewModel = view.DataContext as ShellViewModel;
+            base.OnInitialized();
+
+            var viewModel = Current.MainWindow.DataContext as ShellViewModel;
             viewModel.ShowViewCommand.Execute(typeof(PatientsFileView));
         }
+
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
-            containerRegistry.RegisterSingleton<IStatusBar,StatusBar>();
+            containerRegistry.RegisterSingleton<IActiveViewModel,ActiveViewModel>();
 
             containerRegistry.RegisterForNavigation<PatientsFileView>();
             containerRegistry.RegisterForNavigation<ImportPatientsView>();

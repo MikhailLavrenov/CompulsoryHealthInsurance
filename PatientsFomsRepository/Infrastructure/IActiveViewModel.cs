@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 
 namespace PatientsFomsRepository.Infrastructure
 {
-    public interface IStatusBar
+    public interface IActiveViewModel
     {
-        string StatusText { get; set; }
+        string Status { get; set; }
+        string Header { get; set; }
     }
 }

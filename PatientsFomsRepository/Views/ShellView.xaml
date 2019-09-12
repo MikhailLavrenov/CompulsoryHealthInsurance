@@ -28,7 +28,7 @@
 
     <DockPanel d:DataContext="{d:DesignInstance vm:ShellViewModel, IsDesignTimeCreatable=True}">
 
-        <WrapPanel DockPanel.Dock="Top" Margin="0,2,0,2">
+        <WrapPanel DockPanel.Dock="Top" Margin="0,3,0,3">
             
             <Button Content="Получить ФИО"
                     Style="{StaticResource HeaderReferenceButton}"
@@ -59,12 +59,13 @@
         <Separator DockPanel.Dock="Top"/>
 
         <TextBlock DockPanel.Dock="Top"
+                   Margin="5,10,5,20"
                    Style="{StaticResource TextBlockHeader}"
-                   Text="{Binding ViewModel.FullCaption}" />
+                   Text="{Binding ActiveViewModel.Header}" />
 
         <TextBlock DockPanel.Dock="Bottom"
                    TextWrapping="Wrap"
-                   Text="{Binding StatusBar.StatusText}" />
+                   Text="{Binding ActiveViewModel.Status}" />
 
         <ContentControl prism:RegionManager.RegionName="{x:Static i:RegionNames.MainRegion}" />
         

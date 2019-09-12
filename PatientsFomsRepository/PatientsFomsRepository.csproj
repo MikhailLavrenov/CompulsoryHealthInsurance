@@ -126,14 +126,13 @@
     <Compile Include="Infrastructure\BoolToVisibleConverterExtension.cs" />
     <Compile Include="Infrastructure\EnumHelper.cs" />
     <Compile Include="Infrastructure\EnumToCollectionConverterExtension.cs" />
-    <Compile Include="Infrastructure\IStatusBar.cs" />
-    <Compile Include="Infrastructure\IViewModel.cs" />
+    <Compile Include="Infrastructure\IActiveViewModel.cs" />
     <Compile Include="Infrastructure\PasswordBoxHelper.cs" />
     <Compile Include="Infrastructure\RegionNames.cs" />
     <Compile Include="Infrastructure\RelayCommand.cs" />
     <Compile Include="Infrastructure\BindableBase.cs" />
     <Compile Include="Infrastructure\RelayCommandAsync.cs" />
-    <Compile Include="Infrastructure\StatusBar.cs" />
+    <Compile Include="Infrastructure\ActiveViewModel.cs" />
     <Compile Include="Models\ImportPatientsFile.cs" />
     <Compile Include="Models\PatientsFile\ColumnProperty.cs" />
     <Compile Include="Models\SRZ\CredentialScope.cs" />

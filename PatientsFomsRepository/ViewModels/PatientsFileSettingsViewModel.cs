@@ -1,19 +1,18 @@
 ﻿using PatientsFomsRepository.Infrastructure;
 using PatientsFomsRepository.Models;
+using Prism.Regions;
 
 namespace PatientsFomsRepository.ViewModels
 {
-    public class PatientsFileSettingsViewModel : BindableBase, IViewModel
+    public class PatientsFileSettingsViewModel : BindableBase, IRegionMemberLifetime
     {
         #region Поля
         private Settings settings;
         #endregion
 
         #region Свойства
-        public IStatusBar StatusBar { get; set; }
+        public IActiveViewModel ActiveViewModel { get; set; }
         public bool KeepAlive { get => false; }
-        public string ShortCaption { get; set; }
-        public string FullCaption { get; set; }
         public Settings Settings { get => settings; set => SetProperty(ref settings, value); }
         public RelayCommand SaveCommand { get; }
         public RelayCommand LoadCommand { get; }
@@ -26,11 +25,11 @@ namespace PatientsFomsRepository.ViewModels
         public PatientsFileSettingsViewModel()
         {
         }
-        public PatientsFileSettingsViewModel(IStatusBar statusBar)
+        public PatientsFileSettingsViewModel(IActiveViewModel activeViewModel)
         {
-            ShortCaption = "Настройки файла пациентов";
-            FullCaption = "Настройки файла пациентов";
-            StatusBar = statusBar;
+            ActiveViewModel = activeViewModel;
+
+            ActiveViewModel.Header = "Настройки файла пациентов";            
             Settings = Settings.Instance;
             SaveCommand = new RelayCommand(SaveExecute);
             LoadCommand = new RelayCommand(LoadExecute);
@@ -44,17 +43,17 @@ namespace PatientsFomsRepository.ViewModels
         private void SaveExecute(object parameter)
         {
             Settings.Save();
-            StatusBar.StatusText = "Настройки сохранены.";
+            ActiveViewModel.Status = "Настройки сохранены.";
         }
         private void LoadExecute(object parameter)
         {
             Settings = Settings.Load();
-            StatusBar.StatusText = "Изменения настроек отменены.";
+            ActiveViewModel.Status = "Изменения настроек отменены.";
         }
         private void SetDefaultExecute(object parameter)
         {
             Settings.SetDefaultPatiensFile();
-            StatusBar.StatusText = "Настройки установлены по умолчанию.";
+            ActiveViewModel.Status = "Настройки установлены по умолчанию.";
         }
         #endregion
     }
