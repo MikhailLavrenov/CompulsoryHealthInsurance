@@ -19,9 +19,9 @@ namespace PatientsFomsRepository.ViewModels
         public bool KeepAlive { get => false; }
         public string ImportFilePath { get; set; }
         public string SaveExampleFilePath { get; set; }
-        public RelayCommandAsync ImportPatientsCommand { get; }
-        public RelayCommandAsync SaveExampleCommand { get; }
-        public RelayCommandAsync ClearDatabaseCommand { get; }
+        public DelegateCommandAsync ImportPatientsCommand { get; }
+        public DelegateCommandAsync SaveExampleCommand { get; }
+        public DelegateCommandAsync ClearDatabaseCommand { get; }
         #endregion
 
         #region Конструкторы
@@ -33,14 +33,14 @@ namespace PatientsFomsRepository.ViewModels
             ActiveViewModel = activeViewModel;
 
             ActiveViewModel.Header = "Загрузить известные ФИО из файла в базу данных";
-            ImportPatientsCommand = new RelayCommandAsync(ImportPatientsExecute);
-            SaveExampleCommand = new RelayCommandAsync(SaveExampleExecute);
-            ClearDatabaseCommand = new RelayCommandAsync(ClearDatabaseExecute);
+            ImportPatientsCommand = new DelegateCommandAsync(ImportPatientsExecute);
+            SaveExampleCommand = new DelegateCommandAsync(SaveExampleExecute);
+            ClearDatabaseCommand = new DelegateCommandAsync(ClearDatabaseExecute);
         }
         #endregion
 
         #region Методы
-        private void ImportPatientsExecute(object parameter)
+        private void ImportPatientsExecute()
         {
             if (string.IsNullOrEmpty(ImportFilePath))
                 return;
@@ -71,7 +71,7 @@ namespace PatientsFomsRepository.ViewModels
             int total = existenInsuaranceNumbers.Count + newUniqPatients.Count;
             ActiveViewModel.Status = $"Завершено. В файле найдено {newPatients.Count} человек(а). В БД добавлено {newUniqPatients.Count} новых. Итого в БД {total}.";
         }
-        private void SaveExampleExecute(object parameter)
+        private void SaveExampleExecute()
         {
             if (string.IsNullOrEmpty(SaveExampleFilePath))
                 return;
@@ -80,7 +80,7 @@ namespace PatientsFomsRepository.ViewModels
             ImportPatientsFile.SaveExample(SaveExampleFilePath);
             ActiveViewModel.Status = $"Завершено. Файл сохранен: {SaveExampleFilePath}";
         }
-        private void ClearDatabaseExecute(object parameter)
+        private void ClearDatabaseExecute()
         {
             ActiveViewModel.Status = "Ожидайте. Очистка базы данных...";
             var db = new Models.Database();

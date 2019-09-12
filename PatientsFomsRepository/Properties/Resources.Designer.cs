@@ -59,5 +59,23 @@ namespace PatientsFomsRepository.Properties {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Neither the executeMethod nor the canExecuteMethod delegates can be null..
+        /// </summary>
+        internal static string DelegateCommandDelegatesCannotBeNull {
+            get {
+                return ResourceManager.GetString("DelegateCommandDelegatesCannotBeNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на T for DelegateCommand&amp;lt;T&amp;gt; is not an object nor Nullable..
+        /// </summary>
+        internal static string DelegateCommandInvalidGenericPayloadType {
+            get {
+                return ResourceManager.GetString("DelegateCommandInvalidGenericPayloadType", resourceCulture);
+            }
+        }
     }
 }

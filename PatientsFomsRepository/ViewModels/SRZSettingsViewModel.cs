@@ -24,7 +24,7 @@ namespace PatientsFomsRepository.ViewModels
         public DelegateCommand SaveCommand { get; }
         public DelegateCommand LoadCommand { get; }
         public DelegateCommand SetDefaultCommand { get; }
-        public RelayCommandAsync TestCommand { get; }
+        public DelegateCommandAsync TestCommand { get; }
         public DelegateCommand SwitchShowPasswordCommand { get; }
         #endregion
 
@@ -43,7 +43,7 @@ namespace PatientsFomsRepository.ViewModels
             SaveCommand = new DelegateCommand(SaveCommandExecute);
             LoadCommand = new DelegateCommand(LoadCommandExecute);
             SetDefaultCommand = new DelegateCommand(SetDefaultExecute);
-            TestCommand = new RelayCommandAsync(TestExecute);
+            TestCommand = new DelegateCommandAsync(TestExecute);
             SwitchShowPasswordCommand = new DelegateCommand(SwitchShowPasswordExecute);
         }
         #endregion
@@ -64,7 +64,7 @@ namespace PatientsFomsRepository.ViewModels
             Settings.SetDefaultSRZ();
             ActiveViewModel.Status = "Настройки установлены по умолчанию.";
         }
-        private void TestExecute(object parameter)
+        private void TestExecute()
         {
             ActiveViewModel.Status = "Ожидайте. Проверка настроек...";
             Settings.TestConnection();

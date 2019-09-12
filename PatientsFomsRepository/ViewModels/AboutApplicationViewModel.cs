@@ -1,4 +1,5 @@
 ﻿using PatientsFomsRepository.Infrastructure;
+using Prism.Commands;
 using Prism.Regions;
 using System.Diagnostics;
 using System.IO;
@@ -21,7 +22,7 @@ namespace PatientsFomsRepository.ViewModels
         public string Author { get; }
         public string Email { get; }
         public string Phone { get; }
-        public RelayCommand OpenManualCommand { get; }
+        public DelegateCommand<string> OpenManualCommand { get; }
         #endregion
 
         #region Конструкторы
@@ -38,7 +39,7 @@ namespace PatientsFomsRepository.ViewModels
             Email = "mvlavrenov@mail.ru";
             Phone = "8-924-213-79-11";
 
-            OpenManualCommand = new RelayCommand(x => Process.Start(manualPath), x => File.Exists(manualPath));
+            OpenManualCommand = new DelegateCommand<string>(x => Process.Start(manualPath), x => File.Exists(manualPath));
         }
         #endregion
 

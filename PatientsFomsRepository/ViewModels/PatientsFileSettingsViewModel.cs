@@ -1,5 +1,6 @@
 ﻿using PatientsFomsRepository.Infrastructure;
 using PatientsFomsRepository.Models;
+using Prism.Commands;
 using Prism.Regions;
 
 namespace PatientsFomsRepository.ViewModels
@@ -14,11 +15,11 @@ namespace PatientsFomsRepository.ViewModels
         public IActiveViewModel ActiveViewModel { get; set; }
         public bool KeepAlive { get => false; }
         public Settings Settings { get => settings; set => SetProperty(ref settings, value); }
-        public RelayCommand SaveCommand { get; }
-        public RelayCommand LoadCommand { get; }
-        public RelayCommand SetDefaultCommand { get; }
-        public RelayCommand MoveUpCommand { get; }
-        public RelayCommand MoveDownCommand { get; }
+        public DelegateCommand SaveCommand { get; }
+        public DelegateCommand LoadCommand { get; }
+        public DelegateCommand SetDefaultCommand { get; }
+        public DelegateCommand<ColumnProperty> MoveUpCommand { get; }
+        public DelegateCommand<ColumnProperty> MoveDownCommand { get; }
         #endregion
 
         #region Конструкторы
@@ -31,26 +32,26 @@ namespace PatientsFomsRepository.ViewModels
 
             ActiveViewModel.Header = "Настройки файла пациентов";            
             Settings = Settings.Instance;
-            SaveCommand = new RelayCommand(SaveExecute);
-            LoadCommand = new RelayCommand(LoadExecute);
-            SetDefaultCommand = new RelayCommand(SetDefaultExecute);
-            MoveUpCommand = new RelayCommand(x => Settings.MoveUpColumnProperty(x as ColumnProperty));
-            MoveDownCommand = new RelayCommand(x => Settings.MoveDownColumnProperty(x as ColumnProperty));            
+            SaveCommand = new DelegateCommand(SaveExecute);
+            LoadCommand = new DelegateCommand(LoadExecute);
+            SetDefaultCommand = new DelegateCommand(SetDefaultExecute);
+            MoveUpCommand = new DelegateCommand<ColumnProperty>(x => Settings.MoveUpColumnProperty(x as ColumnProperty));
+            MoveDownCommand = new DelegateCommand<ColumnProperty>(x => Settings.MoveDownColumnProperty(x as ColumnProperty));            
         }
         #endregion
 
         #region Методы
-        private void SaveExecute(object parameter)
+        private void SaveExecute()
         {
             Settings.Save();
             ActiveViewModel.Status = "Настройки сохранены.";
         }
-        private void LoadExecute(object parameter)
+        private void LoadExecute()
         {
             Settings = Settings.Load();
             ActiveViewModel.Status = "Изменения настроек отменены.";
         }
-        private void SetDefaultExecute(object parameter)
+        private void SetDefaultExecute()
         {
             Settings.SetDefaultPatiensFile();
             ActiveViewModel.Status = "Настройки установлены по умолчанию.";

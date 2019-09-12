@@ -23,7 +23,7 @@ namespace PatientsFomsRepository.ViewModels
         public bool KeepAlive { get => false; }
         public Settings Settings { get => settings; set => SetProperty(ref settings, value); }
         public DateTime FileDate { get => fileDate; set => SetProperty(ref fileDate, value); }
-        public RelayCommandAsync ProcessFileCommand { get; }
+        public DelegateCommandAsync ProcessFileCommand { get; }
         #endregion
 
         #region Конструкторы
@@ -37,12 +37,12 @@ namespace PatientsFomsRepository.ViewModels
 
             ActiveViewModel.Header = "Получить полные ФИО пациентов";            
             FileDate = DateTime.Today;            
-            ProcessFileCommand = new RelayCommandAsync(ProcessFileExecute, ProcessFileCanExecute);
+            ProcessFileCommand = new DelegateCommandAsync(ProcessFileExecute, ProcessFileCanExecute);
         }
         #endregion
 
         #region Методы
-        private void ProcessFileExecute(object parameter)
+        private void ProcessFileExecute()
         {
             ActiveViewModel.Status = "Ожидайте. Проверка подключения к СРЗ...";
             Settings.TestConnection();
@@ -118,7 +118,7 @@ namespace PatientsFomsRepository.ViewModels
 
             ActiveViewModel.Status = $"{ resultReport} Осталось найти {unknownPatients.Count} ФИО.";
         }
-        private bool ProcessFileCanExecute(object parameter)
+        private bool ProcessFileCanExecute()
         {
             if (Settings.DownloadNewPatientsFile == false && File.Exists(Settings.PatientsFilePath) == false)
                 return false;
