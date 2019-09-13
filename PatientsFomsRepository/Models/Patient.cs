@@ -4,7 +4,7 @@ using System.Text;
 
 namespace PatientsFomsRepository.Models
 {
-    public class Patient : BindableBase
+    public class Patient : DomainObject
     {
         #region Поля
         private string insuranceNumber;

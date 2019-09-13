@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace PatientsFomsRepository.ViewModels
 {
-    class PatientsFileViewModel : BindableBase, IRegionMemberLifetime
+    class PatientsFileViewModel : DomainObject, IRegionMemberLifetime
     {
         #region Поля
         private Settings settings;

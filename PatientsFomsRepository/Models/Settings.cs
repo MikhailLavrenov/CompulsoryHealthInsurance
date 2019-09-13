@@ -10,7 +10,7 @@ using System.Xml.Serialization;
 
 namespace PatientsFomsRepository.Models
 {
-    public class Settings : BindableBase
+    public class Settings : DomainObject
     {
         #region Поля
         //SRZ

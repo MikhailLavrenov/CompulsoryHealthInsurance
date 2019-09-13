@@ -7,7 +7,7 @@ using System.Reflection;
 
 namespace PatientsFomsRepository.ViewModels
 {
-    class AboutApplicationViewModel : BindableBase, IRegionMemberLifetime
+    class AboutApplicationViewModel : DomainObject, IRegionMemberLifetime
     {
         #region Поля
         private string manualPath;

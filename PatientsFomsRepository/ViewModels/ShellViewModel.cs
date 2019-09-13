@@ -8,7 +8,7 @@ using System.Windows.Controls;
 
 namespace PatientsFomsRepository.ViewModels
 {
-    public class ShellViewModel : BindableBase
+    public class ShellViewModel : DomainObject
     {
         #region Поля
         private IRegionManager regionManager;

@@ -6,7 +6,7 @@ using System.Xml.Serialization;
 
 namespace PatientsFomsRepository.Models
 {
-    public class Credential : BindableBase
+    public class Credential : DomainObject
     {
         #region Поля
         private readonly object locker = new object();

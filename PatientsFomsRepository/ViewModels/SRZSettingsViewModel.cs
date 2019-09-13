@@ -7,7 +7,7 @@ using System.Text;
 
 namespace PatientsFomsRepository.ViewModels
 {
-    public class SRZSettingsViewModel : BindableBase, IRegionMemberLifetime
+    public class SRZSettingsViewModel : DomainObject, IRegionMemberLifetime
     {
         #region Поля
         private Settings settings;

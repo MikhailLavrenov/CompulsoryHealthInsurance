@@ -5,7 +5,7 @@ using Prism.Regions;
 
 namespace PatientsFomsRepository.ViewModels
 {
-    public class PatientsFileSettingsViewModel : BindableBase, IRegionMemberLifetime
+    public class PatientsFileSettingsViewModel : DomainObject, IRegionMemberLifetime
     {
         #region Поля
         private Settings settings;

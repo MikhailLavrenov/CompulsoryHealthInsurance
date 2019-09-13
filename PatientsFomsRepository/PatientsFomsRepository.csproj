@@ -128,6 +128,8 @@
     <Compile Include="Infrastructure\EnumToCollectionConverterExtension.cs" />
     <Compile Include="Infrastructure\IActiveViewModel.cs" />
     <Compile Include="Infrastructure\PasswordBoxHelper.cs" />
+    <Compile Include="Infrastructure\PrismBindableBase.cs" />
+    <Compile Include="Infrastructure\PrismErrorsContainer.cs" />
     <Compile Include="Infrastructure\RegionNames.cs" />
     <Compile Include="Infrastructure\DelegateCommandAsync.cs" />
     <Compile Include="Infrastructure\BindableBase.cs" />

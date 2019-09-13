@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Prism.Mvvm;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -9,10 +10,10 @@ namespace PatientsFomsRepository.Infrastructure
     /// <summary>
     /// Упрощает присваивание свойству значения с уведомлением об измении и валидацией значения.
     /// </summary>
-    public abstract class BindableBase : INotifyPropertyChanged, INotifyDataErrorInfo
+    public abstract class DomainObject : BindableBase, INotifyDataErrorInfo
     {
         #region Поля
-        //Хранить все ошибки экземпляра класса
+        //Хранит все ошибки экземпляра класса
         private Dictionary<string, List<string>> errors = new Dictionary<string, List<string>>();
         #endregion
 
@@ -25,26 +26,17 @@ namespace PatientsFomsRepository.Infrastructure
         #endregion
 
         #region События
-        public event PropertyChangedEventHandler PropertyChanged;
         public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
         #endregion
 
         #region Методы
 
         //INotifyPropertyChanged       
-        protected void OnPropertyChanged([CallerMemberName]string prop = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
-        }
         //Установить значение свойства
-        protected void SetProperty<T>(ref T field, T value, [CallerMemberName]string propertyName = "")
+        protected override void OnPropertyChanged(PropertyChangedEventArgs args)
         {
-            if (EqualityComparer<T>.Default.Equals(field, value) == false)
-            {                
-                field = value;
-                OnPropertyChanged(propertyName);
-                Validate(propertyName);
-            }
+            base.OnPropertyChanged(args);
+            Validate(args.PropertyName);
         }
 
         //INotifyDataErrorInfo

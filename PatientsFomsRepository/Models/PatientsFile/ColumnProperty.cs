@@ -8,7 +8,7 @@ namespace PatientsFomsRepository.Models
     /// Аттрибуты столбца файла пациентов
     /// </summary>
     [Serializable]
-    public class ColumnProperty : BindableBase
+    public class ColumnProperty : DomainObject
     {
         #region Поля
         private string name;

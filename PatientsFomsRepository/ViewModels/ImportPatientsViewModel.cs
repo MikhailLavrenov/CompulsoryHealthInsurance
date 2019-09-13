@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace PatientsFomsRepository.ViewModels
 {
-    class ImportPatientsViewModel : BindableBase, IRegionMemberLifetime
+    class ImportPatientsViewModel : DomainObject, IRegionMemberLifetime
     {
         #region Поля
         #endregion
