@@ -132,7 +132,7 @@
     <Compile Include="Infrastructure\PrismErrorsContainer.cs" />
     <Compile Include="Infrastructure\RegionNames.cs" />
     <Compile Include="Infrastructure\DelegateCommandAsync.cs" />
-    <Compile Include="Infrastructure\BindableBase.cs" />
+    <Compile Include="Infrastructure\DomainObject.cs" />
     <Compile Include="Infrastructure\DelegateCommandAsync{T}.cs" />
     <Compile Include="Infrastructure\ActiveViewModel.cs" />
     <Compile Include="Models\ImportPatientsFile.cs" />

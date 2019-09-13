@@ -19,26 +19,23 @@ namespace PatientsFomsRepository.Infrastructure
 
         #region Свойства
         public bool HasErrors { get => errors.Count > 0; }
-        protected string IsNullOrEmptyErrorMessage = "Значение не может быть пустым";
-        protected string ConnectionErrorMessage = "Не удалось подключиться";
-        protected string LessOneErrorMessage = "Значение не может быть меньше 1";
-        protected string UriFormatErrorMessage = "Не верный формат URI";
+        protected string IsNullOrEmptyErrorMessage { get; } = "Значение не может быть пустым";
+        protected string ConnectionErrorMessage { get; } = "Не удалось подключиться";
+        protected string LessOneErrorMessage { get; } = "Значение не может быть меньше 1";
+        protected string UriFormatErrorMessage { get; } = "Не верный формат URI";
         #endregion
 
         #region События
         public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
         #endregion
 
-        #region Методы
-
-        //INotifyPropertyChanged       
-        //Установить значение свойства
+        #region Методы       
+        //BindableBase
         protected override void OnPropertyChanged(PropertyChangedEventArgs args)
         {
             base.OnPropertyChanged(args);
             Validate(args.PropertyName);
         }
-
         //INotifyDataErrorInfo
         public void OnErrorsChanged(string propertyName)
         {
@@ -94,16 +91,7 @@ namespace PatientsFomsRepository.Infrastructure
                 errors.Remove(propertyName);
                 OnErrorsChanged(propertyName);
             }
-        }               
+        }
         #endregion
-
-
-
-
-
-
-
-
-
     }
 }
