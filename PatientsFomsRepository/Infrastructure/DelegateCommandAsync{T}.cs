@@ -9,7 +9,7 @@ using System.Windows.Input;
 namespace PatientsFomsRepository.Infrastructure
 {
     /// <summary>
-    /// An <see cref="ICommand"/> whose delegates can be attached for <see cref="Execute(T)"/> and <see cref="CanExecute(T)"/>.
+    /// Реализация <see cref="ICommand"/> параметризованная местом заполнения типа T, <see cref="Execute(T)"/> выполняется асинхронно."/>.
     /// </summary>
     /// <typeparam name="T">Parameter type.</typeparam>
     /// <remarks>
@@ -36,22 +36,26 @@ namespace PatientsFomsRepository.Infrastructure
     {
         #region Поля
         private bool isExecuting;
-        readonly Action<T> _executeMethod;
-        Func<T, bool> _canExecuteMethod;
+        private readonly Action<T> executeMethod;
+        private Func<T, bool> canExecuteMethod;
+        
+        private static string delegatesCannotBeNullErrorMessage = "executeMethod и canExecuteMethod не могут быть null.";
+        private static string invalidGenericTypeErrorMessage = "Параметр места заполнения типа T не является ссылочным типом.";
         #endregion
 
         #region Свойства
-        public bool IsExecuting
+        private bool IsExecuting
         {
             get => isExecuting;
             set
             {
                 isExecuting = value;
-                CommandManager.InvalidateRequerySuggested();
+                RaiseCanExecuteChanged();
             }
         }
         #endregion
 
+        #region Конструкторы
         /// <summary>
         /// Initializes a new instance of <see cref="DelegateCommandAsync{T}"/>.
         /// </summary>
@@ -71,36 +75,37 @@ namespace PatientsFomsRepository.Infrastructure
             : base()
         {
             if (executeMethod == null || canExecuteMethod == null)
-                throw new ArgumentNullException(nameof(executeMethod), Resources.DelegateCommandDelegatesCannotBeNull);
+                throw new ArgumentNullException(delegatesCannotBeNullErrorMessage);
 
             TypeInfo genericTypeInfo = typeof(T).GetTypeInfo();
 
-            // DelegateCommand allows object or Nullable<>.  
+            // DelegateCommand allows reference types.  
             // note: Nullable<> is a struct so we cannot use a class constraint.
             if (genericTypeInfo.IsValueType)
             {
                 if ((!genericTypeInfo.IsGenericType) || (!typeof(Nullable<>).GetTypeInfo().IsAssignableFrom(genericTypeInfo.GetGenericTypeDefinition().GetTypeInfo())))
-                {
-                    throw new InvalidCastException(Resources.DelegateCommandInvalidGenericPayloadType);
-                }
+                    throw new InvalidCastException(invalidGenericTypeErrorMessage);
             }
 
-            _executeMethod = executeMethod;
-            _canExecuteMethod = canExecuteMethod;
+            this.executeMethod = executeMethod;
+            this.canExecuteMethod = canExecuteMethod;
         }
+        #endregion
+
+        #region Методы
         ///<summary>
-        ///Executes the command and invokes the <see cref="Action{T}"/> provided during construction.
+        ///Выполняет команду асинхронно.
         ///</summary>
         ///<param name="parameter">Data used by the command.</param>
         public async void Execute(T parameter)
         {
             IsExecuting = true;
-            await Task.Run(() => _executeMethod(parameter));
+            await Task.Run(() => executeMethod(parameter));
             IsExecuting = false;
-            
+
         }
         ///<summary>
-        ///Determines if the command can execute by invoked the <see cref="Func{T,Bool}"/> provided during construction.
+        ///Определяет может ли команда быть выполнена.
         ///</summary>
         ///<param name="parameter">Data used by the command to determine if it can execute.</param>
         ///<returns>
@@ -111,7 +116,7 @@ namespace PatientsFomsRepository.Infrastructure
             if (IsExecuting)
                 return false;
 
-            return _canExecuteMethod(parameter);
+            return canExecuteMethod(parameter);
         }
         /// <summary>
         /// Handle the internal invocation of <see cref="ICommand.Execute(object)"/>
@@ -149,10 +154,12 @@ namespace PatientsFomsRepository.Infrastructure
         public DelegateCommandAsync<T> ObservesCanExecute(Expression<Func<bool>> canExecuteExpression)
         {
             Expression<Func<T, bool>> expression = Expression.Lambda<Func<T, bool>>(canExecuteExpression.Body, Expression.Parameter(typeof(T), "o"));
-            _canExecuteMethod = expression.Compile();
+            canExecuteMethod = expression.Compile();
             ObservesPropertyInternal(canExecuteExpression);
             return this;
         }
+        #endregion
+
     }
 
 }

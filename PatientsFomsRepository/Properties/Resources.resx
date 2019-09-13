@@ -117,10 +117,4 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="DelegateCommandDelegatesCannotBeNull" xml:space="preserve">
-    <value>Neither the executeMethod nor the canExecuteMethod delegates can be null.</value>
-  </data>
-  <data name="DelegateCommandInvalidGenericPayloadType" xml:space="preserve">
-    <value>T for DelegateCommand&amp;lt;T&amp;gt; is not an object nor Nullable.</value>
-  </data>
 </root>

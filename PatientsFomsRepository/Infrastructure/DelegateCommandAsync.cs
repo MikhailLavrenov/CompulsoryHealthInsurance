@@ -8,30 +8,33 @@ using System.Windows.Input;
 namespace PatientsFomsRepository.Infrastructure
 {
     /// <summary>
-    /// An <see cref="ICommand"/> whose delegates do not take any parameters for <see cref="Execute()"/> and <see cref="CanExecute()"/>.
+    /// Реализация <see cref="ICommand"/> без параметров,  <see cref="Execute()"/> выполняется асинхронно."/>.
     /// </summary>
     /// <see cref="DelegateCommandBase"/>
     /// <see cref="DelegateCommand{T}"/>
     public class DelegateCommandAsync : DelegateCommandBase
     {
-        #region Поля
+        #region Поля              
         private bool isExecuting;
-        readonly Action _executeMethod;
-        Func<bool> _canExecuteMethod;
+        private readonly Action executeMethod;
+        private Func<bool> canExecuteMethod;
+
+        private static string delegatesCannotBeNullErrorMessage = "executeMethod и canExecuteMethod не могут быть null.";
         #endregion
 
         #region Свойства
-        public bool IsExecuting
+        private bool IsExecuting
         {
             get => isExecuting;
             set
             {
                 isExecuting = value;
-                CommandManager.InvalidateRequerySuggested();
+                RaiseCanExecuteChanged();
             }
         }
         #endregion
 
+        #region Конструкторы
         /// <summary>
         /// Creates a new instance of <see cref="DelegateCommand"/> with the <see cref="Action"/> to invoke on execution.
         /// </summary>
@@ -39,7 +42,6 @@ namespace PatientsFomsRepository.Infrastructure
         public DelegateCommandAsync(Action executeMethod)
             : this(executeMethod, () => true)
         {
-
         }
         /// <summary>
         /// Creates a new instance of <see cref="DelegateCommand"/> with the <see cref="Action"/> to invoke on execution
@@ -51,23 +53,26 @@ namespace PatientsFomsRepository.Infrastructure
             : base()
         {
             if (executeMethod == null || canExecuteMethod == null)
-                throw new ArgumentNullException(nameof(executeMethod), Resources.DelegateCommandDelegatesCannotBeNull);
+                throw new ArgumentNullException(delegatesCannotBeNullErrorMessage);
 
-            _executeMethod = executeMethod;
-            _canExecuteMethod = canExecuteMethod;
+            this.executeMethod = executeMethod;
+            this.canExecuteMethod = canExecuteMethod;
         }
+        #endregion
+
+        #region Методы
         ///<summary>
-        /// Executes the command.
+        /// Выполняет команду асинхронно.
         ///</summary>
         public async void Execute()
         {
             IsExecuting = true;
-            await Task.Run(() => _executeMethod());
+            await Task.Run(() => executeMethod());
             IsExecuting = false;
 
         }
         /// <summary>
-        /// Determines if the command can be executed.
+        /// Определяет может ли команда быть выполнена.
         /// </summary>
         /// <returns>Returns <see langword="true"/> if the command can execute,otherwise returns <see langword="false"/>.</returns>
         public bool CanExecute()
@@ -75,7 +80,7 @@ namespace PatientsFomsRepository.Infrastructure
             if (IsExecuting)
                 return false;
 
-            return _canExecuteMethod();
+            return canExecuteMethod();
         }
         /// <summary>
         /// Handle the internal invocation of <see cref="ICommand.Execute(object)"/>
@@ -112,9 +117,10 @@ namespace PatientsFomsRepository.Infrastructure
         /// <returns>The current instance of DelegateCommand</returns>
         public DelegateCommandAsync ObservesCanExecute(Expression<Func<bool>> canExecuteExpression)
         {
-            _canExecuteMethod = canExecuteExpression.Compile();
+            canExecuteMethod = canExecuteExpression.Compile();
             ObservesPropertyInternal(canExecuteExpression);
             return this;
         }
+        #endregion
     }
 }
