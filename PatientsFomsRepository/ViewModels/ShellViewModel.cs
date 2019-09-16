@@ -11,7 +11,7 @@ namespace PatientsFomsRepository.ViewModels
     public class ShellViewModel : DomainObject
     {
         #region Поля
-        private IRegionManager regionManager;
+        private readonly IRegionManager regionManager;
         #endregion
 
         #region Свойства 
@@ -20,9 +20,6 @@ namespace PatientsFomsRepository.ViewModels
         #endregion
 
         #region Конструкторы
-        public ShellViewModel()
-        {
-        }
         public ShellViewModel(IRegionManager regionManager, IActiveViewModel activeViewMode)
         {            
             ActiveViewModel = activeViewMode;

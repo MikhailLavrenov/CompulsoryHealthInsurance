@@ -1,5 +1,6 @@
 ﻿using PatientsFomsRepository.Infrastructure;
 using PatientsFomsRepository.Models;
+using Prism.Commands;
 using Prism.Regions;
 using System;
 using System.Collections.Concurrent;
@@ -16,6 +17,7 @@ namespace PatientsFomsRepository.ViewModels
         #region Поля
         private Settings settings;
         private DateTime fileDate;
+        private readonly IFileDialogService fileDialogService;
         #endregion
 
         #region Свойства
@@ -24,24 +26,33 @@ namespace PatientsFomsRepository.ViewModels
         public Settings Settings { get => settings; set => SetProperty(ref settings, value); }
         public DateTime FileDate { get => fileDate; set => SetProperty(ref fileDate, value); }
         public DelegateCommandAsync ProcessFileCommand { get; }
+        public DelegateCommand ShowFileDialogCommand { get; }
         #endregion
 
         #region Конструкторы
-        public PatientsFileViewModel()
+        public PatientsFileViewModel(IActiveViewModel activeViewModel, IFileDialogService fileDialogService)
         {
-        }
-        public PatientsFileViewModel(IActiveViewModel activeViewModel)
-        {
+            this.fileDialogService = fileDialogService;
             ActiveViewModel = activeViewModel;
             Settings = Settings.Instance;
 
             ActiveViewModel.Header = "Получить полные ФИО пациентов";            
             FileDate = DateTime.Today;            
             ProcessFileCommand = new DelegateCommandAsync(ProcessFileExecute, ProcessFileCanExecute);
+            ShowFileDialogCommand = new DelegateCommand(ShowFileDialogExecute);
         }
         #endregion
 
         #region Методы
+        private void ShowFileDialogExecute()
+        {
+            fileDialogService.DialogType = settings.DownloadNewPatientsFile ? DialogType.Save : DialogType.Open;
+            fileDialogService.FullPath = settings.PatientsFilePath;
+            fileDialogService.Filter= "Excel files (*.xslx)|*.xlsx";
+
+            if (fileDialogService.ShowDialog() == true)
+                settings.PatientsFilePath = fileDialogService.FullPath;
+        }
         private void ProcessFileExecute()
         {
             ActiveViewModel.Status = "Ожидайте. Проверка подключения к СРЗ...";

@@ -29,9 +29,6 @@ namespace PatientsFomsRepository.ViewModels
         #endregion
 
         #region Конструкторы
-        public SRZSettingsViewModel()
-        {
-        }
         public SRZSettingsViewModel(IActiveViewModel activeViewModel)
         {
             ActiveViewModel = activeViewModel;

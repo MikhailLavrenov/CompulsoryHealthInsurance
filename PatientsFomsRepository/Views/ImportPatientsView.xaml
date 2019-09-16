@@ -25,13 +25,9 @@
                 Grid.ColumnSpan="2"
                 Orientation="Horizontal">
         <Button Content="Загрузить"
-                Command="{Binding ImportPatientsCommand}"
-                Click="ButtonImportPatientsClick"
-                 />
+                Command="{Binding ImportPatientsCommand}" />
         <Button Content="Скачать пример"                
-                Command="{Binding SaveExampleCommand}"
-                Click="ButtonSaveExampleClick"
-                 />
+                Command="{Binding SaveExampleCommand}" />
         <Button Visibility="Hidden" />
         <Button Content="Очистить БД"
                 Command="{Binding ClearDatabaseCommand}"

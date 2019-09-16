@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:PatientsFomsRepository.Views"
              xmlns:i="clr-namespace:PatientsFomsRepository.Infrastructure"
+             xmlns:vm="clr-namespace:PatientsFomsRepository.ViewModels"
              xmlns:prism="http://prismlibrary.com/"
              
              mc:Ignorable="d"
@@ -21,7 +22,7 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <Grid>
+    <Grid d:DataContext="{d:DesignInstance vm:PatientsFileViewModel }">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="180" />
             <ColumnDefinition Width="350" />
@@ -69,7 +70,7 @@
             <!--Файловый диалог в CodeBehind-->
             <Button  DockPanel.Dock="Right"
                      Style="{StaticResource PictureButton}"
-                     Click="Button_Click">
+                     Command="{Binding ShowFileDialogCommand}">
                 <ContentControl Content="{Binding Source={StaticResource FileDialog}}" />
             </Button>
             <TextBox  Text="{Binding Path=Settings.PatientsFilePath, ValidatesOnDataErrors=True}"

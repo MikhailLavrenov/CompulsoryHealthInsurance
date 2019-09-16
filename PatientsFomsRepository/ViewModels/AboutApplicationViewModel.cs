@@ -10,7 +10,7 @@ namespace PatientsFomsRepository.ViewModels
     class AboutApplicationViewModel : DomainObject, IRegionMemberLifetime
     {
         #region Поля
-        private string manualPath;
+        private readonly string manualPath;
         #endregion
 
         #region Свойства

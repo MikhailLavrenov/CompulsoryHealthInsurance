@@ -9,6 +9,7 @@ namespace PatientsFomsRepository.ViewModels
     {
         #region Поля
         private Settings settings;
+        private readonly IFileDialogService fileDialogService;
         #endregion
 
         #region Свойства
@@ -20,14 +21,13 @@ namespace PatientsFomsRepository.ViewModels
         public DelegateCommand SetDefaultCommand { get; }
         public DelegateCommand<ColumnProperty> MoveUpCommand { get; }
         public DelegateCommand<ColumnProperty> MoveDownCommand { get; }
+        public DelegateCommand ShowFileDialogCommand { get; }
         #endregion
 
         #region Конструкторы
-        public PatientsFileSettingsViewModel()
+        public PatientsFileSettingsViewModel(IActiveViewModel activeViewModel, IFileDialogService fileDialogService)
         {
-        }
-        public PatientsFileSettingsViewModel(IActiveViewModel activeViewModel)
-        {
+            this.fileDialogService = fileDialogService;
             ActiveViewModel = activeViewModel;
 
             ActiveViewModel.Header = "Настройки файла пациентов";            
@@ -36,11 +36,21 @@ namespace PatientsFomsRepository.ViewModels
             LoadCommand = new DelegateCommand(LoadExecute);
             SetDefaultCommand = new DelegateCommand(SetDefaultExecute);
             MoveUpCommand = new DelegateCommand<ColumnProperty>(x => Settings.MoveUpColumnProperty(x as ColumnProperty));
-            MoveDownCommand = new DelegateCommand<ColumnProperty>(x => Settings.MoveDownColumnProperty(x as ColumnProperty));            
+            MoveDownCommand = new DelegateCommand<ColumnProperty>(x => Settings.MoveDownColumnProperty(x as ColumnProperty));
+            ShowFileDialogCommand = new DelegateCommand(ShowFileDialogExecute);
         }
         #endregion
 
         #region Методы
+        private void ShowFileDialogExecute()
+        {
+            fileDialogService.DialogType = settings.DownloadNewPatientsFile ? DialogType.Save : DialogType.Open;
+            fileDialogService.FullPath = settings.PatientsFilePath;
+            fileDialogService.Filter = "Excel files (*.xslx)|*.xlsx";
+
+            if (fileDialogService.ShowDialog() == true)
+                settings.PatientsFilePath = fileDialogService.FullPath;
+        }
         private void SaveExecute()
         {
             Settings.Save();
