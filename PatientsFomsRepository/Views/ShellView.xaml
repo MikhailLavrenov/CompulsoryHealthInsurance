@@ -17,19 +17,21 @@
         prism:ViewModelLocator.AutoWireViewModel="True"
         >
 
+
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary  Source="/PatientsFomsRepository;component/Views/Resources/DefaultStyle.xaml" />
+                <ResourceDictionary Source="/PatientsFomsRepository;component/Views/Resources/Icons.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
 
 
-    <DockPanel d:DataContext="{d:DesignInstance vm:ShellViewModel, IsDesignTimeCreatable=True}">
+    <DockPanel d:DataContext="{d:DesignInstance vm:ShellViewModel}">
 
         <WrapPanel DockPanel.Dock="Top" Margin="0,3,0,3">
-            
+
             <Button Content="Получить ФИО"
                     Style="{StaticResource HeaderReferenceButton}"
                     Command="{Binding ShowViewCommand}"  CommandParameter="{x:Type v:PatientsFileView}"/>
@@ -68,7 +70,7 @@
                    Text="{Binding ActiveViewModel.Status}" />
 
         <ContentControl prism:RegionManager.RegionName="{x:Static i:RegionNames.MainRegion}" />
-        
+
     </DockPanel>
 
 </Window>
