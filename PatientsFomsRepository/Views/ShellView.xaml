@@ -17,7 +17,6 @@
         prism:ViewModelLocator.AutoWireViewModel="True"
         >
 
-
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -60,16 +59,34 @@
 
         <Separator DockPanel.Dock="Top"/>
 
-        <TextBlock DockPanel.Dock="Top"
+        <DockPanel x:Name="MainRegionPanel" >
+
+            <TextBlock DockPanel.Dock="Top"
                    Margin="5,10,5,20"
                    Style="{StaticResource TextBlockHeader}"
-                   Text="{Binding ActiveViewModel.Header}" />
+                   Text="{Binding ActiveViewModel.Header, NotifyOnTargetUpdated=True}" >
+                
+                <TextBlock.Triggers>
+                    <EventTrigger RoutedEvent="Binding.TargetUpdated">
+                        <BeginStoryboard>
+                            <Storyboard >
+                                <DoubleAnimation Storyboard.TargetName="MainRegionPanel" Storyboard.TargetProperty="Opacity"                               
+                                Duration="0:0:2" From="0" To="1">
+                                </DoubleAnimation>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </EventTrigger>
+                </TextBlock.Triggers>
+                
+            </TextBlock>
 
-        <TextBlock DockPanel.Dock="Bottom"
+            <TextBlock   DockPanel.Dock="Bottom"
                    TextWrapping="Wrap"
                    Text="{Binding ActiveViewModel.Status}" />
 
-        <ContentControl prism:RegionManager.RegionName="{x:Static i:RegionNames.MainRegion}" />
+            <ContentControl prism:RegionManager.RegionName="{x:Static i:RegionNames.MainRegion}" />
+
+        </DockPanel>
 
     </DockPanel>
 

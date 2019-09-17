@@ -262,24 +262,4 @@
                 Value="LightGray" />
     </Style>
 
-
-    <Style TargetType="UserControl">
-        <Style.Triggers>
-            <EventTrigger RoutedEvent="Loaded">
-                <EventTrigger.Actions>
-                    <BeginStoryboard>
-                        <Storyboard >
-                            <DoubleAnimation   Storyboard.TargetProperty="Opacity"                               
-                                Duration="0:0:5" From="0" To="1">
-                            </DoubleAnimation>
-                        </Storyboard>
-                    </BeginStoryboard>
-                </EventTrigger.Actions>
-            </EventTrigger>
-        </Style.Triggers>
-
-
-    </Style>
-
-
 </ResourceDictionary>
