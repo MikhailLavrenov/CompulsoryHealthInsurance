@@ -59,7 +59,7 @@
 
         <Separator DockPanel.Dock="Top"/>
 
-        <DockPanel x:Name="MainRegionPanel" RenderTransformOrigin="0.3,0.3" >
+        <DockPanel x:Name="MainRegionPanel" RenderTransformOrigin="0.1,0.1" >
 
             <DockPanel.RenderTransform>
                 <SkewTransform x:Name="AnimatedSkewTransform" />
