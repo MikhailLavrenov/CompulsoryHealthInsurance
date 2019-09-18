@@ -1,15 +1,19 @@
 ﻿using PatientsFomsRepository.Infrastructure;
 using PatientsFomsRepository.Models;
 using Prism.Regions;
+using Prism.Services.Dialogs;
+using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Windows;
 
 namespace PatientsFomsRepository.ViewModels
 {
     class ImportPatientsViewModel : DomainObject, IRegionMemberLifetime
     {
         #region Поля
+        private IDialogService dialogService;
         private readonly IFileDialogService fileDialogService;
         #endregion
 
@@ -22,10 +26,11 @@ namespace PatientsFomsRepository.ViewModels
         #endregion
 
         #region Конструкторы
-        public ImportPatientsViewModel(IActiveViewModel activeViewModel, IFileDialogService fileDialogService)
+        public ImportPatientsViewModel(IActiveViewModel activeViewModel, IFileDialogService fileDialogService, IDialogService dialogService)
         {
             ActiveViewModel = activeViewModel;
             this.fileDialogService = fileDialogService;
+            this.dialogService = dialogService;
 
             ActiveViewModel.Header = "Загрузить известные ФИО из файла в базу данных";
             ImportPatientsCommand = new DelegateCommandAsync(ImportPatientsExecute);
@@ -88,6 +93,12 @@ namespace PatientsFomsRepository.ViewModels
         }
         private void ClearDatabaseExecute()
         {
+            var message = "Очистка базы данных приведет к потере всех сохраненных данных пациентов. Продолжить ?";
+            var result = dialogService.ShowDialog(message);
+
+            if (result == ButtonResult.Cancel)
+                return;
+
             ActiveViewModel.Status = "Ожидайте. Очистка базы данных...";
             var db = new Models.Database();
             if (db.Database.Exists())

@@ -5,6 +5,7 @@ using Prism.DryIoc;
 using Prism.Ioc;
 using Prism.Mvvm;
 using Prism.Regions;
+using Prism.Services.Dialogs;
 using System.Windows;
 
 namespace PatientsFomsRepository
@@ -30,6 +31,7 @@ namespace PatientsFomsRepository
         {
             containerRegistry.RegisterSingleton<IActiveViewModel,ActiveViewModel>();
             containerRegistry.Register<IFileDialogService, FileDialogService>();
+            containerRegistry.RegisterDialog<NotificationDialogView, NotificationDialogViewModel>();
 
             containerRegistry.RegisterForNavigation<PatientsFileView>();
             containerRegistry.RegisterForNavigation<ImportPatientsView>();

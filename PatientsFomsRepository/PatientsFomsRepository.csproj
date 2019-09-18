@@ -127,6 +127,7 @@
     <Compile Include="Infrastructure\DialogType.cs" />
     <Compile Include="Infrastructure\EnumHelper.cs" />
     <Compile Include="Infrastructure\EnumToCollectionConverterExtension.cs" />
+    <Compile Include="Infrastructure\Extensions.cs" />
     <Compile Include="Infrastructure\FileDialogService.cs" />
     <Compile Include="Infrastructure\IActiveViewModel.cs" />
     <Compile Include="Infrastructure\IFileDialogService.cs" />
@@ -142,6 +143,7 @@
     <Compile Include="Models\SRZ\RoundRobinCredentials.cs" />
     <Compile Include="Models\Settings.cs" />
     <Compile Include="ViewModels\AboutApplicationViewModel.cs" />
+    <Compile Include="ViewModels\NotificationDialogViewModel.cs" />
     <Compile Include="ViewModels\ImportPatientsViewModel.cs" />
     <Compile Include="ViewModels\ShellViewModel.cs" />
     <Compile Include="ViewModels\PatientsFileSettingsViewModel.cs" />
@@ -149,6 +151,9 @@
     <Compile Include="ViewModels\SRZSettingsViewModel.cs" />
     <Compile Include="Views\AboutApplicationView.xaml.cs">
       <DependentUpon>AboutApplicationView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\NotificationDialogView.xaml.cs">
+      <DependentUpon>NotificationDialogView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ImportPatientsView.xaml.cs">
       <DependentUpon>ImportPatientsView.xaml</DependentUpon>
@@ -160,6 +165,10 @@
       <DependentUpon>SRZSettingsView.xaml</DependentUpon>
     </Compile>
     <Page Include="Views\AboutApplicationView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\NotificationDialogView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
