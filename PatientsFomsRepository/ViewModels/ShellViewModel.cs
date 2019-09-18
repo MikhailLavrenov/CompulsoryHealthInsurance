@@ -2,9 +2,6 @@
 using Prism.Commands;
 using Prism.Regions;
 using System;
-using System.Collections.Generic;
-using System.Windows;
-using System.Windows.Controls;
 
 namespace PatientsFomsRepository.ViewModels
 {
@@ -21,7 +18,7 @@ namespace PatientsFomsRepository.ViewModels
 
         #region Конструкторы
         public ShellViewModel(IRegionManager regionManager, IActiveViewModel activeViewMode)
-        {            
+        {
             ActiveViewModel = activeViewMode;
             this.regionManager = regionManager;
 
@@ -33,7 +30,7 @@ namespace PatientsFomsRepository.ViewModels
         private void ShowViewExecute(Type parameter)
         {
             ActiveViewModel.Status = "";
-            regionManager.RequestNavigate(RegionNames.MainRegion, parameter.Name);            
+            regionManager.RequestNavigate(RegionNames.MainRegion, parameter.Name);
         }
         #endregion
     }

@@ -14,18 +14,16 @@
         Title="Хранилище пациентов из СРЗ"
         Height="600"
         Width="600"
-        prism:ViewModelLocator.AutoWireViewModel="True"
-        >
+        prism:ViewModelLocator.AutoWireViewModel="True">
 
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary  Source="/PatientsFomsRepository;component/Views/Resources/DefaultStyle.xaml" />
+                <ResourceDictionary Source="/PatientsFomsRepository;component/Views/Resources/DefaultStyle.xaml" />
                 <ResourceDictionary Source="/PatientsFomsRepository;component/Views/Resources/Icons.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
-
 
     <DockPanel d:DataContext="{d:DesignInstance vm:ShellViewModel}">
 
@@ -33,7 +31,8 @@
 
             <Button Content="Получить ФИО"
                     Style="{StaticResource HeaderReferenceButton}"
-                    Command="{Binding ShowViewCommand}"  CommandParameter="{x:Type v:PatientsFileView}"/>
+                    Command="{Binding ShowViewCommand}"
+                    CommandParameter="{x:Type v:PatientsFileView}"/>
 
             <Button Content="Загрузить в БД"
                     Style="{StaticResource HeaderReferenceButton}"
@@ -55,38 +54,69 @@
                     Command="{Binding ShowViewCommand}"
                     CommandParameter="{x:Type v:AboutApplicationView}" />
 
+
         </WrapPanel>
 
         <Separator DockPanel.Dock="Top"/>
 
-        <DockPanel x:Name="MainRegionPanel" >
+        <DockPanel x:Name="MainRegionPanel" RenderTransformOrigin="0.3,0.3" >
+
+            <DockPanel.RenderTransform>
+                <SkewTransform x:Name="AnimatedSkewTransform" />
+            </DockPanel.RenderTransform>
 
             <TextBlock DockPanel.Dock="Top"
-                   Margin="5,10,5,20"
-                   Style="{StaticResource TextBlockHeader}"
-                   Text="{Binding ActiveViewModel.Header, NotifyOnTargetUpdated=True}" >
-                
+                       Margin="5,10,5,20"
+                       Style="{StaticResource TextBlockHeader}"
+                       Text="{Binding ActiveViewModel.Header, NotifyOnTargetUpdated=True}" >
+
                 <TextBlock.Triggers>
                     <EventTrigger RoutedEvent="Binding.TargetUpdated">
                         <BeginStoryboard>
                             <Storyboard >
-                                <DoubleAnimation Storyboard.TargetName="MainRegionPanel" Storyboard.TargetProperty="Opacity"                               
-                                Duration="0:0:2" From="0" To="1">
-                                </DoubleAnimation>
+                                <DoubleAnimation Storyboard.TargetName="MainRegionPanel" 
+                                                 Storyboard.TargetProperty="Opacity"
+                                                 Duration="0:0:0.5" 
+                                                 From="0" 
+                                                 To="1" />
+
+                                <DoubleAnimation Storyboard.TargetName="AnimatedSkewTransform" 
+                                                 Storyboard.TargetProperty="(SkewTransform.AngleX)"
+                                                 Duration="0:0:0.5" 
+                                                 From="90" 
+                                                 To="0"/>
+                                <DoubleAnimation Storyboard.TargetName="AnimatedSkewTransform" 
+                                                 Storyboard.TargetProperty="(SkewTransform.AngleY)"
+                                                 Duration="0:0:0.5" 
+                                                 From="90" 
+                                                 To="0"/>
                             </Storyboard>
                         </BeginStoryboard>
                     </EventTrigger>
                 </TextBlock.Triggers>
-                
+
             </TextBlock>
 
-            <TextBlock   DockPanel.Dock="Bottom"
+            <TextBlock DockPanel.Dock="Bottom"
                    TextWrapping="Wrap"
                    Text="{Binding ActiveViewModel.Status}" />
 
             <ContentControl prism:RegionManager.RegionName="{x:Static i:RegionNames.MainRegion}" />
 
         </DockPanel>
+
+        <DockPanel.Triggers>
+        <EventTrigger RoutedEvent="Loaded">
+            <BeginStoryboard>
+                <Storyboard >
+                    <DoubleAnimation Storyboard.TargetProperty="Opacity"                                                 
+                                     Duration="0:0:0.5"                                                  
+                                     From="0"                                                  
+                                     To="1" />
+                </Storyboard>
+            </BeginStoryboard>
+        </EventTrigger>
+    </DockPanel.Triggers>
 
     </DockPanel>
 

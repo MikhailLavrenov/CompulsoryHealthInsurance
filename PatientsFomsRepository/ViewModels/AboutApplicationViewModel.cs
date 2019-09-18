@@ -15,7 +15,7 @@ namespace PatientsFomsRepository.ViewModels
 
         #region Свойства
         public IActiveViewModel ActiveViewModel { get; set; }
-        public bool KeepAlive { get => true; }
+        public bool KeepAlive { get => false; }
         public string Name { get; }
         public string Version { get; }
         public string Copyright { get; }
