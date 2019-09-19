@@ -7,7 +7,7 @@ using System.Reflection;
 
 namespace PatientsFomsRepository.ViewModels
 {
-    class AboutApplicationViewModel : DomainObject, IRegionMemberLifetime
+    class AboutApplicationViewModel : DomainObject, IRegionMemberLifetime, INavigationAware
     {
         #region Поля
         private readonly string manualPath;
@@ -16,7 +16,7 @@ namespace PatientsFomsRepository.ViewModels
 
         #region Свойства
         public IMainRegionService MainRegionService { get; set; }
-        public bool KeepAlive { get => false; }
+        public bool KeepAlive { get => true; }
         public string Name { get; }
         public string Version { get; }
         public string Copyright { get; }
@@ -32,7 +32,7 @@ namespace PatientsFomsRepository.ViewModels
         {
             MainRegionService = mainRegionService;
 
-            mainRegionService.Header = "О программе";
+            
             manualPath = "Инструкция.docx";
             repositoryPath = @"https://github.com/MikhailLavrenov/PatientsFomsRepository";
             Name = "Хранилище пациентов из СРЗ";
@@ -48,6 +48,17 @@ namespace PatientsFomsRepository.ViewModels
         #endregion
 
         #region Методы
+        public void OnNavigatedTo(NavigationContext navigationContext)
+        {
+            MainRegionService.Header = "О программе";
+        }
+        public bool IsNavigationTarget(NavigationContext navigationContext)
+        {
+            return false;
+        }
+        public void OnNavigatedFrom(NavigationContext navigationContext)
+        {
+        }        
         #endregion
 
     }
