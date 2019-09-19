@@ -95,7 +95,7 @@
         <Button Grid.Row="9"                   
                 Grid.Column="0"
                 Grid.ColumnSpan="2"                   
-                Content="Перейти в репозиторий с исходным кодом"
+                Content="Перейти в репозиторий исходного кода"
                 Style="{StaticResource ReferenceButton}"                   
                 Command="{Binding OpenRepositoryCommand}" />
 
