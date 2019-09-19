@@ -18,7 +18,7 @@ namespace PatientsFomsRepository.ViewModels
         #endregion
 
         #region Свойства
-        public IActiveViewModel ActiveViewModel { get; set; }
+        public IMainRegionService MainRegionService { get; set; }
         public bool KeepAlive { get => false; }
         public DelegateCommandAsync ImportPatientsCommand { get; }
         public DelegateCommandAsync SaveExampleCommand { get; }
@@ -26,13 +26,13 @@ namespace PatientsFomsRepository.ViewModels
         #endregion
 
         #region Конструкторы
-        public ImportPatientsViewModel(IActiveViewModel activeViewModel, IFileDialogService fileDialogService, IDialogService dialogService)
+        public ImportPatientsViewModel(IMainRegionService mainRegionService, IFileDialogService fileDialogService, IDialogService dialogService)
         {
-            ActiveViewModel = activeViewModel;
+            MainRegionService = mainRegionService;
             this.fileDialogService = fileDialogService;
             this.dialogService = dialogService;
 
-            ActiveViewModel.Header = "Загрузить известные ФИО из файла в базу данных";
+            MainRegionService.Header = "Загрузить известные ФИО из файла в базу данных";
             ImportPatientsCommand = new DelegateCommandAsync(ImportPatientsExecute);
             SaveExampleCommand = new DelegateCommandAsync(SaveExampleExecute);
             ClearDatabaseCommand = new DelegateCommandAsync(ClearDatabaseExecute);
@@ -42,7 +42,7 @@ namespace PatientsFomsRepository.ViewModels
         #region Методы
         private void ImportPatientsExecute()
         {
-            fileDialogService.DialogType = DialogType.Open;
+            fileDialogService.DialogType = FileDialogType.Open;
             fileDialogService.Filter = "Excel files (*.xslx)|*.xlsx";
 
             if (fileDialogService.ShowDialog() != true)
@@ -50,7 +50,7 @@ namespace PatientsFomsRepository.ViewModels
 
             var importFilePath = fileDialogService.FullPath;
 
-            ActiveViewModel.Status = "Ожидайте. Открытие файла...";
+            MainRegionService.Status = "Ожидайте. Открытие файла...";
             List<Patient> newPatients;
             using (var file = new ImportPatientsFile())
             {
@@ -59,7 +59,7 @@ namespace PatientsFomsRepository.ViewModels
                 file.Dispose();
             }
 
-            ActiveViewModel.Status = "Ожидайте. Проверка значений...";
+            MainRegionService.Status = "Ожидайте. Проверка значений...";
             var db = new Models.Database();
             db.Patients.Load();
             var existenInsuaranceNumbers = db.Patients.Select(x => x.InsuranceNumber).ToHashSet();
@@ -69,16 +69,16 @@ namespace PatientsFomsRepository.ViewModels
             .Select(x => x.First())
             .ToList();
 
-            ActiveViewModel.Status = "Ожидайте. Сохранение в кэш...";
+            MainRegionService.Status = "Ожидайте. Сохранение в кэш...";
             db.Patients.AddRange(newUniqPatients);
             db.SaveChanges();
 
             int total = existenInsuaranceNumbers.Count + newUniqPatients.Count;
-            ActiveViewModel.Status = $"Завершено. В файле найдено {newPatients.Count} человек(а). В БД добавлено {newUniqPatients.Count} новых. Итого в БД {total}.";
+            MainRegionService.Status = $"Завершено. В файле найдено {newPatients.Count} человек(а). В БД добавлено {newUniqPatients.Count} новых. Итого в БД {total}.";
         }
         private void SaveExampleExecute()
         {
-            fileDialogService.DialogType = DialogType.Save;
+            fileDialogService.DialogType = FileDialogType.Save;
             fileDialogService.FullPath = "Пример для загрузки ФИО";
             fileDialogService.Filter = "Excel files (*.xslx)|*.xlsx";
 
@@ -87,24 +87,25 @@ namespace PatientsFomsRepository.ViewModels
 
             var saveExampleFilePath = fileDialogService.FullPath;
 
-            ActiveViewModel.Status = "Ожидайте. Открытие файла...";
+            MainRegionService.Status = "Ожидайте. Открытие файла...";
             ImportPatientsFile.SaveExample(saveExampleFilePath);
-            ActiveViewModel.Status = $"Завершено. Файл сохранен: {saveExampleFilePath}";
+            MainRegionService.Status = $"Завершено. Файл сохранен: {saveExampleFilePath}";
         }
         private void ClearDatabaseExecute()
         {
-            var message = "Очистка базы данных приведет к потере всех сохраненных данных пациентов. Продолжить ?";
-            var result = dialogService.ShowDialog(message);
+            var title = "Предупреждение";
+            var message = "Информация о пациентах будет удалена из базы данных. Продолжить ?";
+            var result = dialogService.ShowDialog(title, message);
 
             if (result == ButtonResult.Cancel)
                 return;
 
-            ActiveViewModel.Status = "Ожидайте. Очистка базы данных...";
+            MainRegionService.Status = "Ожидайте. Очистка базы данных...";
             var db = new Models.Database();
             if (db.Database.Exists())
                 db.Database.Delete();
             db.Database.Create();
-            ActiveViewModel.Status = "Завершено. База данных очищена.";
+            MainRegionService.Status = "Завершено. База данных очищена.";
         }
         #endregion
     }

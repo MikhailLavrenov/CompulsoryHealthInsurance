@@ -8,6 +8,9 @@ namespace PatientsFomsRepository.Infrastructure
     public static class PasswordBoxHelper
     {
         #region Свойства
+        /// <summary>
+        /// Свойство зависимостей связанное с паролем PasswordBox
+        /// </summary>
         public static readonly DependencyProperty BoundPassword = DependencyProperty.RegisterAttached(
             nameof(BoundPassword),
             typeof(string),

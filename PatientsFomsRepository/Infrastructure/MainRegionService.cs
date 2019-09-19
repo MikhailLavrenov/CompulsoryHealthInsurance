@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace PatientsFomsRepository.Infrastructure
 {
-    public class ActiveViewModel : DomainObject, IActiveViewModel
+    /// <summary>
+    /// Сервис MainRegion
+    /// </summary>
+    public class MainRegionService : DomainObject, IMainRegionService
     {
         private string header;
         private string status;

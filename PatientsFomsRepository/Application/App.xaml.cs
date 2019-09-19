@@ -29,7 +29,7 @@ namespace PatientsFomsRepository
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
-            containerRegistry.RegisterSingleton<IActiveViewModel,ActiveViewModel>();
+            containerRegistry.RegisterSingleton<IMainRegionService,MainRegionService>();
             containerRegistry.Register<IFileDialogService, FileDialogService>();
             containerRegistry.RegisterDialog<NotificationDialogView, NotificationDialogViewModel>();
 

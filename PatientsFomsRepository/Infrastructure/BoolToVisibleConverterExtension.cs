@@ -6,7 +6,9 @@ using System.Windows.Markup;
 
 namespace PatientsFomsRepository.Infrastructure
 {
-    //Расширение разметки xaml, конвертирует bool в Visibility
+    /// <summary>
+    /// Расширение разметки xaml, конвертирует bool в Visibility
+    /// </summary>
     [ValueConversion(typeof(bool), typeof(Visibility))]
     public class BoolToVisibleConverterExtension : MarkupExtension, IValueConverter
     {

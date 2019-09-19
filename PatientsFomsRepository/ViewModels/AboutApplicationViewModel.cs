@@ -14,7 +14,7 @@ namespace PatientsFomsRepository.ViewModels
         #endregion
 
         #region Свойства
-        public IActiveViewModel ActiveViewModel { get; set; }
+        public IMainRegionService MainRegionService { get; set; }
         public bool KeepAlive { get => false; }
         public string Name { get; }
         public string Version { get; }
@@ -26,11 +26,11 @@ namespace PatientsFomsRepository.ViewModels
         #endregion
 
         #region Конструкторы
-        public AboutApplicationViewModel(IActiveViewModel activeViewModel)
+        public AboutApplicationViewModel(IMainRegionService mainRegionService)
         {
-            ActiveViewModel = activeViewModel;
+            MainRegionService = mainRegionService;
 
-            activeViewModel.Header = "О программе";
+            mainRegionService.Header = "О программе";
             manualPath = "Инструкция.docx";           
             Name = "Хранилище пациентов из СРЗ";
             Version = Assembly.GetExecutingAssembly().GetName().Version.ToString();

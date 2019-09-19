@@ -12,15 +12,15 @@ namespace PatientsFomsRepository.ViewModels
         #endregion
 
         #region Свойства 
-        public IActiveViewModel ActiveViewModel { get; set; }
+        public IMainRegionService MainRegionService { get; set; }
         public DelegateCommand<Type> ShowViewCommand { get; }
         #endregion
 
         #region Конструкторы
-        public ShellViewModel(IRegionManager regionManager, IActiveViewModel activeViewMode)
+        public ShellViewModel(IRegionManager mainRegionService, IMainRegionService activeViewModeService)
         {
-            ActiveViewModel = activeViewMode;
-            this.regionManager = regionManager;
+            MainRegionService = activeViewModeService;
+            this.regionManager = mainRegionService;
 
             ShowViewCommand = new DelegateCommand<Type>(ShowViewExecute);
         }
@@ -29,7 +29,7 @@ namespace PatientsFomsRepository.ViewModels
         #region Методы
         private void ShowViewExecute(Type parameter)
         {
-            ActiveViewModel.Status = "";
+            MainRegionService.Status = "";
             regionManager.RequestNavigate(RegionNames.MainRegion, parameter.Name);
         }
         #endregion

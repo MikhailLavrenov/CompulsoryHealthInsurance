@@ -6,9 +6,12 @@ using System.Threading.Tasks;
 
 namespace PatientsFomsRepository.Infrastructure
 {
+    /// <summary>
+    /// Интерфейс сервиса файлового диалога
+    /// </summary>
     public interface IFileDialogService
     {
-        DialogType DialogType { get; set; }
+        FileDialogType DialogType { get; set; }
         string Filter { get; set; }
         string FullPath { get; set; }
         bool? ShowDialog();

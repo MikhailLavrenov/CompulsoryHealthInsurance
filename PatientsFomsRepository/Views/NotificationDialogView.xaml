@@ -8,11 +8,20 @@
              xmlns:vm="clr-namespace:PatientsFomsRepository.ViewModels"
              xmlns:prism="http://prismlibrary.com/"
                          
-             
              mc:Ignorable="d"
              d:DesignHeight="600"
              d:DesignWidth="800"
              prism:ViewModelLocator.AutoWireViewModel=" True ">
+
+    <prism:Dialog.WindowStyle>
+        <Style TargetType="Window">
+            <Setter Property="prism:Dialog.WindowStartupLocation" Value="CenterScreen" />
+            <Setter Property="ResizeMode" Value="NoResize"/>
+            <Setter Property="ShowInTaskbar" Value="False"/>
+            <Setter Property="SizeToContent" Value="WidthAndHeight"/>
+
+        </Style>
+    </prism:Dialog.WindowStyle>
 
     <UserControl.Resources>
         <ResourceDictionary>
@@ -23,7 +32,7 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <Grid d:DataContext="{d:DesignInstance vm:NotificationDialogViewModel}">
+    <Grid d:DataContext="{d:DesignInstance vm:NotificationDialogViewModel}" Margin="40,10,40,10">
 
         <Grid.RowDefinitions>
             <RowDefinition  Height="auto" />
@@ -34,16 +43,17 @@
 
         <TextBlock Grid.Row="0"
                    TextWrapping="Wrap"
+                   HorizontalAlignment="Center"
                    Text="{Binding Message }" />
 
         <StackPanel Grid.Row="2"
-                    Orientation="Horizontal">
+                    Orientation="Horizontal" HorizontalAlignment="Center">
 
             <Button Content="ОК"
                     Command="{Binding CloseDialogCommand}"
                     CommandParameter="{Binding Content, RelativeSource={RelativeSource Self}}" />
 
-            <Button Content="Отмена"
+            <Button Content="Отмена" IsDefault="True"
                     Command="{Binding CloseDialogCommand}"
                     CommandParameter="{Binding Content, RelativeSource={RelativeSource Self}}" />
 

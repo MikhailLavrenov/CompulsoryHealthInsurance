@@ -124,19 +124,19 @@
     </ApplicationDefinition>
     <Compile Include="Infrastructure\CustomDataGrid.cs" />
     <Compile Include="Infrastructure\BoolToVisibleConverterExtension.cs" />
-    <Compile Include="Infrastructure\DialogType.cs" />
+    <Compile Include="Infrastructure\FileDialogType.cs" />
     <Compile Include="Infrastructure\EnumHelper.cs" />
     <Compile Include="Infrastructure\EnumToCollectionConverterExtension.cs" />
     <Compile Include="Infrastructure\Extensions.cs" />
     <Compile Include="Infrastructure\FileDialogService.cs" />
-    <Compile Include="Infrastructure\IActiveViewModel.cs" />
+    <Compile Include="Infrastructure\IMainRegionService.cs" />
     <Compile Include="Infrastructure\IFileDialogService.cs" />
     <Compile Include="Infrastructure\PasswordBoxHelper.cs" />
     <Compile Include="Infrastructure\RegionNames.cs" />
     <Compile Include="Infrastructure\DelegateCommandAsync.cs" />
     <Compile Include="Infrastructure\DomainObject.cs" />
     <Compile Include="Infrastructure\DelegateCommandAsync{T}.cs" />
-    <Compile Include="Infrastructure\ActiveViewModel.cs" />
+    <Compile Include="Infrastructure\MainRegionService.cs" />
     <Compile Include="Models\ImportPatientsFile.cs" />
     <Compile Include="Models\PatientsFile\ColumnProperty.cs" />
     <Compile Include="Models\SRZ\CredentialScope.cs" />

@@ -7,10 +7,11 @@ using System.Threading.Tasks;
 namespace PatientsFomsRepository.Infrastructure
 {
     /// <summary>
-    /// Названия регионов
+    /// Интерфейс сервиса MainRegion
     /// </summary>
-    public static class RegionNames
+    public interface IMainRegionService
     {
-        public static string MainRegion { get; } = "MainRegion";
+        string Status { get; set; }
+        string Header { get; set; }
     }
 }

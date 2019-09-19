@@ -28,7 +28,6 @@
                 Command="{Binding ImportPatientsCommand}" />
         <Button Content="Скачать пример"                
                 Command="{Binding SaveExampleCommand}" />
-        <Button Visibility="Hidden" />
         <Button Content="Очистить БД"
                 Command="{Binding ClearDatabaseCommand}"
                 Background="#FFFF6666" />

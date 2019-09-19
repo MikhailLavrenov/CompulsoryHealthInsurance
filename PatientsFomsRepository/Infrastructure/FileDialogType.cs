@@ -6,9 +6,13 @@ using System.Threading.Tasks;
 
 namespace PatientsFomsRepository.Infrastructure
 {
-    public interface IActiveViewModel
+    /// <summary>
+    /// Тип файлового диалога
+    /// </summary>
+    public enum FileDialogType
     {
-        string Status { get; set; }
-        string Header { get; set; }
+        None=0,
+        Open=1,
+        Save=2,
     }
 }

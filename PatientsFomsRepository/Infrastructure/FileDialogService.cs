@@ -3,19 +3,26 @@ using System.IO;
 
 namespace PatientsFomsRepository.Infrastructure
 {
+    /// <summary>
+    /// Сервис файлового диалога
+    /// </summary>
     class FileDialogService : IFileDialogService
     {
-        public DialogType DialogType { get; set; }
+        public FileDialogType DialogType { get; set; }
         public string Filter { get; set; }
         public string FullPath { get; set; }
 
+        /// <summary>
+        /// Показать диалоговое окно модально
+        /// </summary>
+        /// <returns></returns>
         public bool? ShowDialog()
         {
             FileDialog fileDialog = null;            
 
-            if (DialogType == DialogType.Save)
+            if (DialogType == FileDialogType.Save)
                 fileDialog = new SaveFileDialog();
-            else if (DialogType == DialogType.Open)
+            else if (DialogType == FileDialogType.Open)
                 fileDialog = new OpenFileDialog();
 
             fileDialog.Filter = Filter;

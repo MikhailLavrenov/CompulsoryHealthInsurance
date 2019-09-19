@@ -21,7 +21,7 @@ namespace PatientsFomsRepository.ViewModels
         #endregion
 
         #region Свойства
-        public IActiveViewModel ActiveViewModel { get; set; }
+        public IMainRegionService MainRegionService { get; set; }
         public bool KeepAlive { get => false; }
         public Settings Settings { get => settings; set => SetProperty(ref settings, value); }
         public DateTime FileDate { get => fileDate; set => SetProperty(ref fileDate, value); }
@@ -30,13 +30,13 @@ namespace PatientsFomsRepository.ViewModels
         #endregion
 
         #region Конструкторы
-        public PatientsFileViewModel(IActiveViewModel activeViewModel, IFileDialogService fileDialogService)
+        public PatientsFileViewModel(IMainRegionService mainRegionService, IFileDialogService fileDialogService)
         {
             this.fileDialogService = fileDialogService;
-            ActiveViewModel = activeViewModel;
+            MainRegionService = mainRegionService;
             Settings = Settings.Instance;
 
-            ActiveViewModel.Header = "Получить полные ФИО пациентов";            
+            MainRegionService.Header = "Получить полные ФИО пациентов";            
             FileDate = DateTime.Today;            
             ProcessFileCommand = new DelegateCommandAsync(ProcessFileExecute, ProcessFileCanExecute);
             ShowFileDialogCommand = new DelegateCommand(ShowFileDialogExecute);
@@ -46,7 +46,7 @@ namespace PatientsFomsRepository.ViewModels
         #region Методы
         private void ShowFileDialogExecute()
         {
-            fileDialogService.DialogType = settings.DownloadNewPatientsFile ? DialogType.Save : DialogType.Open;
+            fileDialogService.DialogType = settings.DownloadNewPatientsFile ? FileDialogType.Save : FileDialogType.Open;
             fileDialogService.FullPath = settings.PatientsFilePath;
             fileDialogService.Filter= "Excel files (*.xslx)|*.xlsx";
 
@@ -55,18 +55,18 @@ namespace PatientsFomsRepository.ViewModels
         }
         private void ProcessFileExecute()
         {
-            ActiveViewModel.Status = "Ожидайте. Проверка подключения к СРЗ...";
+            MainRegionService.Status = "Ожидайте. Проверка подключения к СРЗ...";
             Settings.TestConnection();
 
             if (Settings.DownloadNewPatientsFile)
             {
                 if (Settings.ConnectionIsValid == false)
                 {
-                    ActiveViewModel.Status = "Не удалось подключиться к СРЗ, проверьте настройки и работоспособность сайта. Без подключения к СРЗ возможно только подставить ФИО из кэша в существующий файл.";
+                    MainRegionService.Status = "Не удалось подключиться к СРЗ, проверьте настройки и работоспособность сайта. Без подключения к СРЗ возможно только подставить ФИО из кэша в существующий файл.";
                     return;
                 }
 
-                ActiveViewModel.Status = "Ожидайте. Загрузка файла из СРЗ...";
+                MainRegionService.Status = "Ожидайте. Загрузка файла из СРЗ...";
 
                 SRZ site;
                 if (Settings.UseProxy)
@@ -79,7 +79,7 @@ namespace PatientsFomsRepository.ViewModels
                 site.GetPatientsFile(Settings.PatientsFilePath, FileDate);
             }
 
-            ActiveViewModel.Status = "Ожидайте. Подстановка ФИО из кэша...";
+            MainRegionService.Status = "Ожидайте. Подстановка ФИО из кэша...";
             var db = new Models.Database();
             var file = new PatientsFile();
 
@@ -91,17 +91,17 @@ namespace PatientsFomsRepository.ViewModels
 
             if (Settings.ConnectionIsValid)
             {
-                ActiveViewModel.Status = "Ожидайте. Поиск пациентов без ФИО в файле...";
+                MainRegionService.Status = "Ожидайте. Поиск пациентов без ФИО в файле...";
                 var limitCount = Settings.Credentials.Sum(x => x.RequestsLimit);
                 var unknownInsuaranceNumbers = file.GetUnknownInsuaranceNumbers(limitCount);
 
-                ActiveViewModel.Status = "Ожидайте. Поиск ФИО в СРЗ...";
+                MainRegionService.Status = "Ожидайте. Поиск ФИО в СРЗ...";
                 var verifiedPatients = GetPatients(unknownInsuaranceNumbers);
 
-                ActiveViewModel.Status = "Ожидайте. Подстановка в файл ФИО найденных в СРЗ...";
+                MainRegionService.Status = "Ожидайте. Подстановка в файл ФИО найденных в СРЗ...";
                 file.SetFullNames(verifiedPatients);
 
-                ActiveViewModel.Status = "Ожидайте. Добавление в кэш ФИО найденных в СРЗ...";
+                MainRegionService.Status = "Ожидайте. Добавление в кэш ФИО найденных в СРЗ...";
                 var duplicateInsuranceNumber = verifiedPatients.Select(x => x.InsuranceNumber).ToHashSet();
                 var duplicatePatients = db.Patients.Where(x => duplicateInsuranceNumber.Contains(x.InsuranceNumber)).ToArray();
                 db.Patients.RemoveRange(duplicatePatients);
@@ -115,19 +115,19 @@ namespace PatientsFomsRepository.ViewModels
             else
                 resultReport = $"Завершено. ФИО подставлены только из кэша.  Не удалось подключиться к СРЗ, проверьте настройки и работоспособность сайта.";
 
-            ActiveViewModel.Status = "Ожидайте. Подсчет человек без ФИО...";
+            MainRegionService.Status = "Ожидайте. Подсчет человек без ФИО...";
             var unknownPatients = file.GetUnknownInsuaranceNumbers(int.MaxValue);
 
             if (unknownPatients.Count == 0)
             {
-                ActiveViewModel.Status = "Ожидайте. Форматирование файла...";
+                MainRegionService.Status = "Ожидайте. Форматирование файла...";
                 file.Format();
             }
 
-            ActiveViewModel.Status = "Ожидайте. Сохранение изменений...";
+            MainRegionService.Status = "Ожидайте. Сохранение изменений...";
             file.Save();
 
-            ActiveViewModel.Status = $"{ resultReport} Осталось найти {unknownPatients.Count} ФИО.";
+            MainRegionService.Status = $"{ resultReport} Осталось найти {unknownPatients.Count} ФИО.";
         }
         private bool ProcessFileCanExecute()
         {

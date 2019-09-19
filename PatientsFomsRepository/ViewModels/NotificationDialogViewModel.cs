@@ -8,7 +8,7 @@ namespace PatientsFomsRepository.ViewModels
     class NotificationDialogViewModel : DomainObject, IDialogAware
     {
         #region Поля
-        private string title = "Notification";
+        private string title;
         private string message;
         #endregion
 
@@ -30,34 +30,38 @@ namespace PatientsFomsRepository.ViewModels
         #region Конструкторы
         public NotificationDialogViewModel()
         {
-            CloseDialogCommand = new DelegateCommand<string>(CloseDialog);
+            CloseDialogCommand = new DelegateCommand<string>(CloseDialogExecute);
         }
         #endregion
 
         #region Методы
-        public  void  RaiseRequestClose(IDialogResult dialogResult)
+        public void RaiseRequestClose(IDialogResult dialogResult)
         {
             RequestClose?.Invoke(dialogResult);
         }
-        public  bool CanCloseDialog()
+        public bool CanCloseDialog()
         {
             return true;
         }
-        public  void OnDialogClosed()
+        public void OnDialogClosed()
         {
         }
-        public  void OnDialogOpened(IDialogParameters parameters)
+        public void OnDialogOpened(IDialogParameters parameters)
         {
+            Title = parameters.GetValue<string>("title");
             Message = parameters.GetValue<string>("message");
         }
-        protected  void CloseDialog(string parameter)
+        protected void CloseDialogExecute(string parameter)
         {
-            var result = ButtonResult.None;
+            ButtonResult result;
+            var pressedButton = (parameter ?? string.Empty).ToLower();
 
-            if (parameter?.ToLower() == "ОК")
+            if (pressedButton == "ок")
                 result = ButtonResult.OK;
-            else if (parameter?.ToLower() == "Отмена")
+            else if (pressedButton == "отмена")
                 result = ButtonResult.Cancel;
+            else
+                result = ButtonResult.None;
 
             RaiseRequestClose(new DialogResult(result));
         }

@@ -13,7 +13,7 @@ namespace PatientsFomsRepository.ViewModels
         #endregion
 
         #region Свойства
-        public IActiveViewModel ActiveViewModel { get; set; }
+        public IMainRegionService MainRegionService { get; set; }
         public bool KeepAlive { get => false; }
         public Settings Settings { get => settings; set => SetProperty(ref settings, value); }
         public DelegateCommand SaveCommand { get; }
@@ -25,12 +25,12 @@ namespace PatientsFomsRepository.ViewModels
         #endregion
 
         #region Конструкторы
-        public PatientsFileSettingsViewModel(IActiveViewModel activeViewModel, IFileDialogService fileDialogService)
+        public PatientsFileSettingsViewModel(IMainRegionService mainRegionService, IFileDialogService fileDialogService)
         {
             this.fileDialogService = fileDialogService;
-            ActiveViewModel = activeViewModel;
+            MainRegionService = mainRegionService;
 
-            ActiveViewModel.Header = "Настройки файла пациентов";            
+            MainRegionService.Header = "Настройки файла пациентов";            
             Settings = Settings.Instance;
             SaveCommand = new DelegateCommand(SaveExecute);
             LoadCommand = new DelegateCommand(LoadExecute);
@@ -44,7 +44,7 @@ namespace PatientsFomsRepository.ViewModels
         #region Методы
         private void ShowFileDialogExecute()
         {
-            fileDialogService.DialogType = settings.DownloadNewPatientsFile ? DialogType.Save : DialogType.Open;
+            fileDialogService.DialogType = settings.DownloadNewPatientsFile ? FileDialogType.Save : FileDialogType.Open;
             fileDialogService.FullPath = settings.PatientsFilePath;
             fileDialogService.Filter = "Excel files (*.xslx)|*.xlsx";
 
@@ -54,17 +54,17 @@ namespace PatientsFomsRepository.ViewModels
         private void SaveExecute()
         {
             Settings.Save();
-            ActiveViewModel.Status = "Настройки сохранены.";
+            MainRegionService.Status = "Настройки сохранены.";
         }
         private void LoadExecute()
         {
             Settings = Settings.Load();
-            ActiveViewModel.Status = "Изменения настроек отменены.";
+            MainRegionService.Status = "Изменения настроек отменены.";
         }
         private void SetDefaultExecute()
         {
             Settings.SetDefaultPatiensFile();
-            ActiveViewModel.Status = "Настройки установлены по умолчанию.";
+            MainRegionService.Status = "Настройки установлены по умолчанию.";
         }
         #endregion
     }

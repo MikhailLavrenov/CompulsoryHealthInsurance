@@ -68,7 +68,7 @@
             <TextBlock DockPanel.Dock="Top"
                        Margin="5,10,5,20"
                        Style="{StaticResource TextBlockHeader}"
-                       Text="{Binding ActiveViewModel.Header, NotifyOnTargetUpdated=True}" >
+                       Text="{Binding MainRegionService.Header, NotifyOnTargetUpdated=True}" >
 
                 <TextBlock.Triggers>
                     <EventTrigger RoutedEvent="Binding.TargetUpdated">
@@ -99,7 +99,7 @@
 
             <TextBlock DockPanel.Dock="Bottom"
                    TextWrapping="Wrap"
-                   Text="{Binding ActiveViewModel.Status}" />
+                   Text="{Binding MainRegionService.Status}" />
 
             <ContentControl prism:RegionManager.RegionName="{x:Static i:RegionNames.MainRegion}" />
 
