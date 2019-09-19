@@ -33,6 +33,7 @@ namespace PatientsFomsRepository.ViewModels
             this.dialogService = dialogService;
 
             MainRegionService.Header = "Загрузить известные ФИО из файла в базу данных";
+
             ImportPatientsCommand = new DelegateCommandAsync(ImportPatientsExecute);
             SaveExampleCommand = new DelegateCommandAsync(SaveExampleExecute);
             ClearDatabaseCommand = new DelegateCommandAsync(ClearDatabaseExecute);

@@ -37,6 +37,7 @@ namespace PatientsFomsRepository.ViewModels
             MainRegionService.Header = "Настройки подключения к СРЗ ХК ФОМС";
             ShowTextPassword = false;
             ShowProtectedPassword = !ShowTextPassword;
+
             SaveCommand = new DelegateCommand(SaveCommandExecute);
             LoadCommand = new DelegateCommand(LoadCommandExecute);
             SetDefaultCommand = new DelegateCommand(SetDefaultExecute);
