@@ -30,8 +30,9 @@ namespace PatientsFomsRepository.ViewModels
             this.fileDialogService = fileDialogService;
             MainRegionService = mainRegionService;
 
-            MainRegionService.Header = "Настройки файла пациентов";            
             Settings = Settings.Instance;
+            MainRegionService.Header = "Настройки файла пациентов";    
+            
             SaveCommand = new DelegateCommand(SaveExecute);
             LoadCommand = new DelegateCommand(LoadExecute);
             SetDefaultCommand = new DelegateCommand(SetDefaultExecute);

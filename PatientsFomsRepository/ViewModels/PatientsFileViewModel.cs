@@ -34,10 +34,11 @@ namespace PatientsFomsRepository.ViewModels
         {
             this.fileDialogService = fileDialogService;
             MainRegionService = mainRegionService;
-            Settings = Settings.Instance;
 
+            Settings = Settings.Instance;
             MainRegionService.Header = "Получить полные ФИО пациентов";            
-            FileDate = DateTime.Today;            
+            FileDate = DateTime.Today;
+            
             ProcessFileCommand = new DelegateCommandAsync(ProcessFileExecute, ProcessFileCanExecute);
             ShowFileDialogCommand = new DelegateCommand(ShowFileDialogExecute);
         }
