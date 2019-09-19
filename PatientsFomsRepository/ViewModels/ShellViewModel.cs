@@ -17,10 +17,10 @@ namespace PatientsFomsRepository.ViewModels
         #endregion
 
         #region Конструкторы
-        public ShellViewModel(IRegionManager mainRegionService, IMainRegionService activeViewModeService)
+        public ShellViewModel(IRegionManager regionManager, IMainRegionService mainRegionService)
         {
-            MainRegionService = activeViewModeService;
-            this.regionManager = mainRegionService;
+            MainRegionService = mainRegionService;
+            this.regionManager = regionManager;
 
             ShowViewCommand = new DelegateCommand<Type>(ShowViewExecute);
         }
