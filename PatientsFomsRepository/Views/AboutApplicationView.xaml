@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:vm="clr-namespace:PatientsFomsRepository.ViewModels"
              xmlns:local="clr-namespace:PatientsFomsRepository.Views"
              xmlns:prism="http://prismlibrary.com/"
              
@@ -19,8 +20,8 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
-    
-    <Grid>
+
+    <Grid d:DataContext="{d:DesignInstance vm:AboutApplicationViewModel}">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
@@ -29,6 +30,8 @@
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="20" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="5" />
             <RowDefinition Height="auto" />
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
@@ -82,13 +85,19 @@
                    Grid.Column="1"
                    Text="{Binding Phone}" />
 
-
-        <Button Grid.Row="7"
-                   Grid.Column="0"
+        <Button Grid.Row="7"                   
+                Grid.Column="0"
                 Grid.ColumnSpan="2"                   
                 Content="Открыть инструкцию"
-                Style="{StaticResource ReferenceButton}"
-                   Command="{Binding OpenManualCommand}" />
+                Style="{StaticResource ReferenceButton}"                   
+                Command="{Binding OpenManualCommand}" />
+
+        <Button Grid.Row="9"                   
+                Grid.Column="0"
+                Grid.ColumnSpan="2"                   
+                Content="Перейти в репозиторий с исходным кодом"
+                Style="{StaticResource ReferenceButton}"                   
+                Command="{Binding OpenRepositoryCommand}" />
 
 
     </Grid>

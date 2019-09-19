@@ -1,13 +1,11 @@
 ﻿using OfficeOpenXml;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Net;
 using System.Net.Http;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace PatientsFomsRepository.Models
 {
@@ -41,53 +39,50 @@ namespace PatientsFomsRepository.Models
         //авторизация на сайте
         public bool TryAuthorize(Credential credential)
         {
-            this.Credential = credential;
+            Credential = credential;
             var content = new FormUrlEncodedContent(new[]
                 {
                 new KeyValuePair<string, string>("lg", credential.Login),
                 new KeyValuePair<string, string>("pw", credential.Password),
                 });
+
             try
             {
-                var response = client.PostAsync("data/user.ajax.logon.php", content).Result;
+                var response = client.PostAsync("data/user.ajax.logon.php", content).GetAwaiter().GetResult();
                 response.EnsureSuccessStatusCode();
-                var responseText = response.Content.ReadAsStringAsync().Result;
+                var responseText = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
 
                 if (responseText == "")
-                {
-                    Authorized = true;
-                    return Authorized;
-                }
+                    return Authorized = true;
                 else
-                    throw new Exception();
+                    return Authorized = false;
             }
             catch (Exception)
             {
-                Authorized = false;
-                return Authorized;
+                return Authorized = false;
             }
         }
         //выход с сайта
         public void Logout()
         {
             Authorized = false;
-            var response = client.GetAsync("?show=logoff").Result;
+            var response = client.GetAsync("?show=logoff").GetAwaiter().GetResult();
             response.EnsureSuccessStatusCode();
         }
         //запрашивает данные пациента
         public bool TryGetPatient(string insuranceNumber, out Patient patient)
         {
             var content = new FormUrlEncodedContent(new[]
-                {
+            {
                 new KeyValuePair<string, string>("mode", "1"),
                 new KeyValuePair<string, string>("person_enp", insuranceNumber),
-                });
+            });
 
             try
             {
-                var response = client.PostAsync("data/reg.person.polis.search.php", content).Result;
+                var response = client.PostAsync("data/reg.person.polis.search.php", content).GetAwaiter().GetResult();
                 response.EnsureSuccessStatusCode();
-                var responseText = response.Content.ReadAsStringAsync().Result;
+                var responseText = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
                 var responseLines = responseText.Split(new string[] { "||" }, 7, StringSplitOptions.None);
 
                 if (responseLines[0] != "0")
@@ -96,7 +91,10 @@ namespace PatientsFomsRepository.Models
                     return true;
                 }
                 else
-                    throw new Exception();
+                {
+                    patient = null;
+                    return false;
+                }
             }
             catch (Exception)
             {
@@ -111,6 +109,7 @@ namespace PatientsFomsRepository.Models
             var dbfFile = GetDbfFile(fileReference);
             DbfToExcel(dbfFile, excelFile);
         }
+        //Освобождает ресурсы
         public void Dispose()
         {
             client.Dispose();
@@ -121,11 +120,13 @@ namespace PatientsFomsRepository.Models
             Authorized = false;
             var clientHandler = new HttpClientHandler();
             clientHandler.CookieContainer = new CookieContainer();
+
             if (proxyAddress != null && proxyPort != 0)
             {
                 clientHandler.UseProxy = true;
                 clientHandler.Proxy = new WebProxy($"{proxyAddress}:{proxyPort}");
             }
+
             client = new HttpClient(clientHandler);
             client.BaseAddress = new Uri(URL);
         }
@@ -138,9 +139,10 @@ namespace PatientsFomsRepository.Models
                 new KeyValuePair<string, string>("export_date_on", shortFileDate),
                 new KeyValuePair<string, string>("exportlist_id", "25"),
                 });
-            var response = client.PostAsync("data/dbase.export.php", content).Result;
+
+            var response = client.PostAsync("data/dbase.export.php", content).GetAwaiter().GetResult();
             response.EnsureSuccessStatusCode();
-            string responseText = response.Content.ReadAsStringAsync().Result;
+            string responseText = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
 
             int begin = responseText.IndexOf(@"<a href='") + 9;
             int end = responseText.IndexOf(@"' ", begin) - begin;
@@ -150,12 +152,12 @@ namespace PatientsFomsRepository.Models
         //получает dbf файл прикрепленных пацентов
         private Stream GetDbfFile(string downloadReference)
         {
-            //скачиваем zip архив
-            var response = client.GetAsync(downloadReference).Result;
+            //скачивает zip архив
+            var response = client.GetAsync(downloadReference).GetAwaiter().GetResult();
             response.EnsureSuccessStatusCode();
-            var zipFile = response.Content.ReadAsStreamAsync().Result;
+            var zipFile = response.Content.ReadAsStreamAsync().GetAwaiter().GetResult();
 
-            //извлекаем dbf файл
+            //извлекает dbf файл
             Stream dbfFile = new MemoryStream();
             var archive = new ZipArchive(zipFile, ZipArchiveMode.Read);
             archive.Entries[0].Open().CopyTo(dbfFile);
@@ -179,6 +181,7 @@ namespace PatientsFomsRepository.Models
 
                     var type = table.Columns[column].Type;
                     type = Nullable.GetUnderlyingType(type) ?? type;
+
                     if (type.Name == "DateTime")
                         sheet.Column(column + 1).Style.Numberformat.Format = "dd.MM.yyyy";
                 }
