@@ -55,17 +55,17 @@ namespace PatientsFomsRepository.ViewModels
         private void SaveExecute()
         {
             Settings.Save();
-            MainRegionService.Status = "Настройки сохранены.";
+            MainRegionService.SetCompleteStatus ("Настройки сохранены.");
         }
         private void LoadExecute()
         {
             Settings = Settings.Load();
-            MainRegionService.Status = "Изменения настроек отменены.";
+            MainRegionService.SetCompleteStatus ("Изменения настроек отменены.");
         }
         private void SetDefaultExecute()
         {
             Settings.SetDefaultPatiensFile();
-            MainRegionService.Status = "Настройки установлены по умолчанию.";
+            MainRegionService.SetCompleteStatus( "Настройки установлены по умолчанию.");
         }
         #endregion
     }

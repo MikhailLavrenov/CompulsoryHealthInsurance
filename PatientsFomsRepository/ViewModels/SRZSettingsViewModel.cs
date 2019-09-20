@@ -38,8 +38,8 @@ namespace PatientsFomsRepository.ViewModels
             ShowTextPassword = false;
             ShowProtectedPassword = !ShowTextPassword;
 
-            SaveCommand = new DelegateCommand(SaveCommandExecute);
-            LoadCommand = new DelegateCommand(LoadCommandExecute);
+            SaveCommand = new DelegateCommand(SaveExecute);
+            LoadCommand = new DelegateCommand(LoadExecute);
             SetDefaultCommand = new DelegateCommand(SetDefaultExecute);
             TestCommand = new DelegateCommandAsync(TestExecute);
             SwitchShowPasswordCommand = new DelegateCommand(SwitchShowPasswordExecute);
@@ -47,32 +47,32 @@ namespace PatientsFomsRepository.ViewModels
         #endregion
 
         #region Методы        
-        private void SaveCommandExecute()
+        private void SaveExecute()
         {
             Settings.Save();
-            MainRegionService.Status = "Настройки сохранены.";
+            MainRegionService.SetCompleteStatus( "Настройки сохранены.");
         }
-        private void LoadCommandExecute()
+        private void LoadExecute()
         {
             Settings = Settings.Load();
-            MainRegionService.Status = "Изменения настроек отменены.";
+            MainRegionService.SetCompleteStatus("Изменения настроек отменены.");
         }
         private void SetDefaultExecute()
         {
             Settings.SetDefaultSRZ();
-            MainRegionService.Status = "Настройки установлены по умолчанию.";
+            MainRegionService.SetCompleteStatus("Настройки установлены по умолчанию.");
         }
         private void TestExecute()
         {
-            MainRegionService.Status = "Ожидайте. Проверка настроек...";
+            MainRegionService.SetInProgressStatus( "Проверка настроек.");
             Settings.TestConnection();
 
             if (Settings.ConnectionIsValid)
-                MainRegionService.Status = "Завершено. Настройки корректны.";
+                MainRegionService.SetCompleteStatus("Настройки корректны.");
             else if (Settings.ProxyIsNotValid)
-                MainRegionService.Status = "Завершено. Прокси сервер не доступен.";
+                MainRegionService.SetCompleteStatus(" Прокси сервер не доступен.");
             else if (Settings.SiteAddressIsNotValid)
-                MainRegionService.Status = "Завершено. Web-сайт СРЗ не доступен.";
+                MainRegionService.SetCompleteStatus("Web-сайт СРЗ не доступен.");
             else if (Settings.CredentialsIsNotValid)
             {
                 var logins = new StringBuilder();
@@ -82,7 +82,7 @@ namespace PatientsFomsRepository.ViewModels
                 .ForEach(x => logins.Append(x).Append(", "));
                 logins.Remove(logins.Length - 3, 2);
 
-                MainRegionService.Status = $"Завершено. Учетные записи не верны: {logins}. ";
+                MainRegionService.SetCompleteStatus($" Учетные записи не верны: {logins}.");
             }
         }
         private void SwitchShowPasswordExecute()

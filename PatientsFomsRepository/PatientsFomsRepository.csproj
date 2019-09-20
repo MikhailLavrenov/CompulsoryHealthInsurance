@@ -131,6 +131,7 @@
     <Compile Include="Infrastructure\FileDialogService.cs" />
     <Compile Include="Infrastructure\IMainRegionService.cs" />
     <Compile Include="Infrastructure\IFileDialogService.cs" />
+    <Compile Include="Infrastructure\IntegerArithmeticConverterExtension.cs" />
     <Compile Include="Infrastructure\PasswordBoxHelper.cs" />
     <Compile Include="Infrastructure\RegionNames.cs" />
     <Compile Include="Infrastructure\DelegateCommandAsync.cs" />
