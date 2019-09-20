@@ -36,9 +36,9 @@ namespace PatientsFomsRepository.ViewModels
             MainRegionService = mainRegionService;
 
             Settings = Settings.Instance;
-            MainRegionService.Header = "Получить полные ФИО пациентов";            
+            MainRegionService.Header = "Получить полные ФИО пациентов";
             FileDate = DateTime.Today;
-            
+
             ProcessFileCommand = new DelegateCommandAsync(ProcessFileExecute, ProcessFileCanExecute);
             ShowFileDialogCommand = new DelegateCommand(ShowFileDialogExecute);
         }
@@ -49,25 +49,25 @@ namespace PatientsFomsRepository.ViewModels
         {
             fileDialogService.DialogType = settings.DownloadNewPatientsFile ? FileDialogType.Save : FileDialogType.Open;
             fileDialogService.FullPath = settings.PatientsFilePath;
-            fileDialogService.Filter= "Excel files (*.xslx)|*.xlsx";
+            fileDialogService.Filter = "Excel files (*.xslx)|*.xlsx";
 
             if (fileDialogService.ShowDialog() == true)
                 settings.PatientsFilePath = fileDialogService.FullPath;
         }
         private void ProcessFileExecute()
         {
-            MainRegionService.Status = "Ожидайте. Проверка подключения к СРЗ...";
+            MainRegionService.SetInProgressStatus("Проверка подключения к СРЗ.");
             Settings.TestConnection();
 
             if (Settings.DownloadNewPatientsFile)
             {
                 if (Settings.ConnectionIsValid == false)
                 {
-                    MainRegionService.Status = "Не удалось подключиться к СРЗ, проверьте настройки и работоспособность сайта. Без подключения к СРЗ возможно только подставить ФИО из кэша в существующий файл.";
+                    MainRegionService.SetCompleteStatus("Не удалось подключиться к СРЗ, проверьте настройки и работоспособность сайта. Без подключения к СРЗ возможно только подставить ФИО из кэша в существующий файл.");
                     return;
                 }
 
-                MainRegionService.Status = "Ожидайте. Загрузка файла из СРЗ...";
+                MainRegionService.SetInProgressStatus("Загрузка файла из СРЗ.");
 
                 SRZ site;
                 if (Settings.UseProxy)
@@ -80,7 +80,7 @@ namespace PatientsFomsRepository.ViewModels
                 site.GetPatientsFile(Settings.PatientsFilePath, FileDate);
             }
 
-            MainRegionService.Status = "Ожидайте. Подстановка ФИО из кэша...";
+            MainRegionService.SetInProgressStatus("Подстановка ФИО из кэша.");
             var db = new Models.Database();
             var file = new PatientsFile();
 
@@ -92,17 +92,17 @@ namespace PatientsFomsRepository.ViewModels
 
             if (Settings.ConnectionIsValid)
             {
-                MainRegionService.Status = "Ожидайте. Поиск пациентов без ФИО в файле...";
+                MainRegionService.SetInProgressStatus("Поиск пациентов без ФИО в файле.");
                 var limitCount = Settings.Credentials.Sum(x => x.RequestsLimit);
                 var unknownInsuaranceNumbers = file.GetUnknownInsuaranceNumbers(limitCount);
 
-                MainRegionService.Status = "Ожидайте. Поиск ФИО в СРЗ...";
+                MainRegionService.SetInProgressStatus("Поиск ФИО в СРЗ.");
                 var verifiedPatients = GetPatients(unknownInsuaranceNumbers);
 
-                MainRegionService.Status = "Ожидайте. Подстановка в файл ФИО найденных в СРЗ...";
+                MainRegionService.SetInProgressStatus("Подстановка в файл ФИО найденных в СРЗ.");
                 file.SetFullNames(verifiedPatients);
 
-                MainRegionService.Status = "Ожидайте. Добавление в кэш ФИО найденных в СРЗ...";
+                MainRegionService.SetInProgressStatus("Ожидайте. Добавление в кэш ФИО найденных в СРЗ.");
                 var duplicateInsuranceNumber = verifiedPatients.Select(x => x.InsuranceNumber).ToHashSet();
                 var duplicatePatients = db.Patients.Where(x => duplicateInsuranceNumber.Contains(x.InsuranceNumber)).ToArray();
                 db.Patients.RemoveRange(duplicatePatients);
@@ -111,24 +111,24 @@ namespace PatientsFomsRepository.ViewModels
                 db.Patients.AddRange(verifiedPatients);
                 db.SaveChanges();
 
-                resultReport = $"Завершено. В СРЗ запрошено {verifiedPatients.Count()} человек, лимит {limitCount}. ";
+                resultReport = $"В СРЗ запрошено {verifiedPatients.Count()} человек, лимит {limitCount}. ";
             }
             else
-                resultReport = $"Завершено. ФИО подставлены только из кэша.  Не удалось подключиться к СРЗ, проверьте настройки и работоспособность сайта.";
+                resultReport = $"ФИО подставлены только из кэша.  Не удалось подключиться к СРЗ, проверьте настройки и работоспособность сайта.";
 
-            MainRegionService.Status = "Ожидайте. Подсчет человек без ФИО...";
+            MainRegionService.SetInProgressStatus("Подсчет человек без ФИО.");
             var unknownPatients = file.GetUnknownInsuaranceNumbers(int.MaxValue);
 
             if (unknownPatients.Count == 0)
             {
-                MainRegionService.Status = "Ожидайте. Форматирование файла...";
+                MainRegionService.SetInProgressStatus("Форматирование файла.");
                 file.Format();
             }
 
-            MainRegionService.Status = "Ожидайте. Сохранение изменений...";
+            MainRegionService.SetInProgressStatus("Сохранение изменений.");
             file.Save();
 
-            MainRegionService.Status = $"{ resultReport} Осталось найти {unknownPatients.Count} ФИО.";
+            MainRegionService.SetCompleteStatus($"{ resultReport} Осталось найти {unknownPatients.Count} ФИО.");
         }
         private bool ProcessFileCanExecute()
         {

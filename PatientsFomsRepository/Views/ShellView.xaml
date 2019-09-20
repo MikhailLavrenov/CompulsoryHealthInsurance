@@ -7,8 +7,9 @@
         xmlns:i="clr-namespace:PatientsFomsRepository.Infrastructure"
         xmlns:v="clr-namespace:PatientsFomsRepository.Views"
         xmlns:vm="clr-namespace:PatientsFomsRepository.ViewModels"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
         xmlns:prism="http://prismlibrary.com/"
-        mc:Ignorable="d"
+        mc:Ignorable="d"    
         
         WindowStartupLocation="CenterScreen"
         Title="Хранилище пациентов из СРЗ"
@@ -25,99 +26,191 @@
         </ResourceDictionary>
     </Window.Resources>
 
-    <DockPanel d:DataContext="{d:DesignInstance vm:ShellViewModel}">
+    <Grid>
 
-        <WrapPanel DockPanel.Dock="Top" Margin="0,3,0,3">
+        <StackPanel Panel.ZIndex="1000" Opacity="0.3" Background="LightGray"/>
 
-            <Button Content="Получить ФИО"
+        <Ellipse Panel.ZIndex="1000"  
+                 Fill="#FF54ACE0"  
+                 Width="10"  
+                 Height="10" 
+                 HorizontalAlignment="Center"  
+                 VerticalAlignment="Center"  
+                 RenderTransformOrigin="0.5,0.5">
+
+            <Ellipse.RenderTransform >
+                <TransformGroup >
+                    <TranslateTransform x:Name="EllipseTranslate" X="0"  />
+                    <RotateTransform x:Name="EllipseRotate"/>
+                </TransformGroup>
+            </Ellipse.RenderTransform>
+
+            <Ellipse.Triggers>
+                <EventTrigger RoutedEvent="Loaded">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation Storyboard.TargetName="EllipseTranslate"                                                                                                                                                 
+                                             Storyboard.TargetProperty="X"                                                                                                                             
+                                             Duration="00:00:01"                                                                                                                                                                                   
+                                             From="200"    
+                                             To="-200"
+                                             AccelerationRatio="0.5"                                                                                          
+                                             RepeatBehavior="Forever" 
+                                             AutoReverse="True"/>
+                            
+                            <!--<DoubleAnimation Storyboard.TargetName="EllipseRotate"                                                                                                                                                 
+                                             Storyboard.TargetProperty="Angle"                                                                                                                             
+                                             Duration="00:00:01" 
+                                             
+                                             To="360" 
+                                             RepeatBehavior="Forever" />-->
+
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+            </Ellipse.Triggers>
+
+        </Ellipse>
+
+
+        <Ellipse Panel.ZIndex="1000"  
+                 Fill="#FFEBBA16"  
+                 Width="10"  
+                 Height="10" 
+                 HorizontalAlignment="Center"  
+                 VerticalAlignment="Center"  
+                 RenderTransformOrigin="0.5,0.5">
+
+            <Ellipse.RenderTransform >
+                <TransformGroup >
+                    <TranslateTransform x:Name="EllipseTranslate2" X="0"  />
+                    <RotateTransform x:Name="EllipseRotate2" Angle="0"/>
+                </TransformGroup>
+            </Ellipse.RenderTransform>
+
+            <Ellipse.Triggers>
+                <EventTrigger RoutedEvent="Loaded">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation Storyboard.TargetName="EllipseTranslate2"                                                                                                                                                 
+                                             Storyboard.TargetProperty="X"                                                                                                                             
+                                             Duration="00:00:01"                                                                                                                                                                                   
+                                             From="-200"    
+                                             To="200"
+                                             AccelerationRatio="0.5"                                                                                          
+                                             RepeatBehavior="Forever" 
+                                             AutoReverse="True" />
+
+                            <!--<DoubleAnimation Storyboard.TargetName="EllipseRotate2"                                                                                                                                                 
+                                             Storyboard.TargetProperty="Angle"                                                                                                                             
+                                             Duration="00:00:01" 
+                                             
+                                             To="-360" 
+                                             RepeatBehavior="Forever" />-->
+
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+            </Ellipse.Triggers>
+
+        </Ellipse>
+
+
+
+        <DockPanel d:DataContext="{d:DesignInstance vm:ShellViewModel}" Panel.ZIndex="0" Background="White">
+
+            <WrapPanel DockPanel.Dock="Top" Margin="0,3,0,3">
+
+                <Button Content="Получить ФИО"
                     Style="{StaticResource HeaderReferenceButton}"
                     Command="{Binding ShowViewCommand}"
                     CommandParameter="{x:Type v:PatientsFileView}"/>
 
-            <Button Content="Загрузить в БД"
+                <Button Content="Загрузить в БД"
                     Style="{StaticResource HeaderReferenceButton}"
                     Command="{Binding ShowViewCommand}"
                     CommandParameter="{x:Type v:ImportPatientsView}" />
 
-            <Button Content="Настройки СРЗ"
+                <Button Content="Настройки СРЗ"
                     Style="{StaticResource HeaderReferenceButton}"
                     Command="{Binding ShowViewCommand}"
                     CommandParameter="{x:Type v:SRZSettingsView}" />
 
-            <Button Content="Настройки файла пациентов"
+                <Button Content="Настройки файла пациентов"
                     Style="{StaticResource HeaderReferenceButton}"
                     Command="{Binding ShowViewCommand}"
                     CommandParameter="{x:Type v:PatientsFileSettingsView}" />
 
-            <Button Content="О программе"
+                <Button Content="О программе"
                     Style="{StaticResource HeaderReferenceButton}"
                     Command="{Binding ShowViewCommand}"
                     CommandParameter="{x:Type v:AboutApplicationView}" />
 
+            </WrapPanel>
 
-        </WrapPanel>
+            <Separator DockPanel.Dock="Top"/>
 
-        <Separator DockPanel.Dock="Top"/>
+            <DockPanel x:Name="MainRegionPanel" RenderTransformOrigin="0.1,0.1" >
 
-        <DockPanel x:Name="MainRegionPanel" RenderTransformOrigin="0.1,0.1" >
+                <DockPanel.RenderTransform>
+                    <SkewTransform x:Name="AnimatedSkewTransform" />
+                </DockPanel.RenderTransform>
 
-            <DockPanel.RenderTransform>
-                <SkewTransform x:Name="AnimatedSkewTransform" />
-            </DockPanel.RenderTransform>
-
-            <TextBlock DockPanel.Dock="Top"
+                <TextBlock DockPanel.Dock="Top"
                        Margin="5,10,5,20"
                        Style="{StaticResource TextBlockHeader}"
                        Text="{Binding MainRegionService.Header, NotifyOnTargetUpdated=True}" >
 
-                <TextBlock.Triggers>
-                    <EventTrigger RoutedEvent="Binding.TargetUpdated">
-                        <BeginStoryboard>
-                            <Storyboard >
-                                <DoubleAnimation Storyboard.TargetName="MainRegionPanel" 
+                    <TextBlock.Triggers>
+                        <EventTrigger RoutedEvent="Binding.TargetUpdated">
+                            <BeginStoryboard>
+                                <Storyboard >
+                                    <DoubleAnimation Storyboard.TargetName="MainRegionPanel" 
                                                  Storyboard.TargetProperty="Opacity"
                                                  Duration="0:0:0.5" 
                                                  From="0" 
                                                  To="1" />
 
-                                <DoubleAnimation Storyboard.TargetName="AnimatedSkewTransform" 
+                                    <DoubleAnimation Storyboard.TargetName="AnimatedSkewTransform" 
                                                  Storyboard.TargetProperty="(SkewTransform.AngleX)"
                                                  Duration="0:0:0.5" 
                                                  From="90" 
                                                  To="0"/>
-                                <DoubleAnimation Storyboard.TargetName="AnimatedSkewTransform" 
+                                    <DoubleAnimation Storyboard.TargetName="AnimatedSkewTransform" 
                                                  Storyboard.TargetProperty="(SkewTransform.AngleY)"
                                                  Duration="0:0:0.5" 
                                                  From="90" 
                                                  To="0"/>
-                            </Storyboard>
-                        </BeginStoryboard>
-                    </EventTrigger>
-                </TextBlock.Triggers>
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                    </TextBlock.Triggers>
 
-            </TextBlock>
+                </TextBlock>
 
-            <TextBlock DockPanel.Dock="Bottom"
+                <TextBlock DockPanel.Dock="Bottom"
                    TextWrapping="Wrap"
                    Text="{Binding MainRegionService.Status}" />
 
-            <ContentControl prism:RegionManager.RegionName="{x:Static i:RegionNames.MainRegion}" />
+                <ContentControl prism:RegionManager.RegionName="{x:Static i:RegionNames.MainRegion}" />
 
-        </DockPanel>
+            </DockPanel>
 
-        <DockPanel.Triggers>
-        <EventTrigger RoutedEvent="Loaded">
-            <BeginStoryboard>
-                <Storyboard >
-                    <DoubleAnimation Storyboard.TargetProperty="Opacity"                                                 
+            <DockPanel.Triggers>
+                <EventTrigger RoutedEvent="Loaded">
+                    <BeginStoryboard>
+                        <Storyboard >
+                            <DoubleAnimation Storyboard.TargetProperty="Opacity"                                                 
                                      Duration="0:0:0.5"                                                  
                                      From="0"                                                  
                                      To="1" />
-                </Storyboard>
-            </BeginStoryboard>
-        </EventTrigger>
-    </DockPanel.Triggers>
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+            </DockPanel.Triggers>
 
-    </DockPanel>
+        </DockPanel>
+
+    </Grid>
 
 </Window>

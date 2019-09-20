@@ -13,5 +13,10 @@ namespace PatientsFomsRepository.Infrastructure
     {
         string Status { get; set; }
         string Header { get; set; }
+        bool InProgress { get; set; }
+
+        void SetCompleteStatus(string statusMessage);
+        void SetInProgressStatus(string statusMessage);
+        void RequestNavigate(string targetName);
     }
 }

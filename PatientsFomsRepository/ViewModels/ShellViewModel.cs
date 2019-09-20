@@ -1,6 +1,5 @@
 ﻿using PatientsFomsRepository.Infrastructure;
 using Prism.Commands;
-using Prism.Regions;
 using System;
 
 namespace PatientsFomsRepository.ViewModels
@@ -8,7 +7,6 @@ namespace PatientsFomsRepository.ViewModels
     public class ShellViewModel : DomainObject
     {
         #region Поля
-        private readonly IRegionManager regionManager;
         #endregion
 
         #region Свойства 
@@ -17,21 +15,15 @@ namespace PatientsFomsRepository.ViewModels
         #endregion
 
         #region Конструкторы
-        public ShellViewModel(IRegionManager regionManager, IMainRegionService mainRegionService)
+        public ShellViewModel(IMainRegionService mainRegionService)
         {
             MainRegionService = mainRegionService;
-            this.regionManager = regionManager;
 
-            ShowViewCommand = new DelegateCommand<Type>(ShowViewExecute);
+            ShowViewCommand = new DelegateCommand<Type>(x => MainRegionService.RequestNavigate(x.Name));
         }
         #endregion
 
         #region Методы
-        private void ShowViewExecute(Type parameter)
-        {
-            MainRegionService.Status = "";
-            regionManager.RequestNavigate(RegionNames.MainRegion, parameter.Name);
-        }
         #endregion
     }
 }

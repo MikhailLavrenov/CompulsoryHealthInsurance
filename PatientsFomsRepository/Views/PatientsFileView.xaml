@@ -66,7 +66,7 @@
                      Command="{Binding ShowFileDialogCommand}">
                 <ContentControl Content="{Binding Source={StaticResource FileDialog}}" />
             </Button>
-            <TextBox  Text="{Binding Settings.PatientsFilePath, ValidatesOnDataErrors=True}"
+            <TextBox  Text="{Binding Settings.PatientsFilePath, ValidatesOnDataErrors=True}"      
                       Name="TextBoxFilePath" />
         </DockPanel>
 
