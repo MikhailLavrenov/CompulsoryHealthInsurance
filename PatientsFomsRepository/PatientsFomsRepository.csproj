@@ -162,6 +162,9 @@
     <Compile Include="Views\PatientsFileSettingsView.xaml.cs">
       <DependentUpon>PatientsFileSettingsView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\ProgressBarView.xaml.cs">
+      <DependentUpon>ProgressBarView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\SRZSettingsView.xaml.cs">
       <DependentUpon>SRZSettingsView.xaml</DependentUpon>
     </Compile>
@@ -182,6 +185,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\PatientsFileView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\ProgressBarView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
