@@ -1,0 +1,105 @@
+﻿<UserControl x:Class="PatientsFomsRepository.Views.ProgressBarView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:PatientsFomsRepository.Views"
+             mc:Ignorable="d"
+             d:DesignHeight="450"
+             d:DesignWidth="800">
+
+    <UserControl.Resources>
+
+        <Style TargetType="Ellipse"
+               x:Key="ProgressBarEllipse">
+            <Setter Property="Width"
+                    Value="10" />
+            <Setter Property="Height"
+                    Value="10" />
+            <Setter Property="HorizontalAlignment"
+                    Value="Center" />
+            <Setter Property="VerticalAlignment"
+                    Value="Center" />
+            <Setter Property="RenderTransformOrigin"
+                    Value="0.5,0.5" />
+        </Style>
+
+    </UserControl.Resources>
+
+    <Grid>
+
+        <Grid.Triggers>
+            <EventTrigger RoutedEvent="Loaded">
+                <BeginStoryboard>
+                    <Storyboard>
+
+                        <DoubleAnimation Storyboard.TargetName="EllipseTranslate"
+                                         Storyboard.TargetProperty="X"
+                                         Duration="00:00:00.5"
+                                         From="-400"
+                                         To="400"
+                                         AccelerationRatio="0.5"
+                                         RepeatBehavior="Forever" />
+
+                        <!--<DoubleAnimation Storyboard.TargetName="EllipseRotate"                                                                                                                                                 
+                                             Storyboard.TargetProperty="Angle"                                                                                                                             
+                                             Duration="00:00:01"                                              
+                                             To="360" 
+                                             RepeatBehavior="Forever" />-->
+
+                        <DoubleAnimation  Storyboard.TargetName="EllipseTranslate2"
+                                          Storyboard.TargetProperty="X"
+                                          BeginTime="00:00:00.25"
+                                          Duration="00:00:00.5"
+                                          From="-400"
+                                          To="400"
+                                          AccelerationRatio="0.5"
+                                          RepeatBehavior="Forever" />
+
+                        <!--<DoubleAnimation Storyboard.TargetName="EllipseRotate2"                                                                                                                                                 
+                                             Storyboard.TargetProperty="Angle"                                                                                                                             
+                                             Duration="00:00:01"                                              
+                                             To="-360" 
+                                             RepeatBehavior="Forever" />-->
+
+                    </Storyboard>
+                </BeginStoryboard>
+            </EventTrigger>
+        </Grid.Triggers>
+
+        <StackPanel Panel.ZIndex="0"
+                    Opacity="0.3"
+                    Background="LightGray" />
+
+        <Ellipse Panel.ZIndex="1"
+                 Fill="#FF54ACE0"
+                 Style="{StaticResource ProgressBarEllipse}">
+
+            <Ellipse.RenderTransform>
+                <TransformGroup>
+                    <TranslateTransform x:Name="EllipseTranslate"
+                                        X="0" />
+                    <RotateTransform x:Name="EllipseRotate" />
+                </TransformGroup>
+            </Ellipse.RenderTransform>
+
+        </Ellipse>
+
+
+        <Ellipse Panel.ZIndex="1"
+                 Fill="#FFEBBA16"
+                 Style="{StaticResource ProgressBarEllipse}">
+
+            <Ellipse.RenderTransform>
+                <TransformGroup>
+                    <TranslateTransform x:Name="EllipseTranslate2"
+                                        X="50" />
+                    <RotateTransform x:Name="EllipseRotate2" />
+                </TransformGroup>
+            </Ellipse.RenderTransform>
+
+        </Ellipse>
+
+    </Grid>
+
+</UserControl>

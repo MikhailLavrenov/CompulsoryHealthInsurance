@@ -28,95 +28,12 @@
 
     <Grid>
 
-        <StackPanel Panel.ZIndex="1000" Opacity="0.3" Background="LightGray"/>
 
-        <Ellipse Panel.ZIndex="1000"  
-                 Fill="#FF54ACE0"  
-                 Width="10"  
-                 Height="10" 
-                 HorizontalAlignment="Center"  
-                 VerticalAlignment="Center"  
-                 RenderTransformOrigin="0.5,0.5">
+        <v:ProgressBarView Panel.ZIndex="1000"
+                           />
 
-            <Ellipse.RenderTransform >
-                <TransformGroup >
-                    <TranslateTransform x:Name="EllipseTranslate" X="0"  />
-                    <RotateTransform x:Name="EllipseRotate"/>
-                </TransformGroup>
-            </Ellipse.RenderTransform>
-
-            <Ellipse.Triggers>
-                <EventTrigger RoutedEvent="Loaded">
-                    <BeginStoryboard>
-                        <Storyboard>
-                            <DoubleAnimation Storyboard.TargetName="EllipseTranslate"                                                                                                                                                 
-                                             Storyboard.TargetProperty="X"                                                                                                                             
-                                             Duration="00:00:01"                                                                                                                                                                                   
-                                             From="200"    
-                                             To="-200"
-                                             AccelerationRatio="0.5"                                                                                          
-                                             RepeatBehavior="Forever" 
-                                             AutoReverse="True"/>
-                            
-                            <!--<DoubleAnimation Storyboard.TargetName="EllipseRotate"                                                                                                                                                 
-                                             Storyboard.TargetProperty="Angle"                                                                                                                             
-                                             Duration="00:00:01" 
-                                             
-                                             To="360" 
-                                             RepeatBehavior="Forever" />-->
-
-                        </Storyboard>
-                    </BeginStoryboard>
-                </EventTrigger>
-            </Ellipse.Triggers>
-
-        </Ellipse>
-
-
-        <Ellipse Panel.ZIndex="1000"  
-                 Fill="#FFEBBA16"  
-                 Width="10"  
-                 Height="10" 
-                 HorizontalAlignment="Center"  
-                 VerticalAlignment="Center"  
-                 RenderTransformOrigin="0.5,0.5">
-
-            <Ellipse.RenderTransform >
-                <TransformGroup >
-                    <TranslateTransform x:Name="EllipseTranslate2" X="0"  />
-                    <RotateTransform x:Name="EllipseRotate2" Angle="0"/>
-                </TransformGroup>
-            </Ellipse.RenderTransform>
-
-            <Ellipse.Triggers>
-                <EventTrigger RoutedEvent="Loaded">
-                    <BeginStoryboard>
-                        <Storyboard>
-                            <DoubleAnimation Storyboard.TargetName="EllipseTranslate2"                                                                                                                                                 
-                                             Storyboard.TargetProperty="X"                                                                                                                             
-                                             Duration="00:00:01"                                                                                                                                                                                   
-                                             From="-200"    
-                                             To="200"
-                                             AccelerationRatio="0.5"                                                                                          
-                                             RepeatBehavior="Forever" 
-                                             AutoReverse="True" />
-
-                            <!--<DoubleAnimation Storyboard.TargetName="EllipseRotate2"                                                                                                                                                 
-                                             Storyboard.TargetProperty="Angle"                                                                                                                             
-                                             Duration="00:00:01" 
-                                             
-                                             To="-360" 
-                                             RepeatBehavior="Forever" />-->
-
-                        </Storyboard>
-                    </BeginStoryboard>
-                </EventTrigger>
-            </Ellipse.Triggers>
-
-        </Ellipse>
-
-
-
+        <!--Visibility="{Binding MainRegionService.InProgress, Converter={i:BoolToVisibleConverter}}"-->
+        
         <DockPanel d:DataContext="{d:DesignInstance vm:ShellViewModel}" Panel.ZIndex="0" Background="White">
 
             <WrapPanel DockPanel.Dock="Top" Margin="0,3,0,3">
@@ -176,6 +93,7 @@
                                                  Duration="0:0:0.5" 
                                                  From="90" 
                                                  To="0"/>
+                                    
                                     <DoubleAnimation Storyboard.TargetName="AnimatedSkewTransform" 
                                                  Storyboard.TargetProperty="(SkewTransform.AngleY)"
                                                  Duration="0:0:0.5" 
