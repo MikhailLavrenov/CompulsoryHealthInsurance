@@ -14,7 +14,7 @@ namespace PatientsFomsRepository.Infrastructure
 
         public string Header { get => header; set => SetProperty(ref header, value); }
         public string Status { get => status; set => SetProperty(ref status, value); }
-        public bool InProgress { get => inProgress; set => SetProperty(ref inProgress, value); }
+        public bool IsBusy { get => inProgress; set => SetProperty(ref inProgress, value); }
 
         public MainRegionService(IRegionManager regionManager)
         {
@@ -23,20 +23,20 @@ namespace PatientsFomsRepository.Infrastructure
 
         public void SetCompleteStatus(string statusMessage)
         {
-            if (InProgress)
-                Status = $"Завершено. {statusMessage}";
+            if (IsBusy)
+                Status = $"{statusMessage}";
             else
                 Status = statusMessage;
-            InProgress = false;
+            IsBusy = false;
         }
         public void SetInProgressStatus(string statusMessage)
         {
-            Status = $"Ожидайте... {statusMessage}";
-            InProgress = true;
+            Status = $"{statusMessage}";
+            IsBusy = true;
         }
         public void RequestNavigate(string targetName)
         {
-            InProgress = false;
+            IsBusy = false;
             Status = string.Empty;
             regionManager.RequestNavigate(RegionNames.MainRegion, targetName);
         }
