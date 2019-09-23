@@ -29,8 +29,8 @@
     <Grid>
 
 
-        <v:ProgressBarView Panel.ZIndex="1000"
-                           />
+        <v:ProgressBarView Panel.ZIndex="100"
+                           Visibility="{Binding MainRegionService.IsBusy, Converter={i:BoolToVisibleConverter}}" />
 
         <!--Visibility="{Binding MainRegionService.InProgress, Converter={i:BoolToVisibleConverter}}"-->
         

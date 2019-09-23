@@ -9,7 +9,6 @@
              d:DesignWidth="800">
 
     <UserControl.Resources>
-
         <Style TargetType="Ellipse"
                x:Key="ProgressBarEllipse">
             <Setter Property="Width"
@@ -22,8 +21,9 @@
                     Value="Center" />
             <Setter Property="RenderTransformOrigin"
                     Value="0.5,0.5" />
+            <Setter Property="Fill"
+                    Value="#FF54ACE0" />
         </Style>
-
     </UserControl.Resources>
 
     <Grid>
@@ -33,34 +33,121 @@
                 <BeginStoryboard>
                     <Storyboard>
 
-                        <DoubleAnimation Storyboard.TargetName="EllipseTranslate"
-                                         Storyboard.TargetProperty="X"
-                                         Duration="00:00:00.5"
-                                         From="-400"
-                                         To="400"
-                                         AccelerationRatio="0.5"
+                        <DoubleAnimation Storyboard.TargetName="EllipseTranslate1"
+                                         Storyboard.TargetProperty="Y"
+                                         BeginTime="00:00:00"
+                                         Duration="00:00:00.4"
+                                         From="-10"
+                                         To="10"
+                                         AccelerationRatio="0.1"
+                                         AutoReverse="True"
                                          RepeatBehavior="Forever" />
 
-                        <!--<DoubleAnimation Storyboard.TargetName="EllipseRotate"                                                                                                                                                 
-                                             Storyboard.TargetProperty="Angle"                                                                                                                             
-                                             Duration="00:00:01"                                              
-                                             To="360" 
-                                             RepeatBehavior="Forever" />-->
+                        <DoubleAnimation  Storyboard.TargetName="EllipseTranslate2"
+                                          Storyboard.TargetProperty="Y"
+                                          BeginTime="00:00:00.1"
+                                          Duration="00:00:0.4"
+                                          From="-20"
+                                          To="20"
+                                          AccelerationRatio="0.1"
+                                          AutoReverse="True"
+                                          RepeatBehavior="Forever" />
+
+                        <DoubleAnimation  Storyboard.TargetName="EllipseTranslate3"
+                                          Storyboard.TargetProperty="Y"
+                                          BeginTime="00:00:00.2"
+                                          Duration="00:00:00.4"
+                                          From="-30"
+                                          To="30"
+                                          AccelerationRatio="0.1"
+                                          AutoReverse="True"
+                                          RepeatBehavior="Forever" />
+
+                        <DoubleAnimation  Storyboard.TargetName="EllipseTranslate4"
+                                          Storyboard.TargetProperty="Y"
+                                          BeginTime="00:00:00.3"
+                                          Duration="00:00:00.4"
+                                          From="-30"
+                                          To="30"
+                                          AccelerationRatio="0.1"
+                                          AutoReverse="True"
+                                          RepeatBehavior="Forever" />
+
+                        <DoubleAnimation  Storyboard.TargetName="EllipseTranslate5"
+                                          Storyboard.TargetProperty="Y"
+                                          BeginTime="00:00:00.4"
+                                          Duration="00:00:00.4"
+                                          From="-20"
+                                          To="20"
+                                          AccelerationRatio="0.1"
+                                          AutoReverse="True"
+                                          RepeatBehavior="Forever" />
+
+                        <DoubleAnimation  Storyboard.TargetName="EllipseTranslate6"
+                                          Storyboard.TargetProperty="Y"
+                                          BeginTime="00:00:00.5"
+                                          Duration="00:00:00.4"
+                                          From="-10"
+                                          To="10"
+                                          AccelerationRatio="0.1"
+                                          AutoReverse="True"
+                                          RepeatBehavior="Forever" />
+
+                        <!--VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV-->
+
+                        <DoubleAnimation Storyboard.TargetName="EllipseTranslate1"
+                                         Storyboard.TargetProperty="X"
+                                         Duration="00:00:02"
+                                         From="-80"
+                                         To="-20"
+                                         AccelerationRatio="0.1"
+                                         AutoReverse="True"
+                                         RepeatBehavior="Forever" />
 
                         <DoubleAnimation  Storyboard.TargetName="EllipseTranslate2"
                                           Storyboard.TargetProperty="X"
-                                          BeginTime="00:00:00.25"
-                                          Duration="00:00:00.5"
-                                          From="-400"
-                                          To="400"
-                                          AccelerationRatio="0.5"
+                                          Duration="00:00:02"
+                                          From="-50"
+                                          To="-10"
+                                          AccelerationRatio="0.1"
+                                          AutoReverse="True"
                                           RepeatBehavior="Forever" />
 
-                        <!--<DoubleAnimation Storyboard.TargetName="EllipseRotate2"                                                                                                                                                 
-                                             Storyboard.TargetProperty="Angle"                                                                                                                             
-                                             Duration="00:00:01"                                              
-                                             To="-360" 
-                                             RepeatBehavior="Forever" />-->
+                        <DoubleAnimation  Storyboard.TargetName="EllipseTranslate3"
+                                          Storyboard.TargetProperty="X"
+                                          Duration="00:00:02"
+                                          From="-20"
+                                          To="0"
+                                          AccelerationRatio="0.1"
+                                          AutoReverse="True"
+                                          RepeatBehavior="Forever" />
+
+                        <DoubleAnimation  Storyboard.TargetName="EllipseTranslate4"
+                                          Storyboard.TargetProperty="X"
+                                          Duration="00:00:02"
+                                          From="20"
+                                          To="0"
+                                          AccelerationRatio="0.1"
+                                          AutoReverse="True"
+                                          RepeatBehavior="Forever" />
+
+                        <DoubleAnimation  Storyboard.TargetName="EllipseTranslate5"
+                                          Storyboard.TargetProperty="X"
+                                          Duration="00:00:02"
+                                          From="50"
+                                          To="10"
+                                          AccelerationRatio="0.1"
+                                          AutoReverse="True"
+                                          RepeatBehavior="Forever" />
+
+                        <DoubleAnimation  Storyboard.TargetName="EllipseTranslate6"
+                                          Storyboard.TargetProperty="X"
+                                          Duration="00:00:02"
+                                          From="80"
+                                          To="20"
+                                          AccelerationRatio="0.1"
+                                          AutoReverse="True"
+                                          RepeatBehavior="Forever" />
 
                     </Storyboard>
                 </BeginStoryboard>
@@ -71,34 +158,78 @@
                     Opacity="0.3"
                     Background="LightGray" />
 
-        <Ellipse Panel.ZIndex="1"
-                 Fill="#FF54ACE0"
-                 Style="{StaticResource ProgressBarEllipse}">
+        <StackPanel HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Panel.ZIndex="1">
 
-            <Ellipse.RenderTransform>
-                <TransformGroup>
-                    <TranslateTransform x:Name="EllipseTranslate"
-                                        X="0" />
-                    <RotateTransform x:Name="EllipseRotate" />
-                </TransformGroup>
-            </Ellipse.RenderTransform>
+            <TextBlock Text="Ожидайте..."
+                       FontSize="24"
+                       FontWeight="SemiBold"
+                       Opacity="0.7">
 
-        </Ellipse>
+                <TextBlock.Triggers>
+                    <EventTrigger RoutedEvent="Loaded">
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation Duration="00:00:01.5"
+                                                 Storyboard.TargetProperty="Opacity"
+                                                 From="0.7"
+                                                 To="0.4"
+                                                 RepeatBehavior="Forever"
+                                                 AutoReverse="True" />
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </EventTrigger>
+                </TextBlock.Triggers>
+                
+            </TextBlock>
+
+            <Canvas  HorizontalAlignment="Center"
+                     VerticalAlignment="Center"
+                     Margin="35"
+                     Panel.ZIndex="1">
+
+                <Ellipse Style="{StaticResource ProgressBarEllipse}">
+                    <Ellipse.RenderTransform>
+                        <TranslateTransform x:Name="EllipseTranslate1" />
+                    </Ellipse.RenderTransform>
+                </Ellipse>
+
+                <!--FFEBBA16-->
+                <Ellipse Style="{StaticResource ProgressBarEllipse}">
+                    <Ellipse.RenderTransform>
+                        <TranslateTransform x:Name="EllipseTranslate2" />
+                    </Ellipse.RenderTransform>
+                </Ellipse>
+
+                <Ellipse Style="{StaticResource ProgressBarEllipse}">
+                    <Ellipse.RenderTransform>
+                        <TranslateTransform x:Name="EllipseTranslate3" />
+                    </Ellipse.RenderTransform>
+                </Ellipse>
+
+                <Ellipse Style="{StaticResource ProgressBarEllipse}">
+                    <Ellipse.RenderTransform>
+                        <TranslateTransform x:Name="EllipseTranslate4" />
+                    </Ellipse.RenderTransform>
+                </Ellipse>
+
+                <Ellipse Style="{StaticResource ProgressBarEllipse}">
+                    <Ellipse.RenderTransform>
+                        <TranslateTransform x:Name="EllipseTranslate5" />
+                    </Ellipse.RenderTransform>
+                </Ellipse>
+
+                <Ellipse Style="{StaticResource ProgressBarEllipse}">
+                    <Ellipse.RenderTransform>
+                        <TranslateTransform x:Name="EllipseTranslate6" />
+                    </Ellipse.RenderTransform>
+                </Ellipse>
 
 
-        <Ellipse Panel.ZIndex="1"
-                 Fill="#FFEBBA16"
-                 Style="{StaticResource ProgressBarEllipse}">
+            </Canvas>
 
-            <Ellipse.RenderTransform>
-                <TransformGroup>
-                    <TranslateTransform x:Name="EllipseTranslate2"
-                                        X="50" />
-                    <RotateTransform x:Name="EllipseRotate2" />
-                </TransformGroup>
-            </Ellipse.RenderTransform>
-
-        </Ellipse>
+        </StackPanel>
 
     </Grid>
 
