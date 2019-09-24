@@ -51,7 +51,7 @@ namespace PatientsFomsRepository.ViewModels
 
             var importFilePath = fileDialogService.FullPath;
 
-            MainRegionService.SetInProgressStatus("Открытие файла.");
+            MainRegionService.SetBusyStatus("Открытие файла.");
             List<Patient> newPatients;
             using (var file = new ImportPatientsFile())
             {
@@ -60,7 +60,7 @@ namespace PatientsFomsRepository.ViewModels
                 file.Dispose();
             }
 
-            MainRegionService.SetInProgressStatus("Проверка значений.");
+            MainRegionService.SetBusyStatus("Проверка значений.");
             var db = new Models.Database();
             db.Patients.Load();
             var existenInsuaranceNumbers = db.Patients.Select(x => x.InsuranceNumber).ToHashSet();
@@ -70,7 +70,7 @@ namespace PatientsFomsRepository.ViewModels
             .Select(x => x.First())
             .ToList();
 
-            MainRegionService.SetInProgressStatus("Сохранение в кэш.");
+            MainRegionService.SetBusyStatus("Сохранение в кэш.");
             db.Patients.AddRange(newUniqPatients);
             db.SaveChanges();
 
@@ -88,7 +88,7 @@ namespace PatientsFomsRepository.ViewModels
 
             var saveExampleFilePath = fileDialogService.FullPath;
 
-            MainRegionService.SetInProgressStatus("Открытие файла.");
+            MainRegionService.SetBusyStatus("Открытие файла.");
             ImportPatientsFile.SaveExample(saveExampleFilePath);
             MainRegionService.SetCompleteStatus ($"Файл сохранен: {saveExampleFilePath}");
         }
@@ -101,7 +101,7 @@ namespace PatientsFomsRepository.ViewModels
             if (result == ButtonResult.Cancel)
                 return;
 
-            MainRegionService.SetInProgressStatus("Очистка базы данных...");
+            MainRegionService.SetBusyStatus("Очистка базы данных...");
             var db = new Models.Database();
             if (db.Database.Exists())
                 db.Database.Delete();

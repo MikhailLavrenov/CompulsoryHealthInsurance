@@ -9,12 +9,12 @@ namespace PatientsFomsRepository.Infrastructure
     {
         private string header;
         private string status;
-        private bool inProgress;
+        private bool isBusy;
         private IRegionManager regionManager;
 
         public string Header { get => header; set => SetProperty(ref header, value); }
         public string Status { get => status; set => SetProperty(ref status, value); }
-        public bool IsBusy { get => inProgress; set => SetProperty(ref inProgress, value); }
+        public bool IsBusy { get => isBusy; set => SetProperty(ref isBusy, value); }
 
         public MainRegionService(IRegionManager regionManager)
         {
@@ -23,13 +23,10 @@ namespace PatientsFomsRepository.Infrastructure
 
         public void SetCompleteStatus(string statusMessage)
         {
-            if (IsBusy)
-                Status = $"{statusMessage}";
-            else
-                Status = statusMessage;
+            Status = statusMessage;
             IsBusy = false;
         }
-        public void SetInProgressStatus(string statusMessage)
+        public void SetBusyStatus(string statusMessage)
         {
             Status = $"{statusMessage}";
             IsBusy = true;

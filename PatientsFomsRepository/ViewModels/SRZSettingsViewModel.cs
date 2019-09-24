@@ -64,7 +64,7 @@ namespace PatientsFomsRepository.ViewModels
         }
         private void TestExecute()
         {
-            MainRegionService.SetInProgressStatus( "Проверка настроек.");
+            MainRegionService.SetBusyStatus( "Проверка настроек.");
             Settings.TestConnection();
 
             if (Settings.ConnectionIsValid)
