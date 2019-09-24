@@ -1,4 +1,6 @@
-﻿using Prism.Regions;
+﻿using PatientsFomsRepository.Views;
+using Prism.Regions;
+using System.Windows;
 
 namespace PatientsFomsRepository.Infrastructure
 {
@@ -14,7 +16,7 @@ namespace PatientsFomsRepository.Infrastructure
 
         public string Header { get => header; set => SetProperty(ref header, value); }
         public string Status { get => status; set => SetProperty(ref status, value); }
-        public bool IsBusy { get => isBusy; set => SetProperty(ref isBusy, value); }
+        public bool IsBusy { get => isBusy; set => SetProperty(ref isBusy, value, SwitchProgressBar); }
 
         public MainRegionService(IRegionManager regionManager)
         {
@@ -36,6 +38,16 @@ namespace PatientsFomsRepository.Infrastructure
             IsBusy = false;
             Status = string.Empty;
             regionManager.RequestNavigate(RegionNames.MainRegion, targetName);
+        }
+        private void SwitchProgressBar()
+        {
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                if (IsBusy)
+                    regionManager.RequestNavigate(RegionNames.ProgressBarRegion, nameof(ProgressBarView));
+                else
+                    regionManager.Regions[RegionNames.ProgressBarRegion].RemoveAll();
+            });
         }
     }
 }

@@ -38,6 +38,7 @@ namespace PatientsFomsRepository
             containerRegistry.RegisterForNavigation<SRZSettingsView>();
             containerRegistry.RegisterForNavigation<PatientsFileSettingsView>();
             containerRegistry.RegisterForNavigation<AboutApplicationView>();
+            containerRegistry.RegisterForNavigation<ProgressBarView>();
         }
     }
 }
