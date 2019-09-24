@@ -9,13 +9,13 @@
         xmlns:vm="clr-namespace:PatientsFomsRepository.ViewModels"
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         xmlns:prism="http://prismlibrary.com/"
-        mc:Ignorable="d"    
-        
+        mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
         Title="Хранилище пациентов из СРЗ"
         Height="600"
         Width="600"
-        prism:ViewModelLocator.AutoWireViewModel="True">
+        prism:ViewModelLocator.AutoWireViewModel="True"
+        IsEnabled="{Binding MainRegionService.IsBusy, Converter={i:InvertBoolConverter}}">
 
     <Window.Resources>
         <ResourceDictionary>
@@ -28,77 +28,78 @@
 
     <Grid>
 
+        <ContentControl Panel.ZIndex="10"
+                        prism:RegionManager.RegionName="{x:Static i:RegionNames.ProgressBarRegion}" />
 
-        <v:ProgressBarView Panel.ZIndex="100"
-                           Visibility="{Binding MainRegionService.IsBusy, Converter={i:BoolToVisibleConverter}}" />
+        <DockPanel d:DataContext="{d:DesignInstance vm:ShellViewModel}"
+                   Panel.ZIndex="0"
+                   Background="White">
 
-        <!--Visibility="{Binding MainRegionService.InProgress, Converter={i:BoolToVisibleConverter}}"-->
-        
-        <DockPanel d:DataContext="{d:DesignInstance vm:ShellViewModel}" Panel.ZIndex="0" Background="White">
-
-            <WrapPanel DockPanel.Dock="Top" Margin="0,3,0,3">
+            <WrapPanel DockPanel.Dock="Top"
+                       Margin="0,3,0,3">
 
                 <Button Content="Получить ФИО"
-                    Style="{StaticResource HeaderReferenceButton}"
-                    Command="{Binding ShowViewCommand}"
-                    CommandParameter="{x:Type v:PatientsFileView}"/>
+                        Style="{StaticResource HeaderReferenceButton}"
+                        Command="{Binding ShowViewCommand}"
+                        CommandParameter="{x:Type v:PatientsFileView}" />
 
                 <Button Content="Загрузить в БД"
-                    Style="{StaticResource HeaderReferenceButton}"
-                    Command="{Binding ShowViewCommand}"
-                    CommandParameter="{x:Type v:ImportPatientsView}" />
+                        Style="{StaticResource HeaderReferenceButton}"
+                        Command="{Binding ShowViewCommand}"
+                        CommandParameter="{x:Type v:ImportPatientsView}" />
 
                 <Button Content="Настройки СРЗ"
-                    Style="{StaticResource HeaderReferenceButton}"
-                    Command="{Binding ShowViewCommand}"
-                    CommandParameter="{x:Type v:SRZSettingsView}" />
+                        Style="{StaticResource HeaderReferenceButton}"
+                        Command="{Binding ShowViewCommand}"
+                        CommandParameter="{x:Type v:SRZSettingsView}" />
 
                 <Button Content="Настройки файла пациентов"
-                    Style="{StaticResource HeaderReferenceButton}"
-                    Command="{Binding ShowViewCommand}"
-                    CommandParameter="{x:Type v:PatientsFileSettingsView}" />
+                        Style="{StaticResource HeaderReferenceButton}"
+                        Command="{Binding ShowViewCommand}"
+                        CommandParameter="{x:Type v:PatientsFileSettingsView}" />
 
                 <Button Content="О программе"
-                    Style="{StaticResource HeaderReferenceButton}"
-                    Command="{Binding ShowViewCommand}"
-                    CommandParameter="{x:Type v:AboutApplicationView}" />
+                        Style="{StaticResource HeaderReferenceButton}"
+                        Command="{Binding ShowViewCommand}"
+                        CommandParameter="{x:Type v:AboutApplicationView}" />
 
             </WrapPanel>
 
-            <Separator DockPanel.Dock="Top"/>
+            <Separator DockPanel.Dock="Top" />
 
-            <DockPanel x:Name="MainRegionPanel" RenderTransformOrigin="0.1,0.1" >
+            <DockPanel x:Name="MainRegionPanel"
+                       RenderTransformOrigin="0.1,0.1">
 
                 <DockPanel.RenderTransform>
                     <SkewTransform x:Name="AnimatedSkewTransform" />
                 </DockPanel.RenderTransform>
 
                 <TextBlock DockPanel.Dock="Top"
-                       Margin="5,10,5,20"
-                       Style="{StaticResource TextBlockHeader}"
-                       Text="{Binding MainRegionService.Header, NotifyOnTargetUpdated=True}" >
+                           Margin="5,10,5,20"
+                           Style="{StaticResource TextBlockHeader}"
+                           Text="{Binding MainRegionService.Header, NotifyOnTargetUpdated=True}">
 
                     <TextBlock.Triggers>
                         <EventTrigger RoutedEvent="Binding.TargetUpdated">
                             <BeginStoryboard>
-                                <Storyboard >
-                                    <DoubleAnimation Storyboard.TargetName="MainRegionPanel" 
-                                                 Storyboard.TargetProperty="Opacity"
-                                                 Duration="0:0:0.5" 
-                                                 From="0" 
-                                                 To="1" />
+                                <Storyboard>
+                                    <DoubleAnimation Storyboard.TargetName="MainRegionPanel"
+                                                     Storyboard.TargetProperty="Opacity"
+                                                     Duration="0:0:0.5"
+                                                     From="0"
+                                                     To="1" />
 
-                                    <DoubleAnimation Storyboard.TargetName="AnimatedSkewTransform" 
-                                                 Storyboard.TargetProperty="(SkewTransform.AngleX)"
-                                                 Duration="0:0:0.5" 
-                                                 From="90" 
-                                                 To="0"/>
-                                    
-                                    <DoubleAnimation Storyboard.TargetName="AnimatedSkewTransform" 
-                                                 Storyboard.TargetProperty="(SkewTransform.AngleY)"
-                                                 Duration="0:0:0.5" 
-                                                 From="90" 
-                                                 To="0"/>
+                                    <DoubleAnimation Storyboard.TargetName="AnimatedSkewTransform"
+                                                     Storyboard.TargetProperty="AngleX"
+                                                     Duration="0:0:0.5"
+                                                     From="90"
+                                                     To="0" />
+
+                                    <DoubleAnimation Storyboard.TargetName="AnimatedSkewTransform"
+                                                     Storyboard.TargetProperty="AngleY"
+                                                     Duration="0:0:0.5"
+                                                     From="90"
+                                                     To="0" />
                                 </Storyboard>
                             </BeginStoryboard>
                         </EventTrigger>
@@ -107,8 +108,8 @@
                 </TextBlock>
 
                 <TextBlock DockPanel.Dock="Bottom"
-                   TextWrapping="Wrap"
-                   Text="{Binding MainRegionService.Status}" />
+                           TextWrapping="Wrap"
+                           Text="{Binding MainRegionService.Status}" />
 
                 <ContentControl prism:RegionManager.RegionName="{x:Static i:RegionNames.MainRegion}" />
 
@@ -117,11 +118,11 @@
             <DockPanel.Triggers>
                 <EventTrigger RoutedEvent="Loaded">
                     <BeginStoryboard>
-                        <Storyboard >
-                            <DoubleAnimation Storyboard.TargetProperty="Opacity"                                                 
-                                     Duration="0:0:0.5"                                                  
-                                     From="0"                                                  
-                                     To="1" />
+                        <Storyboard>
+                            <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                             Duration="0:0:0.5"
+                                             From="0"
+                                             To="1" />
                         </Storyboard>
                     </BeginStoryboard>
                 </EventTrigger>

@@ -12,5 +12,6 @@ namespace PatientsFomsRepository.Infrastructure
     public static class RegionNames
     {
         public static string MainRegion { get; } = "MainRegion";
+        public static string ProgressBarRegion { get; } = "ProgressBarRegion";
     }
 }

@@ -33,6 +33,8 @@
                 <BeginStoryboard>
                     <Storyboard>
 
+                        <!--Вертикальное смещение-->
+
                         <DoubleAnimation Storyboard.TargetName="EllipseTranslate1"
                                          Storyboard.TargetProperty="Y"
                                          BeginTime="00:00:00"
@@ -93,7 +95,7 @@
                                           AutoReverse="True"
                                           RepeatBehavior="Forever" />
 
-                        <!--VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV-->
+                        <!--Горизонтальное смещение-->
 
                         <DoubleAnimation Storyboard.TargetName="EllipseTranslate1"
                                          Storyboard.TargetProperty="X"
@@ -164,8 +166,7 @@
 
             <TextBlock Text="Ожидайте..."
                        FontSize="24"
-                       FontWeight="SemiBold"
-                       Opacity="0.7">
+                       FontWeight="SemiBold">
 
                 <TextBlock.Triggers>
                     <EventTrigger RoutedEvent="Loaded">
@@ -173,8 +174,8 @@
                             <Storyboard>
                                 <DoubleAnimation Duration="00:00:01.5"
                                                  Storyboard.TargetProperty="Opacity"
-                                                 From="0.7"
-                                                 To="0.4"
+                                                 From="0.8"
+                                                 To="0.6"
                                                  RepeatBehavior="Forever"
                                                  AutoReverse="True" />
                             </Storyboard>
