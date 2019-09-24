@@ -16,7 +16,7 @@ namespace PatientsFomsRepository.Infrastructure
         bool IsBusy { get; set; }
 
         void SetCompleteStatus(string statusMessage);
-        void SetInProgressStatus(string statusMessage);
+        void SetBusyStatus(string statusMessage);
         void RequestNavigate(string targetName);
     }
 }
