@@ -128,7 +128,10 @@ namespace PatientsFomsRepository.ViewModels
             MainRegionService.SetBusyStatus("Сохранение изменений.");
             file.Save();
 
-            MainRegionService.SetCompleteStatus($"{ resultReport} Осталось найти {unknownPatients.Count} ФИО.");
+            if (unknownPatients.Count == 0)
+                MainRegionService.SetCompleteStatus($"{ resultReport} Файл готов, найдены все ФИО.");
+            else
+                MainRegionService.SetCompleteStatus($"{ resultReport} Файл не готов, осталось найти {unknownPatients.Count} ФИО.");
         }
         private bool ProcessFileCanExecute()
         {
