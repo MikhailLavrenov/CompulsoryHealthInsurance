@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:PatientsFomsRepository.Views"
+             xmlns:i="clr-namespace:PatientsFomsRepository.Infrastructure"
              mc:Ignorable="d"
              d:DesignHeight="450"
              d:DesignWidth="800">
@@ -23,6 +24,7 @@
                     Value="0.5,0.5" />
             <Setter Property="Fill"
                     Value="#FF54ACE0" />
+            
         </Style>
     </UserControl.Resources>
 
@@ -33,123 +35,106 @@
                 <BeginStoryboard>
                     <Storyboard>
 
-                        <!--Вертикальное смещение-->
+                        <DoubleAnimationUsingKeyFrames  Storyboard.TargetName="Ellipse1"                                          
+                                                        Storyboard.TargetProperty="RenderTransform.X"
+                                                        BeginTime="00:00:00"                                             
+                                                        Duration="00:00:04"                                                                                                    
+                                                        RepeatBehavior="Forever">
+                            <SplineDoubleKeyFrame Value="300" KeyTime="50%" KeySpline="0.0,0.9 0.9,0.0" />
+                            <SplineDoubleKeyFrame Value="300"/>
+                        </DoubleAnimationUsingKeyFrames>
 
-                        <DoubleAnimation Storyboard.TargetName="EllipseTranslate1"
-                                         Storyboard.TargetProperty="Y"
-                                         BeginTime="00:00:00"
-                                         Duration="00:00:00.4"
-                                         From="-10"
-                                         To="10"
-                                         AccelerationRatio="0.1"
-                                         AutoReverse="True"
-                                         RepeatBehavior="Forever" />
+                        <DoubleAnimationUsingKeyFrames  Storyboard.TargetName="Ellipse1"                                          
+                                                        Storyboard.TargetProperty="Opacity"
+                                                        BeginTime="00:00:00"                                             
+                                                        Duration="00:00:04"                                                            
+                                                        RepeatBehavior="Forever">
+                            <DiscreteDoubleKeyFrame KeyTime="50%"  Value="0"  />
+                        </DoubleAnimationUsingKeyFrames>
 
-                        <DoubleAnimation  Storyboard.TargetName="EllipseTranslate2"
-                                          Storyboard.TargetProperty="Y"
-                                          BeginTime="00:00:00.1"
-                                          Duration="00:00:0.4"
-                                          From="-20"
-                                          To="20"
-                                          AccelerationRatio="0.1"
-                                          AutoReverse="True"
-                                          RepeatBehavior="Forever" />
+                        <DoubleAnimationUsingKeyFrames  Storyboard.TargetName="Ellipse2"                                          
+                                                        Storyboard.TargetProperty="RenderTransform.X"
+                                                        BeginTime="00:00:00.15"                                                                                                  
+                                                        Duration="00:00:04"                                                                                                          
+                                                        RepeatBehavior="Forever">
+                            <SplineDoubleKeyFrame Value="300" KeyTime="50%" KeySpline="0.0,0.9 0.9,0.0" />
+                            <SplineDoubleKeyFrame Value="300"/>
+                        </DoubleAnimationUsingKeyFrames>
 
-                        <DoubleAnimation  Storyboard.TargetName="EllipseTranslate3"
-                                          Storyboard.TargetProperty="Y"
-                                          BeginTime="00:00:00.2"
-                                          Duration="00:00:00.4"
-                                          From="-30"
-                                          To="30"
-                                          AccelerationRatio="0.1"
-                                          AutoReverse="True"
-                                          RepeatBehavior="Forever" />
+                        <DoubleAnimationUsingKeyFrames  Storyboard.TargetName="Ellipse2"                                          
+                                                        Storyboard.TargetProperty="Opacity"
+                                                        BeginTime="00:00:00.15"                                                                                                  
+                                                        Duration="00:00:04"                                                                                                         
+                                                        RepeatBehavior="Forever">
+                            <DiscreteDoubleKeyFrame KeyTime="50%"  Value="0"  />
+                        </DoubleAnimationUsingKeyFrames>
 
-                        <DoubleAnimation  Storyboard.TargetName="EllipseTranslate4"
-                                          Storyboard.TargetProperty="Y"
-                                          BeginTime="00:00:00.3"
-                                          Duration="00:00:00.4"
-                                          From="-30"
-                                          To="30"
-                                          AccelerationRatio="0.1"
-                                          AutoReverse="True"
-                                          RepeatBehavior="Forever" />
+                        <DoubleAnimationUsingKeyFrames  Storyboard.TargetName="Ellipse3"                                         
+                                                        Storyboard.TargetProperty="RenderTransform.X"
+                                                        BeginTime="00:00:00.3"                                                                                                  
+                                                        Duration="00:00:04"                                                                                                         
+                                                        RepeatBehavior="Forever">
+                            <SplineDoubleKeyFrame Value="300" KeyTime="50%" KeySpline="0.0,0.9 0.9,0.0" />
+                            <SplineDoubleKeyFrame Value="300"/>
+                        </DoubleAnimationUsingKeyFrames>
 
-                        <DoubleAnimation  Storyboard.TargetName="EllipseTranslate5"
-                                          Storyboard.TargetProperty="Y"
-                                          BeginTime="00:00:00.4"
-                                          Duration="00:00:00.4"
-                                          From="-20"
-                                          To="20"
-                                          AccelerationRatio="0.1"
-                                          AutoReverse="True"
-                                          RepeatBehavior="Forever" />
+                        <DoubleAnimationUsingKeyFrames  Storyboard.TargetName="Ellipse3"                                          
+                                                        Storyboard.TargetProperty="Opacity"
+                                                        BeginTime="00:00:00.3"                                                                                                  
+                                                        Duration="00:00:04"                                                                                                       
+                                                        RepeatBehavior="Forever">
+                            <DiscreteDoubleKeyFrame KeyTime="50%"  Value="0"  />
+                        </DoubleAnimationUsingKeyFrames>
 
-                        <DoubleAnimation  Storyboard.TargetName="EllipseTranslate6"
-                                          Storyboard.TargetProperty="Y"
-                                          BeginTime="00:00:00.5"
-                                          Duration="00:00:00.4"
-                                          From="-10"
-                                          To="10"
-                                          AccelerationRatio="0.1"
-                                          AutoReverse="True"
-                                          RepeatBehavior="Forever" />
+                        <DoubleAnimationUsingKeyFrames  Storyboard.TargetName="Ellipse4"                                          
+                                                        Storyboard.TargetProperty="RenderTransform.X"
+                                                        BeginTime="00:00:00.45"                                                                                                 
+                                                        Duration="00:00:04"                                                                                                          
+                                                        RepeatBehavior="Forever">
+                            <SplineDoubleKeyFrame Value="300" KeyTime="50%" KeySpline="0.0,0.9 0.9,0.0" />
+                            <SplineDoubleKeyFrame Value="300"/>
+                        </DoubleAnimationUsingKeyFrames>
 
-                        <!--Горизонтальное смещение-->
+                        <DoubleAnimationUsingKeyFrames  Storyboard.TargetName="Ellipse4"                                          
+                                                        Storyboard.TargetProperty="Opacity"
+                                                        BeginTime="00:00:00.45"                                                                                                   
+                                                        Duration="00:00:04"                                                                                                       
+                                                        RepeatBehavior="Forever">
+                            <DiscreteDoubleKeyFrame KeyTime="50%"  Value="0"  />
+                        </DoubleAnimationUsingKeyFrames>
 
-                        <DoubleAnimation Storyboard.TargetName="EllipseTranslate1"
-                                         Storyboard.TargetProperty="X"
-                                         Duration="00:00:02"
-                                         From="-80"
-                                         To="-20"
-                                         AccelerationRatio="0.1"
-                                         AutoReverse="True"
-                                         RepeatBehavior="Forever" />
+                        <DoubleAnimationUsingKeyFrames  Storyboard.TargetName="Ellipse5"                                          
+                                                        Storyboard.TargetProperty="RenderTransform.X"
+                                                        BeginTime="00:00:00.6"                                                                                                  
+                                                        Duration="00:00:04"                                                                                                          
+                                                        RepeatBehavior="Forever">
+                            <SplineDoubleKeyFrame Value="300" KeyTime="50%" KeySpline="0.0,0.9 0.9,0.0" />
+                            <SplineDoubleKeyFrame Value="300"/>
+                        </DoubleAnimationUsingKeyFrames>
 
-                        <DoubleAnimation  Storyboard.TargetName="EllipseTranslate2"
-                                          Storyboard.TargetProperty="X"
-                                          Duration="00:00:02"
-                                          From="-50"
-                                          To="-10"
-                                          AccelerationRatio="0.1"
-                                          AutoReverse="True"
-                                          RepeatBehavior="Forever" />
+                        <DoubleAnimationUsingKeyFrames  Storyboard.TargetName="Ellipse5"                                          
+                                                        Storyboard.TargetProperty="Opacity"
+                                                        BeginTime="00:00:00.6"                                                                                               
+                                                        Duration="00:00:04"                                                                                                       
+                                                        RepeatBehavior="Forever">
+                            <DiscreteDoubleKeyFrame KeyTime="50%"  Value="0"  />
+                        </DoubleAnimationUsingKeyFrames>
 
-                        <DoubleAnimation  Storyboard.TargetName="EllipseTranslate3"
-                                          Storyboard.TargetProperty="X"
-                                          Duration="00:00:02"
-                                          From="-20"
-                                          To="0"
-                                          AccelerationRatio="0.1"
-                                          AutoReverse="True"
-                                          RepeatBehavior="Forever" />
+                        <DoubleAnimationUsingKeyFrames  Storyboard.TargetName="Ellipse6"                                          
+                                                        Storyboard.TargetProperty="RenderTransform.X"
+                                                        BeginTime="00:00:00.75"                                                                                                  
+                                                        Duration="00:00:04"                                                                                                          
+                                                        RepeatBehavior="Forever">
+                            <SplineDoubleKeyFrame Value="300" KeyTime="50%" KeySpline="0.0,0.9 0.9,0.0" />
+                        </DoubleAnimationUsingKeyFrames>
 
-                        <DoubleAnimation  Storyboard.TargetName="EllipseTranslate4"
-                                          Storyboard.TargetProperty="X"
-                                          Duration="00:00:02"
-                                          From="20"
-                                          To="0"
-                                          AccelerationRatio="0.1"
-                                          AutoReverse="True"
-                                          RepeatBehavior="Forever" />
-
-                        <DoubleAnimation  Storyboard.TargetName="EllipseTranslate5"
-                                          Storyboard.TargetProperty="X"
-                                          Duration="00:00:02"
-                                          From="50"
-                                          To="10"
-                                          AccelerationRatio="0.1"
-                                          AutoReverse="True"
-                                          RepeatBehavior="Forever" />
-
-                        <DoubleAnimation  Storyboard.TargetName="EllipseTranslate6"
-                                          Storyboard.TargetProperty="X"
-                                          Duration="00:00:02"
-                                          From="80"
-                                          To="20"
-                                          AccelerationRatio="0.1"
-                                          AutoReverse="True"
-                                          RepeatBehavior="Forever" />
+                        <DoubleAnimationUsingKeyFrames  Storyboard.TargetName="Ellipse6"                                          
+                                                        Storyboard.TargetProperty="Opacity"
+                                                        BeginTime="00:00:00.75"                                                                                                   
+                                                        Duration="00:00:04"                                                                                                       
+                                                        RepeatBehavior="Forever">
+                            <DiscreteDoubleKeyFrame KeyTime="50%"  Value="0"  />
+                        </DoubleAnimationUsingKeyFrames>
 
                     </Storyboard>
                 </BeginStoryboard>
@@ -182,48 +167,48 @@
                         </BeginStoryboard>
                     </EventTrigger>
                 </TextBlock.Triggers>
-                
+
             </TextBlock>
 
             <Canvas  HorizontalAlignment="Center"
                      VerticalAlignment="Center"
-                     Margin="35"
+                     Margin="10"
                      Panel.ZIndex="1">
 
-                <Ellipse Style="{StaticResource ProgressBarEllipse}">
+                <Ellipse Style="{StaticResource ProgressBarEllipse}" x:Name="Ellipse1">
                     <Ellipse.RenderTransform>
-                        <TranslateTransform x:Name="EllipseTranslate1" />
+                        <TranslateTransform X="-300" />
                     </Ellipse.RenderTransform>
                 </Ellipse>
 
                 <!--FFEBBA16-->
-                <Ellipse Style="{StaticResource ProgressBarEllipse}">
+                <Ellipse Style="{StaticResource ProgressBarEllipse}" x:Name="Ellipse2">
                     <Ellipse.RenderTransform>
-                        <TranslateTransform x:Name="EllipseTranslate2" />
+                        <TranslateTransform   X="-300" />
                     </Ellipse.RenderTransform>
                 </Ellipse>
 
-                <Ellipse Style="{StaticResource ProgressBarEllipse}">
+                <Ellipse Style="{StaticResource ProgressBarEllipse}" x:Name="Ellipse3">
                     <Ellipse.RenderTransform>
-                        <TranslateTransform x:Name="EllipseTranslate3" />
+                        <TranslateTransform  X="-300" />
                     </Ellipse.RenderTransform>
                 </Ellipse>
 
-                <Ellipse Style="{StaticResource ProgressBarEllipse}">
+                <Ellipse Style="{StaticResource ProgressBarEllipse}" x:Name="Ellipse4">
                     <Ellipse.RenderTransform>
-                        <TranslateTransform x:Name="EllipseTranslate4" />
+                        <TranslateTransform  X="-300" />
                     </Ellipse.RenderTransform>
                 </Ellipse>
 
-                <Ellipse Style="{StaticResource ProgressBarEllipse}">
+                <Ellipse Style="{StaticResource ProgressBarEllipse}" x:Name="Ellipse5">
                     <Ellipse.RenderTransform>
-                        <TranslateTransform x:Name="EllipseTranslate5" />
+                        <TranslateTransform  X="-300" />
                     </Ellipse.RenderTransform>
                 </Ellipse>
 
-                <Ellipse Style="{StaticResource ProgressBarEllipse}">
+                <Ellipse Style="{StaticResource ProgressBarEllipse}" x:Name="Ellipse6">
                     <Ellipse.RenderTransform>
-                        <TranslateTransform x:Name="EllipseTranslate6" />
+                        <TranslateTransform  X="-300" />
                     </Ellipse.RenderTransform>
                 </Ellipse>
 
