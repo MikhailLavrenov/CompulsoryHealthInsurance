@@ -63,7 +63,8 @@ namespace PatientsFomsRepository.ViewModels
             MainRegionService.SetBusyStatus("Проверка значений.");
             var db = new Models.Database();
             db.Patients.Load();
-            var existenInsuaranceNumbers = db.Patients.Select(x => x.InsuranceNumber).ToHashSet();
+
+            var existenInsuaranceNumbers = new HashSet<string>(db.Patients.Select(x => x.InsuranceNumber));
             var newUniqPatients = newPatients
             .Where(x => !existenInsuaranceNumbers.Contains(x.InsuranceNumber))
             .GroupBy(x => x.InsuranceNumber)

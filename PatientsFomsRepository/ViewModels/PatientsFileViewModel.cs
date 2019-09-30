@@ -103,7 +103,7 @@ namespace PatientsFomsRepository.ViewModels
                 file.SetFullNames(verifiedPatients);
 
                 MainRegionService.SetBusyStatus("Ожидайте. Добавление в кэш ФИО найденных в СРЗ.");
-                var duplicateInsuranceNumber = verifiedPatients.Select(x => x.InsuranceNumber).ToHashSet();
+                var duplicateInsuranceNumber = new HashSet<string>(verifiedPatients.Select(x => x.InsuranceNumber));
                 var duplicatePatients = db.Patients.Where(x => duplicateInsuranceNumber.Contains(x.InsuranceNumber)).ToArray();
                 db.Patients.RemoveRange(duplicatePatients);
                 db.SaveChanges();
