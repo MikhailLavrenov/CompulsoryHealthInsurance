@@ -139,6 +139,7 @@
     <Compile Include="Infrastructure\DomainObject.cs" />
     <Compile Include="Infrastructure\DelegateCommandAsync{T}.cs" />
     <Compile Include="Infrastructure\MainRegionService.cs" />
+    <Compile Include="Infrastructure\ErrorMessages.cs" />
     <Compile Include="Models\ImportPatientsFile.cs" />
     <Compile Include="Models\PatientsFile\ColumnProperty.cs" />
     <Compile Include="Models\SRZ\CredentialScope.cs" />

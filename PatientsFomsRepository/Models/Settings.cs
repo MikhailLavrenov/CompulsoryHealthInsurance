@@ -22,11 +22,6 @@ namespace PatientsFomsRepository.Models
         private byte threadsLimit;
         private CredentialScope credentialsScope;
         private ObservableCollection<Credential> credentials;
-
-        //валидация SRZ
-        private bool siteAddressIsNotValid;
-        private bool proxyIsNotValid;
-        private bool credentialsIsNotValid;
         private bool connectionIsValid;
 
         //PatientsFile
@@ -37,7 +32,7 @@ namespace PatientsFomsRepository.Models
         #endregion
 
         #region Свойства       
-        public static string ThisFileName { get; }
+        public static string SettingsFileName { get; }
         public static Settings Instance { get; private set; }
 
         //SRZ
@@ -92,11 +87,6 @@ namespace PatientsFomsRepository.Models
         public byte ThreadsLimit { get => threadsLimit; set => SetProperty(ref threadsLimit, value); }
         public CredentialScope CredentialsScope { get => credentialsScope; set { Credential.Scope = value; SetProperty(ref credentialsScope, value); } }
         public ObservableCollection<Credential> Credentials { get => credentials; set => SetProperty(ref credentials, value); }
-
-        //валидация SRZ
-        [XmlIgnore] public bool SiteAddressIsNotValid { get => siteAddressIsNotValid; set => SetProperty(ref siteAddressIsNotValid, value); }
-        [XmlIgnore] public bool ProxyIsNotValid { get => proxyIsNotValid; set => SetProperty(ref proxyIsNotValid, value); }
-        [XmlIgnore] public bool CredentialsIsNotValid { get => credentialsIsNotValid; set => SetProperty(ref credentialsIsNotValid, value); }
         [XmlIgnore] public bool ConnectionIsValid { get => connectionIsValid; set => SetProperty(ref connectionIsValid, value); }
 
         //PatientsFile
@@ -109,7 +99,7 @@ namespace PatientsFomsRepository.Models
         #region Конструкторы
         static Settings()
         {
-            ThisFileName = "Settings.xml";
+            SettingsFileName = "Settings.xml";
             Instance = Load();
         }
         public Settings()
@@ -124,11 +114,36 @@ namespace PatientsFomsRepository.Models
         //проверить настройки
         public void TestConnection()
         {
-            TestProxy();
-            TestSite();
-            TestCredentials();
+            RemoveError(ErrorMessages.Connection, nameof(SiteAddress));
+            Credentials.ToList().ForEach(x => x.RemoveErrorsMessage(ErrorMessages.Connection));
 
-            ConnectionIsValid = SiteAddressIsNotValid == false && ProxyIsNotValid == false && CredentialsIsNotValid == false;
+            if (UseProxy && !TryConnectProxy())
+            {
+                AddError(ErrorMessages.Connection, nameof(ProxyAddress));
+                AddError(ErrorMessages.Connection, nameof(ProxyPort));
+                ConnectionIsValid = false;
+                return;
+            }
+            else
+            {
+                RemoveError(ErrorMessages.Connection, nameof(ProxyAddress));
+                RemoveError(ErrorMessages.Connection, nameof(ProxyPort));
+            }
+
+            if (!TryConnectSite())
+            {
+                AddError(ErrorMessages.Connection, nameof(SiteAddress));
+                ConnectionIsValid = false;
+                return;
+            }              
+
+            if (!TryAuthorizeCredentials())
+            {
+                ConnectionIsValid = false;
+                return;
+            }
+
+            ConnectionIsValid = true;
         }
         //сохраняет настройки в xml
         public void Save()
@@ -141,7 +156,7 @@ namespace PatientsFomsRepository.Models
             foreach (var item in ColumnProperties)
                 item.Validate();
 
-            using (var stream = new FileStream(ThisFileName, FileMode.Create))
+            using (var stream = new FileStream(SettingsFileName, FileMode.Create))
             {
                 var formatter = new XmlSerializer(GetType());
                 formatter.Serialize(stream, this);
@@ -150,8 +165,8 @@ namespace PatientsFomsRepository.Models
         //загружает настройки из xml
         public static Settings Load()
         {
-            if (File.Exists(ThisFileName))
-                using (var stream = new FileStream(ThisFileName, FileMode.Open))
+            if (File.Exists(SettingsFileName))
+                using (var stream = new FileStream(SettingsFileName, FileMode.Open))
                 {
                     var formatter = new XmlSerializer(typeof(Settings));
                     return formatter.Deserialize(stream) as Settings;
@@ -242,10 +257,10 @@ namespace PatientsFomsRepository.Models
             switch (propertyName)
             {
                 case nameof(SiteAddress):
-                    if (string.IsNullOrEmpty(SiteAddress) || Uri.TryCreate(SiteAddress, UriKind.Absolute,out var t)==false)
-                        AddError(UriFormatErrorMessage, propertyName);
+                    if (string.IsNullOrEmpty(SiteAddress) || Uri.TryCreate(SiteAddress, UriKind.Absolute, out _) == false)
+                        AddError(ErrorMessages.UriFormat, propertyName);
                     else
-                        RemoveError(UriFormatErrorMessage, propertyName);
+                        RemoveError(ErrorMessages.UriFormat, propertyName);
 
                     break;
 
@@ -268,99 +283,76 @@ namespace PatientsFomsRepository.Models
 
                 case nameof(ThreadsLimit):
                     if (ThreadsLimit < 1)
-                        AddError(LessOneErrorMessage, propertyName);
+                        AddError(ErrorMessages.LessOne, propertyName);
                     else
-                        RemoveError(LessOneErrorMessage, propertyName);
-                    break;
-
-                case nameof(SiteAddressIsNotValid):
-                    if (SiteAddressIsNotValid)
-                        AddError(ConnectionErrorMessage, nameof(SiteAddress));
-                    else
-                        RemoveError(ConnectionErrorMessage, nameof(SiteAddress));
-                    break;
-
-                case nameof(ProxyIsNotValid):
-                    if (ProxyIsNotValid)
-                    {
-                        AddError(ConnectionErrorMessage, nameof(ProxyAddress));
-                        AddError(ConnectionErrorMessage, nameof(ProxyPort));
-                    }
-                    else
-                    {
-                        RemoveError(ConnectionErrorMessage, nameof(ProxyAddress));
-                        RemoveError(ConnectionErrorMessage, nameof(ProxyPort));
-                    }
+                        RemoveError(ErrorMessages.LessOne, propertyName);
                     break;
             }
         }
-        //проверяет настройки прокси-сервера
-        private void TestProxy()
+        //проверяет настройки прокси-сервера, в случае успеха - true
+        private bool TryConnectProxy()
         {
-            if (UseProxy)
-            {
-                var client = new TcpClient();
+            //if (!UseProxy)
+            //    return true;
 
-                try
-                {
-                    var connected = client.ConnectAsync(ProxyAddress, ProxyPort).Wait(timeoutConnection);
-                    ProxyIsNotValid = !connected;
-                }
-                catch (Exception)
-                {
-                    ProxyIsNotValid = true;
-                }
-                finally
-                {
-                    client.Close();
-                }
-            }
-            else
-                ProxyIsNotValid = false;
-        }
-        //проверяет доступность сайта
-        private void TestSite()
-        {
-            if (ProxyIsNotValid == false)
+            var connected = false;
+
+            using (var client = new TcpClient())
             {
                 try
                 {
-                    var webRequest = (HttpWebRequest)WebRequest.Create(SiteAddress);
-                    webRequest.Timeout = timeoutConnection;
-                    if (UseProxy)
-                        webRequest.Proxy = new WebProxy(ProxyAddress + ":" + ProxyPort);
-
-                    webRequest.GetResponse();
-                    webRequest.Abort();
-
-                    SiteAddressIsNotValid = false;
+                    connected = client.ConnectAsync(ProxyAddress, ProxyPort).Wait(timeoutConnection);
                 }
                 catch (Exception)
-                {
-                    SiteAddressIsNotValid = true;
-                }
+                { }
             }
-            else
-                SiteAddressIsNotValid = false;
-
-
+            return connected;
         }
-        //проверяет учетные данные
-        private void TestCredentials()
+        //проверяет доступность сайта, в случае успеха - true
+        private bool TryConnectSite()
         {
-            if (SiteAddressIsNotValid == false && ProxyIsNotValid == false)
+            var connected = false;
+
+            try
             {
-                Parallel.ForEach(Credentials, credential =>
-                {
-                    using (SRZ site = new SRZ(SiteAddress, ProxyAddress, ProxyPort))
-                    {
-                        credential.IsNotValid = site.TryAuthorize(credential) == false;
-                    }
-                });
-                CredentialsIsNotValid = Credentials.FirstOrDefault(x => x.IsNotValid == true) != null;
+                var webRequest = (HttpWebRequest)WebRequest.Create(SiteAddress);
+
+                webRequest.Timeout = timeoutConnection;
+
+                if (UseProxy)
+                    webRequest.Proxy = new WebProxy(ProxyAddress + ":" + ProxyPort);
+
+                webRequest.GetResponse();
+                webRequest.Abort();
+
+                connected = true;
             }
-            else
-                CredentialsIsNotValid = false;
+            catch (Exception)
+            { }
+
+            return connected;
+        }
+        //проверяет учетные данные, в случае успеха - true
+        private bool TryAuthorizeCredentials()
+        {
+            Parallel.ForEach(Credentials, credential =>
+            {
+                using (var site = new SRZ(SiteAddress, ProxyAddress, ProxyPort))
+                {
+                    if (site.TryAuthorize(credential))
+                    {
+                        credential.RemoveErrors(nameof(credential.Login));
+                        credential.RemoveErrors(nameof(credential.Password));
+                    }
+                    else
+                    {
+                        credential.AddError(ErrorMessages.Connection, nameof(credential.Login));
+                        credential.AddError(ErrorMessages.Connection, nameof(credential.Password));
+                    }
+                }
+            });
+
+            return !Credentials.Any(x => x.HasErrors);
         }
         #endregion
     }

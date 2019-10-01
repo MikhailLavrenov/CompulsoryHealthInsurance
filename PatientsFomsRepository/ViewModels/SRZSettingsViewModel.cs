@@ -50,7 +50,7 @@ namespace PatientsFomsRepository.ViewModels
         private void SaveExecute()
         {
             Settings.Save();
-            MainRegionService.SetCompleteStatus( "Настройки сохранены.");
+            MainRegionService.SetCompleteStatus("Настройки сохранены.");
         }
         private void LoadExecute()
         {
@@ -64,26 +64,17 @@ namespace PatientsFomsRepository.ViewModels
         }
         private void TestExecute()
         {
-            MainRegionService.SetBusyStatus( "Проверка настроек.");
+            MainRegionService.SetBusyStatus("Проверка настроек.");
             Settings.TestConnection();
 
             if (Settings.ConnectionIsValid)
                 MainRegionService.SetCompleteStatus("Настройки корректны.");
-            else if (Settings.ProxyIsNotValid)
-                MainRegionService.SetCompleteStatus(" Прокси сервер не доступен.");
-            else if (Settings.SiteAddressIsNotValid)
+            else if (Settings.ContainsErrorMessage(nameof(Settings.ProxyAddress),ErrorMessages.Connection))
+                MainRegionService.SetCompleteStatus("Прокси сервер не доступен.");
+            else if (Settings.ContainsErrorMessage(nameof(Settings.SiteAddress), ErrorMessages.Connection))
                 MainRegionService.SetCompleteStatus("Web-сайт СРЗ не доступен.");
-            else if (Settings.CredentialsIsNotValid)
-            {
-                var logins = new StringBuilder();
-                Settings.Credentials
-                .Where(x => x.IsNotValid)
-                .ToList()
-                .ForEach(x => logins.Append(x).Append(", "));
-                logins.Remove(logins.Length - 3, 2);
-
-                MainRegionService.SetCompleteStatus($" Учетные записи не верны: {logins}.");
-            }
+            else
+                MainRegionService.SetCompleteStatus($"Не удалось авторизоваться под некоторыми учетными записями.");
         }
         private void SwitchShowPasswordExecute()
         {
