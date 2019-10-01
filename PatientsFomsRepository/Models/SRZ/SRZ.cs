@@ -9,7 +9,6 @@ using System.Text;
 
 namespace PatientsFomsRepository.Models
 {
-
     /// <summary>
     /// Работа с веб-порталом СРЗ
     /// </summary>
@@ -40,11 +39,11 @@ namespace PatientsFomsRepository.Models
         public bool TryAuthorize(Credential credential)
         {
             Credential = credential;
-            var content = new FormUrlEncodedContent(new[]
-                {
+            var content = new FormUrlEncodedContent(new[]                
+            {
                 new KeyValuePair<string, string>("lg", credential.Login),
-                new KeyValuePair<string, string>("pw", credential.Password),
-                });
+                new KeyValuePair<string, string>("pw", credential.Password),                
+            });
 
             try
             {
@@ -72,6 +71,8 @@ namespace PatientsFomsRepository.Models
         //запрашивает данные пациента
         public bool TryGetPatient(string insuranceNumber, out Patient patient)
         {
+            patient = null;
+
             var content = new FormUrlEncodedContent(new[]
             {
                 new KeyValuePair<string, string>("mode", "1"),
@@ -90,15 +91,11 @@ namespace PatientsFomsRepository.Models
                     patient = new Patient(responseLines[2], responseLines[3], responseLines[4], responseLines[5]);
                     return true;
                 }
-                else
-                {
-                    patient = null;
+                else              
                     return false;
-                }
             }
             catch (Exception)
             {
-                patient = null;
                 return false;
             }
         }
@@ -159,9 +156,12 @@ namespace PatientsFomsRepository.Models
 
             //извлекает dbf файл
             Stream dbfFile = new MemoryStream();
-            var archive = new ZipArchive(zipFile, ZipArchiveMode.Read);
-            archive.Entries[0].Open().CopyTo(dbfFile);
-            dbfFile.Position = 0;
+            using (var archive = new ZipArchive(zipFile, ZipArchiveMode.Read))
+            {
+                archive.Entries[0].Open().CopyTo(dbfFile);
+            }
+                
+            dbfFile.Position = 0;            
 
             return dbfFile;
         }

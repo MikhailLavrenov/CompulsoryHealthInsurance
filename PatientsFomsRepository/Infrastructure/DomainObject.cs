@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace PatientsFomsRepository.Infrastructure
@@ -15,14 +16,11 @@ namespace PatientsFomsRepository.Infrastructure
         #region Поля
         //Хранит все ошибки экземпляра класса
         private Dictionary<string, List<string>> errors = new Dictionary<string, List<string>>();
+
         #endregion
 
         #region Свойства
         public bool HasErrors { get => errors.Count > 0; }
-        protected string IsNullOrEmptyErrorMessage { get; } = "Значение не может быть пустым";
-        protected string ConnectionErrorMessage { get; } = "Не удалось подключиться";
-        protected string LessOneErrorMessage { get; } = "Значение не может быть меньше 1";
-        protected string UriFormatErrorMessage { get; } = "Не верный формат URI";
         #endregion
 
         #region События
@@ -47,6 +45,13 @@ namespace PatientsFomsRepository.Infrastructure
                 return null;
             return errors[propertyName];
         }
+        public bool ContainsErrorMessage(string propertyName, string errorMessage)
+        {
+            if (errors.ContainsKey(propertyName) && errors[propertyName].Contains(errorMessage))
+                return true;
+            else
+                return false;
+        }
         //Выполняет валидацию. Должен быть переопределен в производном классе для автоматического вызова при изменении свойств.
         public virtual void Validate(string propertyName)
         { }
@@ -54,28 +59,28 @@ namespace PatientsFomsRepository.Infrastructure
         protected void ValidateIsNullOrEmptyString(string propertyName, string propertyValue)
         {
             if (string.IsNullOrEmpty(propertyValue))
-                AddError(IsNullOrEmptyErrorMessage, propertyName);
+                AddError(ErrorMessages.IsNullOrEmpty, propertyName);
             else
-                RemoveError(IsNullOrEmptyErrorMessage, propertyName);
+                RemoveError(ErrorMessages.IsNullOrEmpty, propertyName);
         }
         //Добавить сообщение об ошибке в значении свойства
-        protected void AddError(string errormessage, [CallerMemberName]string propertyName = "")
+        public void AddError(string errorMessage, [CallerMemberName]string propertyName = "")
         {
             if (errors.ContainsKey(propertyName) == false)
                 errors[propertyName] = new List<string>();
 
-            if (errors[propertyName].Contains(errormessage) == false)
+            if (errors[propertyName].Contains(errorMessage) == false)
             {
-                errors[propertyName].Add(errormessage);
+                errors[propertyName].Add(errorMessage);
                 OnErrorsChanged(propertyName);
             }
         }
         //Удалить сообщение об ошибке в значении свойства
-        protected void RemoveError(string errormessage, [CallerMemberName]string propertyName = "")
+        public void RemoveError(string errorMessage, [CallerMemberName]string propertyName = "")
         {
-            if (errors.ContainsKey(propertyName) && errors[propertyName].Contains(errormessage))
+            if (errors.ContainsKey(propertyName) && errors[propertyName].Contains(errorMessage))
             {
-                errors[propertyName].Remove(errormessage);
+                errors[propertyName].Remove(errorMessage);
 
                 if (errors[propertyName].Count == 0)
                     errors.Remove(propertyName);
@@ -83,8 +88,29 @@ namespace PatientsFomsRepository.Infrastructure
                 OnErrorsChanged(propertyName);
             }
         }
+        //Удалить сообщение об ошибке во всех свойствах
+        public void RemoveErrorsMessage(string errormessage)
+        {
+            var propertyNames = errors.Keys.ToList();
+
+            for (int i = 0; i < propertyNames.Count; i++)
+            {
+                var propertyName = propertyNames[i];
+                var propertyErrorMessages = errors[propertyName];
+
+                if (propertyErrorMessages?.Contains(errormessage) == true)
+                {
+                    if (propertyErrorMessages.Count == 1)
+                        errors.Remove(propertyName);
+                    else
+                        propertyErrorMessages.Remove(errormessage);
+
+                    OnErrorsChanged(propertyName);
+                }
+            }
+        }
         //Удалить все сообщения об ошибке  в значении свойства
-        protected void RemoveErrors([CallerMemberName]string propertyName = "")
+        public void RemoveErrors([CallerMemberName]string propertyName = "")
         {
             if (errors.ContainsKey(propertyName))
             {

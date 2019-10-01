@@ -14,7 +14,6 @@ namespace PatientsFomsRepository.Models
         private string password;
         private uint requestsLimit;
         private uint requestsLeft;
-        private bool isNotValid;
         #endregion
 
         #region Свойства
@@ -32,7 +31,6 @@ namespace PatientsFomsRepository.Models
                 requestsLeft = value;
             }
         }
-        [XmlIgnore] public bool IsNotValid { get => isNotValid; set => SetProperty(ref isNotValid, value); }
         #endregion
 
         #region Конструкторы
@@ -59,27 +57,13 @@ namespace PatientsFomsRepository.Models
             }
         }
         //валидация свойств
-        public override void Validate(string propertyName = null)
+        public override void Validate(string propertyName=null)
         {
             if (propertyName == nameof(Login) || propertyName == null)
                 ValidateIsNullOrEmptyString(nameof(Login), Login);
 
             if (propertyName == nameof(Password) || propertyName == null)
                 ValidateIsNullOrEmptyString(nameof(Password), Password);
-
-            if (isNotValid)
-            {
-                if (isNotValid)
-                {
-                    AddError(ConnectionErrorMessage, nameof(Login));
-                    AddError(ConnectionErrorMessage, nameof(Password));
-                }
-                else
-                {
-                    RemoveError(ConnectionErrorMessage, nameof(Login));
-                    RemoveError(ConnectionErrorMessage, nameof(Password));
-                }
-            }
         }
         //шифрует текст в соответствии с видимостью
         private static string Encrypt(string text)
@@ -105,7 +89,7 @@ namespace PatientsFomsRepository.Models
         private static string Decrypt(string text)
         {
             if (text == null)
-                text = "";
+                text = string.Empty;
 
             if (Scope == CredentialScope.Все)
                 return text;
@@ -118,41 +102,13 @@ namespace PatientsFomsRepository.Models
 
             try
             {
-                byte[] byteText = Convert.FromBase64String(text);
+                var byteText = Convert.FromBase64String(text);
                 var unprotectedText = ProtectedData.Unprotect(byteText, null, scope);
                 return Encoding.Default.GetString(unprotectedText);
             }
             catch (Exception)
             {
-                return "";
-            }
-        }
-        //пытается расшифровывает текст в соответствии с видимостью
-        private static bool TryDecrypt(string text, CredentialScope сredentialScope, out string decryptedText)
-        {
-            if (сredentialScope == CredentialScope.Все)
-            {
-                decryptedText = text;
-                return true;
-            }
-
-            DataProtectionScope scope;
-            if (сredentialScope == CredentialScope.ТекущийПользователь)
-                scope = DataProtectionScope.CurrentUser;
-            else
-                scope = DataProtectionScope.LocalMachine;
-
-            try
-            {
-                byte[] byteText = Convert.FromBase64String(text);
-                var unprotectedText = ProtectedData.Unprotect(byteText, null, scope);
-                decryptedText = Encoding.Default.GetString(unprotectedText);
-                return true;
-            }
-            catch (Exception)
-            {
-                decryptedText = null;
-                return false;
+                return string.Empty;
             }
         }
         #endregion
