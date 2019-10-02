@@ -128,7 +128,7 @@
     <Compile Include="Infrastructure\FileDialogType.cs" />
     <Compile Include="Infrastructure\EnumHelper.cs" />
     <Compile Include="Infrastructure\EnumToCollectionConverterExtension.cs" />
-    <Compile Include="Infrastructure\Extensions.cs" />
+    <Compile Include="Infrastructure\ExtensionMethods.cs" />
     <Compile Include="Infrastructure\FileDialogService.cs" />
     <Compile Include="Infrastructure\IMainRegionService.cs" />
     <Compile Include="Infrastructure\IFileDialogService.cs" />
