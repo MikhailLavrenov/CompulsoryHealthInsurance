@@ -8,7 +8,7 @@ namespace PatientsFomsRepository.Infrastructure
     /// <summary>
     /// Содержит все расширяющие методы
     /// </summary>
-    public static class Extensions
+    public static class ExtensionMethods
     {
         /// <summary>
         /// Вызывает диалоговое окно модально

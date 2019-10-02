@@ -16,19 +16,22 @@ namespace PatientsFomsRepository.Infrastructure
             base.OnPreparingCellForEdit(e);
 
             // Если редактируется ячейка DataGridTemplateColumn
-            if (e.EditingElement.GetType().Name == "ContentPresenter")
+            if (e.Column.GetType() == typeof(DataGridTemplateColumn))
             {
                 var control = FindVisualVisibleChild<Control>(e.EditingElement);
 
                 // Установливает фокус на элемент управления, чтобы исключить лишний клик
-                if (control != null && control.IsFocused == false)
+                if (control?.IsFocused == false)
                     control.Focus();
             }
 
             //Исключает выделение текста при выборе стандартной ячейки DataGridTextColumn
-            else if (e.EditingElement is TextBox textBox)
+            else if (e.Column.GetType() == typeof(DataGridTextColumn))
+            {
+                var textBox = (TextBox)e.EditingElement;
                 if (textBox.SelectionLength != 0)
                     textBox.CaretIndex = textBox.Text.Length;
+            }
         }
         // Редактирование стандартных ячеек одним кликом (устанавливает фокус на ячейку и IsSelected)
         protected override void OnPreviewMouseLeftButtonDown(MouseButtonEventArgs e)
@@ -36,7 +39,7 @@ namespace PatientsFomsRepository.Infrastructure
             base.OnPreviewMouseLeftButtonDown(e);
 
             var mbe = e as MouseButtonEventArgs;
-            var clickedElement = mbe.OriginalSource as UIElement;            
+            var clickedElement = mbe.OriginalSource as UIElement;
             var cell = FindVisualParent<DataGridCell>(clickedElement);
 
             if (cell == null || cell.IsEditing || cell.IsReadOnly)
