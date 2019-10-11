@@ -1,5 +1,4 @@
-﻿using PatientsFomsRepository.Properties;
-using Prism.Commands;
+﻿using Prism.Commands;
 using System;
 using System.Linq.Expressions;
 using System.Threading.Tasks;

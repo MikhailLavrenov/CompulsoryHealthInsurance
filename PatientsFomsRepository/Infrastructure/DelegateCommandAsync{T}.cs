@@ -1,5 +1,4 @@
-﻿using PatientsFomsRepository.Properties;
-using Prism.Commands;
+﻿using Prism.Commands;
 using System;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -38,7 +37,7 @@ namespace PatientsFomsRepository.Infrastructure
         private bool isExecuting;
         private readonly Action<T> executeMethod;
         private Func<T, bool> canExecuteMethod;
-        
+
         private static string delegatesCannotBeNullErrorMessage = "executeMethod и canExecuteMethod не могут быть null.";
         private static string invalidGenericTypeErrorMessage = "Параметр места заполнения типа T не является ссылочным типом.";
         #endregion

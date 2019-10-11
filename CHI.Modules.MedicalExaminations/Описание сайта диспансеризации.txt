@@ -1,0 +1,658 @@
+﻿Search by SNPOL
+***************
+Поиск пациента в плане. В этом запросе тело запроса я указываю не полностью, а только draw (он с каждым запросом должен увеличиваться на единицу), start и length. Строку запроса указываю полностью. Параметр DispType является обязательным: поиск проводится только в одном виде плана. Пациент имеет два ID. Это офигительно: в одних запросах нужно использовать один, в других - другой. Подробности в конце файла.
+
+POST http://dd.khfoms.ru/disp/GetDispData
+?Filter.Year=2&Filter.Smo=&Filter.PolisNum=7850010881001817&Filter.PersonId=&Filter.Surname=&Filter.Firstname=&Filter.Secname=&Filter.Region=&Filter.AnotherAttachment=false&Filter.Stage=&Filter.StageEmpty=false&Filter.StageFrom=&Filter.StageTo=&Filter.Result1Id=&Filter.Dest1Id=&Filter.Result2Id=&Filter.Dest2Id=&Filter.BillsDispStage=&Filter.BillsDispStageEmpty=false&Filter.BillsFrom=&Filter.BillsTo=&Filter.DispType=1
+Query string
+Filter.Year: 2
+Filter.Smo: 
+Filter.PolisNum: 7150010881001817
+Filter.PersonId: 
+Filter.Surname: 
+Filter.Firstname: 
+Filter.Secname: 
+Filter.Region: 
+Filter.AnotherAttachment: false
+Filter.Stage: 
+Filter.StageEmpty: false
+Filter.StageFrom: 
+Filter.StageTo: 
+Filter.Result1Id: 
+Filter.Dest1Id: 
+Filter.Result2Id: 
+Filter.Dest2Id: 
+Filter.BillsDispStage: 
+Filter.BillsDispStageEmpty: false
+Filter.BillsFrom: 
+Filter.BillsTo: 
+Filter.DispType: 1
+
+Query body
+draw: 2
+columns[0][data]: PersonId
+columns[0][name]: 
+columns[0][searchable]: true
+columns[0][orderable]: true
+columns[0][search][value]: 
+columns[0][search][regex]: false
+columns[1][data]: Person_Surname
+columns[1][name]: 
+columns[1][searchable]: true
+columns[1][orderable]: true
+columns[1][search][value]: 
+columns[1][search][regex]: false
+columns[2][data]: Person_Firname
+columns[2][name]: 
+columns[2][searchable]: true
+columns[2][orderable]: true
+columns[2][search][value]: 
+columns[2][search][regex]: false
+columns[3][data]: Person_Secname
+columns[3][name]: 
+columns[3][searchable]: true
+columns[3][orderable]: true
+columns[3][search][value]: 
+columns[3][search][regex]: false
+columns[4][data]: Person_Birthday
+columns[4][name]: 
+columns[4][searchable]: true
+columns[4][orderable]: true
+columns[4][search][value]: 
+columns[4][search][regex]: false
+columns[5][data]: GenderName
+columns[5][name]: 
+columns[5][searchable]: true
+columns[5][orderable]: true
+columns[5][search][value]: 
+columns[5][search][regex]: false
+columns[6][data]: Polis_Num
+columns[6][name]: 
+columns[6][searchable]: true
+columns[6][orderable]: true
+columns[6][search][value]: 
+columns[6][search][regex]: false
+columns[7][data]: Month
+columns[7][name]: 
+columns[7][searchable]: true
+columns[7][orderable]: true
+columns[7][search][value]: 
+columns[7][search][regex]: false
+columns[8][data]: Note
+columns[8][name]: 
+columns[8][searchable]: true
+columns[8][orderable]: true
+columns[8][search][value]: 
+columns[8][search][regex]: false
+columns[9][data]: OrgLpu
+columns[9][name]: 
+columns[9][searchable]: true
+columns[9][orderable]: true
+columns[9][search][value]: 
+columns[9][search][regex]: false
+columns[10][data]: OrgSmoCode
+columns[10][name]: 
+columns[10][searchable]: true
+columns[10][orderable]: true
+columns[10][search][value]: 
+columns[10][search][regex]: false
+columns[11][data]: OrgSmo
+columns[11][name]: 
+columns[11][searchable]: true
+columns[11][orderable]: true
+columns[11][search][value]: 
+columns[11][search][regex]: false
+columns[12][data]: OrgLpuRegion_Num
+columns[12][name]: 
+columns[12][searchable]: true
+columns[12][orderable]: true
+columns[12][search][value]: 
+columns[12][search][regex]: false
+columns[13][data]: PersonCard_begDT
+columns[13][name]: 
+columns[13][searchable]: true
+columns[13][orderable]: true
+columns[13][search][value]: 
+columns[13][search][regex]: false
+columns[14][data]: Disp1BeginDate
+columns[14][name]: 
+columns[14][searchable]: true
+columns[14][orderable]: true
+columns[14][search][value]: 
+columns[14][search][regex]: false
+columns[15][data]: Disp1Date
+columns[15][name]: 
+columns[15][searchable]: true
+columns[15][orderable]: true
+columns[15][search][value]: 
+columns[15][search][regex]: false
+columns[16][data]: Disp2DirectDate
+columns[16][name]: 
+columns[16][searchable]: true
+columns[16][orderable]: true
+columns[16][search][value]: 
+columns[16][search][regex]: false
+columns[17][data]: Disp2BeginDate
+columns[17][name]: 
+columns[17][searchable]: true
+columns[17][orderable]: true
+columns[17][search][value]: 
+columns[17][search][regex]: false
+columns[18][data]: Disp2Date
+columns[18][name]: 
+columns[18][searchable]: true
+columns[18][orderable]: true
+columns[18][search][value]: 
+columns[18][search][regex]: false
+columns[19][data]: DispCancelDate
+columns[19][name]: 
+columns[19][searchable]: true
+columns[19][orderable]: true
+columns[19][search][value]: 
+columns[19][search][regex]: false
+columns[20][data]: Stage1ResultName
+columns[20][name]: 
+columns[20][searchable]: true
+columns[20][orderable]: true
+columns[20][search][value]: 
+columns[20][search][regex]: false
+columns[21][data]: Stage1DestName
+columns[21][name]: 
+columns[21][searchable]: true
+columns[21][orderable]: true
+columns[21][search][value]: 
+columns[21][search][regex]: false
+columns[22][data]: Stage2ResultName
+columns[22][name]: 
+columns[22][searchable]: true
+columns[22][orderable]: true
+columns[22][search][value]: 
+columns[22][search][regex]: false
+columns[23][data]: Stage2DestName
+columns[23][name]: 
+columns[23][searchable]: true
+columns[23][orderable]: true
+columns[23][search][value]: 
+columns[23][search][regex]: false
+columns[24][data]: usl1Date
+columns[24][name]: 
+columns[24][searchable]: true
+columns[24][orderable]: true
+columns[24][search][value]: 
+columns[24][search][regex]: false
+columns[25][data]: usl1Name
+columns[25][name]: 
+columns[25][searchable]: true
+columns[25][orderable]: true
+columns[25][search][value]: 
+columns[25][search][regex]: false
+columns[26][data]: usl1ResultName
+columns[26][name]: 
+columns[26][searchable]: true
+columns[26][orderable]: true
+columns[26][search][value]: 
+columns[26][search][regex]: false
+columns[27][data]: DS1
+columns[27][name]: 
+columns[27][searchable]: true
+columns[27][orderable]: true
+columns[27][search][value]: 
+columns[27][search][regex]: false
+columns[28][data]: usl2Date
+columns[28][name]: 
+columns[28][searchable]: true
+columns[28][orderable]: true
+columns[28][search][value]: 
+columns[28][search][regex]: false
+columns[29][data]: usl2Name
+columns[29][name]: 
+columns[29][searchable]: true
+columns[29][orderable]: true
+columns[29][search][value]: 
+columns[29][search][regex]: false
+columns[30][data]: usl2ResultName
+columns[30][name]: 
+columns[30][searchable]: true
+columns[30][orderable]: true
+columns[30][search][value]: 
+columns[30][search][regex]: false
+columns[31][data]: DS2
+columns[31][name]: 
+columns[31][searchable]: true
+columns[31][orderable]: true
+columns[31][search][value]: 
+columns[31][search][regex]: false
+columns[32][data]: Notice1Date
+columns[32][name]: 
+columns[32][searchable]: true
+columns[32][orderable]: true
+columns[32][search][value]: 
+columns[32][search][regex]: false
+columns[33][data]: Notice1Type
+columns[33][name]: 
+columns[33][searchable]: true
+columns[33][orderable]: true
+columns[33][search][value]: 
+columns[33][search][regex]: false
+columns[34][data]: Phone1Date
+columns[34][name]: 
+columns[34][searchable]: true
+columns[34][orderable]: true
+columns[34][search][value]: 
+columns[34][search][regex]: false
+columns[35][data]: ReNotice1
+columns[35][name]: 
+columns[35][searchable]: true
+columns[35][orderable]: true
+columns[35][search][value]: 
+columns[35][search][regex]: false
+columns[36][data]: Notice2Date
+columns[36][name]: 
+columns[36][searchable]: true
+columns[36][orderable]: true
+columns[36][search][value]: 
+columns[36][search][regex]: false
+columns[37][data]: Notice2Type
+columns[37][name]: 
+columns[37][searchable]: true
+columns[37][orderable]: true
+columns[37][search][value]: 
+columns[37][search][regex]: false
+columns[38][data]: Phone2Date
+columns[38][name]: 
+columns[38][searchable]: true
+columns[38][orderable]: true
+columns[38][search][value]: 
+columns[38][search][regex]: false
+columns[39][data]: ReNotice2
+columns[39][name]: 
+columns[39][searchable]: true
+columns[39][orderable]: true
+columns[39][search][value]: 
+columns[39][search][regex]: false
+columns[40][data]: 
+columns[40][name]: 
+columns[40][searchable]: false
+columns[40][orderable]: false
+columns[40][search][value]: 
+columns[40][search][regex]: false
+order[0][column]: 0
+order[0][dir]: asc
+start: 0
+length: 25
+search[value]: 
+search[regex]: false
+
+Response
+{
+  "draw": "2",
+  "recordsTotal": 7345,
+  "recordsFiltered": 1,
+  "data": [
+    {
+      "Id": 578262,
+      "PersonId": 3904695,
+      "YearId": 2,
+      "Month": 3,
+      "UploadOrgCode": "270019",
+      "OrgCode": "270019",
+      "OrgLpu_Nick": "КГБУЗ \"ГКП № 3\"",
+      "Person_Surname": "ИВАНОВ",
+      "Person_Firname": "ЕГОР",
+      "Person_Secname": "ПЕТРОВИЧ",
+      "Person_Birthday": "1989-09-18T00:00:00",
+      "Age": 30,
+      "GenderId": 2,
+      "GenderName": "Мужской",
+      "OrgSmoCode": "27003",
+      "OrgSmo": "ФИЛИАЛ ООО \"КАПИТАЛ МС\" В ХАБАРОВСКОМ КРАЕ",
+      "RegPunkt_id": 5,
+      "RegPunkt_Name": "ФИЛИАЛ  ООО\"КАПИТАЛ МС\" В ХАБАРОВСКОМ КРАЕ",
+      "OrgLpuCode": "270019",
+      "OrgLpu": "КГБУЗ \"ГКП № 3\"",
+      "NoteId": null,
+      "Note": null,
+      "VredProd": null,
+      "Disp1BeginDate": null,
+      "Disp1Date": null,
+      "Disp2DirectDate": null,
+      "Disp2BeginDate": null,
+      "Disp2Date": null,
+      "DispCancelDate": null,
+      "DispSuccessDate": null,
+      "Stage1ResultId": null,
+      "Stage1ResultName": null,
+      "Stage1DestId": null,
+      "Stage1DestName": null,
+      "Stage2ResultId": null,
+      "Stage2ResultName": null,
+      "Stage2DestId": null,
+      "Stage2DestName": null,
+      "OrgLpuRegion_Name": "10 участок",
+      "PersonCard_begDT": "2019-03-25T00:00:00",
+      "OrgLpuRegion_Num": "10",
+      "Person_Snils": "122-061-130 82",
+      "Person_Phone": "МУЗЕЙ 79635634744",
+      "Polis_Num": "7150010881001817",
+      "Person_ENP": "7150010881001817",
+      "Notice1Date": null,
+      "Notice1Type": null,
+      "Notice1TypeId": null,
+      "ReNotice1": null,
+      "ReNotice1Type": null,
+      "ReNotice1TypeId": null,
+      "Phone1Date": null,
+      "Notice2Date": null,
+      "Notice2Type": null,
+      "Notice2TypeId": null,
+      "ReNotice2": null,
+      "ReNotice2Type": null,
+      "ReNotice2TypeId": null,
+      "Phone2Date": null,
+      "PersonStatus_id": null,
+      "PersonStatus_Name": null,
+      "OrgCode1": null,
+      "OrgName1": null,
+      "usl1Date": null,
+      "usl1Name": null,
+      "usl1ResultId": null,
+      "usl1ResultName": null,
+      "usl1Dest": null,
+      "DS1": null,
+      "OrgCode2": null,
+      "OrgName2": null,
+      "usl2Date": null,
+      "usl2Name": null,
+      "usl2ResultId": null,
+      "usl2ResultName": null,
+      "usl2Dest": null,
+      "DS2": null,
+      "DispType": 1
+    }
+  ]
+}
+
+Delete
+******
+Удалить из плана.
+
+POST http://dd.khfoms.ru/disp/removeDisp
+
+Query body
+Id: 578262
+
+Response
+{
+  "IsError": false,
+  "Errors": null,
+  "Header": null,
+  "Message": "Запись удалена",
+  "Redirect": null,
+  "Html": null,
+  "Data": null,
+  "PartialView": null
+}
+
+
+Search in SRZ
+*************
+Поиск в web-регистре. В ответе ищу строку 'var personId = "xxxxxx";'. Этот ID используется для добавления в план (/disp/AddToDisp). Если пациент не найден, 'var personId = "0";'. Также в тексте ответа ищу маркеры:
+  "Застрахованное лицо находится в плане диспансеризации другой МО"
+  "Застрахованное лицо уже находится в плане диспансеризации вашей МО"
+POST http://dd.khfoms.ru/disp/SrzSearch
+
+Req body
+SearchData.DispYearId: 2
+SearchData.Surname: 
+SearchData.Firstname: 
+SearchData.Secname: 
+SearchData.Birthday: 
+SearchData.SelectSearchValues: polis
+SearchData.PolisNum: 7150010881001817
+
+Response
+            <div class="detailed-person-box">
+                <div class="detailed-person-pic">
+                    <i class="fa fa-user" aria-hidden="true"></i>
+                </div>
+                <div class="detailed-person-fio">
+                    Байдак Анна Сергеевна
+                    
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div>
+               
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <table class="table">
+                        <tr>
+                            <td><label>Дата рождения</label></td>
+                            <td>18.09.1989</td>
+                        </tr>
+                        <tr>
+                            <td><label>Страховая медицинская организация</label></td>
+                            <td>ФИЛИАЛ ООО &quot;КАПИТАЛ МС&quot; В ХАБАРОВСКОМ КРАЕ</td>
+                        </tr>
+                        <tr>
+                            <td><label>Номер полиса</label></td>
+                            <td>7150010881001817</td>
+                        </tr>
+                        <tr>
+                            <td><label>СНИЛС</label></td>
+                            <td>122-061-130 82</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <table class="table">
+                        <tr>
+                            <td><label>Медицинская организация</label></td>
+                            <td>КГБУЗ &quot;ГКП № 3&quot;</td>
+                        </tr>
+                        <tr>
+                            <td><label>Участок прикрепления</label></td>
+                            <td>10 участок</td>
+                        </tr>
+                        <tr>
+                            <td><label>Дата начала прикрепления</label></td>
+                            <td>25.03.2019</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div>
+                    <div class="form-inline">
+                        <div class="form-group">
+                            <select class="form-control" id="ddl_DispType" name="ddl_DispType"><option value="1">Диспансеризация раз в 3 года</option>
+<option value="3">Проф. осмотры</option>
+<option value="4">Ежегодная диспансеризация</option>
+</select>
+                            <button class="btn btn-success" id="btnAddToDisp">Добавить в свой план проф.мероприятий</button>
+                        </div>
+                    </div>
+                
+            </div>
+
+<script>
+    var personId = "3904695";
+    var yearId = "2";
+    $('#btnAddToDisp').click(function () {
+        var data = {
+            personId: personId,
+            yearId: yearId,
+            dispType: $("#ddl_DispType").val()
+    }
+        SendPostQueryFixedType("/disp/AddToDisp", data, $(this), null);
+    });
+</script>
+
+Insert to plan
+**************
+POST http://dd.khfoms.ru/disp/AddToDisp
+
+Req body:
+personId: 3904695
+yearId: 2
+dispType: 1
+
+Response
+{
+  "IsError": false,
+  "Errors": null,
+  "Header": null,
+  "Message": null,
+  "Redirect": null,
+  "Html": null,
+  "Data": null,
+  "PartialView": null
+}
+
+Add stage
+*********
+Добавить этап ДД для пациента. stageId - этап ДД. resultId - группа здоровья. destId - куда направлен по итогам ДД.
+Для этапа "Результат" поля resultId и destId должны быть заполнены. Для остальных этапов соответственно 0 и пустая строка.
+POST http://dd.khfoms.ru/disp/editDispStage
+
+Req body:
+
+stageId: 12
+stageDate: 20.09.2019
+resultId: 0
+destId: 
+dispId: 566137
+
+Response:
+{
+  "IsError": false,
+  "Errors": null,
+  "Header": null,
+  "Message": "Этап успешно добавлен",
+  "Redirect": null,
+  "Html": null,
+  "Data": [
+    {
+      "DispStageType": 1,
+      "DispStage": {
+        "Id": 1414599,
+        "DispPersonId": 566137,
+        "DispStageId": 12,
+        "DispStageName": "Начало 1 этапа диспансеризации",
+        "DispStageOrgCode": "270023",
+        "DispStageOrgName": "КГБУЗ \"ГКП № 8\"",
+        "DispStageDate": "2019-09-20T00:00:00",
+        "DispStageResult": null,
+        "UpdateDate": "2019-09-27T10:52:51.977",
+        "YearId": 2
+      },
+      "DispResult": null
+    }
+  ],
+  "PartialView": null
+}
+
+Delete stage
+************
+Удалить последний из пройденных этапов для пациента
+POST http://dd.khfoms.ru/disp/deleteDispStage
+
+Req body:
+dispId: 566137
+
+Response:
+{
+  "IsError": false,
+  "Errors": null,
+  "Header": null,
+  "Message": "Операция успешно выполнена",
+  "Redirect": null,
+  "Html": null,
+  "Data": [],
+  "PartialView": null
+}
+
+
+
+RESUME
+******
+*бучие идентификаторы:
+  "Id": 578262,        // Delete, add stage, delete last stage
+  "PersonId": 3904695, // Search in plan, plan new patient, result of search-in-srz
+
+Группы здоровья
+***************
+[{
+		"Id" : 1,
+		"Name" : "Присвоена I группа здоровья",
+		"Enabled" : true
+	}, {
+		"Id" : 2,
+		"Name" : "Присвоена II группа здоровья",
+		"Enabled" : true
+	}, {
+		"Id" : 4,
+		"Name" : "Присвоена IIIа группа здоровья",
+		"Enabled" : true
+	}, {
+		"Id" : 5,
+		"Name" : "Присвоена IIIб группа здоровья",
+		"Enabled" : true
+	}
+]
+
+Результат ДД
+************
+[{
+		"Id" : 1,
+		"Name" : "Направлен на консультацию в медицинскую организацию по месту прикрепления",
+		"Enabled" : true
+	}, {
+		"Id" : 2,
+		"Name" : "Направлен на консультацию в иную МО",
+		"Enabled" : true
+	}, {
+		"Id" : 3,
+		"Name" : "Направлен на обследование",
+		"Enabled" : true
+	}, {
+		"Id" : 4,
+		"Name" : "Направлен в дневной стационар",
+		"Enabled" : true
+	}, {
+		"Id" : 5,
+		"Name" : "Направлен на госпитализацию",
+		"Enabled" : true
+	}, {
+		"Id" : 6,
+		"Name" : "Направлен в реабилитационное отделение",
+		"Enabled" : true
+	}, {
+		"Id" : 7,
+		"Name" : "Нет назначения",
+		"Enabled" : true
+	}
+]
+
+Этапы ДД (stageId)
+******************
+12  Начало 1 этапа диспансеризации
+15  Завершен 1 этап диспансеризации
+16  Результат 1 этапа диспансеризации
+
+21  Направлен на 2 этап диспансеризации
+22  Начало 2 этапа диспансеризации
+25  Завершен 2 этап диспансеризации
+40  Результат (2 stage)
+
+90  Отказ от прохождения диспансеризации
+
+mpx (предыдущий этап -> возможный следующий):
+****
+0 -> 12, 90
+12 -> 15, 90
+15 -> 21, 16, 90
+16 -> 21
+21 -> 22, 90
+22 -> 25, 90
+25 -> 40, 90
