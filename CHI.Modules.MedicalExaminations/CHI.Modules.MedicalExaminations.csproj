@@ -60,7 +60,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MedicalExaminationsModule.cs" />
-    <Compile Include="Models\Patient.cs" />
+    <Compile Include="Models\Examination.cs" />
+    <Compile Include="Models\ExaminationStage.cs" />
+    <Compile Include="Models\ExaminationType.cs" />
+    <Compile Include="Models\HealthGroup.cs" />
+    <Compile Include="Models\PatientExaminations.cs" />
+    <Compile Include="Models\ReferralTo.cs" />
+    <Compile Include="Models\StageStates.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\BillsRegister.cs" />
     <Compile Include="Services\WebSite.cs" />

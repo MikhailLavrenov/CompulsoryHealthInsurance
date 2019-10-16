@@ -465,10 +465,11 @@ Response
             <div>
                     <div class="form-inline">
                         <div class="form-group">
-                            <select class="form-control" id="ddl_DispType" name="ddl_DispType"><option value="1">Диспансеризация раз в 3 года</option>
-<option value="3">Проф. осмотры</option>
-<option value="4">Ежегодная диспансеризация</option>
-</select>
+                            <select class="form-control" id="ddl_DispType" name="ddl_DispType">
+				<option value="1">Диспансеризация раз в 3 года</option>
+				<option value="3">Проф. осмотры</option>
+				<option value="4">Ежегодная диспансеризация</option>
+			    </select>
                             <button class="btn btn-success" id="btnAddToDisp">Добавить в свой план проф.мероприятий</button>
                         </div>
                     </div>

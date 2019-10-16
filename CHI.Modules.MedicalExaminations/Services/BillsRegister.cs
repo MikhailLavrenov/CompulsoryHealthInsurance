@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CHI.Modules.MedicalExaminations.Models;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
@@ -9,7 +10,7 @@ namespace CHI.Modules.MedicalExaminations.Services
 {
     public class BillsRegister
     {
-        private StringComparison comparer = StringComparison.OrdinalIgnoreCase;
+        private static StringComparison comparer = StringComparison.OrdinalIgnoreCase;
         private List<string> filePaths;
 
         public BillsRegister(ICollection<string> filePaths)
@@ -21,32 +22,32 @@ namespace CHI.Modules.MedicalExaminations.Services
             filePaths = new List<string>() { filePath };
         }
 
-        public List<ZL_LIST> GetCoupons(List<Stream> billFiles)
+        public List<PatientExaminations> GetPatientsExaminations(IEnumerable<string> examinationsFileNamesStartsWith, IEnumerable<string> patientsFileNamesStartsWith)
         {
-            var result = new List<ZL_LIST>();
+            var patientsFiles = GetFiles(patientsFileNamesStartsWith);
+            var patientsRegisters = DeserializeCollection<PERS_LIST>(patientsFiles);
 
-            foreach (var billFile in billFiles)
-            {
-                billFile.Seek(0, SeekOrigin.Begin);
-                var formatter = new XmlSerializer(typeof(ZL_LIST));
-                var t = (ZL_LIST)formatter.Deserialize(billFile);
+            foreach (var file in patientsFiles)
+                file.Dispose();
 
-                result.Add(t);
-            }
+            var examinationsFiles = GetFiles(examinationsFileNamesStartsWith);
+            var examinationsRegisters = DeserializeCollection<ZL_LIST>(examinationsFiles);
 
-            return result;
+            foreach (var file in examinationsFiles)
+                file.Dispose();
 
+            return GetPatientsExaminations(examinationsRegisters, patientsRegisters);
         }
-        public List<Stream> GetFiles(IEnumerable<string> requiredFileNamesStartsWith)
+        private List<Stream> GetFiles(IEnumerable<string> fileNamesStartsWithFilter)
         {
             var files = new List<Stream>();
 
             foreach (var filePath in filePaths)
-                files.AddRange(GetFilesRecursive(filePath, requiredFileNamesStartsWith));
+                files.AddRange(GetFilesRecursive(filePath, fileNamesStartsWithFilter));
 
             return files;
         }
-        private List<Stream> GetFilesRecursive(string path, IEnumerable<string> requiredFileNamesStartsWith)
+        private List<Stream> GetFilesRecursive(string path, IEnumerable<string> fileNamesStartsWithFilter)
         {
             var result = new List<Stream>();
             var isDirectory = new FileInfo(path).Attributes.HasFlag(FileAttributes.Directory);
@@ -56,27 +57,27 @@ namespace CHI.Modules.MedicalExaminations.Services
                 var entries = Directory.GetFileSystemEntries(path);
 
                 foreach (var entry in entries)
-                    result.AddRange(GetFilesRecursive(entry, requiredFileNamesStartsWith));
+                    result.AddRange(GetFilesRecursive(entry, fileNamesStartsWithFilter));
             }
             else
             {
                 var extension = Path.GetExtension(path);
 
                 if (extension.Equals(".xml", comparer)
-                    && requiredFileNamesStartsWith.Any(x => Path.GetFileName(path).StartsWith(x, comparer)))
+                    && fileNamesStartsWithFilter.Any(x => Path.GetFileName(path).StartsWith(x, comparer)))
                     result.Add(new FileStream(path, FileMode.Open));
 
                 else if (extension.Equals(".zip", comparer))
                     using (var archive = ZipFile.OpenRead(path))
                     {
                         foreach (var entry in archive.Entries)
-                            result.AddRange(GetFilesRecursive(entry, requiredFileNamesStartsWith));
+                            result.AddRange(GetFilesRecursive(entry, fileNamesStartsWithFilter));
                     }
             }
 
             return result;
         }
-        private List<Stream> GetFilesRecursive(ZipArchiveEntry archiveEntry, IEnumerable<string> requiredFileNamesStartsWith)
+        private List<Stream> GetFilesRecursive(ZipArchiveEntry archiveEntry, IEnumerable<string> fileNamesStartsWithFilter)
         {
             var result = new List<Stream>();
 
@@ -86,7 +87,7 @@ namespace CHI.Modules.MedicalExaminations.Services
             var extension = Path.GetExtension(archiveEntry.Name);
 
             if (extension.Equals(".xml", comparer)
-                && requiredFileNamesStartsWith.Any(x => archiveEntry.Name.StartsWith(x, comparer)))
+                && fileNamesStartsWithFilter.Any(x => archiveEntry.Name.StartsWith(x, comparer)))
             {
                 var extractedEntry = new MemoryStream();
                 archiveEntry.Open().CopyTo(extractedEntry);
@@ -100,13 +101,147 @@ namespace CHI.Modules.MedicalExaminations.Services
                 using (var archive = new ZipArchive(extractedEntry))
                 {
                     foreach (var entry in archive.Entries)
-                        result.AddRange(GetFilesRecursive(entry, requiredFileNamesStartsWith));
+                        result.AddRange(GetFilesRecursive(entry, fileNamesStartsWithFilter));
                 }
             }
 
             return result;
         }
+        private List<PatientExaminations> GetPatientsExaminations(IEnumerable<ZL_LIST> examinationsRegisters, IEnumerable<PERS_LIST> patientsRegisters)
+        {
+            var patientsExaminations = new List<PatientExaminations>();
 
+            var patients = new List<(Guid, int)>();
+
+            foreach (var patientsRegister in patientsRegisters)
+                foreach (var patient in patientsRegister.PERS)
+                    patients.Add((patient.ID_PAC, patient.DR.Year));
+
+            patients = patients.Distinct().ToList();
+
+            foreach (var examinationsRegister in examinationsRegisters)
+            {
+                if (examinationsRegister?.SCHET == null || examinationsRegister.ZAP == null)
+                    continue;
+
+                var examinationStage = DispToExaminationStage(examinationsRegister.SCHET.DISP);
+                var examinationYear = examinationsRegister.SCHET.YEAR;
+
+                if (examinationStage == 0 || examinationYear < 2018)
+                    continue;
+
+                foreach (var treatmentCase in examinationsRegister.ZAP)
+                {
+                    if (treatmentCase?.PACIENT == null || treatmentCase.Z_SL?.SL?.USL == null || treatmentCase.Z_SL.SL.NAZ == null)
+                        continue;
+
+                    var insuranceNumber = $@"{treatmentCase.PACIENT.SPOLIS}{treatmentCase.PACIENT.NPOLIS}";
+
+                    if (string.IsNullOrEmpty(insuranceNumber))
+                        continue;
+
+                    var examination = new Examination();
+
+                    examination.Stage = examinationStage;
+                    examination.Year = examinationYear;
+
+                    var patient = patients.FirstOrDefault(x => x.Item1 == treatmentCase.PACIENT.ID_PAC);
+
+                    if (patient == default)
+                        continue;
+
+                    examination.Type = DispToExaminationType(examinationsRegister.SCHET.DISP, examinationYear - patient.Item2);
+
+                    if (examinationStage == 1)
+                        examination.BeginDate = treatmentCase.Z_SL.SL.USL.First(x => x.CODE_USL == "024101").DATE_IN;
+                    else
+                        examination.BeginDate = treatmentCase.Z_SL.SL.DATE_1;
+
+                    examination.EndDate = treatmentCase.Z_SL.SL.DATE_2;
+                    examination.HealthGroup = RSLT_DToHealthGroup(treatmentCase.Z_SL.RSLT_D);
+                    examination.Referral = (ReferralTo)(treatmentCase.Z_SL.SL.NAZ.FirstOrDefault()?.NAZ_R ?? 0);
+
+                    if (examination.HealthGroup == HealthGroup.None)
+                        continue;
+
+                    var patientExaminations = patientsExaminations.FirstOrDefault(x => x.InsuranceNumber.Equals(insuranceNumber, comparer));
+
+                    if (patientExaminations == null)
+                    {
+                        patientExaminations = new PatientExaminations { InsuranceNumber = insuranceNumber };
+
+                        patientsExaminations.Add(patientExaminations);
+                    }
+
+                    patientExaminations.Examinations.Add(examination);
+                }
+            }
+
+            return patientsExaminations;
+        }
+        private static int DispToExaminationStage(string disp)
+        {
+            switch (disp.ToUpper())
+            {
+                case "ОПВ":
+                case "ДВ4":
+                    return 1;
+                case "ДВ2":
+                    return 2;
+                default:
+                    return 0;
+            }
+        }
+        private static ExaminationType DispToExaminationType(string disp, int age)
+        {
+            switch (disp.ToUpper())
+            {
+                case "ОПВ":
+                    return ExaminationType.ProfOsmotr;
+                case "ДВ2":
+                case "ДВ4":
+                    return age >= 40 ? ExaminationType.Dispanserizacia1 : ExaminationType.Dispanserizacia3;
+                default:
+                    return ExaminationType.None;
+            }
+        }
+        private static HealthGroup RSLT_DToHealthGroup(int RSLT_D)
+        {
+            switch (RSLT_D)
+            {
+                case 1:
+                    return HealthGroup.First;
+                case 2:
+                case 12:
+                    return HealthGroup.Second;
+                case 31:
+                case 14:
+                    return HealthGroup.ThirdA;
+                case 32:
+                case 15:
+                    return HealthGroup.ThirdB;
+                default:
+                    return HealthGroup.None;
+            }
+        }
+        private static List<T> DeserializeCollection<T>(IEnumerable<Stream> files) where T : class
+        {
+            var result = new List<T>();
+
+            foreach (var file in files)
+            {
+                file.Seek(0, SeekOrigin.Begin);
+
+                var formatter = new XmlSerializer(typeof(T));
+                var obj = formatter.Deserialize(file);
+
+                result.Add((T)obj);
+            }
+
+            return result;
+        }
+
+        #region Классы для десериализации случаев реестров-счетов
         [XmlRoot(ElementName = "ZL_LIST")]
         public class ZL_LIST
         {
@@ -121,10 +256,15 @@ namespace CHI.Modules.MedicalExaminations.Services
         [XmlRoot(ElementName = "SCHET")]
         public class SCHET
         {
+            [XmlElement(ElementName = "YEAR")]
+            public int YEAR { get; set; }
             //Реестровый номер медицинской организации
             [XmlElement(ElementName = "CODE_MO")]
             public string CODE_MO { get; set; }
             //Тип диспансеризации
+            //ДВ2	Второй этап диспансеризации определенных групп взрослого населения с периодичностью 1 раз в 3 года
+            //ОПВ	Профилактические медицинские осмотры взрослого населения
+            //ДВ4	Первый этап диспансеризации определенных групп взрослого населения с периодичностью 1 раз в год
             [XmlElement(ElementName = "DISP")]
             public string DISP { get; set; }
         }
@@ -143,9 +283,8 @@ namespace CHI.Modules.MedicalExaminations.Services
         [XmlRoot(ElementName = "PACIENT")]
         public class PACIENT
         {
-            //Тип документа, подтверждающего факт страхования по ОМС
-            [XmlElement(ElementName = "VPOLIS")]
-            public string VPOLIS { get; set; }
+            [XmlElement(ElementName = "ID_PAC")]
+            public Guid ID_PAC { get; set; }
             //Серия документа, подтверждающего факт страхования по ОМС
             [XmlElement(ElementName = "SPOLIS")]
             public string SPOLIS { get; set; }
@@ -157,18 +296,17 @@ namespace CHI.Modules.MedicalExaminations.Services
         [XmlRoot(ElementName = "Z_SL")]
         public class Z_SL
         {
-            //Дата начала лечения
-            [XmlElement(ElementName = "DATE_Z_1")]
-            public string DATE_Z_1 { get; set; }
-            //Дата окончания лечения
-            [XmlElement(ElementName = "DATE_Z_2")]
-            public string DATE_Z_2 { get; set; }
             //результат диспансеризации
+            //1	Присвоена I группа здоровья
+            //2	Присвоена II группа здоровья
+            //12 Направлен на II этап профилактического медицинского осмотра несовершеннолетних или диспансеризации всех типов, предварительно присвоена II группа здоровья
+            //3	Присвоена III группа здоровья
+            //14 Направлен на II этап диспансеризации определенных групп взрослого населения, предварительно присвоена IIIа группа здоровья
+            //31 Присвоена IIIа группа здоровья	
+            //15 Направлен на II этап диспансеризации определенных групп взрослого населения, предварительно присвоена IIIб группа здоровья
+            //32 Присвоена IIIб группа здоровья
             [XmlElement(ElementName = "RSLT_D")]
-            public string RSLT_D { get; set; }
-            //Исход заболевания
-            [XmlElement(ElementName = "ISHOD")]
-            public string ISHOD { get; set; }
+            public int RSLT_D { get; set; }
             [XmlElement(ElementName = "SL")]
             public SL SL { get; set; }
         }
@@ -176,31 +314,34 @@ namespace CHI.Modules.MedicalExaminations.Services
         [XmlRoot(ElementName = "SL")]
         public class SL
         {
-            //Цель обраще-ния
+            //Цель обращения
             public string CEL { get; set; }
             [XmlElement(ElementName = "DATE_1")]
             //Дата начала лечения
-            public string DATE_1 { get; set; }
+            public DateTime DATE_1 { get; set; }
             //Дата оконча-ния лечения
             [XmlElement(ElementName = "DATE_2")]
-            public string DATE_2 { get; set; }
-            //Диспансерное наблюдение
-            [XmlElement(ElementName = "PR_D_N")]
-            public string PR_D_N { get; set; }
+            public DateTime DATE_2 { get; set; }
             //Назначения
             [XmlElement(ElementName = "NAZ")]
-            public NAZ NAZ { get; set; }
+            public List<NAZ> NAZ { get; set; }
+            //Услуги
+            [XmlElement(ElementName = "USL")]
+            public List<USL> USL { get; set; }
         }
 
         [XmlRoot(ElementName = "NAZ")]
         public class NAZ
         {
             //Вид назначения
+            //1 – направлен на консультацию в медицинскую организацию по месту прикрепления;
+            //2 – направлен на консультацию в иную медицинскую организацию;
+            //3 – направлен на обследование;
+            //4 – направлен в дневной стационар;
+            //5 – направлен на госпитализацию;
+            //6 – направлен в реабилитационное отделение.
             [XmlElement(ElementName = "NAZ_R")]
-            public string NAZ_R { get; set; }
-            //Дата направления
-            [XmlElement(ElementName = "NAPR_DATE")]
-            public string NAPR_DATE { get; set; }
+            public int NAZ_R { get; set; }
         }
 
         [XmlRoot(ElementName = "USL")]
@@ -208,10 +349,31 @@ namespace CHI.Modules.MedicalExaminations.Services
         {
             //Дата начала оказания услуги
             [XmlElement(ElementName = "DATE_IN")]
-            public string DATE_IN { get; set; }
+            public DateTime DATE_IN { get; set; }
             //Код услуги
             [XmlElement(ElementName = "CODE_USL")]
             public string CODE_USL { get; set; }
         }
+        #endregion
+        #region Классы для десериализации пациентов реестров-счетов
+        [XmlRoot(ElementName = "PERS_LIST")]
+        public class PERS_LIST
+        {
+            [XmlElement(ElementName = "PERS")]
+            public List<PERS> PERS { get; set; }
+        }
+
+        [XmlRoot(ElementName = "PERS")]
+        public class PERS
+        {
+            //guid пациента
+            [XmlElement(ElementName = "ID_PAC")]
+            public Guid ID_PAC { get; set; }
+            //Дата рождения
+            [XmlElement(ElementName = "DR")]
+            public DateTime DR { get; set; }
+        }
+        #endregion
     }
 }
+
