@@ -24,13 +24,23 @@ namespace PatientsFomsRepository.Models
         #endregion
 
         #region Конструкторы
-        public SRZ(string URL)
-        {
-            Initialize(URL, null, 0);
-        }
+        public SRZ(string URL) 
+            : this(URL, null, 0)
+        { }
         public SRZ(string URL, string proxyAddress, int proxyPort)
         {
-            Initialize(URL, proxyAddress, proxyPort);
+            Authorized = false;
+            var clientHandler = new HttpClientHandler();
+            clientHandler.CookieContainer = new CookieContainer();
+
+            if (proxyAddress != null && proxyPort != 0)
+            {
+                clientHandler.UseProxy = true;
+                clientHandler.Proxy = new WebProxy($"{proxyAddress}:{proxyPort}");
+            }
+
+            client = new HttpClient(clientHandler);
+            client.BaseAddress = new Uri(URL);
         }
         #endregion
 
@@ -39,10 +49,10 @@ namespace PatientsFomsRepository.Models
         public bool TryAuthorize(Credential credential)
         {
             Credential = credential;
-            var content = new FormUrlEncodedContent(new[]                
+            var content = new FormUrlEncodedContent(new[]
             {
                 new KeyValuePair<string, string>("lg", credential.Login),
-                new KeyValuePair<string, string>("pw", credential.Password),                
+                new KeyValuePair<string, string>("pw", credential.Password),
             });
 
             try
@@ -91,7 +101,7 @@ namespace PatientsFomsRepository.Models
                     patient = new Patient(responseLines[2], responseLines[3], responseLines[4], responseLines[5]);
                     return true;
                 }
-                else              
+                else
                     return false;
             }
             catch (Exception)
@@ -110,22 +120,6 @@ namespace PatientsFomsRepository.Models
         public void Dispose()
         {
             client.Dispose();
-        }
-        // инициализация класса
-        private void Initialize(string URL, string proxyAddress = null, int proxyPort = 0)
-        {
-            Authorized = false;
-            var clientHandler = new HttpClientHandler();
-            clientHandler.CookieContainer = new CookieContainer();
-
-            if (proxyAddress != null && proxyPort != 0)
-            {
-                clientHandler.UseProxy = true;
-                clientHandler.Proxy = new WebProxy($"{proxyAddress}:{proxyPort}");
-            }
-
-            client = new HttpClient(clientHandler);
-            client.BaseAddress = new Uri(URL);
         }
         //получает ссылку на файл заданной даты
         private string GetFileReference(DateTime fileDate)
@@ -160,8 +154,8 @@ namespace PatientsFomsRepository.Models
             {
                 archive.Entries[0].Open().CopyTo(dbfFile);
             }
-                
-            dbfFile.Position = 0;            
+
+            dbfFile.Position = 0;
 
             return dbfFile;
         }
