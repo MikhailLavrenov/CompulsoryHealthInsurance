@@ -10,9 +10,12 @@ namespace CHI.Modules.MedicalExaminations.Services
 {
     public class BillsRegister
     {
+        #region Поля
         private static StringComparison comparer = StringComparison.OrdinalIgnoreCase;
         private List<string> filePaths;
+        #endregion
 
+        #region Конструкторы
         public BillsRegister(ICollection<string> filePaths)
         {
             this.filePaths = filePaths.ToList();
@@ -21,7 +24,9 @@ namespace CHI.Modules.MedicalExaminations.Services
         {
             filePaths = new List<string>() { filePath };
         }
+        #endregion
 
+        #region Методы
         public List<PatientExaminations> GetPatientsExaminations(IEnumerable<string> examinationsFileNamesStartsWith, IEnumerable<string> patientsFileNamesStartsWith)
         {
             var patientsFiles = GetFiles(patientsFileNamesStartsWith);
@@ -240,6 +245,7 @@ namespace CHI.Modules.MedicalExaminations.Services
 
             return result;
         }
+        #endregion
 
         #region Классы для десериализации случаев реестров-счетов
         [XmlRoot(ElementName = "ZL_LIST")]
@@ -256,6 +262,7 @@ namespace CHI.Modules.MedicalExaminations.Services
         [XmlRoot(ElementName = "SCHET")]
         public class SCHET
         {
+            //год
             [XmlElement(ElementName = "YEAR")]
             public int YEAR { get; set; }
             //Реестровый номер медицинской организации
@@ -283,6 +290,7 @@ namespace CHI.Modules.MedicalExaminations.Services
         [XmlRoot(ElementName = "PACIENT")]
         public class PACIENT
         {
+            //guid пациента
             [XmlElement(ElementName = "ID_PAC")]
             public Guid ID_PAC { get; set; }
             //Серия документа, подтверждающего факт страхования по ОМС
@@ -307,6 +315,7 @@ namespace CHI.Modules.MedicalExaminations.Services
             //32 Присвоена IIIб группа здоровья
             [XmlElement(ElementName = "RSLT_D")]
             public int RSLT_D { get; set; }
+            //сведения о случае
             [XmlElement(ElementName = "SL")]
             public SL SL { get; set; }
         }
@@ -359,6 +368,7 @@ namespace CHI.Modules.MedicalExaminations.Services
         [XmlRoot(ElementName = "PERS_LIST")]
         public class PERS_LIST
         {
+            //сведения о пациенте
             [XmlElement(ElementName = "PERS")]
             public List<PERS> PERS { get; set; }
         }
