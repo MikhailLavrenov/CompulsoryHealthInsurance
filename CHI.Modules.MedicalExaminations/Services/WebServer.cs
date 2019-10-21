@@ -61,7 +61,7 @@ namespace CHI.Modules.MedicalExaminations.Services
             else
                 return Authorized = false;
         }
-        public bool TryFindPatientInPlan(string insuranceNumber, ExaminationType examinationType, int year)
+        public bool TryFindPatientInPlan(string insuranceNumber, ExaminationKind examinationType, int year)
         {
             var builder = new UriBuilder(@"/disp/GetDispData");
             builder.Port = -1;
