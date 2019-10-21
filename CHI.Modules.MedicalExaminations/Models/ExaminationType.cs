@@ -11,7 +11,6 @@ namespace CHI.Modules.MedicalExaminations.Models
     {
         [Description("Не выбрано")] None = 0,
         [Description ("Диспансеризация 1 раз в 3 года")] Dispanserizacia3=1,
-        //[Description("Диспансеризация 1 раз в 2 года")] Dispanserizacia2 = 2,
         [Description("Профилактический осмотр")] ProfOsmotr = 3,
         [Description("Диспансеризация 1 раз в год")] Dispanserizacia1 = 4,
     }

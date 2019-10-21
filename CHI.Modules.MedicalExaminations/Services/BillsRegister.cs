@@ -27,7 +27,7 @@ namespace CHI.Modules.MedicalExaminations.Services
         #endregion
 
         #region Методы
-        public List<PatientExaminations> GetPatientsExaminations(IEnumerable<string> examinationsFileNamesStartsWith, IEnumerable<string> patientsFileNamesStartsWith)
+        public Dictionary<Patient, List<Examination>> GetPatientsExaminations(IEnumerable<string> examinationsFileNamesStartsWith, IEnumerable<string> patientsFileNamesStartsWith)
         {
             var patientsFiles = GetFiles(patientsFileNamesStartsWith);
             var patientsRegisters = DeserializeCollection<PERS_LIST>(patientsFiles);
@@ -112,9 +112,9 @@ namespace CHI.Modules.MedicalExaminations.Services
 
             return result;
         }
-        private List<PatientExaminations> GetPatientsExaminations(IEnumerable<ZL_LIST> examinationsRegisters, IEnumerable<PERS_LIST> patientsRegisters)
+        private Dictionary<Patient, List<Examination>> GetPatientsExaminations(IEnumerable<ZL_LIST> examinationsRegisters, IEnumerable<PERS_LIST> patientsRegisters)
         {
-            var patientsExaminations = new List<PatientExaminations>();
+            var result = new Dictionary<Patient, List<Examination>>();
 
             var patients = new List<(Guid, int)>();
 
@@ -150,12 +150,12 @@ namespace CHI.Modules.MedicalExaminations.Services
                     examination.Stage = examinationStage;
                     examination.Year = examinationYear;
 
-                    var patient = patients.FirstOrDefault(x => x.Item1 == treatmentCase.PACIENT.ID_PAC);
+                    var foundPatient = patients.FirstOrDefault(x => x.Item1 == treatmentCase.PACIENT.ID_PAC);
 
-                    if (patient == default)
+                    if (foundPatient == default)
                         continue;
 
-                    examination.Type = DispToExaminationType(examinationsRegister.SCHET.DISP, examinationYear - patient.Item2);
+                    examination.Type = DispToExaminationType(examinationsRegister.SCHET.DISP, examinationYear - foundPatient.Item2);
 
                     if (examinationStage == 1)
                         examination.BeginDate = treatmentCase.Z_SL.SL.USL.First(x => x.CODE_USL == "024101").DATE_IN;
@@ -169,20 +169,16 @@ namespace CHI.Modules.MedicalExaminations.Services
                     if (examination.HealthGroup == HealthGroup.None)
                         continue;
 
-                    var patientExaminations = patientsExaminations.FirstOrDefault(x => x.InsuranceNumber.Equals(insuranceNumber, comparer));
+                    var patient = new Patient(insuranceNumber);
 
-                    if (patientExaminations == null)
-                    {
-                        patientExaminations = new PatientExaminations { InsuranceNumber = insuranceNumber };
-
-                        patientsExaminations.Add(patientExaminations);
-                    }
-
-                    patientExaminations.Examinations.Add(examination);
+                    if (result.TryGetValue(patient, out var examinations))
+                        examinations.Add(examination);
+                    else
+                        result.Add(patient, new List<Examination> { examination });
                 }
             }
 
-            return patientsExaminations;
+            return result;
         }
         private static int DispToExaminationStage(string disp)
         {

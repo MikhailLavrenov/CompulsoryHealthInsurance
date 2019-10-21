@@ -1,17 +1,15 @@
-﻿using PatientsFomsRepository.Models;
+﻿using CHI.Modules.MedicalExaminations.Models;
+using PatientsFomsRepository.Models;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CHI.Modules.MedicalExaminations.Services
 {
     public class WebServer
     {
-        #region Поля
+        #region Поля        
         private HttpClient client;
         #endregion
 
@@ -46,26 +44,77 @@ namespace CHI.Modules.MedicalExaminations.Services
         public bool TryAuthorize(Credential credential)
         {
             Credential = credential;
-            var content = new FormUrlEncodedContent(new[]
-            {
-                new KeyValuePair<string, string>("Login", credential.Login),
-                new KeyValuePair<string, string>("Password", credential.Password),
-            });
 
+            var requestValues = new Dictionary<string, string> {
+                { "Login",      credential.Login    },
+                { "Password",   credential.Password }
+            };
+
+            var isRequestSuccessful = TryPostReqest(@"account/login", requestValues, out var responseText);
+
+            if (isRequestSuccessful && !string.IsNullOrEmpty(responseText) && !responseText.Contains(@"<li>Пользователь не найден</li>"))
+                return Authorized = true;
+            else
+                return Authorized = false;
+        }
+        public bool TryFindPatientInPlan(string insuranceNumber, ExaminationType examinationType, int year)
+        {
+            var requestValues = new Dictionary<string, string>
+            {
+                { "Filter.Year",        GetYearId(year)                     },
+                { "Filter.PolisNum",    insuranceNumber                     },
+                { "Filter.DispType",    ((int)examinationType).ToString()   }
+            };
+
+            var isRequestSuccessful = TryPostReqest(@"/disp/GetDispData", requestValues, out var responseText);
+
+            return true;
+
+            // Query string parameters
+            var queryString = new Dictionary<string, string>() { { "foo", "bar" } };
+
+            // Create json for body
+            var content = new JObject(json);
+
+            // Create HttpClient
+            var client = new HttpClient();
+            client.BaseAddress = new Uri("https://api.baseaddress.com/");
+
+            // This is the missing piece
+            var requestUri = QueryHelpers.AddQueryString("something", queryString);
+
+            var request = new HttpRequestMessage(HttpMethod.Post, requestUri);
+            // Setup header(s)
+            request.Headers.Add("Accept", "application/json");
+            // Add body content
+            request.Content = new StringContent(
+                content.ToString(),
+                Encoding.UTF8,
+                "application/json"
+            );
+
+            // Send the request
+            client.SendAsync(request);
+        }
+        private static string GetYearId(int year) => (year - 2017).ToString();
+        private bool TryPostReqest(string URN, Dictionary<string, string> requestValues, out string responseText)
+        {
             try
             {
-                var response = client.PostAsync(@"account/login", content).GetAwaiter().GetResult();
-                response.EnsureSuccessStatusCode();
-                var responseText = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+                var content = new FormUrlEncodedContent(requestValues);
 
-                if (!string.IsNullOrEmpty(responseText) && !responseText.Contains("<li>Пользователь не найден</li>"))
-                    return Authorized = true;
-                else
-                    return Authorized = false;
+                var response = client.PostAsync(URN, content).GetAwaiter().GetResult();
+
+                response.EnsureSuccessStatusCode();
+
+                responseText = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+
+                return true;
             }
             catch (Exception)
             {
-                return Authorized = false;
+                responseText = string.Empty;
+                return false;
             }
         }
 
