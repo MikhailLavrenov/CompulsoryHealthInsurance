@@ -164,7 +164,7 @@ namespace CHI.Modules.MedicalExaminations.Services
 
                     examination.EndDate = treatmentCase.Z_SL.SL.DATE_2;
                     examination.HealthGroup = RSLT_DToHealthGroup(treatmentCase.Z_SL.RSLT_D);
-                    examination.Referral = (ReferralTo)(treatmentCase.Z_SL.SL.NAZ.FirstOrDefault()?.NAZ_R ?? 0);
+                    examination.Referral = (Referral)(treatmentCase.Z_SL.SL.NAZ.FirstOrDefault()?.NAZ_R ?? 0);
 
                     if (examination.HealthGroup == HealthGroup.None)
                         continue;
@@ -193,17 +193,17 @@ namespace CHI.Modules.MedicalExaminations.Services
                     return 0;
             }
         }
-        private static ExaminationKind DispToExaminationType(string disp, int age)
+        private static ExaminationType DispToExaminationType(string disp, int age)
         {
             switch (disp.ToUpper())
             {
                 case "ОПВ":
-                    return ExaminationKind.ProfOsmotr;
+                    return ExaminationType.ProfOsmotr;
                 case "ДВ2":
                 case "ДВ4":
-                    return age >= 40 ? ExaminationKind.Dispanserizacia1 : ExaminationKind.Dispanserizacia3;
+                    return age >= 40 ? ExaminationType.Dispanserizacia1 : ExaminationType.Dispanserizacia3;
                 default:
-                    return ExaminationKind.None;
+                    return ExaminationType.None;
             }
         }
         private static HealthGroup RSLT_DToHealthGroup(int RSLT_D)

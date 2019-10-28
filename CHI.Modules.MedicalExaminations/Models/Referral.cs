@@ -2,7 +2,7 @@
 
 namespace CHI.Modules.MedicalExaminations.Models
 {
-    public enum ReferralTo
+    public enum Referral
     {
         [Description("Нет назначения")] None = 7,
         [Description("Консультацию в МО по месту прикрепления")] LocalClinic = 1,

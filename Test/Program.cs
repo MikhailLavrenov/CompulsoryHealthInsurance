@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CHI.Modules.MedicalExaminations.Models;
 using CHI.Modules.MedicalExaminations.Services;
 using PatientsFomsRepository.Models;
 
@@ -21,7 +22,19 @@ namespace CHI.Test
             var proxyPort = 3128;
             var web = new WebServer(url, proxyServer, proxyPort);
             var cred = new Credential() { Login= "UshanovaTA", Password= "UshanovaTA1" };
-            web.TryAuthorize(cred);
+            var r1=web.TryAuthorize(cred);           
+            var r2=web.TryFindPatientInPlan("2751530822000157", ExaminationType.Dispanserizacia1, 2019,out var webPlanPatientData);
+            var r3 = web.TryDeletePatientFromPlan(webPlanPatientData.Id);
+            var r4 = web.TryFindPatientInSRZ("2751530822000157", 2019, out var PatientId);
+            var r5 = web.TryAddPatientToPlan(PatientId, ExaminationType.Dispanserizacia1, 2019);
+
+            var r6 = web.TryAddStep(ExaminationStage.FirstBegin, new DateTime(2019, 10, 25), 0, 0, webPlanPatientData.Id);
+            var r7 = web.TryAddStep(ExaminationStage.FirstEnd, new DateTime(2019, 10, 28), 0, 0, webPlanPatientData.Id);
+            var r8 = web.TryAddStep(ExaminationStage.FirstResult, new DateTime(2019, 10, 28),  HealthGroup.First, Referral.None, webPlanPatientData.Id);
+
+            var r9 = web.TryDeleteLastStep(webPlanPatientData.Id);
+            var r10 = web.TryDeleteLastStep(webPlanPatientData.Id);
+            var r11 = web.TryDeleteLastStep(webPlanPatientData.Id);
         }
         static void TestBillsRegisters()
         {
@@ -32,7 +45,7 @@ namespace CHI.Test
             var patientsNames = new string[] { @"LPM", @"LVM", @"LOM" };
 
             var patients = register.GetPatientsExaminations(examinationNames, patientsNames);
-            var t = patients.Where(x => x.Examinations.Count > 1).ToList();
+            var t = patients.Values.Where(x => x.Count > 1).ToList();
         }
     }
 }

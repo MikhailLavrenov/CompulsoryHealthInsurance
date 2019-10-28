@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace CHI.Modules.MedicalExaminations.Models
 {
-    public enum ExaminationKind
+    public enum ExaminationType
     {
         [Description("Не выбрано")] None = 0,
         [Description ("Диспансеризация 1 раз в 3 года")] Dispanserizacia3=1,
