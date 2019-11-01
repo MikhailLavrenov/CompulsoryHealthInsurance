@@ -10,26 +10,23 @@ using System.Web.Script.Serialization;
 
 namespace CHI.Modules.MedicalExaminations.Services
 {
-    public class WebServer
+    public class WebSiteApi
     {
         #region Поля        
         private HttpClient client;
-        private int drawCounter;
         #endregion
 
         #region Свойства
-        public Credential Credential { get; private set; }
-        public bool Authorized { get; private set; }
+        public bool Authorized { get; protected set; }
         #endregion
 
         #region Конструкторы
-        public WebServer(string URL)
+        protected WebSiteApi(string URL)
             : this(URL, null, 0)
         { }
-        public WebServer(string URL, string proxyAddress, int proxyPort)
+        protected WebSiteApi(string URL, string proxyAddress, int proxyPort)
         {
             Authorized = false;
-            drawCounter = 1;
 
             var clientHandler = new HttpClientHandler();
             clientHandler.CookieContainer = new CookieContainer();
@@ -42,38 +39,39 @@ namespace CHI.Modules.MedicalExaminations.Services
 
             client = new HttpClient(clientHandler);
             client.BaseAddress = new Uri(URL);
-            client.Timeout = TimeSpan.FromMinutes(2);
         }
         #endregion
 
         #region Методы
         //авторизация на сайте
-        public bool TryAuthorize(Credential credential)
+        public bool TryAuthorize(string login, string password)
         {
-            Credential = credential;
-
             var requestValues = new Dictionary<string, string> {
-                { "Login",      credential.Login    },
-                { "Password",   credential.Password }
+                { "Login",      login    },
+                { "Password",   password }
             };
 
-            var isRequestSuccessful = TryPostRequest(@"account/login", requestValues, out var responseText);
+            var isRequestSuccessful = TrySendRequest(HttpMethod.Post, @"account/login", requestValues, out var responseText);
 
             if (isRequestSuccessful && !string.IsNullOrEmpty(responseText) && !responseText.Contains(@"<li>Пользователь не найден</li>"))
                 return Authorized = true;
             else
                 return Authorized = false;
         }
+        public bool TryLogout()
+        {
+            return TrySendRequest(HttpMethod.Get, @"account/logout", null, out _);
+
+        }
         //поиск пациента в плане
-        public bool TryFindPatientInPlan(string insuranceNumber, ExaminationType examinationType, int year, out WebPlanPatientData foundPatientData)
+        protected bool TryGetPatientDataFromPlan(string insuranceNumber, ExaminationType examinationType, int year, out WebPatientData foundPatientData)
         {
             foundPatientData = null;
 
-            if (!Authorized)
-                throw new UnauthorizedAccessException("Сначала необходимо авторизоваться.");
+            //if (!Authorized)
+            //    throw new UnauthorizedAccessException("Сначала необходимо авторизоваться.");
 
-            var uriParameters = new Dictionary<string, string>
-            {
+            var uriParameters = new Dictionary<string, string> {
                 {"Filter.Year", GetYearId(year) },
                 {"Filter.PolisNum", insuranceNumber },
                 {"Filter.DispType", ((int)examinationType).ToString() },
@@ -82,14 +80,13 @@ namespace CHI.Modules.MedicalExaminations.Services
             var uriParamentersString = new FormUrlEncodedContent(uriParameters).ReadAsStringAsync().Result;
             var urn = $@"disp/GetDispData?{uriParamentersString}";
 
-            var contentParameters = new Dictionary<string, string>
-            {
+            var contentParameters = new Dictionary<string, string> {
                 {"columns[0][data]", "PersonId"},
                 {"order[0][column]", "0"},
                 {"length", "25"},
             };
 
-            var isRequestSuccessful = TryPostRequest(urn, contentParameters, out var responseText);
+            var isRequestSuccessful = TrySendRequest(HttpMethod.Post, urn, contentParameters, out var responseText);
 
             if (isRequestSuccessful)
             {
@@ -103,14 +100,14 @@ namespace CHI.Modules.MedicalExaminations.Services
 
             return isRequestSuccessful;
         }
-        public bool TryDeletePatientFromPlan(int Id)
+        protected bool TryDeletePatientFromPlan(int patientId)
         {
             var contentParameters = new Dictionary<string, string>
             {
-                { "Id", Id.ToString() }
+                { "Id", patientId.ToString() }
             };
 
-            var isRequestSuccessful = TryPostRequest(@"disp/removeDisp", contentParameters, out var responseText);
+            var isRequestSuccessful = TrySendRequest(HttpMethod.Post, @"disp/removeDisp", contentParameters, out var responseText);
 
             if (isRequestSuccessful)
             {
@@ -122,16 +119,16 @@ namespace CHI.Modules.MedicalExaminations.Services
 
             return isRequestSuccessful;
         }
-        public bool TryAddPatientToPlan(int PatientId, ExaminationType examinationType, int year)
+        protected bool TryAddPatientToPlan(int srzPatientId, ExaminationType examinationType, int year)
         {
             var contentParameters = new Dictionary<string, string>
             {
-                { "personId", PatientId.ToString() },
+                { "personId", srzPatientId.ToString() },
                 { "yearId", GetYearId(year) },
                 { "dispType", ((int)examinationType).ToString() },
             };
 
-            var isRequestSuccessful = TryPostRequest(@"disp/AddToDisp", contentParameters, out var responseText);
+            var isRequestSuccessful = TrySendRequest(HttpMethod.Post, @"disp/AddToDisp", contentParameters, out var responseText);
 
             if (isRequestSuccessful)
             {
@@ -143,9 +140,9 @@ namespace CHI.Modules.MedicalExaminations.Services
 
             return isRequestSuccessful;
         }
-        public bool TryFindPatientInSRZ(string insuranceNumber, int year, out int patientId)
+        protected bool TryGetPatientFromSRZ(string insuranceNumber, int year, out int srzPatientId)
         {
-            patientId = 0;
+            srzPatientId = 0;
 
             if (!Authorized)
                 throw new UnauthorizedAccessException("Сначала необходимо авторизоваться.");
@@ -157,7 +154,7 @@ namespace CHI.Modules.MedicalExaminations.Services
                 {"SearchData.PolisNum", insuranceNumber }
             };
 
-            var isRequestSuccessful = TryPostRequest(@"disp/SrzSearch", contentParameters, out var responseText);
+            var isRequestSuccessful = TrySendRequest(HttpMethod.Post, @"disp/SrzSearch", contentParameters, out var responseText);
 
             if (isRequestSuccessful)
             {
@@ -166,23 +163,23 @@ namespace CHI.Modules.MedicalExaminations.Services
                 var idLength = responseText.IndexOf('\"', idBegin) - idBegin;
                 var idString = responseText.Substring(idBegin, idLength);
 
-                int.TryParse(idString, out patientId);
+                int.TryParse(idString, out srzPatientId);
             }
 
-            return patientId!=0;
+            return srzPatientId != 0;
         }
-        public bool TryAddStep(ExaminationStage step, DateTime date,  HealthGroup healthGroup,Referral referralTo, int PatientId    )
+        protected bool TryAddStep(ExaminationStep step, DateTime date, HealthGroup healthGroup, Referral referralTo, int patientId)
         {
             var contentParameters = new Dictionary<string, string>
             {
                 { "stageId", ((int)step).ToString() },
                 { "stageDate", date.ToString("dd.MM.yyyy", CultureInfo.InvariantCulture) },
-                { "resultId", ((int)healthGroup).ToString()  },                               
+                { "resultId", ((int)healthGroup).ToString()  },
                 { "destId", ((int)referralTo).ToString() },
-                { "dispId", PatientId.ToString() },
+                { "dispId", patientId.ToString() },
             };
 
-            var isRequestSuccessful = TryPostRequest(@"disp/editDispStage", contentParameters, out var responseText);
+            var isRequestSuccessful = TrySendRequest(HttpMethod.Post, @"disp/editDispStage", contentParameters, out var responseText);
 
             if (isRequestSuccessful)
             {
@@ -194,14 +191,13 @@ namespace CHI.Modules.MedicalExaminations.Services
 
             return isRequestSuccessful;
         }
-        public bool TryDeleteLastStep(int PatientId)
+        protected bool TryDeleteLastStep(int patientId)
         {
-            var contentParameters = new Dictionary<string, string>
-            {
-                { "dispId", PatientId.ToString() },
+            var contentParameters = new Dictionary<string, string> {
+                { "dispId", patientId.ToString() },
             };
 
-            var isRequestSuccessful = TryPostRequest(@"disp/deleteDispStage", contentParameters, out var responseText);
+            var isRequestSuccessful = TrySendRequest(HttpMethod.Post, @"disp/deleteDispStage", contentParameters, out var responseText);
 
             if (isRequestSuccessful)
             {
@@ -213,14 +209,20 @@ namespace CHI.Modules.MedicalExaminations.Services
 
             return isRequestSuccessful;
         }
-
-        private bool TryPostRequest(string urn, Dictionary<string, string> contentParameters, out string responseText)
+        protected static string GetYearId(int year)
+        {
+            return (year - 2017).ToString();
+        }
+        private bool TrySendRequest(HttpMethod httpMethod, string urn, Dictionary<string, string> contentParameters, out string responseText)
         {
             try
             {
-                var content = new FormUrlEncodedContent(contentParameters);
+                var requestMessage = new HttpRequestMessage(httpMethod, urn);
 
-                var response = client.PostAsync(urn, content).GetAwaiter().GetResult();
+                if (httpMethod == HttpMethod.Post && contentParameters?.Count > 0)
+                    requestMessage.Content = new FormUrlEncodedContent(contentParameters);
+
+                var response = client.SendAsync(requestMessage).GetAwaiter().GetResult();
 
                 response.EnsureSuccessStatusCode();
 
@@ -234,14 +236,10 @@ namespace CHI.Modules.MedicalExaminations.Services
                 return false;
             }
         }
-        private static string GetYearId(int year)
-        {
-            return (year - 2017).ToString();
-        }
         #endregion
 
         #region Классы для десериализации
-        public class WebPlanPatientData
+        protected class WebPatientData
         {
             public int Id { get; set; }
             public int PersonId { get; set; }
@@ -266,12 +264,12 @@ namespace CHI.Modules.MedicalExaminations.Services
             public string Person_ENP { get; set; }
             public int DispType { get; set; }
         }
-        public class PlanResponse
+        protected class PlanResponse
         {
-            public List<WebPlanPatientData> Data { get; set; }
+            public List<WebPatientData> Data { get; set; }
             //public int recordsFiltered { get; set; }
         }
-        public class WebResult
+        protected class WebResult
         {
             public bool IsError { get; set; }
         }
