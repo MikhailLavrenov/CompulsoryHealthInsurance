@@ -2,28 +2,28 @@
 {
     public static class StageStates
     {
-        public static ExaminationStep[,] States { get; }
+        public static ExaminationStepKind[,] States { get; }
 
         static StageStates()
         {
-            States = new ExaminationStep[,] {
-               { ExaminationStep.None,             ExaminationStep.FirstBegin },
-               { ExaminationStep.FirstBegin,       ExaminationStep.FirstEnd },
-               { ExaminationStep.FirstEnd,         ExaminationStep.FirstResult },
+            States = new ExaminationStepKind[,] {
+               { ExaminationStepKind.None,             ExaminationStepKind.FirstBegin },
+               { ExaminationStepKind.FirstBegin,       ExaminationStepKind.FirstEnd },
+               { ExaminationStepKind.FirstEnd,         ExaminationStepKind.FirstResult },
 
-               { ExaminationStep.FirstEnd,         ExaminationStep.SecondTransition },
-               { ExaminationStep.SecondTransition, ExaminationStep.SecondBegin },
-               { ExaminationStep.SecondBegin,      ExaminationStep.SecondEnd },
-               { ExaminationStep.SecondEnd,        ExaminationStep.SecondResult },
+               { ExaminationStepKind.FirstEnd,         ExaminationStepKind.SecondTransition },
+               { ExaminationStepKind.SecondTransition, ExaminationStepKind.SecondBegin },
+               { ExaminationStepKind.SecondBegin,      ExaminationStepKind.SecondEnd },
+               { ExaminationStepKind.SecondEnd,        ExaminationStepKind.SecondResult },
 
-               { ExaminationStep.None,             ExaminationStep.Refuse },
-               { ExaminationStep.FirstBegin,       ExaminationStep.Refuse },
-               { ExaminationStep.FirstEnd,         ExaminationStep.Refuse },
+               { ExaminationStepKind.None,             ExaminationStepKind.Refuse },
+               { ExaminationStepKind.FirstBegin,       ExaminationStepKind.Refuse },
+               { ExaminationStepKind.FirstEnd,         ExaminationStepKind.Refuse },
 
-               { ExaminationStep.SecondTransition, ExaminationStep.Refuse },
-               { ExaminationStep.SecondBegin,      ExaminationStep.Refuse },
-               { ExaminationStep.SecondEnd,        ExaminationStep.Refuse },
-               { ExaminationStep.SecondResult,     ExaminationStep.Refuse }
+               { ExaminationStepKind.SecondTransition, ExaminationStepKind.Refuse },
+               { ExaminationStepKind.SecondBegin,      ExaminationStepKind.Refuse },
+               { ExaminationStepKind.SecondEnd,        ExaminationStepKind.Refuse },
+               { ExaminationStepKind.SecondResult,     ExaminationStepKind.Refuse }
             };
         }
     }

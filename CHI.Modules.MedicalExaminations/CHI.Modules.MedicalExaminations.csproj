@@ -64,7 +64,8 @@
     <Compile Include="MedicalExaminationsModule.cs" />
     <Compile Include="Models\Examination.cs" />
     <Compile Include="Models\ExaminationStep.cs" />
-    <Compile Include="Models\ExaminationType.cs" />
+    <Compile Include="Models\ExaminationStepKind.cs" />
+    <Compile Include="Models\ExaminationKind.cs" />
     <Compile Include="Models\HealthGroup.cs" />
     <Compile Include="Models\Patient.cs" />
     <Compile Include="Models\Referral.cs" />

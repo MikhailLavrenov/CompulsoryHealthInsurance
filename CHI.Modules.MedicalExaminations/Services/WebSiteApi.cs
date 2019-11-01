@@ -64,7 +64,7 @@ namespace CHI.Modules.MedicalExaminations.Services
 
         }
         //поиск пациента в плане
-        protected bool TryGetPatientDataFromPlan(string insuranceNumber, ExaminationType examinationType, int year, out WebPatientData foundPatientData)
+        protected bool TryGetPatientDataFromPlan(string insuranceNumber, ExaminationKind examinationType, int year, out WebPatientData foundPatientData)
         {
             foundPatientData = null;
 
@@ -72,7 +72,7 @@ namespace CHI.Modules.MedicalExaminations.Services
             //    throw new UnauthorizedAccessException("Сначала необходимо авторизоваться.");
 
             var uriParameters = new Dictionary<string, string> {
-                {"Filter.Year", GetYearId(year) },
+                {"Filter.Year", ConvertToYearId(year) },
                 {"Filter.PolisNum", insuranceNumber },
                 {"Filter.DispType", ((int)examinationType).ToString() },
             };
@@ -119,12 +119,12 @@ namespace CHI.Modules.MedicalExaminations.Services
 
             return isRequestSuccessful;
         }
-        protected bool TryAddPatientToPlan(int srzPatientId, ExaminationType examinationType, int year)
+        protected bool TryAddPatientToPlan(int srzPatientId, ExaminationKind examinationType, int year)
         {
             var contentParameters = new Dictionary<string, string>
             {
                 { "personId", srzPatientId.ToString() },
-                { "yearId", GetYearId(year) },
+                { "yearId", ConvertToYearId(year) },
                 { "dispType", ((int)examinationType).ToString() },
             };
 
@@ -149,7 +149,7 @@ namespace CHI.Modules.MedicalExaminations.Services
 
             var contentParameters = new Dictionary<string, string>
             {
-                {"SearchData.DispYearId", GetYearId(year) },
+                {"SearchData.DispYearId", ConvertToYearId(year) },
                 {"SearchData.SelectSearchValues", "polis"},
                 {"SearchData.PolisNum", insuranceNumber }
             };
@@ -168,7 +168,7 @@ namespace CHI.Modules.MedicalExaminations.Services
 
             return srzPatientId != 0;
         }
-        protected bool TryAddStep(ExaminationStep step, DateTime date, HealthGroup healthGroup, Referral referralTo, int patientId)
+        protected bool TryAddStep(ExaminationStepKind step, DateTime date, HealthGroup healthGroup, Referral referralTo, int patientId)
         {
             var contentParameters = new Dictionary<string, string>
             {
@@ -209,7 +209,7 @@ namespace CHI.Modules.MedicalExaminations.Services
 
             return isRequestSuccessful;
         }
-        protected static string GetYearId(int year)
+        protected static string ConvertToYearId(int year)
         {
             return (year - 2017).ToString();
         }
@@ -252,14 +252,14 @@ namespace CHI.Modules.MedicalExaminations.Services
             public DateTime? Disp2Date { get; set; }
             public DateTime? DispCancelDate { get; set; }
             public DateTime? DispSuccessDate { get; set; }
-            public object Stage1ResultId { get; set; }
-            public object Stage1ResultName { get; set; }
-            public object Stage1DestId { get; set; }
-            public object Stage1DestName { get; set; }
-            public object Stage2ResultId { get; set; }
-            public object Stage2ResultName { get; set; }
-            public object Stage2DestId { get; set; }
-            public object Stage2DestName { get; set; }
+            public int? Stage1ResultId { get; set; }
+            //public string Stage1ResultName { get; set; }
+            public int? Stage1DestId { get; set; }
+            //public string Stage1DestName { get; set; }
+            public int? Stage2ResultId { get; set; }
+            //public string Stage2ResultName { get; set; }
+            public int? Stage2DestId { get; set; }
+            //public string Stage2DestName { get; set; }
             public string Polis_Num { get; set; }
             public string Person_ENP { get; set; }
             public int DispType { get; set; }
@@ -267,7 +267,6 @@ namespace CHI.Modules.MedicalExaminations.Services
         protected class PlanResponse
         {
             public List<WebPatientData> Data { get; set; }
-            //public int recordsFiltered { get; set; }
         }
         protected class WebResult
         {

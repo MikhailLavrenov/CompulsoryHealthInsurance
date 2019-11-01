@@ -11,7 +11,7 @@ namespace CHI.Modules.MedicalExaminations.Services
     public class BillsRegister
     {
         #region Поля
-        private static StringComparison comparer = StringComparison.OrdinalIgnoreCase;
+        private static readonly StringComparison comparer = StringComparison.OrdinalIgnoreCase;
         private List<string> filePaths;
         #endregion
 
@@ -193,17 +193,17 @@ namespace CHI.Modules.MedicalExaminations.Services
                     return 0;
             }
         }
-        private static ExaminationType DispToExaminationType(string disp, int age)
+        private static ExaminationKind DispToExaminationType(string disp, int age)
         {
             switch (disp.ToUpper())
             {
                 case "ОПВ":
-                    return ExaminationType.ProfOsmotr;
+                    return ExaminationKind.ProfOsmotr;
                 case "ДВ2":
                 case "ДВ4":
-                    return age >= 40 ? ExaminationType.Dispanserizacia1 : ExaminationType.Dispanserizacia3;
+                    return age >= 40 ? ExaminationKind.Dispanserizacia1 : ExaminationKind.Dispanserizacia3;
                 default:
-                    return ExaminationType.None;
+                    return ExaminationKind.None;
             }
         }
         private static HealthGroup RSLT_DToHealthGroup(int RSLT_D)
@@ -360,6 +360,7 @@ namespace CHI.Modules.MedicalExaminations.Services
             public string CODE_USL { get; set; }
         }
         #endregion
+
         #region Классы для десериализации пациентов реестров-счетов
         [XmlRoot(ElementName = "PERS_LIST")]
         public class PERS_LIST
