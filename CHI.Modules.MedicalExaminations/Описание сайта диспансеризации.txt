@@ -574,6 +574,34 @@ Response:
 }
 
 
+Get Available Stages
+************
+POST /disp/getAvailableStages
+
+Req body:
+dispId: 566137
+
+Response:
+{
+	"DispStages":null,
+	"AvailableStages":[
+		{
+			"StageId":0,
+			"NextStageId":12,
+			"StageName":"Начало 1 этапа диспансеризации",
+			"PreviousStageId":null
+		},
+		{
+			"StageId":0,
+			"NextStageId":90,
+			"StageName":"Отказ от прохождения диспансеризации",
+			"PreviousStageId":null
+		}
+	],
+	"AvailableResults":null,
+	"AvailableDestinations":null
+}
+
 
 RESUME
 ******

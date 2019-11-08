@@ -11,8 +11,8 @@
                { ExaminationStepKind.FirstBegin,       ExaminationStepKind.FirstEnd },
                { ExaminationStepKind.FirstEnd,         ExaminationStepKind.FirstResult },
 
-               { ExaminationStepKind.FirstEnd,         ExaminationStepKind.SecondTransition },
-               { ExaminationStepKind.SecondTransition, ExaminationStepKind.SecondBegin },
+               { ExaminationStepKind.FirstEnd,         ExaminationStepKind.TransferSecond },
+               { ExaminationStepKind.TransferSecond, ExaminationStepKind.SecondBegin },
                { ExaminationStepKind.SecondBegin,      ExaminationStepKind.SecondEnd },
                { ExaminationStepKind.SecondEnd,        ExaminationStepKind.SecondResult },
 
@@ -20,7 +20,7 @@
                { ExaminationStepKind.FirstBegin,       ExaminationStepKind.Refuse },
                { ExaminationStepKind.FirstEnd,         ExaminationStepKind.Refuse },
 
-               { ExaminationStepKind.SecondTransition, ExaminationStepKind.Refuse },
+               { ExaminationStepKind.TransferSecond, ExaminationStepKind.Refuse },
                { ExaminationStepKind.SecondBegin,      ExaminationStepKind.Refuse },
                { ExaminationStepKind.SecondEnd,        ExaminationStepKind.Refuse },
                { ExaminationStepKind.SecondResult,     ExaminationStepKind.Refuse }

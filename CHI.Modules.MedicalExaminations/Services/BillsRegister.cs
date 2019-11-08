@@ -155,7 +155,7 @@ namespace CHI.Modules.MedicalExaminations.Services
                     if (foundPatient == default)
                         continue;
 
-                    examination.Type = DispToExaminationType(examinationsRegister.SCHET.DISP, examinationYear - foundPatient.Item2);
+                    examination.Kind = DispToExaminationType(examinationsRegister.SCHET.DISP, examinationYear - foundPatient.Item2);
 
                     if (examinationStage == 1)
                         examination.BeginDate = treatmentCase.Z_SL.SL.USL.First(x => x.CODE_USL == "024101").DATE_IN;

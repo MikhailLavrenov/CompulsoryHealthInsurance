@@ -8,7 +8,7 @@ namespace CHI.Modules.MedicalExaminations.Models
 {    
     public class Examination
     {
-        public ExaminationKind Type { get; set; }
+        public ExaminationKind Kind { get; set; }
         public int Stage { get; set; }
         public int Year { get; set; }
         public DateTime BeginDate { get; set; }

@@ -1,5 +1,4 @@
 ﻿using CHI.Modules.MedicalExaminations.Models;
-using PatientsFomsRepository.Models;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -175,7 +174,7 @@ namespace CHI.Modules.MedicalExaminations.Services
                 { "stageId", ((int)step).ToString() },
                 { "stageDate", date.ToString("dd.MM.yyyy", CultureInfo.InvariantCulture) },
                 { "resultId", ((int)healthGroup).ToString()  },
-                { "destId", ((int)referralTo).ToString() },
+                { "destId", referralTo==Referral.None? string.Empty:((int)referralTo).ToString() },
                 { "dispId", patientId.ToString() },
             };
 
@@ -190,6 +189,10 @@ namespace CHI.Modules.MedicalExaminations.Services
             }
 
             return isRequestSuccessful;
+        }
+        protected bool TryAddStep(ExaminationStep examinationStep, int patientId)
+        {
+            return TryAddStep(examinationStep.ExaminationStepKind, examinationStep.Date, examinationStep.HealthGroup, examinationStep.Referral, patientId);
         }
         protected bool TryDeleteLastStep(int patientId)
         {
@@ -208,6 +211,16 @@ namespace CHI.Modules.MedicalExaminations.Services
             }
 
             return isRequestSuccessful;
+        }
+        protected bool TryDeleteLastSteps(int patientId, int count)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                if (!TryDeleteLastStep(patientId))
+                    return false;
+            }
+
+            return true;
         }
         protected static string ConvertToYearId(int year)
         {
@@ -247,22 +260,49 @@ namespace CHI.Modules.MedicalExaminations.Services
             public int Month { get; set; }
             public DateTime? Disp1BeginDate { get; set; }
             public DateTime? Disp1Date { get; set; }
+            public int? Stage1ResultId { get; set; }
+            public int? Stage1DestId { get; set; }
             public DateTime? Disp2DirectDate { get; set; }
             public DateTime? Disp2BeginDate { get; set; }
             public DateTime? Disp2Date { get; set; }
-            public DateTime? DispCancelDate { get; set; }
-            public DateTime? DispSuccessDate { get; set; }
-            public int? Stage1ResultId { get; set; }
-            //public string Stage1ResultName { get; set; }
-            public int? Stage1DestId { get; set; }
-            //public string Stage1DestName { get; set; }
             public int? Stage2ResultId { get; set; }
-            //public string Stage2ResultName { get; set; }
             public int? Stage2DestId { get; set; }
-            //public string Stage2DestName { get; set; }
+            public DateTime? DispSuccessDate { get; set; }
+            public DateTime? DispCancelDate { get; set; }
             public string Polis_Num { get; set; }
             public string Person_ENP { get; set; }
             public int DispType { get; set; }
+
+            public byte GetStepsCount()
+            {
+                byte count = 0;
+
+                if (Disp1BeginDate != default)
+                    count++;
+
+                if (Disp1Date != default)
+                    count++;
+
+                if (Disp1Date != default && Stage1ResultId != default && Stage1DestId != default)
+                    count++;
+
+                if (Disp2DirectDate != default)
+                    count++;
+
+                if (Disp2BeginDate != default)
+                    count++;
+
+                if (Disp2Date != default)
+                    count++;
+
+                if (Disp2Date != default && Stage2ResultId != default && Stage2DestId != default)
+                    count++;
+
+                if (DispCancelDate != default)
+                    count++;
+
+                return count;
+            }
         }
         protected class PlanResponse
         {
