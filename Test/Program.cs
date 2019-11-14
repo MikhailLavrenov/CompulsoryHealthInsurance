@@ -42,16 +42,16 @@ namespace CHI.Test
             var web = new WebSite(url, proxyServer, proxyPort);
 
             var patient = new Modules.MedicalExaminations.Models.Patient("2751530822000157");
-            var examination1Stage = new Examination
-            {
-                Kind = ExaminationKind.Dispanserizacia1,
-                Stage = 1,
-                Year = 2019,
-                BeginDate = new DateTime(2019, 10, 10),
-                EndDate = new DateTime(2019, 10, 15),
-                HealthGroup = HealthGroup.ThirdA,
-                Referral = Referral.LocalClinic
-            };
+            //var examination1Stage = new Examination
+            //{
+            //    Kind = ExaminationKind.Dispanserizacia1,
+            //    Stage = 1,
+            //    Year = 2019,
+            //    BeginDate = new DateTime(2019, 10, 10),
+            //    EndDate = new DateTime(2019, 10, 15),
+            //    HealthGroup = HealthGroup.ThirdA,
+            //    Referral = Referral.LocalClinic
+            //};
             var examination2Stage = new Examination
             {
                 Kind = ExaminationKind.Dispanserizacia1,
@@ -62,10 +62,10 @@ namespace CHI.Test
                 HealthGroup = HealthGroup.ThirdB,
                 Referral = Referral.AnotherClinic
             };
-            var examinations = new List<Examination> { examination2Stage, examination1Stage };
+            var examinations = new List<Examination> { examination2Stage };//, examination1Stage };
 
             var r1 = web.TryAuthorize(login, password);
-            var r2 = web.TryAddExaminations(patient, examinations);
+            var r2 = web.TryAddPatientExaminations(patient, examinations);
 
         }
 

@@ -167,6 +167,22 @@ namespace CHI.Modules.MedicalExaminations.Services
 
             return srzPatientId != 0;
         }
+        protected bool TryGetAvailableSteps(int patientId, out List<AvailableStage> availableSteps)
+        {
+            var contentParameters = new Dictionary<string, string>
+            {
+                { "dispId", patientId.ToString() },
+            };
+
+            var isRequestSuccessful = TrySendRequest(HttpMethod.Post, @"/disp/getAvailableStages", contentParameters, out var responseText);
+
+            if (isRequestSuccessful)
+                availableSteps = new JavaScriptSerializer().Deserialize<AvailableStagesResponse>(responseText).AvailableStages;
+            else
+                availableSteps = null;
+
+            return isRequestSuccessful;
+        }
         protected bool TryAddStep(ExaminationStepKind step, DateTime date, HealthGroup healthGroup, Referral referralTo, int patientId)
         {
             var contentParameters = new Dictionary<string, string>
@@ -311,6 +327,17 @@ namespace CHI.Modules.MedicalExaminations.Services
         protected class WebResult
         {
             public bool IsError { get; set; }
+        }
+        public class AvailableStagesResponse
+        {
+            public List<AvailableStage> AvailableStages { get; set; }
+        }
+        public class AvailableStage
+        {
+            public int StageId { get; set; }
+            public int NextStageId { get; set; }
+            //public string StageName { get; set; }
+            public object PreviousStageId { get; set; }
         }
         #endregion
     }

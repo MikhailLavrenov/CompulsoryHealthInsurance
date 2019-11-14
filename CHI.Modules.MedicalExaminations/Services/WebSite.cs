@@ -16,11 +16,11 @@ namespace CHI.Modules.MedicalExaminations.Services
         #endregion
 
         #region Методы
-        public bool TryAddExaminations(Models.Patient patient, IEnumerable<Examination> examinations)
+        public bool TryAddPatientExaminations(Models.Patient patient, IEnumerable<Examination> examinations)
         {
 
             if (TryGetOrAddPatientToPlan(patient, examinations.First().Kind, examinations.First().Year, out var webPatientData)
-                && (TryAddExaminations(patient, examinations, webPatientData)))
+                && (TryAddPatientExaminations(patient, examinations, webPatientData)))
                 return true;
             else
                 return false;
@@ -61,7 +61,7 @@ namespace CHI.Modules.MedicalExaminations.Services
 
             return true;
         }
-        protected bool TryAddExaminations(Models.Patient patient, IEnumerable<Examination> examinations, WebPatientData webPatientData)
+        protected bool TryAddPatientExaminations(Models.Patient patient, IEnumerable<Examination> examinations, WebPatientData webPatientData)
         {
             var transfer2StageDate = examinations.FirstOrDefault(x => x.Stage == 1)?.EndDate ?? webPatientData.Disp1Date;
             var userSteps = ConvertToExaminationSteps(examinations, transfer2StageDate);
@@ -73,7 +73,7 @@ namespace CHI.Modules.MedicalExaminations.Services
                 .OrderBy(x => (int)x)
                 .ToList();
 
-            var wasDeleteSteps = false;
+            int deletedStepsTotal = 0;
 
             for (int i = 0; i < steps.Count; i++)
             {
@@ -90,12 +90,14 @@ namespace CHI.Modules.MedicalExaminations.Services
                         else
                         {
                             var webStepIndex = webSteps.IndexOf(webStep);
-                            TryDeleteLastSteps(webPatientData.Id, webSteps.Count - webStepIndex);
-                            wasDeleteSteps = true;
+                            var deleteSteps = webSteps.Count - webStepIndex - deletedStepsTotal;
+                            deleteSteps = deleteSteps > 0 ? deleteSteps : 0;
+                            TryDeleteLastSteps(webPatientData.Id, deleteSteps);
+                            deletedStepsTotal += deleteSteps;
                             TryAddStep(userStep, webPatientData.Id);
                         }
                     }
-                    else if (wasDeleteSteps)
+                    else if (deletedStepsTotal != 0)
                         TryAddStep(userStep, webPatientData.Id);
                 }
                 else
@@ -108,7 +110,7 @@ namespace CHI.Modules.MedicalExaminations.Services
                             break;
                     }
 
-                    if (wasDeleteSteps)
+                    if (deletedStepsTotal != 0)
                         TryAddStep(webStep, webPatientData.Id);
                 }
             }
@@ -257,103 +259,3 @@ namespace CHI.Modules.MedicalExaminations.Services
 
     }
 }
-
-
-//if (stage1.BeginDate != webPatientData.Disp1BeginDate
-//    || stage1.EndDate != webPatientData.Disp1Date
-//    || (int) stage1.HealthGroup != webPatientData.Stage1ResultId
-//    || (int) stage1.Referral != webPatientData.Stage1DestId)
-
-//protected bool TryAddExamination2(Models.Patient patient, IEnumerable<Examination> examinations, WebPatientData webPatientData)
-//{
-//    var stage1 = examinations.FirstOrDefault(x => x.Stage == 1);
-
-
-//    var webStepsCounter = new WebStepsCounter(webPatientData.GetStepsCount());
-
-//    if (stage1 != default)
-//    {
-//        if (stage1.BeginDate != webPatientData.Disp1BeginDate)
-//        {
-//            if (webPatientData.Disp1BeginDate != default)
-//                TryDeleteLastSteps(webPatientData.Id, webStepsCounter.SubstractAllButSaveAmount(0));
-
-//            TryAddStep(ExaminationStepKind.FirstBegin, stage1.BeginDate, 0, 0, webPatientData.Id);
-//        }
-
-//        if (stage1.EndDate != webPatientData.Disp1Date)
-//        {
-//            if (webPatientData.Disp1Date != default)
-//                TryDeleteLastSteps(webPatientData.Id, webStepsCounter.SubstractAllButSaveAmount(1));
-
-//            TryAddStep(ExaminationStepKind.FirstEnd, stage1.EndDate, 0, 0, webPatientData.Id);
-//        }
-
-//        if (stage1.EndDate != webPatientData.Disp1Date || (int)stage1.HealthGroup != webPatientData.Stage1ResultId || (int)stage1.Referral != webPatientData.Stage1DestId)
-//        {
-//            if (webPatientData.Disp1Date != default || webPatientData.Stage1ResultId != default || webPatientData.Stage1DestId != default)
-//                TryDeleteLastSteps(webPatientData.Id, webStepsCounter.SubstractAllButSaveAmount(2));
-
-//            TryAddStep(ExaminationStepKind.FirstResult, stage1.EndDate, stage1.HealthGroup, stage1.Referral, webPatientData.Id);
-//        }
-//    }
-
-//    int webStage1ResultExist;
-
-//    if (webPatientData.Stage1ResultId != default || stage1 != default)
-//        webStage1ResultExist = 1;
-//    else
-//        webStage1ResultExist = 0;
-
-//    var stage2 = examinations.FirstOrDefault(x => x.Stage == 2);
-
-//    if (stage2 != default)
-//    {
-//        if (stage1 != default || webPatientData.Disp1Date != default)
-//        {
-//            var transferDate = stage1?.EndDate ?? webPatientData.Disp1Date.Value;
-
-//            if (webPatientData.Disp2BeginDate != default)
-//                TryDeleteLastSteps(webPatientData.Id, webStepsCounter.SubstractAllButSaveAmount(2 + webStage1ResultExist));
-
-//            TryAddStep(ExaminationStepKind.TransferSecond, transferDate, 0, 0, webPatientData.Id);
-
-
-
-//        }
-//        else
-//            return false;
-
-
-
-
-
-
-
-//        if (stage2.BeginDate != webPatientData.Disp2BeginDate)
-//        {
-//            if (webPatientData.Disp2BeginDate != default)
-//                TryDeleteLastSteps(webPatientData.Id, webStepsCounter.SubstractAllButSaveAmount(3 + webStage1ResultExist));
-
-//            TryAddStep(ExaminationStepKind.FirstBegin, stage2.BeginDate, 0, 0, webPatientData.Id);
-//        }
-
-//        if (stage2.EndDate != webPatientData.Disp2Date)
-//        {
-//            if (webPatientData.Disp2Date != default)
-//                TryDeleteLastSteps(webPatientData.Id, webStepsCounter.SubstractAllButSaveAmount(4 + webStage1ResultExist));
-
-//            TryAddStep(ExaminationStepKind.FirstEnd, stage2.EndDate, 0, 0, webPatientData.Id);
-//        }
-
-//        if (stage2.EndDate != webPatientData.Disp2Date || (int)stage2.HealthGroup != webPatientData.Stage2ResultId || (int)stage2.Referral != webPatientData.Stage2DestId)
-//        {
-//            if (webPatientData.Disp2Date != default || webPatientData.Stage2ResultId != default || webPatientData.Stage2DestId != default)
-//                TryDeleteLastSteps(webPatientData.Id, webStepsCounter.SubstractAllButSaveAmount(5 + webStage1ResultExist));
-
-//            TryAddStep(ExaminationStepKind.FirstResult, stage2.EndDate, stage2.HealthGroup, stage2.Referral, webPatientData.Id);
-//        }
-//    }
-
-//    return true;
-//}
