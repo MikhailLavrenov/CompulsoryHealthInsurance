@@ -7,7 +7,19 @@ namespace CHI.Modules.MedicalExaminations.Services
 {
     public class WebSite : WebSiteApi
     {
+        #region Поля
+        private static readonly ExaminationStepKind[] examinationSteps;
+        #endregion
+
         #region Конструкторы
+        static WebSite()
+        {
+            examinationSteps = Enum.GetValues(typeof(ExaminationStepKind))
+                .Cast<ExaminationStepKind>()
+                .Where(x => x != ExaminationStepKind.Refuse && x != ExaminationStepKind.None)
+                .OrderBy(x => (int)x)
+                .ToArray();
+        }
         public WebSite(string URL)
             : this(URL, null, 0)
         { }
@@ -16,16 +28,18 @@ namespace CHI.Modules.MedicalExaminations.Services
         #endregion
 
         #region Методы
-        public bool TryAddPatientExaminations(Models.Patient patient, IEnumerable<Examination> examinations)
+        public void AddPatientExaminations(Models.Patient patient, IEnumerable<Examination> examinations)
         {
+            var webPatientData = GetOrAddPatientToPlan(patient, examinations.First().Kind, examinations.First().Year);
 
-            if (TryGetOrAddPatientToPlan(patient, examinations.First().Kind, examinations.First().Year, out var webPatientData)
-                && (TryAddPatientExaminations(patient, examinations, webPatientData)))
-                return true;
-            else
-                return false;
+            var transfer2StageDate = examinations.FirstOrDefault(x => x.Stage == 1)?.EndDate ?? webPatientData.Disp1Date;
+            var userSteps = ConvertToExaminationSteps(examinations, transfer2StageDate);
+            var webSteps = ConvertToExaminationSteps(webPatientData);
+
+            AddPatientExaminations(webPatientData.Id, userSteps, webSteps);
+
         }
-        protected bool TryGetOrAddPatientToPlan(Models.Patient patient, ExaminationKind examinationKind, int examinationYear, out WebPatientData webPatientData)
+        private WebPatientData GetOrAddPatientToPlan(Models.Patient patient, ExaminationKind examinationKind, int examinationYear)
         {
             //пациент не найден в нужном плане
             if (!TryGetPatientDataFromPlan(patient.InsuranceNumber, examinationKind, examinationYear, out webPatientData))
@@ -42,7 +56,7 @@ namespace CHI.Modules.MedicalExaminations.Services
                         if (webPatientData.Disp1BeginDate != default || webPatientData.Disp2BeginDate != default || webPatientData.DispCancelDate != default)
                             while (TryDeleteLastStep(webPatientData.Id)) ;
 
-                        TryDeletePatientFromPlan(webPatientData.Id);
+                        DeletePatientFromPlan(webPatientData.Id);
 
                         break;
                     }
@@ -51,72 +65,70 @@ namespace CHI.Modules.MedicalExaminations.Services
                 var srzPatientId = webPatientData?.PersonId ?? 0;
 
                 if (srzPatientId == 0)
-                    TryGetPatientFromSRZ(patient.InsuranceNumber, examinationYear, out srzPatientId);
+                    GetPatientFromSRZ(patient.InsuranceNumber, examinationYear, out srzPatientId);
 
-                TryAddPatientToPlan(srzPatientId, examinationKind, examinationYear);
+                AddPatientToPlan(srzPatientId, examinationKind, examinationYear);
 
                 if (!TryGetPatientDataFromPlan(patient.InsuranceNumber, examinationKind, examinationYear, out webPatientData))
                     return false;
             }
 
-            return true;
         }
-        protected bool TryAddPatientExaminations(Models.Patient patient, IEnumerable<Examination> examinations, WebPatientData webPatientData)
+        private void AddPatientExaminations(int patientId, List<ExaminationStep> userSteps, List<ExaminationStep> webSteps)
         {
-            var transfer2StageDate = examinations.FirstOrDefault(x => x.Stage == 1)?.EndDate ?? webPatientData.Disp1Date;
-            var userSteps = ConvertToExaminationSteps(examinations, transfer2StageDate);
-            var webSteps = ConvertToExaminationSteps(webPatientData);
-
-            var steps = Enum.GetValues(typeof(ExaminationStepKind))
-                .Cast<ExaminationStepKind>()
-                .Where(x => x != ExaminationStepKind.Refuse && x != ExaminationStepKind.None)
-                .OrderBy(x => (int)x)
-                .ToList();
-
-            int deletedStepsTotal = 0;
-
-            for (int i = 0; i < steps.Count; i++)
+            try
             {
-                var step = steps[i];
-                var userStep = userSteps.Where(x => x.ExaminationStepKind == step).FirstOrDefault();
-                var webStep = webSteps.Where(x => x.ExaminationStepKind == step).FirstOrDefault();
+                int deletedStepsTotal = 0;
 
-                if (userStep != default)
+                for (int i = 0; i < examinationSteps.Length; i++)
                 {
-                    if (userStep != webStep)
+                    var step = examinationSteps[i];
+                    var userStep = userSteps.Where(x => x.ExaminationStepKind == step).FirstOrDefault();
+                    var webStep = webSteps.Where(x => x.ExaminationStepKind == step).FirstOrDefault();
+
+                    if (userStep != default)
+                    {
+                        if (userStep != webStep)
+                        {
+                            if (webStep == default)
+                                AddStep(patientId, userStep);
+                            else
+                            {
+                                var webStepIndex = webSteps.IndexOf(webStep);
+                                var deleteSteps = webSteps.Count - webStepIndex - deletedStepsTotal;
+                                deleteSteps = deleteSteps > 0 ? deleteSteps : 0;
+                                DeleteLastSteps(patientId, deleteSteps);
+                                deletedStepsTotal += deleteSteps;
+                                AddStep(patientId, userStep);
+                            }
+                        }
+                        else if (deletedStepsTotal != 0)
+                            AddStep(patientId, userStep);
+                    }
+                    else
                     {
                         if (webStep == default)
-                            TryAddStep(userStep, webPatientData.Id);
-                        else
                         {
-                            var webStepIndex = webSteps.IndexOf(webStep);
-                            var deleteSteps = webSteps.Count - webStepIndex - deletedStepsTotal;
-                            deleteSteps = deleteSteps > 0 ? deleteSteps : 0;
-                            TryDeleteLastSteps(webPatientData.Id, deleteSteps);
-                            deletedStepsTotal += deleteSteps;
-                            TryAddStep(userStep, webPatientData.Id);
+                            if (step == ExaminationStepKind.FirstResult)
+                                continue;
+                            else
+                                break;
                         }
+                        if (deletedStepsTotal != 0)
+                            AddStep(patientId, webStep);
                     }
-                    else if (deletedStepsTotal != 0)
-                        TryAddStep(userStep, webPatientData.Id);
                 }
-                else
-                {
-                    if (webStep == default)
-                    {
-                        if (step == ExaminationStepKind.FirstResult)
-                            continue;
-                        else
-                            break;
-                    }
 
-                    if (deletedStepsTotal != 0)
-                        TryAddStep(webStep, webPatientData.Id);
-                }
             }
+            catch (WebServerOperationException)
+            {
+                while (TryDeleteLastStep(patientId));
 
-            return true;
+                foreach (var webStep in webSteps)
+                    AddStep(patientId, webStep);
+            }
         }
+
         private static List<ExaminationStep> ConvertToExaminationSteps(IEnumerable<Examination> patientExaminations, DateTime? transfer2StageDate = null)
         {
             var examinationSteps = new List<ExaminationStep>();
@@ -235,27 +247,5 @@ namespace CHI.Modules.MedicalExaminations.Services
             return examinationSteps;
         }
         #endregion
-
-        private struct WebStepsCounter
-        {
-            public int InitialCount { get; }
-            public int CurrentCount { get; private set; }
-
-
-            public WebStepsCounter(int initialCount)
-            {
-                InitialCount = initialCount;
-                CurrentCount = InitialCount;
-            }
-            public int SubstractAllButSaveAmount(int saveAmount)
-            {
-                var countForSubstraction = CurrentCount > saveAmount ? CurrentCount - saveAmount : 0;
-
-                CurrentCount -= countForSubstraction;
-
-                return countForSubstraction;
-            }
-        }
-
     }
 }

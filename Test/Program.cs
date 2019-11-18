@@ -64,7 +64,7 @@ namespace CHI.Test
             };
             var examinations = new List<Examination> { examination2Stage };//, examination1Stage };
 
-            var r1 = web.TryAuthorize(login, password);
+            var r1 = web.Authorize(login, password);
             var r2 = web.TryAddPatientExaminations(patient, examinations);
 
         }
@@ -76,10 +76,10 @@ namespace CHI.Test
             { }
             public TestWebSiteApi(string URL, string proxyAddress, int proxyPort) : base(URL, proxyAddress, proxyPort)
             {
-                var r1 = TryAuthorize("UshanovaTA", "UshanovaTA1");
+                var r1 = Authorize("UshanovaTA", "UshanovaTA1");
                 var r2 = TryGetPatientDataFromPlan("2751530822000157", ExaminationKind.Dispanserizacia1, 2019, out var webPlanPatientData);
                 var r3 = TryDeletePatientFromPlan(webPlanPatientData.Id);
-                var r4 = TryGetPatientFromSRZ("2751530822000157", 2019, out var srzPatientId);
+                var r4 = GetPatientFromSRZ("2751530822000157", 2019, out var srzPatientId);
                 var r5 = TryAddPatientToPlan(srzPatientId, ExaminationKind.Dispanserizacia1, 2019);
 
                 var r6 = TryAddStep(ExaminationStepKind.FirstBegin, new DateTime(2019, 10, 25), 0, 0, webPlanPatientData.Id);

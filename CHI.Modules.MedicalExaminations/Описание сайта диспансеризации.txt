@@ -563,15 +563,35 @@ dispId: 566137
 
 Response:
 {
-  "IsError": false,
-  "Errors": null,
-  "Header": null,
-  "Message": "Операция успешно выполнена",
-  "Redirect": null,
-  "Html": null,
-  "Data": [],
-  "PartialView": null
+"IsError":false,
+"Errors":null,
+"Header":null,
+"Message":"Операция успешно выполнена",
+"Redirect":null,
+"Html":null,
+"Data":
+	[
+	{
+	"DispStageType":1,
+	"DispStage":
+		{
+			"Id":1552872,
+			"DispPersonId":653058,
+			"DispStageId":12,
+			"DispStageName":"Начало 1 этапа диспансеризации",
+			"DispStageOrgCode":"270023",
+			"DispStageOrgName":"КГБУЗ ГП 8 ХАБАРОВСКА",
+			"DispStageDate":"2019-10-10T00:00:00",
+			"DispStageResult":null,
+			"UpdateDate":"2019-11-14T16:33:04.413",
+			"YearId":2
+		},
+	"DispResult":null
+	}
+	],
+"PartialView":null
 }
+
 
 
 Get Available Stages

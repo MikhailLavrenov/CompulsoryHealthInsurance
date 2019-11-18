@@ -13,6 +13,8 @@ namespace CHI.Modules.MedicalExaminations.Services
     {
         #region Поля        
         private HttpClient client;
+        private static readonly string ParseResponseErrorMessage = "Ошибка разбора ответа от web-сервера";
+        private static readonly string SRZNotFoundErrorMessage = "Пациент не найден в СРЗ";
         #endregion
 
         #region Свойства
@@ -43,32 +45,29 @@ namespace CHI.Modules.MedicalExaminations.Services
 
         #region Методы
         //авторизация на сайте
-        public bool TryAuthorize(string login, string password)
+        public bool Authorize(string login, string password)
         {
             var requestValues = new Dictionary<string, string> {
                 { "Login",      login    },
                 { "Password",   password }
             };
 
-            var isRequestSuccessful = TrySendRequest(HttpMethod.Post, @"account/login", requestValues, out var responseText);
+            var responseText = SendRequest(HttpMethod.Post, @"account/login", requestValues);
 
-            if (isRequestSuccessful && !string.IsNullOrEmpty(responseText) && !responseText.Contains(@"<li>Пользователь не найден</li>"))
+            if (!string.IsNullOrEmpty(responseText) && !responseText.Contains(@"<li>Пользователь не найден</li>"))
                 return Authorized = true;
             else
                 return Authorized = false;
         }
-        public bool TryLogout()
+        public void Logout()
         {
-            return TrySendRequest(HttpMethod.Get, @"account/logout", null, out _);
+            SendRequest(HttpMethod.Get, @"account/logout", null);
 
         }
         //поиск пациента в плане
-        protected bool TryGetPatientDataFromPlan(string insuranceNumber, ExaminationKind examinationType, int year, out WebPatientData foundPatientData)
+        protected WebPatientData GetPatientDataFromPlan(string insuranceNumber, ExaminationKind examinationType, int year)
         {
-            foundPatientData = null;
-
-            //if (!Authorized)
-            //    throw new UnauthorizedAccessException("Сначала необходимо авторизоваться.");
+            CheckAuthorization();
 
             var uriParameters = new Dictionary<string, string> {
                 {"Filter.Year", ConvertToYearId(year) },
@@ -85,41 +84,45 @@ namespace CHI.Modules.MedicalExaminations.Services
                 {"length", "25"},
             };
 
-            var isRequestSuccessful = TrySendRequest(HttpMethod.Post, urn, contentParameters, out var responseText);
+            var responseText = SendRequest(HttpMethod.Post, urn, contentParameters);
 
-            if (isRequestSuccessful)
-            {
-                var planResponse = new JavaScriptSerializer().Deserialize<PlanResponse>(responseText);
+            var planResponse = new JavaScriptSerializer().Deserialize<PlanResponse>(responseText);
 
-                if (planResponse?.Data?.Count == 1)
-                    foundPatientData = planResponse.Data.FirstOrDefault();
-                else
-                    isRequestSuccessful = false;
-            }
-
-            return isRequestSuccessful;
+            if (planResponse?.Data?.Count == 1)
+                return planResponse.Data.First();
+            else
+                throw new InvalidOperationException(ParseResponseErrorMessage);
         }
-        protected bool TryDeletePatientFromPlan(int patientId)
+        protected void DeletePatientFromPlan(int patientId)
         {
+            CheckAuthorization();
+
             var contentParameters = new Dictionary<string, string>
             {
                 { "Id", patientId.ToString() }
             };
 
-            var isRequestSuccessful = TrySendRequest(HttpMethod.Post, @"disp/removeDisp", contentParameters, out var responseText);
+            var responseText = SendRequest(HttpMethod.Post, @"disp/removeDisp", contentParameters);
 
-            if (isRequestSuccessful)
-            {
-                var response = new JavaScriptSerializer().Deserialize<WebResult>(responseText);
+            var response = new JavaScriptSerializer().Deserialize<WebResult>(responseText);
 
-                if (response.IsError)
-                    isRequestSuccessful = false;
-            }
-
-            return isRequestSuccessful;
+            if (response.IsError)
+                throw new WebServerOperationException();
         }
-        protected bool TryAddPatientToPlan(int srzPatientId, ExaminationKind examinationType, int year)
+        protected void TryDeletePatientFromPlan(int patientId)
         {
+            try
+            {
+                DeletePatientFromPlan(patientId);
+            }
+            catch (WebServerOperationException)
+            {
+            }
+        }
+        protected void AddPatientToPlan(int srzPatientId, ExaminationKind examinationType, int year)
+        {
+            CheckAuthorization();
+
             var contentParameters = new Dictionary<string, string>
             {
                 { "personId", srzPatientId.ToString() },
@@ -127,24 +130,16 @@ namespace CHI.Modules.MedicalExaminations.Services
                 { "dispType", ((int)examinationType).ToString() },
             };
 
-            var isRequestSuccessful = TrySendRequest(HttpMethod.Post, @"disp/AddToDisp", contentParameters, out var responseText);
+            var responseText = SendRequest(HttpMethod.Post, @"disp/AddToDisp", contentParameters);
 
-            if (isRequestSuccessful)
-            {
-                var response = new JavaScriptSerializer().Deserialize<WebResult>(responseText);
+            var response = new JavaScriptSerializer().Deserialize<WebResult>(responseText);
 
-                if (response.IsError)
-                    isRequestSuccessful = false;
-            }
-
-            return isRequestSuccessful;
+            if (response.IsError)
+                throw new WebServerOperationException();
         }
-        protected bool TryGetPatientFromSRZ(string insuranceNumber, int year, out int srzPatientId)
+        protected int GetPatientFromSRZ(string insuranceNumber, int year)
         {
-            srzPatientId = 0;
-
-            if (!Authorized)
-                throw new UnauthorizedAccessException("Сначала необходимо авторизоваться.");
+            CheckAuthorization();
 
             var contentParameters = new Dictionary<string, string>
             {
@@ -153,38 +148,40 @@ namespace CHI.Modules.MedicalExaminations.Services
                 {"SearchData.PolisNum", insuranceNumber }
             };
 
-            var isRequestSuccessful = TrySendRequest(HttpMethod.Post, @"disp/SrzSearch", contentParameters, out var responseText);
+            var responseText = SendRequest(HttpMethod.Post, @"disp/SrzSearch", contentParameters);
 
-            if (isRequestSuccessful)
+            var startIndex = responseText.IndexOf("personId") + 1;
+            var idBegin = responseText.IndexOf('\"', startIndex) + 1;
+            var idLength = responseText.IndexOf('\"', idBegin) - idBegin;
+            var idString = responseText.Substring(idBegin, idLength);
+
+            if (int.TryParse(idString, out var srzPatientId))
             {
-                var startIndex = responseText.IndexOf("personId") + 1;
-                var idBegin = responseText.IndexOf('\"', startIndex) + 1;
-                var idLength = responseText.IndexOf('\"', idBegin) - idBegin;
-                var idString = responseText.Substring(idBegin, idLength);
-
-                int.TryParse(idString, out srzPatientId);
+                if (srzPatientId != 0)
+                    return srzPatientId;
+                else
+                    throw new InvalidOperationException(SRZNotFoundErrorMessage);
             }
-
-            return srzPatientId != 0;
+            else
+                throw new InvalidOperationException(ParseResponseErrorMessage);
         }
-        protected bool TryGetAvailableSteps(int patientId, out List<AvailableStage> availableSteps)
+        protected List<AvailableStage> GetAvailableSteps(int patientId)
         {
             var contentParameters = new Dictionary<string, string>
             {
                 { "dispId", patientId.ToString() },
             };
 
-            var isRequestSuccessful = TrySendRequest(HttpMethod.Post, @"/disp/getAvailableStages", contentParameters, out var responseText);
+            var responseText = SendRequest(HttpMethod.Post, @"/disp/getAvailableStages", contentParameters);
 
-            if (isRequestSuccessful)
-                availableSteps = new JavaScriptSerializer().Deserialize<AvailableStagesResponse>(responseText).AvailableStages;
-            else
-                availableSteps = null;
+            var availableStagesResponse = new JavaScriptSerializer().Deserialize<AvailableStagesResponse>(responseText);
 
-            return isRequestSuccessful;
+            return availableStagesResponse?.AvailableStages ?? new List<AvailableStage>();
         }
-        protected bool TryAddStep(ExaminationStepKind step, DateTime date, HealthGroup healthGroup, Referral referralTo, int patientId)
+        protected void AddStep(int patientId, ExaminationStepKind step, DateTime date, HealthGroup healthGroup, Referral referralTo)
         {
+            CheckAuthorization();
+
             var contentParameters = new Dictionary<string, string>
             {
                 { "stageId", ((int)step).ToString() },
@@ -194,81 +191,81 @@ namespace CHI.Modules.MedicalExaminations.Services
                 { "dispId", patientId.ToString() },
             };
 
-            var isRequestSuccessful = TrySendRequest(HttpMethod.Post, @"disp/editDispStage", contentParameters, out var responseText);
+            var responseText = SendRequest(HttpMethod.Post, @"disp/editDispStage", contentParameters);
 
-            if (isRequestSuccessful)
-            {
-                var response = new JavaScriptSerializer().Deserialize<WebResult>(responseText);
+            var response = new JavaScriptSerializer().Deserialize<WebResult>(responseText);
 
-                if (response.IsError)
-                    isRequestSuccessful = false;
-            }
-
-            return isRequestSuccessful;
+            if (response.IsError)
+                throw new WebServerOperationException();
         }
-        protected bool TryAddStep(ExaminationStep examinationStep, int patientId)
+        protected void AddStep(int patientId, ExaminationStep examinationStep)
         {
-            return TryAddStep(examinationStep.ExaminationStepKind, examinationStep.Date, examinationStep.HealthGroup, examinationStep.Referral, patientId);
+            AddStep(patientId, examinationStep.ExaminationStepKind, examinationStep.Date, examinationStep.HealthGroup, examinationStep.Referral);
         }
-        protected bool TryDeleteLastStep(int patientId)
+        protected ExaminationStepKind DeleteLastStep(int patientId)
         {
+            CheckAuthorization();
+
             var contentParameters = new Dictionary<string, string> {
                 { "dispId", patientId.ToString() },
             };
 
-            var isRequestSuccessful = TrySendRequest(HttpMethod.Post, @"disp/deleteDispStage", contentParameters, out var responseText);
+            var responseText = SendRequest(HttpMethod.Post, @"disp/deleteDispStage", contentParameters);
 
-            if (isRequestSuccessful)
-            {
-                var response = new JavaScriptSerializer().Deserialize<WebResult>(responseText);
+            var response = new JavaScriptSerializer().Deserialize<DeleteLastStepResponse>(responseText);
 
-                if (response.IsError)
-                    isRequestSuccessful = false;
-            }
+            if (response.IsError)
+                throw new WebServerOperationException();
 
-            return isRequestSuccessful;
+            var currentStep = response.Data?.FirstOrDefault()?.DispStage?.DispStageId;
+
+            if (currentStep == null)
+                throw new InvalidOperationException(ParseResponseErrorMessage);
+
+            return currentStep.Value;
         }
-        protected bool TryDeleteLastSteps(int patientId, int count)
+        //protected bool TryDeleteLastStep(int patientId)
+        //{
+        //    try
+        //    {
+        //        DeleteLastStep(patientId);
+        //        return true;
+        //    }
+        //    catch (WebServerOperationException)
+        //    {
+        //        return false;
+        //    }
+        //}
+        protected void DeleteStepsTo(int patientId, ExaminationStepKind stepTo)
         {
-            for (int i = 0; i < count; i++)
-            {
-                if (!TryDeleteLastStep(patientId))
-                    return false;
-            }
-
-            return true;
+            while (DeleteLastStep(patientId) != stepTo) ;
         }
         protected static string ConvertToYearId(int year)
         {
             return (year - 2017).ToString();
         }
-        private bool TrySendRequest(HttpMethod httpMethod, string urn, Dictionary<string, string> contentParameters, out string responseText)
+        private string SendRequest(HttpMethod httpMethod, string urn, Dictionary<string, string> contentParameters)
         {
-            try
-            {
-                var requestMessage = new HttpRequestMessage(httpMethod, urn);
+            var requestMessage = new HttpRequestMessage(httpMethod, urn);
 
-                if (httpMethod == HttpMethod.Post && contentParameters?.Count > 0)
-                    requestMessage.Content = new FormUrlEncodedContent(contentParameters);
+            if (httpMethod == HttpMethod.Post && contentParameters?.Count > 0)
+                requestMessage.Content = new FormUrlEncodedContent(contentParameters);
 
-                var response = client.SendAsync(requestMessage).GetAwaiter().GetResult();
+            var response = client.SendAsync(requestMessage).GetAwaiter().GetResult();
 
-                response.EnsureSuccessStatusCode();
+            response.EnsureSuccessStatusCode();
 
-                responseText = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
-
-                return true;
-            }
-            catch (Exception)
-            {
-                responseText = string.Empty;
-                return false;
-            }
+            return response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+        }
+        private void CheckAuthorization()
+        {
+            if (!Authorized)
+                throw new UnauthorizedAccessException("Сначала необходимо авторизоваться.");
         }
         #endregion
 
         #region Классы для десериализации
-        protected class WebPatientData
+        public class WebPatientData
         {
             public int Id { get; set; }
             public int PersonId { get; set; }
@@ -338,6 +335,33 @@ namespace CHI.Modules.MedicalExaminations.Services
             public int NextStageId { get; set; }
             //public string StageName { get; set; }
             public object PreviousStageId { get; set; }
+        }
+
+
+
+        public class DeletedStep
+        {
+            //public int Id { get; set; }
+            //public int DispPersonId { get; set; }
+            public ExaminationStepKind DispStageId { get; set; }
+            //public string DispStageName { get; set; }
+            //public string DispStageOrgCode { get; set; }
+            //public string DispStageOrgName { get; set; }
+            //public DateTime DispStageDate { get; set; }
+            //public object DispStageResult { get; set; }
+            //public DateTime UpdateDate { get; set; }
+            //public int YearId { get; set; }
+        }
+        public class DeletedData
+        {
+            //public int DispStageType { get; set; }
+            public DeletedStep DispStage { get; set; }
+            //public object DispResult { get; set; }
+        }
+        public class DeleteLastStepResponse
+        {
+            public bool IsError { get; set; }
+            public List<DeletedData> Data { get; set; }
         }
         #endregion
     }

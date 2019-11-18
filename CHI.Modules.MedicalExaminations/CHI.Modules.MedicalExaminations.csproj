@@ -70,6 +70,7 @@
     <Compile Include="Models\Patient.cs" />
     <Compile Include="Models\Referral.cs" />
     <Compile Include="Models\StageStates.cs" />
+    <Compile Include="Models\WebServerOperationException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\BillsRegister.cs" />
     <Compile Include="Services\WebSite.cs" />
