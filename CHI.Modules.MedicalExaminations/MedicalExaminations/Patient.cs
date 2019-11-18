@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CHI.Modules.MedicalExaminations.Models
+namespace CHI.Services.MedicalExaminations
 {
     public class Patient:IEqualityComparer<Patient>
     {

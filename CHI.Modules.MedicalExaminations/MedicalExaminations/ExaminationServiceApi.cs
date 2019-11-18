@@ -1,46 +1,26 @@
-﻿using CHI.Modules.MedicalExaminations.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
 using System.Web.Script.Serialization;
 
-namespace CHI.Modules.MedicalExaminations.Services
+namespace CHI.Services.MedicalExaminations
 {
-    public class WebSiteApi
+    public class ExaminationServiceApi : WebServiceBase
     {
         #region Поля        
-        private HttpClient client;
         private static readonly string ParseResponseErrorMessage = "Ошибка разбора ответа от web-сервера";
         private static readonly string SRZNotFoundErrorMessage = "Пациент не найден в СРЗ";
         #endregion
 
-        #region Свойства
-        public bool Authorized { get; protected set; }
-        #endregion
-
         #region Конструкторы
-        protected WebSiteApi(string URL)
-            : this(URL, null, 0)
+        protected ExaminationServiceApi(string URL)
+            : base(URL)
         { }
-        protected WebSiteApi(string URL, string proxyAddress, int proxyPort)
-        {
-            Authorized = false;
-
-            var clientHandler = new HttpClientHandler();
-            clientHandler.CookieContainer = new CookieContainer();
-
-            if (proxyAddress != null && proxyPort != 0)
-            {
-                clientHandler.UseProxy = true;
-                clientHandler.Proxy = new WebProxy($"{proxyAddress}:{proxyPort}");
-            }
-
-            client = new HttpClient(clientHandler);
-            client.BaseAddress = new Uri(URL);
-        }
+        protected ExaminationServiceApi(string URL, string proxyAddress, int proxyPort)
+            : base(URL, proxyAddress, proxyPort)
+        { }
         #endregion
 
         #region Методы
@@ -104,7 +84,7 @@ namespace CHI.Modules.MedicalExaminations.Services
 
             var responseText = SendRequest(HttpMethod.Post, @"disp/removeDisp", contentParameters);
 
-            var response = new JavaScriptSerializer().Deserialize<WebResult>(responseText);
+            var response = new JavaScriptSerializer().Deserialize<WebResponse>(responseText);
 
             if (response.IsError)
                 throw new WebServerOperationException();
@@ -132,7 +112,7 @@ namespace CHI.Modules.MedicalExaminations.Services
 
             var responseText = SendRequest(HttpMethod.Post, @"disp/AddToDisp", contentParameters);
 
-            var response = new JavaScriptSerializer().Deserialize<WebResult>(responseText);
+            var response = new JavaScriptSerializer().Deserialize<WebResponse>(responseText);
 
             if (response.IsError)
                 throw new WebServerOperationException();
@@ -178,7 +158,7 @@ namespace CHI.Modules.MedicalExaminations.Services
 
             return availableStagesResponse?.AvailableStages ?? new List<AvailableStage>();
         }
-        protected void AddStep(int patientId, ExaminationStepKind step, DateTime date, HealthGroup healthGroup, Referral referralTo)
+        protected void AddStep(int patientId, ExaminationStepKind step, DateTime date, ExaminationHealthGroup healthGroup, ExaminationReferral referralTo)
         {
             CheckAuthorization();
 
@@ -187,13 +167,13 @@ namespace CHI.Modules.MedicalExaminations.Services
                 { "stageId", ((int)step).ToString() },
                 { "stageDate", date.ToString("dd.MM.yyyy", CultureInfo.InvariantCulture) },
                 { "resultId", ((int)healthGroup).ToString()  },
-                { "destId", referralTo==Referral.None? string.Empty:((int)referralTo).ToString() },
+                { "destId", referralTo==ExaminationReferral.None? string.Empty:((int)referralTo).ToString() },
                 { "dispId", patientId.ToString() },
             };
 
             var responseText = SendRequest(HttpMethod.Post, @"disp/editDispStage", contentParameters);
 
-            var response = new JavaScriptSerializer().Deserialize<WebResult>(responseText);
+            var response = new JavaScriptSerializer().Deserialize<WebResponse>(responseText);
 
             if (response.IsError)
                 throw new WebServerOperationException();
@@ -224,43 +204,17 @@ namespace CHI.Modules.MedicalExaminations.Services
 
             return currentStep.Value;
         }
-        //protected bool TryDeleteLastStep(int patientId)
-        //{
-        //    try
-        //    {
-        //        DeleteLastStep(patientId);
-        //        return true;
-        //    }
-        //    catch (WebServerOperationException)
-        //    {
-        //        return false;
-        //    }
-        //}
-        protected void DeleteStepsTo(int patientId, ExaminationStepKind stepTo)
+        protected void DeleteStepsAfter(int patientId, ExaminationStepKind stepAfter)
         {
-            while (DeleteLastStep(patientId) != stepTo) ;
+            while (DeleteLastStep(patientId) != stepAfter) ;
+        }
+        protected void DeleteAllSteps(int patientId)
+        {
+            while (DeleteLastStep(patientId) != 0) ;
         }
         protected static string ConvertToYearId(int year)
         {
             return (year - 2017).ToString();
-        }
-        private string SendRequest(HttpMethod httpMethod, string urn, Dictionary<string, string> contentParameters)
-        {
-            var requestMessage = new HttpRequestMessage(httpMethod, urn);
-
-            if (httpMethod == HttpMethod.Post && contentParameters?.Count > 0)
-                requestMessage.Content = new FormUrlEncodedContent(contentParameters);
-
-            var response = client.SendAsync(requestMessage).GetAwaiter().GetResult();
-
-            response.EnsureSuccessStatusCode();
-
-            return response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
-        }
-        private void CheckAuthorization()
-        {
-            if (!Authorized)
-                throw new UnauthorizedAccessException("Сначала необходимо авторизоваться.");
         }
         #endregion
 
@@ -285,43 +239,12 @@ namespace CHI.Modules.MedicalExaminations.Services
             public string Polis_Num { get; set; }
             public string Person_ENP { get; set; }
             public int DispType { get; set; }
-
-            public byte GetStepsCount()
-            {
-                byte count = 0;
-
-                if (Disp1BeginDate != default)
-                    count++;
-
-                if (Disp1Date != default)
-                    count++;
-
-                if (Disp1Date != default && Stage1ResultId != default && Stage1DestId != default)
-                    count++;
-
-                if (Disp2DirectDate != default)
-                    count++;
-
-                if (Disp2BeginDate != default)
-                    count++;
-
-                if (Disp2Date != default)
-                    count++;
-
-                if (Disp2Date != default && Stage2ResultId != default && Stage2DestId != default)
-                    count++;
-
-                if (DispCancelDate != default)
-                    count++;
-
-                return count;
-            }
         }
         protected class PlanResponse
         {
             public List<WebPatientData> Data { get; set; }
         }
-        protected class WebResult
+        protected class WebResponse
         {
             public bool IsError { get; set; }
         }
@@ -336,8 +259,6 @@ namespace CHI.Modules.MedicalExaminations.Services
             //public string StageName { get; set; }
             public object PreviousStageId { get; set; }
         }
-
-
 
         public class DeletedStep
         {

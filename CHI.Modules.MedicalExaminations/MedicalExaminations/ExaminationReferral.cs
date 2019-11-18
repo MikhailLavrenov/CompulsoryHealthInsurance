@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel;
 
-namespace CHI.Modules.MedicalExaminations.Models
+namespace CHI.Services.MedicalExaminations
 {
-    public enum Referral
+    public enum ExaminationReferral
     {
         [Description("Не выбрано")] None = 0,
         [Description("Консультацию в МО по месту прикрепления")] LocalClinic = 1,

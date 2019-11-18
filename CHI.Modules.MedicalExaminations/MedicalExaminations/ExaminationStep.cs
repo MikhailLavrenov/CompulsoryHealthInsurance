@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CHI.Modules.MedicalExaminations.Models
+namespace CHI.Services.MedicalExaminations
 {
     public class ExaminationStep : IEqualityComparer<ExaminationStep>
     {
@@ -12,8 +12,8 @@ namespace CHI.Modules.MedicalExaminations.Models
         public ExaminationKind Type { get; set; }
         public int Year { get; set; }
         public DateTime Date { get; set; }
-        public HealthGroup HealthGroup { get; set; }
-        public Referral Referral { get; set; }
+        public ExaminationHealthGroup HealthGroup { get; set; }
+        public ExaminationReferral Referral { get; set; }
 
         public bool Equals(ExaminationStep x, ExaminationStep y)
         {

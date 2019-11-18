@@ -1,4 +1,4 @@
-﻿using CHI.Modules.MedicalExaminations.Models;
+﻿using CHI.Services.MedicalExaminations;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -6,9 +6,9 @@ using System.IO.Compression;
 using System.Linq;
 using System.Xml.Serialization;
 
-namespace CHI.Modules.MedicalExaminations.Services
+namespace CHI.Services
 {
-    public class BillsRegister
+    public class BillsRegisterService
     {
         #region Поля
         private static readonly StringComparison comparer = StringComparison.OrdinalIgnoreCase;
@@ -16,11 +16,11 @@ namespace CHI.Modules.MedicalExaminations.Services
         #endregion
 
         #region Конструкторы
-        public BillsRegister(ICollection<string> filePaths)
+        public BillsRegisterService(ICollection<string> filePaths)
         {
             this.filePaths = filePaths.ToList();
         }
-        public BillsRegister(string filePath)
+        public BillsRegisterService(string filePath)
         {
             filePaths = new List<string>() { filePath };
         }
@@ -164,9 +164,9 @@ namespace CHI.Modules.MedicalExaminations.Services
 
                     examination.EndDate = treatmentCase.Z_SL.SL.DATE_2;
                     examination.HealthGroup = RSLT_DToHealthGroup(treatmentCase.Z_SL.RSLT_D);
-                    examination.Referral = (Referral)(treatmentCase.Z_SL.SL.NAZ.FirstOrDefault()?.NAZ_R ?? 0);
+                    examination.Referral = (ExaminationReferral)(treatmentCase.Z_SL.SL.NAZ.FirstOrDefault()?.NAZ_R ?? 0);
 
-                    if (examination.HealthGroup == HealthGroup.None)
+                    if (examination.HealthGroup == ExaminationHealthGroup.None)
                         continue;
 
                     var patient = new Patient(insuranceNumber);
@@ -206,23 +206,23 @@ namespace CHI.Modules.MedicalExaminations.Services
                     return ExaminationKind.None;
             }
         }
-        private static HealthGroup RSLT_DToHealthGroup(int RSLT_D)
+        private static ExaminationHealthGroup RSLT_DToHealthGroup(int RSLT_D)
         {
             switch (RSLT_D)
             {
                 case 1:
-                    return HealthGroup.First;
+                    return ExaminationHealthGroup.First;
                 case 2:
                 case 12:
-                    return HealthGroup.Second;
+                    return ExaminationHealthGroup.Second;
                 case 31:
                 case 14:
-                    return HealthGroup.ThirdA;
+                    return ExaminationHealthGroup.ThirdA;
                 case 32:
                 case 15:
-                    return HealthGroup.ThirdB;
+                    return ExaminationHealthGroup.ThirdB;
                 default:
-                    return HealthGroup.None;
+                    return ExaminationHealthGroup.None;
             }
         }
         private static List<T> DeserializeCollection<T>(IEnumerable<Stream> files) where T : class

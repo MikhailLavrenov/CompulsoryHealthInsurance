@@ -1,18 +1,17 @@
-﻿using CHI.Modules.MedicalExaminations.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CHI.Modules.MedicalExaminations.Services
+namespace CHI.Services.MedicalExaminations
 {
-    public class WebSite : WebSiteApi
+    public class ExaminationService : ExaminationServiceApi
     {
         #region Поля
         private static readonly ExaminationStepKind[] examinationSteps;
         #endregion
 
         #region Конструкторы
-        static WebSite()
+        static ExaminationService()
         {
             examinationSteps = Enum.GetValues(typeof(ExaminationStepKind))
                 .Cast<ExaminationStepKind>()
@@ -20,15 +19,15 @@ namespace CHI.Modules.MedicalExaminations.Services
                 .OrderBy(x => (int)x)
                 .ToArray();
         }
-        public WebSite(string URL)
+        public ExaminationService(string URL)
             : this(URL, null, 0)
         { }
-        public WebSite(string URL, string proxyAddress, int proxyPort) : base(URL, proxyAddress, proxyPort)
+        public ExaminationService(string URL, string proxyAddress, int proxyPort) : base(URL, proxyAddress, proxyPort)
         { }
         #endregion
 
         #region Методы
-        public void AddPatientExaminations(Models.Patient patient, IEnumerable<Examination> examinations)
+        public void AddPatientExaminations(Patient patient, IEnumerable<Examination> examinations)
         {
             var webPatientData = GetOrAddPatientToPlan(patient, examinations.First().Kind, examinations.First().Year);
 
@@ -39,22 +38,28 @@ namespace CHI.Modules.MedicalExaminations.Services
             AddPatientExaminations(webPatientData.Id, userSteps, webSteps);
 
         }
-        private WebPatientData GetOrAddPatientToPlan(Models.Patient patient, ExaminationKind examinationKind, int examinationYear)
+        private WebPatientData GetOrAddPatientToPlan(Patient patient, ExaminationKind examinationKind, int examinationYear)
         {
-            //пациент не найден в нужном плане
-            if (!TryGetPatientDataFromPlan(patient.InsuranceNumber, examinationKind, examinationYear, out webPatientData))
+            var webPatientData = GetPatientDataFromPlan(patient.InsuranceNumber, examinationKind, examinationYear);
+
+            //пациент найден в нужном плане
+            if (webPatientData == null)
             {
-                var otherExaminationTypes = Enum.GetValues(typeof(ExaminationKind)).Cast<ExaminationKind>().Where(x => x != ExaminationKind.None && x != examinationKind).ToList();
+                var otherExaminationKinds = Enum.GetValues(typeof(ExaminationKind))
+                    .Cast<ExaminationKind>()
+                    .Where(x => x != ExaminationKind.None && x != examinationKind)
+                    .ToList();
 
                 //ищем в др. планах
-                foreach (var examinationType in otherExaminationTypes)
-                {
-                    //пациент добавлен в другой план
-                    if (TryGetPatientDataFromPlan(patient.InsuranceNumber, examinationType, examinationYear, out webPatientData))
+                foreach (var examinationType in otherExaminationKinds)
+                {                   
+                    webPatientData = GetPatientDataFromPlan(patient.InsuranceNumber, examinationType, examinationYear);
+                    //пациент найден в другом план
+                    if (webPatientData != null)
                     {
                         //заполнены шаги осмотра
                         if (webPatientData.Disp1BeginDate != default || webPatientData.Disp2BeginDate != default || webPatientData.DispCancelDate != default)
-                            while (TryDeleteLastStep(webPatientData.Id)) ;
+                            DeleteAllSteps(webPatientData.Id);
 
                         DeletePatientFromPlan(webPatientData.Id);
 
@@ -62,17 +67,14 @@ namespace CHI.Modules.MedicalExaminations.Services
                     }
                 }
 
-                var srzPatientId = webPatientData?.PersonId ?? 0;
-
-                if (srzPatientId == 0)
-                    GetPatientFromSRZ(patient.InsuranceNumber, examinationYear, out srzPatientId);
+                var srzPatientId = webPatientData?.PersonId ?? GetPatientFromSRZ(patient.InsuranceNumber, examinationYear);
 
                 AddPatientToPlan(srzPatientId, examinationKind, examinationYear);
 
-                if (!TryGetPatientDataFromPlan(patient.InsuranceNumber, examinationKind, examinationYear, out webPatientData))
-                    return false;
+                webPatientData = GetPatientDataFromPlan(patient.InsuranceNumber, examinationKind, examinationYear);
             }
 
+            return webPatientData;
         }
         private void AddPatientExaminations(int patientId, List<ExaminationStep> userSteps, List<ExaminationStep> webSteps)
         {
@@ -122,13 +124,14 @@ namespace CHI.Modules.MedicalExaminations.Services
             }
             catch (WebServerOperationException)
             {
-                while (TryDeleteLastStep(patientId));
+                DeleteAllSteps(patientId);
 
                 foreach (var webStep in webSteps)
                     AddStep(patientId, webStep);
+
+                throw;
             }
         }
-
         private static List<ExaminationStep> ConvertToExaminationSteps(IEnumerable<Examination> patientExaminations, DateTime? transfer2StageDate = null)
         {
             var examinationSteps = new List<ExaminationStep>();
@@ -210,8 +213,8 @@ namespace CHI.Modules.MedicalExaminations.Services
                 {
                     ExaminationStepKind = ExaminationStepKind.FirstResult,
                     Date = webPatientData.Disp1Date.Value,
-                    HealthGroup = (HealthGroup)webPatientData.Stage1ResultId.Value,
-                    Referral = (Referral)webPatientData.Stage1DestId.Value
+                    HealthGroup = (ExaminationHealthGroup)webPatientData.Stage1ResultId.Value,
+                    Referral = (ExaminationReferral)webPatientData.Stage1DestId.Value
                 });
 
             if (webPatientData.Disp2DirectDate != default)
@@ -240,8 +243,8 @@ namespace CHI.Modules.MedicalExaminations.Services
                 {
                     ExaminationStepKind = ExaminationStepKind.SecondResult,
                     Date = webPatientData.Disp1Date.Value,
-                    HealthGroup = (HealthGroup)webPatientData.Stage1ResultId.Value,
-                    Referral = (Referral)webPatientData.Stage1DestId.Value
+                    HealthGroup = (ExaminationHealthGroup)webPatientData.Stage1ResultId.Value,
+                    Referral = (ExaminationReferral)webPatientData.Stage1DestId.Value
                 });
 
             return examinationSteps;

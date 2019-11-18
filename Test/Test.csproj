@@ -50,9 +50,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CHI.Modules.MedicalExaminations\CHI.Modules.MedicalExaminations.csproj">
+    <ProjectReference Include="..\CHI.Modules.MedicalExaminations\CHI.Services.csproj">
       <Project>{F0D0927C-270D-4BB2-9DAC-77DE973185E9}</Project>
-      <Name>CHI.Modules.MedicalExaminations</Name>
+      <Name>CHI.Services</Name>
     </ProjectReference>
     <ProjectReference Include="..\PatientsFomsRepository\CHI.csproj">
       <Project>{519989BB-8C1C-4B58-B184-2310F23ED64A}</Project>

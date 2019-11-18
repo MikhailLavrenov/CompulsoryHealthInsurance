@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.28922.388
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CHI", "PatientsFomsRepository\CHI.csproj", "{519989BB-8C1C-4B58-B184-2310F23ED64A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CHI.Modules.MedicalExaminations", "CHI.Modules.MedicalExaminations\CHI.Modules.MedicalExaminations.csproj", "{F0D0927C-270D-4BB2-9DAC-77DE973185E9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CHI.Services", "CHI.Modules.MedicalExaminations\CHI.Services.csproj", "{F0D0927C-270D-4BB2-9DAC-77DE973185E9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", "{5B2FA9E3-A740-4358-B6C8-39A4C4AB3DC2}"
 EndProject
