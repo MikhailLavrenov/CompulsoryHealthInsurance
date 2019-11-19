@@ -1,4 +1,5 @@
-﻿using CHI.Services.MedicaExaminations;
+﻿using CHI.Services;
+using CHI.Services.MedicalExaminations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -61,10 +62,10 @@ namespace CHI.Test
                 HealthGroup = ExaminationHealthGroup.ThirdB,
                 Referral = ExaminationReferral.AnotherClinic
             };
-            var examinations = new List<Examination> { examination2Stage };//, examination1Stage };
+            var examinations = new List<Examination> { examination2Stage, examination1Stage };
 
-            var r1 = web.Authorize(login, password);
-            var r2 = web.TryAddPatientExaminations(patient, examinations);
+            web.Authorize(login, password);
+            web.AddPatientExaminations(patient, examinations);
 
         }
 
@@ -76,14 +77,14 @@ namespace CHI.Test
             public TestExaminationServiceApi(string URL, string proxyAddress, int proxyPort) : base(URL, proxyAddress, proxyPort)
             {
                 Authorize("UshanovaTA", "UshanovaTA1");
-                GetPatientDataFromPlan("2751530822000157", ExaminationKind.Dispanserizacia1, 2019, out var webPlanPatientData);
+                var webPlanPatientData = GetPatientDataFromPlan("2751530822000157", ExaminationKind.Dispanserizacia1, 2019);
                 DeletePatientFromPlan(webPlanPatientData.Id);
-                PatientFromSRZ("2751530822000157", 2019, out var srzPatientId);
+                var srzPatientId = GetPatientFromSRZ("2751530822000157", 2019);
                 AddPatientToPlan(srzPatientId, ExaminationKind.Dispanserizacia1, 2019);
 
-                AddStep(ExaminationStepKind.FirstBegin, new DateTime(2019, 10, 25), 0, 0, webPlanPatientData.Id);
-                AddStep(ExaminationStepKind.FirstEnd, new DateTime(2019, 10, 28), 0, 0, webPlanPatientData.Id);
-                AddStep(ExaminationStepKind.FirstResult, new DateTime(2019, 10, 28), ExaminationHealthGroup.First, ExaminationReferral.None, webPlanPatientData.Id);
+                AddStep(webPlanPatientData.Id, ExaminationStepKind.FirstBegin, new DateTime(2019, 10, 25), 0, 0);
+                AddStep(webPlanPatientData.Id, ExaminationStepKind.FirstEnd, new DateTime(2019, 10, 28), 0, 0);
+                AddStep(webPlanPatientData.Id, ExaminationStepKind.FirstResult, new DateTime(2019, 10, 28), ExaminationHealthGroup.First, ExaminationReferral.None);
 
                 DeleteLastStep(webPlanPatientData.Id);
                 DeleteLastStep(webPlanPatientData.Id);

@@ -11,7 +11,6 @@ namespace CHI.Services.MedicalExaminations
     {
         #region Поля        
         private static readonly string ParseResponseErrorMessage = "Ошибка разбора ответа от web-сервера";
-        private static readonly string SRZNotFoundErrorMessage = "Пациент не найден в СРЗ";
         #endregion
 
         #region Конструкторы
@@ -68,36 +67,10 @@ namespace CHI.Services.MedicalExaminations
 
             var planResponse = new JavaScriptSerializer().Deserialize<PlanResponse>(responseText);
 
-            if (planResponse?.Data?.Count == 1)
-                return planResponse.Data.First();
+            if (planResponse != null)
+                return planResponse.Data?.FirstOrDefault();
             else
                 throw new InvalidOperationException(ParseResponseErrorMessage);
-        }
-        protected void DeletePatientFromPlan(int patientId)
-        {
-            CheckAuthorization();
-
-            var contentParameters = new Dictionary<string, string>
-            {
-                { "Id", patientId.ToString() }
-            };
-
-            var responseText = SendRequest(HttpMethod.Post, @"disp/removeDisp", contentParameters);
-
-            var response = new JavaScriptSerializer().Deserialize<WebResponse>(responseText);
-
-            if (response.IsError)
-                throw new WebServerOperationException();
-        }
-        protected void TryDeletePatientFromPlan(int patientId)
-        {
-            try
-            {
-                DeletePatientFromPlan(patientId);
-            }
-            catch (WebServerOperationException)
-            {
-            }
         }
         protected void AddPatientToPlan(int srzPatientId, ExaminationKind examinationType, int year)
         {
@@ -117,6 +90,22 @@ namespace CHI.Services.MedicalExaminations
             if (response.IsError)
                 throw new WebServerOperationException();
         }
+        protected void DeletePatientFromPlan(int patientId)
+        {
+            CheckAuthorization();
+
+            var contentParameters = new Dictionary<string, string>
+            {
+                { "Id", patientId.ToString() }
+            };
+
+            var responseText = SendRequest(HttpMethod.Post, @"disp/removeDisp", contentParameters);
+
+            var response = new JavaScriptSerializer().Deserialize<WebResponse>(responseText);
+
+            if (response.IsError)
+                throw new WebServerOperationException();
+        }        
         protected int GetPatientFromSRZ(string insuranceNumber, int year)
         {
             CheckAuthorization();
@@ -136,12 +125,7 @@ namespace CHI.Services.MedicalExaminations
             var idString = responseText.Substring(idBegin, idLength);
 
             if (int.TryParse(idString, out var srzPatientId))
-            {
-                if (srzPatientId != 0)
-                    return srzPatientId;
-                else
-                    throw new InvalidOperationException(SRZNotFoundErrorMessage);
-            }
+                return srzPatientId;
             else
                 throw new InvalidOperationException(ParseResponseErrorMessage);
         }
@@ -156,7 +140,7 @@ namespace CHI.Services.MedicalExaminations
 
             var availableStagesResponse = new JavaScriptSerializer().Deserialize<AvailableStagesResponse>(responseText);
 
-            return availableStagesResponse?.AvailableStages ?? new List<AvailableStage>();
+            return availableStagesResponse?.AvailableStages?? new List<AvailableStage>();
         }
         protected void AddStep(int patientId, ExaminationStepKind step, DateTime date, ExaminationHealthGroup healthGroup, ExaminationReferral referralTo)
         {
@@ -177,11 +161,7 @@ namespace CHI.Services.MedicalExaminations
 
             if (response.IsError)
                 throw new WebServerOperationException();
-        }
-        protected void AddStep(int patientId, ExaminationStep examinationStep)
-        {
-            AddStep(patientId, examinationStep.ExaminationStepKind, examinationStep.Date, examinationStep.HealthGroup, examinationStep.Referral);
-        }
+        }        
         protected ExaminationStepKind DeleteLastStep(int patientId)
         {
             CheckAuthorization();
@@ -197,21 +177,8 @@ namespace CHI.Services.MedicalExaminations
             if (response.IsError)
                 throw new WebServerOperationException();
 
-            var currentStep = response.Data?.FirstOrDefault()?.DispStage?.DispStageId;
-
-            if (currentStep == null)
-                throw new InvalidOperationException(ParseResponseErrorMessage);
-
-            return currentStep.Value;
-        }
-        protected void DeleteStepsAfter(int patientId, ExaminationStepKind stepAfter)
-        {
-            while (DeleteLastStep(patientId) != stepAfter) ;
-        }
-        protected void DeleteAllSteps(int patientId)
-        {
-            while (DeleteLastStep(patientId) != 0) ;
-        }
+            return response.Data?.FirstOrDefault()?.DispStage?.DispStageId ?? 0;
+        }        
         protected static string ConvertToYearId(int year)
         {
             return (year - 2017).ToString();
@@ -254,7 +221,7 @@ namespace CHI.Services.MedicalExaminations
         }
         public class AvailableStage
         {
-            public int StageId { get; set; }
+            public ExaminationStepKind StageId { get; set; }
             public int NextStageId { get; set; }
             //public string StageName { get; set; }
             public object PreviousStageId { get; set; }

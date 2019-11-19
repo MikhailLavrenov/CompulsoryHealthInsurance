@@ -31,6 +31,9 @@ namespace CHI.Services.MedicalExaminations
         {
             var webPatientData = GetOrAddPatientToPlan(patient, examinations.First().Kind, examinations.First().Year);
 
+            if (webPatientData == null)
+                return;
+
             var transfer2StageDate = examinations.FirstOrDefault(x => x.Stage == 1)?.EndDate ?? webPatientData.Disp1Date;
             var userSteps = ConvertToExaminationSteps(examinations, transfer2StageDate);
             var webSteps = ConvertToExaminationSteps(webPatientData);
@@ -52,7 +55,7 @@ namespace CHI.Services.MedicalExaminations
 
                 //ищем в др. планах
                 foreach (var examinationType in otherExaminationKinds)
-                {                   
+                {
                     webPatientData = GetPatientDataFromPlan(patient.InsuranceNumber, examinationType, examinationYear);
                     //пациент найден в другом план
                     if (webPatientData != null)
@@ -80,7 +83,7 @@ namespace CHI.Services.MedicalExaminations
         {
             try
             {
-                int deletedStepsTotal = 0;
+                var realWebStep = webSteps.LastOrDefault()?.ExaminationStepKind ?? ExaminationStepKind.None;
 
                 for (int i = 0; i < examinationSteps.Length; i++)
                 {
@@ -93,19 +96,17 @@ namespace CHI.Services.MedicalExaminations
                         if (userStep != webStep)
                         {
                             if (webStep == default)
-                                AddStep(patientId, userStep);
+                                realWebStep = AddStep(patientId, userStep);
                             else
                             {
-                                var webStepIndex = webSteps.IndexOf(webStep);
-                                var deleteSteps = webSteps.Count - webStepIndex - deletedStepsTotal;
-                                deleteSteps = deleteSteps > 0 ? deleteSteps : 0;
-                                DeleteLastSteps(patientId, deleteSteps);
-                                deletedStepsTotal += deleteSteps;
-                                AddStep(patientId, userStep);
+                                while (realWebStep >= userStep.ExaminationStepKind)
+                                    realWebStep = DeleteLastStep(patientId);
+
+                                realWebStep = AddStep(patientId, userStep);
                             }
                         }
-                        else if (deletedStepsTotal != 0)
-                            AddStep(patientId, userStep);
+                        else if (realWebStep < userStep.ExaminationStepKind)
+                            realWebStep = AddStep(patientId, userStep);
                     }
                     else
                     {
@@ -116,8 +117,8 @@ namespace CHI.Services.MedicalExaminations
                             else
                                 break;
                         }
-                        if (deletedStepsTotal != 0)
-                            AddStep(patientId, webStep);
+                        else if (realWebStep < webStep.ExaminationStepKind)
+                            realWebStep = AddStep(patientId, webStep);
                     }
                 }
 
@@ -248,6 +249,16 @@ namespace CHI.Services.MedicalExaminations
                 });
 
             return examinationSteps;
+        }
+        protected ExaminationStepKind AddStep(int patientId, ExaminationStep examinationStep)
+        {
+            AddStep(patientId, examinationStep.ExaminationStepKind, examinationStep.Date, examinationStep.HealthGroup, examinationStep.Referral);
+
+            return examinationStep.ExaminationStepKind;
+        }
+        protected void DeleteAllSteps(int patientId)
+        {
+            while (DeleteLastStep(patientId) != 0) ;
         }
         #endregion
     }
