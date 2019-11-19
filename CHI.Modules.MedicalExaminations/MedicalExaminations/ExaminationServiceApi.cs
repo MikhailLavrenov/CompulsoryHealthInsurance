@@ -10,7 +10,7 @@ namespace CHI.Services.MedicalExaminations
     public class ExaminationServiceApi : WebServiceBase
     {
         #region Поля        
-        private static readonly string ParseResponseErrorMessage = "Ошибка разбора ответа от web-сервера";
+        
         #endregion
 
         #region Конструкторы
@@ -106,7 +106,7 @@ namespace CHI.Services.MedicalExaminations
             if (response.IsError)
                 throw new WebServerOperationException();
         }        
-        protected int GetPatientFromSRZ(string insuranceNumber, int year)
+        protected int GetPatientIdFromSRZ(string insuranceNumber, int year)
         {
             CheckAuthorization();
 
@@ -190,8 +190,6 @@ namespace CHI.Services.MedicalExaminations
         {
             public int Id { get; set; }
             public int PersonId { get; set; }
-            public int YearId { get; set; }
-            public int Month { get; set; }
             public DateTime? Disp1BeginDate { get; set; }
             public DateTime? Disp1Date { get; set; }
             public int? Stage1ResultId { get; set; }
@@ -203,9 +201,6 @@ namespace CHI.Services.MedicalExaminations
             public int? Stage2DestId { get; set; }
             public DateTime? DispSuccessDate { get; set; }
             public DateTime? DispCancelDate { get; set; }
-            public string Polis_Num { get; set; }
-            public string Person_ENP { get; set; }
-            public int DispType { get; set; }
         }
         protected class PlanResponse
         {
@@ -223,28 +218,16 @@ namespace CHI.Services.MedicalExaminations
         {
             public ExaminationStepKind StageId { get; set; }
             public int NextStageId { get; set; }
-            //public string StageName { get; set; }
             public object PreviousStageId { get; set; }
         }
 
         public class DeletedStep
         {
-            //public int Id { get; set; }
-            //public int DispPersonId { get; set; }
             public ExaminationStepKind DispStageId { get; set; }
-            //public string DispStageName { get; set; }
-            //public string DispStageOrgCode { get; set; }
-            //public string DispStageOrgName { get; set; }
-            //public DateTime DispStageDate { get; set; }
-            //public object DispStageResult { get; set; }
-            //public DateTime UpdateDate { get; set; }
-            //public int YearId { get; set; }
         }
         public class DeletedData
         {
-            //public int DispStageType { get; set; }
             public DeletedStep DispStage { get; set; }
-            //public object DispResult { get; set; }
         }
         public class DeleteLastStepResponse
         {

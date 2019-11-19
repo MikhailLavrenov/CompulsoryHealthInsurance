@@ -21,8 +21,8 @@ namespace CHI.Test
             var examinationNames = new string[] { @"DPM", @"DVM", @"DOM" };
             var patientsNames = new string[] { @"LPM", @"LVM", @"LOM" };
 
-            var patients = register.GetPatientsExaminations(examinationNames, patientsNames);
-            var t = patients.Values.Where(x => x.Count > 1).ToList();
+            var patientsExaminations = register.GetPatientsExaminations(examinationNames, patientsNames);
+            var t = patientsExaminations.Where(x => x.Examinations.Count > 1).ToList();
         }
         static void TestWebSiteApiMethod()
         {
@@ -41,7 +41,6 @@ namespace CHI.Test
 
             var web = new ExaminationService(url, proxyServer, proxyPort);
 
-            var patient = new Patient("2751530822000157");
             var examination1Stage = new Examination
             {
                 Kind = ExaminationKind.Dispanserizacia1,
@@ -62,10 +61,10 @@ namespace CHI.Test
                 HealthGroup = ExaminationHealthGroup.ThirdB,
                 Referral = ExaminationReferral.AnotherClinic
             };
-            var examinations = new List<Examination> { examination2Stage, examination1Stage };
+            var patientExaminations = new PatientExaminations("2751530822000157", new List<Examination> { examination2Stage, examination1Stage });
 
             web.Authorize(login, password);
-            web.AddPatientExaminations(patient, examinations);
+            web.AddPatientExaminations(patientExaminations);
 
         }
 
@@ -79,7 +78,7 @@ namespace CHI.Test
                 Authorize("UshanovaTA", "UshanovaTA1");
                 var webPlanPatientData = GetPatientDataFromPlan("2751530822000157", ExaminationKind.Dispanserizacia1, 2019);
                 DeletePatientFromPlan(webPlanPatientData.Id);
-                var srzPatientId = GetPatientFromSRZ("2751530822000157", 2019);
+                var srzPatientId = GetPatientIdFromSRZ("2751530822000157", 2019);
                 AddPatientToPlan(srzPatientId, ExaminationKind.Dispanserizacia1, 2019);
 
                 AddStep(webPlanPatientData.Id, ExaminationStepKind.FirstBegin, new DateTime(2019, 10, 25), 0, 0);

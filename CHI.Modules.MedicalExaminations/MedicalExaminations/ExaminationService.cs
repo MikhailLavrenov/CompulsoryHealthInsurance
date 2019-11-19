@@ -27,23 +27,27 @@ namespace CHI.Services.MedicalExaminations
         #endregion
 
         #region Методы
-        public void AddPatientExaminations(Patient patient, IEnumerable<Examination> examinations)
+        public bool Authorize(Credential credential)
         {
-            var webPatientData = GetOrAddPatientToPlan(patient, examinations.First().Kind, examinations.First().Year);
+            return Authorize(credential.Login, credential.Password);
+        }
+        public void AddPatientExaminations(PatientExaminations patientExaminations)
+        {
+            var webPatientData = GetOrAddPatientToPlan(patientExaminations.InsuranceNumber, patientExaminations.ExaminationKind, patientExaminations.Year);
 
             if (webPatientData == null)
                 return;
 
-            var transfer2StageDate = examinations.FirstOrDefault(x => x.Stage == 1)?.EndDate ?? webPatientData.Disp1Date;
-            var userSteps = ConvertToExaminationSteps(examinations, transfer2StageDate);
+            var transfer2StageDate = patientExaminations.Examinations.FirstOrDefault(x => x.Stage == 1)?.EndDate ?? webPatientData.Disp1Date;
+            var userSteps = ConvertToExaminationSteps(patientExaminations.Examinations, transfer2StageDate);
             var webSteps = ConvertToExaminationSteps(webPatientData);
 
             AddPatientExaminations(webPatientData.Id, userSteps, webSteps);
 
         }
-        private WebPatientData GetOrAddPatientToPlan(Patient patient, ExaminationKind examinationKind, int examinationYear)
+        private WebPatientData GetOrAddPatientToPlan(string insuranceNumber, ExaminationKind examinationKind, int examinationYear)
         {
-            var webPatientData = GetPatientDataFromPlan(patient.InsuranceNumber, examinationKind, examinationYear);
+            var webPatientData = GetPatientDataFromPlan(insuranceNumber, examinationKind, examinationYear);
 
             //пациент найден в нужном плане
             if (webPatientData == null)
@@ -56,7 +60,7 @@ namespace CHI.Services.MedicalExaminations
                 //ищем в др. планах
                 foreach (var examinationType in otherExaminationKinds)
                 {
-                    webPatientData = GetPatientDataFromPlan(patient.InsuranceNumber, examinationType, examinationYear);
+                    webPatientData = GetPatientDataFromPlan(insuranceNumber, examinationType, examinationYear);
                     //пациент найден в другом план
                     if (webPatientData != null)
                     {
@@ -70,11 +74,11 @@ namespace CHI.Services.MedicalExaminations
                     }
                 }
 
-                var srzPatientId = webPatientData?.PersonId ?? GetPatientFromSRZ(patient.InsuranceNumber, examinationYear);
+                var srzPatientId = webPatientData?.PersonId ?? GetPatientIdFromSRZ(insuranceNumber, examinationYear);
 
                 AddPatientToPlan(srzPatientId, examinationKind, examinationYear);
 
-                webPatientData = GetPatientDataFromPlan(patient.InsuranceNumber, examinationKind, examinationYear);
+                webPatientData = GetPatientDataFromPlan(insuranceNumber, examinationKind, examinationYear);
             }
 
             return webPatientData;
@@ -248,15 +252,22 @@ namespace CHI.Services.MedicalExaminations
                     Referral = (ExaminationReferral)webPatientData.Stage1DestId.Value
                 });
 
+            if (webPatientData.DispCancelDate != default)
+                examinationSteps.Add(new ExaminationStep
+                {
+                    ExaminationStepKind = ExaminationStepKind.Refuse,
+                    Date = webPatientData.DispCancelDate.Value
+                });
+
             return examinationSteps;
         }
-        protected ExaminationStepKind AddStep(int patientId, ExaminationStep examinationStep)
+        private ExaminationStepKind AddStep(int patientId, ExaminationStep examinationStep)
         {
             AddStep(patientId, examinationStep.ExaminationStepKind, examinationStep.Date, examinationStep.HealthGroup, examinationStep.Referral);
 
             return examinationStep.ExaminationStepKind;
         }
-        protected void DeleteAllSteps(int patientId)
+        private void DeleteAllSteps(int patientId)
         {
             while (DeleteLastStep(patientId) != 0) ;
         }

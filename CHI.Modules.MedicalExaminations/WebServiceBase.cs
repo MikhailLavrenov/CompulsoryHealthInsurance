@@ -9,7 +9,8 @@ namespace CHI.Services
     {
         #region Поля   
         private HttpClient client;
-        private static readonly string UnauthorizedAccessErrorMessage = "Сначала необходимо авторизоваться.";
+        protected static readonly string UnauthorizedAccessErrorMessage = "Сначала необходимо авторизоваться.";
+        protected static readonly string ParseResponseErrorMessage = "Ошибка разбора ответа от web-сервера";
         #endregion
 
         #region Свойства

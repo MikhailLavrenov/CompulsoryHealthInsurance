@@ -27,7 +27,7 @@ namespace CHI.Services
         #endregion
 
         #region Методы
-        public Dictionary<Patient, List<Examination>> GetPatientsExaminations(IEnumerable<string> examinationsFileNamesStartsWith, IEnumerable<string> patientsFileNamesStartsWith)
+        public List<PatientExaminations> GetPatientsExaminations(IEnumerable<string> examinationsFileNamesStartsWith, IEnumerable<string> patientsFileNamesStartsWith)
         {
             var patientsFiles = GetFiles(patientsFileNamesStartsWith);
             var patientsRegisters = DeserializeCollection<PERS_LIST>(patientsFiles);
@@ -112,9 +112,9 @@ namespace CHI.Services
 
             return result;
         }
-        private Dictionary<Patient, List<Examination>> GetPatientsExaminations(IEnumerable<ZL_LIST> examinationsRegisters, IEnumerable<PERS_LIST> patientsRegisters)
+        private List<PatientExaminations> GetPatientsExaminations(IEnumerable<ZL_LIST> examinationsRegisters, IEnumerable<PERS_LIST> patientsRegisters)
         {
-            var result = new Dictionary<Patient, List<Examination>>();
+            var result = new List<PatientExaminations>();
 
             var patients = new List<(Guid, int)>();
 
@@ -169,12 +169,14 @@ namespace CHI.Services
                     if (examination.HealthGroup == ExaminationHealthGroup.None)
                         continue;
 
-                    var patient = new Patient(insuranceNumber);
+                    var patientExamination = result.FirstOrDefault(x => x.InsuranceNumber.Equals(insuranceNumber,comparer) && x.Year == examination.Year && x.ExaminationKind == examination.Kind);
 
-                    if (result.TryGetValue(patient, out var examinations))
-                        examinations.Add(examination);
+                    if (patientExamination != default)
+                        patientExamination.Examinations.Add(examination);
                     else
-                        result.Add(patient, new List<Examination> { examination });
+                        patientExamination = new PatientExaminations(insuranceNumber,  examination);
+
+                    result.Add(patientExamination);
                 }
             }
 
