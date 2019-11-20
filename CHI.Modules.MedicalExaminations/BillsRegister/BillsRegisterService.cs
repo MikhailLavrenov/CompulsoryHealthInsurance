@@ -6,7 +6,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Xml.Serialization;
 
-namespace CHI.Services
+namespace CHI.Services.BillsRegister
 {
     public class BillsRegisterService
     {

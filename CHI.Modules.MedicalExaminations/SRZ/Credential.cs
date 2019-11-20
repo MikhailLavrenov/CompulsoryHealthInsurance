@@ -4,9 +4,9 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Xml.Serialization;
 
-namespace PatientsFomsRepository.Models
+namespace CHI.Services.SRZ
 {
-    public class Credential : DomainObject
+    public class Credential : DomainObject,ICredential
     {
         #region Поля
         private readonly object locker = new object();

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CHI.Services.Common;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -24,11 +25,11 @@ namespace CHI.Services.MedicalExaminations
 
         #region Методы
         //авторизация на сайте
-        public bool Authorize(string login, string password)
+        public bool Authorize(ICredential credential)
         {
             var requestValues = new Dictionary<string, string> {
-                { "Login",      login    },
-                { "Password",   password }
+                { "Login",      credential.Login    },
+                { "Password",   credential.Password }
             };
 
             var responseText = SendRequest(HttpMethod.Post, @"account/login", requestValues);

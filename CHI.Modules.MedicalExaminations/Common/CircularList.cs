@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CHI.Services
+namespace CHI.Services.Common
 {
-    public class CircularList<T> //where T : IEnumerable<T>
+    public class CircularList<T>
     { 
         private IEnumerable<T> list;
         private IEnumerator<T> enumerator;

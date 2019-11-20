@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CHI.Services
+namespace CHI.Services.Common
 {
     public class WebServerOperationException:ApplicationException
     {

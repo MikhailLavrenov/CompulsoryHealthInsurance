@@ -7,12 +7,12 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 
-namespace PatientsFomsRepository.Models
+namespace CHI.Services.SRZ
 {
     /// <summary>
     /// Работа с веб-порталом СРЗ
     /// </summary>
-    public class SRZ : IDisposable
+    public class SRZService : IDisposable
     {
         #region Поля
         private HttpClient client;
@@ -24,10 +24,10 @@ namespace PatientsFomsRepository.Models
         #endregion
 
         #region Конструкторы
-        public SRZ(string URL) 
+        public SRZService(string URL) 
             : this(URL, null, 0)
         { }
-        public SRZ(string URL, string proxyAddress, int proxyPort)
+        public SRZService(string URL, string proxyAddress, int proxyPort)
         {
             Authorized = false;
             var clientHandler = new HttpClientHandler();

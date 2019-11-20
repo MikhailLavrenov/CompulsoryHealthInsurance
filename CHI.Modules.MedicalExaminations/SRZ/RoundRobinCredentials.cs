@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace PatientsFomsRepository.Models
+namespace CHI.Services.SRZ
 {
     /// <summary>
     /// возвращает учетные данные по кругу пока лимит запросов не исчерпан

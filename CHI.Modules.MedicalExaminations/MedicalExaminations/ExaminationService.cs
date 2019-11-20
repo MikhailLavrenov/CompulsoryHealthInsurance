@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CHI.Services.Common;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -28,10 +29,6 @@ namespace CHI.Services.MedicalExaminations
         #endregion
 
         #region Методы
-        public bool Authorize(SimpleCredential credential)
-        {
-            return Authorize(credential.Login, credential.Password);
-        }
         public bool TryAddPatientExaminations(PatientExaminations patientExaminations)
         {
             try

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 
-namespace CHI.Services
+namespace CHI.Services.Common
 {
     public abstract class WebServiceBase : IDisposable
     {

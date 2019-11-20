@@ -147,9 +147,6 @@
     <Compile Include="Infrastructure\MainRegionService.cs" />
     <Compile Include="Infrastructure\ErrorMessages.cs" />
     <Compile Include="Models\ImportPatientsFile.cs" />
-    <Compile Include="Models\PatientsFile\ColumnProperty.cs" />
-    <Compile Include="Models\SRZ\CredentialScope.cs" />
-    <Compile Include="Models\SRZ\RoundRobinCredentials.cs" />
     <Compile Include="Models\Settings.cs" />
     <Compile Include="ViewModels\AboutApplicationViewModel.cs" />
     <Compile Include="ViewModels\NotificationDialogViewModel.cs" />
@@ -229,11 +226,8 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Models\PatientsFile\PatientsFile.cs" />
-    <Compile Include="Models\SRZ\Credential.cs" />
     <Compile Include="Models\Patient.cs" />
     <Compile Include="Models\Database.cs" />
-    <Compile Include="Models\SRZ\SRZ.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

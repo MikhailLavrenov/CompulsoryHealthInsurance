@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using CHI.Services.Common;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -7,21 +8,21 @@ namespace CHI.Services.MedicalExaminations
 {
     public class ExaminationServiceClient
     {
-        public IEnumerable<SimpleCredential> Credentials { get; private set; }
+        public IEnumerable<ICredential> Credentials { get; private set; }
         public string URL { get; private set; }
-        public string ProxyAdress { get; private set; }
+        public string ProxyAddress { get; private set; }
         public int ProxyPort { get; private set; }
         public int ThreadsLimit { get; private set; }
         public bool UseProxy { get; private set; }
 
-        public ExaminationServiceClient(string url, int threadsLimit, IEnumerable<SimpleCredential> credentials)
+        public ExaminationServiceClient(string url, int threadsLimit, IEnumerable<ICredential> credentials)
             :this(url,null,0, threadsLimit, credentials)
         {
         }
-        public ExaminationServiceClient(string url, string proxyAdress, int proxyPort, int threadsLimit, IEnumerable<SimpleCredential> credentials)
+        public ExaminationServiceClient(string url, string proxyAddress, int proxyPort, int threadsLimit, IEnumerable<ICredential> credentials)
         {
             URL = url;
-            ProxyAdress = proxyAdress;
+            ProxyAddress = proxyAddress;
             ProxyPort = proxyPort;
             ThreadsLimit = threadsLimit;
             Credentials = credentials;
@@ -34,7 +35,7 @@ namespace CHI.Services.MedicalExaminations
             if (patientsExaminations.Count < threadsLimit)
                 threadsLimit = patientsExaminations.Count;
 
-            var circularList = new CircularList<SimpleCredential>(Credentials);
+            var circularList = new CircularList<ICredential>(Credentials);
             var errors = new ConcurrentBag<PatientExaminations>();
             var tasks = new Task<ExaminationService>[threadsLimit];
 
@@ -47,11 +48,11 @@ namespace CHI.Services.MedicalExaminations
                 var index = Task.WaitAny(tasks);
                 tasks[index] = tasks[index].ContinueWith((task) =>
                 {
-                    var service = task.Result;
+                    var service = task.ConfigureAwait(false).GetAwaiter().GetResult();
                     if (service == null)
                     {
                         if (UseProxy)
-                            service = new ExaminationService(URL, ProxyAdress, ProxyPort);
+                            service = new ExaminationService(URL, ProxyAddress, ProxyPort);
                         else
                             service = new ExaminationService(URL);
 

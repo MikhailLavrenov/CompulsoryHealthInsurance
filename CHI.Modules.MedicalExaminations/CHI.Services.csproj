@@ -34,6 +34,10 @@
     <Reference Include="CommonServiceLocator, Version=2.0.4.0, Culture=neutral, PublicKeyToken=489b6accfaf20ef0, processorArchitecture=MSIL">
       <HintPath>..\packages\CommonServiceLocator.2.0.4\lib\net47\CommonServiceLocator.dll</HintPath>
     </Reference>
+    <Reference Include="EPPlus, Version=4.5.3.2, Culture=neutral, PublicKeyToken=ea159fdaa78159a1, processorArchitecture=MSIL">
+      <HintPath>..\packages\EPPlus.4.5.3.2\lib\net40\EPPlus.dll</HintPath>
+    </Reference>
+    <Reference Include="PresentationCore" />
     <Reference Include="Prism, Version=7.2.0.1367, Culture=neutral, PublicKeyToken=40ee6c3a2184dc59, processorArchitecture=MSIL">
       <HintPath>..\packages\Prism.Core.7.2.0.1367\lib\net45\Prism.dll</HintPath>
     </Reference>
@@ -43,8 +47,10 @@
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.IO.Compression.FileSystem" />
+    <Reference Include="System.Security" />
     <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.ValueTuple.4.5.0\lib\net47\System.ValueTuple.dll</HintPath>
     </Reference>
@@ -61,8 +67,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CircularList.cs" />
-    <Compile Include="Credential.cs" />
+    <Compile Include="AttachedPatients\ColumnProperty.cs" />
+    <Compile Include="AttachedPatients\PatientsFile.cs" />
+    <Compile Include="Common\CircularList.cs" />
+    <Compile Include="Common\ICredential.cs" />
     <Compile Include="MedicalExaminations\Examination.cs" />
     <Compile Include="MedicalExaminations\ExaminationServiceClient.cs" />
     <Compile Include="MedicalExaminations\ExaminationStep.cs" />
@@ -71,14 +79,20 @@
     <Compile Include="MedicalExaminations\ExaminationHealthGroup.cs" />
     <Compile Include="MedicalExaminations\ExaminationReferral.cs" />
     <Compile Include="MedicalExaminations\PatientExaminations.cs" />
-    <Compile Include="WebServerOperationException.cs" />
+    <Compile Include="Common\WebServerOperationException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="BillsRegisterService.cs" />
+    <Compile Include="BillsRegister\BillsRegisterService.cs" />
     <Compile Include="MedicalExaminations\ExaminationService.cs" />
     <Compile Include="MedicalExaminations\ExaminationServiceApi.cs" />
-    <Compile Include="WebServiceBase.cs" />
+    <Compile Include="Common\WebServiceBase.cs" />
+    <Compile Include="SRZ\Credential.cs" />
+    <Compile Include="SRZ\CredentialScope.cs" />
+    <Compile Include="SRZ\RoundRobinCredentials.cs" />
+    <Compile Include="SRZ\SRZService.cs" />
+    <Compile Include="SRZ\SRZServiceClient.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -87,8 +101,6 @@
       <Name>CHI</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="SRZ\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

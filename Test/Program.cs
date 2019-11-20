@@ -1,4 +1,5 @@
 ﻿using CHI.Services;
+using CHI.Services.BillsRegister;
 using CHI.Services.MedicalExaminations;
 using System;
 using System.Collections.Generic;
