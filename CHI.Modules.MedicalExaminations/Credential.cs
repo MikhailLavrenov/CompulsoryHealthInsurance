@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CHI.Services
 {
-    public class Credential
+    public class SimpleCredential
     {
         public string Login { get; set; }
         public string Password { get; set; }

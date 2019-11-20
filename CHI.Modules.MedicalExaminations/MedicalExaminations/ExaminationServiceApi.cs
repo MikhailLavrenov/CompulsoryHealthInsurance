@@ -49,7 +49,7 @@ namespace CHI.Services.MedicalExaminations
             CheckAuthorization();
 
             var uriParameters = new Dictionary<string, string> {
-                {"Filter.Year", ConvertToYearId(year) },
+                {"Filter.Year", ConvertToYearId(year).ToString() },
                 {"Filter.PolisNum", insuranceNumber },
                 {"Filter.DispType", ((int)examinationType).ToString() },
             };
@@ -79,7 +79,7 @@ namespace CHI.Services.MedicalExaminations
             var contentParameters = new Dictionary<string, string>
             {
                 { "personId", srzPatientId.ToString() },
-                { "yearId", ConvertToYearId(year) },
+                { "yearId", ConvertToYearId(year).ToString() },
                 { "dispType", ((int)examinationType).ToString() },
             };
 
@@ -112,7 +112,7 @@ namespace CHI.Services.MedicalExaminations
 
             var contentParameters = new Dictionary<string, string>
             {
-                {"SearchData.DispYearId", ConvertToYearId(year) },
+                {"SearchData.DispYearId", ConvertToYearId(year).ToString() },
                 {"SearchData.SelectSearchValues", "polis"},
                 {"SearchData.PolisNum", insuranceNumber }
             };
@@ -179,9 +179,13 @@ namespace CHI.Services.MedicalExaminations
 
             return response.Data?.FirstOrDefault()?.DispStage?.DispStageId ?? 0;
         }        
-        protected static string ConvertToYearId(int year)
+        protected static int ConvertToYearId(int year)
         {
-            return (year - 2017).ToString();
+            return (year - 2017);
+        }
+        protected static int ConvertToYear(int yearId)
+        {
+            return (yearId + 2017);
         }
         #endregion
 
@@ -192,15 +196,17 @@ namespace CHI.Services.MedicalExaminations
             public int PersonId { get; set; }
             public DateTime? Disp1BeginDate { get; set; }
             public DateTime? Disp1Date { get; set; }
-            public int? Stage1ResultId { get; set; }
-            public int? Stage1DestId { get; set; }
+            public ExaminationHealthGroup? Stage1ResultId { get; set; }
+            public ExaminationReferral? Stage1DestId { get; set; }
             public DateTime? Disp2DirectDate { get; set; }
             public DateTime? Disp2BeginDate { get; set; }
             public DateTime? Disp2Date { get; set; }
-            public int? Stage2ResultId { get; set; }
-            public int? Stage2DestId { get; set; }
+            public ExaminationHealthGroup? Stage2ResultId { get; set; }
+            public ExaminationReferral? Stage2DestId { get; set; }
             public DateTime? DispSuccessDate { get; set; }
             public DateTime? DispCancelDate { get; set; }
+            public ExaminationKind DispType { get; set; }
+            public int YearId { get; set; }
         }
         protected class PlanResponse
         {

@@ -8,6 +8,7 @@ namespace CHI.Services.MedicalExaminations
     {
         #region Поля
         private static readonly ExaminationStepKind[] examinationSteps;
+        private static readonly string AddPlanErrorMessage = "Не удалось добавить пациента в план";
         #endregion
 
         #region Конструкторы
@@ -27,23 +28,34 @@ namespace CHI.Services.MedicalExaminations
         #endregion
 
         #region Методы
-        public bool Authorize(Credential credential)
+        public bool Authorize(SimpleCredential credential)
         {
             return Authorize(credential.Login, credential.Password);
+        }
+        public bool TryAddPatientExaminations(PatientExaminations patientExaminations)
+        {
+            try
+            {
+                AddPatientExaminations(patientExaminations);
+                return true;
+            }
+            catch
+            {
+                return false; 
+            }
         }
         public void AddPatientExaminations(PatientExaminations patientExaminations)
         {
             var webPatientData = GetOrAddPatientToPlan(patientExaminations.InsuranceNumber, patientExaminations.ExaminationKind, patientExaminations.Year);
 
             if (webPatientData == null)
-                return;
+                throw new InvalidOperationException(AddPlanErrorMessage);
 
             var transfer2StageDate = patientExaminations.Examinations.FirstOrDefault(x => x.Stage == 1)?.EndDate ?? webPatientData.Disp1Date;
-            var userSteps = ConvertToExaminationSteps(patientExaminations.Examinations, transfer2StageDate);
-            var webSteps = ConvertToExaminationSteps(webPatientData);
+            var userSteps = ConvertToExaminationsSteps(patientExaminations.Examinations, transfer2StageDate);
+            var webSteps = ConvertToExaminationsSteps(webPatientData);
 
-            AddPatientExaminations(webPatientData.Id, userSteps, webSteps);
-
+            AddPatientExaminations(webPatientData.Id, userSteps, webSteps) ;
         }
         private WebPatientData GetOrAddPatientToPlan(string insuranceNumber, ExaminationKind examinationKind, int examinationYear)
         {
@@ -137,7 +149,7 @@ namespace CHI.Services.MedicalExaminations
                 throw;
             }
         }
-        private static List<ExaminationStep> ConvertToExaminationSteps(IEnumerable<Examination> patientExaminations, DateTime? transfer2StageDate = null)
+        private static List<ExaminationStep> ConvertToExaminationsSteps(IEnumerable<Examination> patientExaminations, DateTime? transfer2StageDate = null)
         {
             var examinationSteps = new List<ExaminationStep>();
 
@@ -195,7 +207,7 @@ namespace CHI.Services.MedicalExaminations
 
             return examinationSteps;
         }
-        private static List<ExaminationStep> ConvertToExaminationSteps(WebPatientData webPatientData)
+        private static List<ExaminationStep> ConvertToExaminationsSteps(WebPatientData webPatientData)
         {
             var examinationSteps = new List<ExaminationStep>();
 
@@ -260,6 +272,52 @@ namespace CHI.Services.MedicalExaminations
                 });
 
             return examinationSteps;
+        }
+        private static List<Examination> ConvertToExaminations(WebPatientData webPatientData)
+        {
+            var result = new List<Examination>();
+
+            if (webPatientData.Disp1BeginDate!=null)
+            {
+                var examination = new Examination();
+                examination.BeginDate = webPatientData.Disp1BeginDate.Value;
+                examination.Stage = 1;
+                examination.Kind = webPatientData.DispType;
+                examination.Year = ConvertToYear(webPatientData.YearId);
+
+                if (webPatientData.Disp1Date != null)
+                    examination.EndDate = webPatientData.Disp1Date.Value;
+
+                if(webPatientData.Stage1ResultId!=null && webPatientData.Stage1ResultId!=null )
+                {
+                    examination.HealthGroup = webPatientData.Stage1ResultId.Value;
+                    examination.Referral = webPatientData.Stage1DestId.Value;
+                }
+
+                result.Add(examination);
+            }
+
+            if (webPatientData.Disp2BeginDate != null)
+            {
+                var examination = new Examination();
+                examination.BeginDate = webPatientData.Disp2BeginDate.Value;
+                examination.Stage = 2;
+                examination.Kind = webPatientData.DispType;
+                examination.Year = ConvertToYear(webPatientData.YearId);
+
+                if (webPatientData.Disp2Date != null)
+                    examination.EndDate = webPatientData.Disp2Date.Value;
+
+                if (webPatientData.Stage2ResultId != null && webPatientData.Stage2ResultId != null)
+                {
+                    examination.HealthGroup = webPatientData.Stage2ResultId.Value;
+                    examination.Referral = webPatientData.Stage2DestId.Value;
+                }
+
+                result.Add(examination);
+            }
+
+            return result;
         }
         private ExaminationStepKind AddStep(int patientId, ExaminationStep examinationStep)
         {

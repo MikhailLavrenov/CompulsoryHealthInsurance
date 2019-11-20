@@ -1,27 +1,41 @@
 ﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace CHI.Services.MedicalExaminations
 {
     public class ExaminationServiceClient
     {
-        public IEnumerable<Credential> Credentials { get; set; }
-        public string URL { get; set; }
-        public string ProxyAdress { get; set; }
-        public int ProxyPort { get; set; }
-        public int ThreadsLimit { get; set; }
-        public bool UseProxy { get; set; }
+        public IEnumerable<SimpleCredential> Credentials { get; private set; }
+        public string URL { get; private set; }
+        public string ProxyAdress { get; private set; }
+        public int ProxyPort { get; private set; }
+        public int ThreadsLimit { get; private set; }
+        public bool UseProxy { get; private set; }
 
-        public void AddPatiensExaminations(List<PatientExaminations> patientsExaminations)
+        public ExaminationServiceClient(string url, int threadsLimit, IEnumerable<SimpleCredential> credentials)
+            :this(url,null,0, threadsLimit, credentials)
+        {
+        }
+        public ExaminationServiceClient(string url, string proxyAdress, int proxyPort, int threadsLimit, IEnumerable<SimpleCredential> credentials)
+        {
+            URL = url;
+            ProxyAdress = proxyAdress;
+            ProxyPort = proxyPort;
+            ThreadsLimit = threadsLimit;
+            Credentials = credentials;
+        }
+
+        public List<PatientExaminations> AddPatientsExaminations(List<PatientExaminations> patientsExaminations)
         {
             var threadsLimit = ThreadsLimit;
 
             if (patientsExaminations.Count < threadsLimit)
                 threadsLimit = patientsExaminations.Count;
 
-            var circularList = new CircularList<Credential>(Credentials);
-            var verifiedPatients = new ConcurrentBag<PatientExaminations>();
+            var circularList = new CircularList<SimpleCredential>(Credentials);
+            var errors = new ConcurrentBag<PatientExaminations>();
             var tasks = new Task<ExaminationService>[threadsLimit];
 
             for (int i = 0; i < threadsLimit; i++)
@@ -44,19 +58,15 @@ namespace CHI.Services.MedicalExaminations
                         service.Authorize(circularList.GetNext());
                     }
 
-                    service.AddPatientExaminations(patientExaminations);
-
-
-                    //if (service.TryGetPatient(patientExaminations, out Patient patient))
-                    //    verifiedPatients.Add(patient);
+                    if(!service.TryAddPatientExaminations(patientExaminations))
+                        errors.Add(patientExaminations);
 
                     return service;
-
                 });
             }
             Task.WaitAll(tasks);
 
-            //return verifiedPatients.ToArray();
+            return errors.ToList();
         }
     }
 }
