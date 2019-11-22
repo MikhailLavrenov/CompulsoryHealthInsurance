@@ -35,7 +35,7 @@ namespace CHI.Services.SRZ
             if (insuranceNumbers.Count < threadsLimit)
                 threadsLimit = insuranceNumbers.Count;
 
-            var robinRoundCredentials = new RoundRobinCredentials(Credentials);
+            var robinRoundCredentials = new CircularCredentials(Credentials);
             var verifiedPatients = new ConcurrentBag<Patient>();
             var tasks = new Task<SRZService>[threadsLimit];
             for (int i = 0; i < threadsLimit; i++)

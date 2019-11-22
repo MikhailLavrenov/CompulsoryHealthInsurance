@@ -5,18 +5,18 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace PatientsFomsRepository.Models
+namespace CHI.Services.AttachedPatients
 {
     /// <summary>
     /// Работа с excel файлом пациентов
     /// </summary>
-    public class PatientsFile : IDisposable
+    public class AttachedPatientsService : IDisposable
     {
         #region Поля
         private static readonly object locker = new object();
         private ExcelPackage excel;
         private ExcelWorksheet sheet;
-        private List<ColumnProperty> columnProperties;
+        private List<IColumnProperties> columnProperties;
         private int maxRow;
         private int maxCol;
         private int headerIndex = 1;
@@ -29,7 +29,7 @@ namespace PatientsFomsRepository.Models
 
         #region Методы
         //открывает файл
-        public void Open(string filePath, IEnumerable<ColumnProperty> columnProperties)
+        public void Open(string filePath, IEnumerable<IColumnProperties> columnProperties)
         {
             excel = new ExcelPackage(new FileInfo(filePath));
             sheet = excel.Workbook.Worksheets[1];
@@ -122,15 +122,15 @@ namespace PatientsFomsRepository.Models
         private int GetColumnIndex(string columnName)
         {
             var columnProperty = columnProperties
-                .Where(x=>string.Equals(x.Name, columnName, StringComparison.OrdinalIgnoreCase) || string.Equals(x.AltName, columnName, StringComparison.OrdinalIgnoreCase))
+                .Where(x => string.Equals(x.Name, columnName, StringComparison.OrdinalIgnoreCase) || string.Equals(x.AltName, columnName, StringComparison.OrdinalIgnoreCase))
                 .FirstOrDefault();
 
             if (columnProperty == null)
-                columnProperty = new ColumnProperty() { Name = columnName, AltName = columnName };
+                return GetColumnIndex(columnName, columnName);
 
-            return GetColumnIndex(columnProperty);
+            return GetColumnIndex(columnProperty.Name, columnProperty.AltName);
         }
-        private int GetColumnIndex(ColumnProperty columnProperty)
+        private int GetColumnIndex(string name, string altName)
         {
             for (int col = 1; col <= maxCol; col++)
             {
@@ -140,19 +140,19 @@ namespace PatientsFomsRepository.Models
                     continue;
 
                 var cellText = cellValue.ToString();
-                if ((cellText == columnProperty.Name) || (cellText == columnProperty.AltName))
+                if ((cellText == name) || (cellText == altName))
                     return col;
             }
             return -1;
         }
-        //возвращает атрибуты столбца по имени, если такого нет - возвращает новый экземпляр с таким именем
-        private ColumnProperty GetColumnProperty(string name)
+        //возвращает атрибуты столбца по имени, если такого нет - null
+        private IColumnProperties GetColumnProperty(string name)
         {
             foreach (var attribute in columnProperties)
-                if (string.Equals(attribute.Name,name, StringComparison.OrdinalIgnoreCase)    || string.Equals(attribute.AltName, name, StringComparison.OrdinalIgnoreCase))
+                if (string.Equals(attribute.Name, name, StringComparison.OrdinalIgnoreCase) || string.Equals(attribute.AltName, name, StringComparison.OrdinalIgnoreCase))
                     return attribute;
 
-            return new ColumnProperty { Name = name, AltName = name, Hide = false, Delete = false };
+            return null;
         }
         //проверяет структуру файла, при необходимости добавляет столбцы Фамилия, Имя, Отчество
         private void FixStructure()
@@ -187,14 +187,14 @@ namespace PatientsFomsRepository.Models
                 maxCol++;
             }
         }
-        //изменяет порядок столбоцов в соотвествии с порядком следования ColumnProperties
+        //изменяет порядок столбоцов в соотвествии с порядком следования IColumnProperties
         private void SetColumnsOrder()
         {
             int correctIndex = 1;
 
             foreach (var columnProperty in columnProperties)
             {
-                var currentIndex = GetColumnIndex(columnProperty);
+                var currentIndex = GetColumnIndex(columnProperty.Name, columnProperty.AltName);
 
                 //если столбец на своем месте 
                 if (currentIndex == correctIndex)
@@ -224,7 +224,7 @@ namespace PatientsFomsRepository.Models
                 .Where(x => x.Value != null);
 
             foreach (var cell in cells)
-                cell.Value=cell.Value.ToString()
+                cell.Value = cell.Value.ToString()
                     .Replace("1", "Мужской")
                     .Replace("2", "Женский");
         }
@@ -241,7 +241,7 @@ namespace PatientsFomsRepository.Models
                 var name = cellValue.ToString();
                 var columnProperty = GetColumnProperty(name);
 
-                if (name != columnProperty.AltName)
+                if (columnProperty?.AltName != string.Empty)
                     sheet.Cells[headerIndex, i].Value = columnProperty.AltName;
 
                 if (columnProperty.Hide)

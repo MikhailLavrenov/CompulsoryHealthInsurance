@@ -5,7 +5,7 @@ namespace CHI.Services.SRZ
     /// <summary>
     /// возвращает учетные данные по кругу пока лимит запросов не исчерпан
     /// </summary>
-    public class RoundRobinCredentials
+    public class CircularCredentials
     {
         #region Поля
         private readonly object locker = new object();
@@ -14,7 +14,7 @@ namespace CHI.Services.SRZ
         #endregion
 
         #region Конструкторы
-        public RoundRobinCredentials(IEnumerable<Credential> credentials)
+        public CircularCredentials(IEnumerable<Credential> credentials)
         {
             this.credentials = new List<Credential>();
 

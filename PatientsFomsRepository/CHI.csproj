@@ -60,8 +60,8 @@
     <NoWin32Manifest>true</NoWin32Manifest>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CommonServiceLocator, Version=2.0.4.0, Culture=neutral, PublicKeyToken=489b6accfaf20ef0, processorArchitecture=MSIL">
-      <HintPath>..\packages\CommonServiceLocator.2.0.4\lib\net47\CommonServiceLocator.dll</HintPath>
+    <Reference Include="CommonServiceLocator, Version=2.0.5.0, Culture=neutral, PublicKeyToken=489b6accfaf20ef0, processorArchitecture=MSIL">
+      <HintPath>..\packages\CommonServiceLocator.2.0.5\lib\net47\CommonServiceLocator.dll</HintPath>
     </Reference>
     <Reference Include="DryIoc, Version=4.0.7.0, Culture=neutral, PublicKeyToken=dfbf2bd50fcf7768, processorArchitecture=MSIL">
       <HintPath>..\packages\DryIoc.dll.4.0.7\lib\net45\DryIoc.dll</HintPath>
@@ -146,7 +146,8 @@
     <Compile Include="Infrastructure\DelegateCommandAsync{T}.cs" />
     <Compile Include="Infrastructure\MainRegionService.cs" />
     <Compile Include="Infrastructure\ErrorMessages.cs" />
-    <Compile Include="Models\ImportPatientsFile.cs" />
+    <Compile Include="Models\ColumnProperty.cs" />
+    <Compile Include="Models\Credential.cs" />
     <Compile Include="Models\Settings.cs" />
     <Compile Include="ViewModels\AboutApplicationViewModel.cs" />
     <Compile Include="ViewModels\NotificationDialogViewModel.cs" />
@@ -226,7 +227,6 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Models\Patient.cs" />
     <Compile Include="Models\Database.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
@@ -268,6 +268,12 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Application\AppIcon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CHI.Modules.MedicalExaminations\CHI.Services.csproj">
+      <Project>{f0d0927c-270d-4bb2-9dac-77de973185e9}</Project>
+      <Name>CHI.Services</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

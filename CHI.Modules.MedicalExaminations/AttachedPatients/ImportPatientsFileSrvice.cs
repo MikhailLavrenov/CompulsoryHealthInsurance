@@ -3,12 +3,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace PatientsFomsRepository.Models
+namespace CHI.Services.AttachedPatients
 {
     /// <summary>
     /// Работа с excel файлом для загрузки пациентов пациентов
     /// </summary>
-    public class ImportPatientsFile : IDisposable
+    public class ImportPatientsFileSrvice : IDisposable
     {
         #region Поля
         private ExcelPackage excel;

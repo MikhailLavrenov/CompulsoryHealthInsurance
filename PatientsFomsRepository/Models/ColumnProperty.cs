@@ -1,4 +1,5 @@
-﻿using PatientsFomsRepository.Infrastructure;
+﻿using CHI.Services.AttachedPatients;
+using PatientsFomsRepository.Infrastructure;
 using System;
 
 namespace PatientsFomsRepository.Models
@@ -8,13 +9,27 @@ namespace PatientsFomsRepository.Models
     /// Аттрибуты столбца файла пациентов
     /// </summary>
     [Serializable]
-    public class ColumnProperty : DomainObject
+    public class ColumnProperties : DomainObject, IColumnProperties
     {
         #region Поля
         private string name;
         private string altName;
         private bool hide;
         private bool delete;
+        #endregion
+
+        #region Констукторы
+        public ColumnProperties()
+        : this(null, null)
+        {
+        }
+        public ColumnProperties(string name, string altName)
+        {
+            Name = name;
+            AltName = altName;
+            Hide = false;
+            Delete = false;
+        }
         #endregion
 
         #region Свойства
@@ -26,10 +41,10 @@ namespace PatientsFomsRepository.Models
 
         #region Методы
         // Валидация свойств
-        public override void Validate(string propertyName=null)
+        public override void Validate(string propertyName = null)
         {
-            if (propertyName == nameof(Name) || propertyName == null)            
-                ValidateIsNullOrEmptyString(nameof(Name), Name);            
+            if (propertyName == nameof(Name) || propertyName == null)
+                ValidateIsNullOrEmptyString(nameof(Name), Name);
 
             if (propertyName == nameof(AltName) || propertyName == null)
                 ValidateIsNullOrEmptyString(nameof(AltName), AltName);

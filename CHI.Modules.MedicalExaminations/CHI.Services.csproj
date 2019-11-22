@@ -31,11 +31,14 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CommonServiceLocator, Version=2.0.4.0, Culture=neutral, PublicKeyToken=489b6accfaf20ef0, processorArchitecture=MSIL">
-      <HintPath>..\packages\CommonServiceLocator.2.0.4\lib\net47\CommonServiceLocator.dll</HintPath>
+    <Reference Include="CommonServiceLocator, Version=2.0.5.0, Culture=neutral, PublicKeyToken=489b6accfaf20ef0, processorArchitecture=MSIL">
+      <HintPath>..\packages\CommonServiceLocator.2.0.5\lib\net47\CommonServiceLocator.dll</HintPath>
     </Reference>
     <Reference Include="EPPlus, Version=4.5.3.2, Culture=neutral, PublicKeyToken=ea159fdaa78159a1, processorArchitecture=MSIL">
       <HintPath>..\packages\EPPlus.4.5.3.2\lib\net40\EPPlus.dll</HintPath>
+    </Reference>
+    <Reference Include="NDbfReader, Version=2.3.0.0, Culture=neutral, PublicKeyToken=421d1ecd09787b1d, processorArchitecture=MSIL">
+      <HintPath>..\packages\NDbfReader.2.3.0\lib\net45\NDbfReader.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="Prism, Version=7.2.0.1367, Culture=neutral, PublicKeyToken=40ee6c3a2184dc59, processorArchitecture=MSIL">
@@ -45,6 +48,10 @@
       <HintPath>..\packages\Prism.Wpf.7.2.0.1367\lib\net45\Prism.Wpf.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Annotations, Version=4.2.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ComponentModel.Annotations.4.6.0\lib\net461\System.ComponentModel.Annotations.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -67,10 +74,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AttachedPatients\ColumnProperty.cs" />
-    <Compile Include="AttachedPatients\PatientsFile.cs" />
+    <Compile Include="AttachedPatients\AttachedPatientsService.cs" />
+    <Compile Include="AttachedPatients\IColumnProperties.cs" />
     <Compile Include="Common\CircularList.cs" />
     <Compile Include="Common\ICredential.cs" />
+    <Compile Include="AttachedPatients\Patient.cs" />
+    <Compile Include="AttachedPatients\ImportPatientsFileSrvice.cs" />
     <Compile Include="MedicalExaminations\Examination.cs" />
     <Compile Include="MedicalExaminations\ExaminationServiceClient.cs" />
     <Compile Include="MedicalExaminations\ExaminationStep.cs" />
@@ -85,21 +94,14 @@
     <Compile Include="MedicalExaminations\ExaminationService.cs" />
     <Compile Include="MedicalExaminations\ExaminationServiceApi.cs" />
     <Compile Include="Common\WebServiceBase.cs" />
-    <Compile Include="SRZ\Credential.cs" />
     <Compile Include="SRZ\CredentialScope.cs" />
-    <Compile Include="SRZ\RoundRobinCredentials.cs" />
+    <Compile Include="SRZ\CircularCredentials.cs" />
     <Compile Include="SRZ\SRZService.cs" />
     <Compile Include="SRZ\SRZServiceClient.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\PatientsFomsRepository\CHI.csproj">
-      <Project>{519989BB-8C1C-4B58-B184-2310F23ED64A}</Project>
-      <Name>CHI</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
