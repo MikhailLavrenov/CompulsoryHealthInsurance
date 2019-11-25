@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CHI.Services.SRZ
+namespace PatientsFomsRepository.Models
 {
     /// <summary>
     /// Перечисление кто может видеть учетные данные

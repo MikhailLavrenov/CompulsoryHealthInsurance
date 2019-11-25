@@ -1,4 +1,5 @@
-﻿using System.Data.Entity;
+﻿using CHI.Services.AttachedPatients;
+using System.Data.Entity;
 
 namespace PatientsFomsRepository.Models
 {

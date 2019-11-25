@@ -1,12 +1,10 @@
-﻿using PatientsFomsRepository.Infrastructure;
-using PatientsFomsRepository.Models;
+﻿using CHI.Services.AttachedPatients;
+using PatientsFomsRepository.Infrastructure;
 using Prism.Regions;
 using Prism.Services.Dialogs;
-using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
-using System.Windows;
 
 namespace PatientsFomsRepository.ViewModels
 {
@@ -52,13 +50,8 @@ namespace PatientsFomsRepository.ViewModels
             var importFilePath = fileDialogService.FullPath;
 
             MainRegionService.SetBusyStatus("Открытие файла.");
-            List<Patient> newPatients;
-            using (var file = new ImportPatientsFile())
-            {
-                file.Open(importFilePath);
-                newPatients = file.GetPatients();
-                file.Dispose();
-            }
+
+            var newPatients = PatientsFileService.ReadImportPatientsFile(importFilePath);
 
             MainRegionService.SetBusyStatus("Проверка значений.");
             var db = new Models.Database();
@@ -76,7 +69,7 @@ namespace PatientsFomsRepository.ViewModels
             db.SaveChanges();
 
             int total = existenInsuaranceNumbers.Count + newUniqPatients.Count;
-            MainRegionService.SetCompleteStatus ($"В файле найдено {newPatients.Count} человек(а). В БД добавлено {newUniqPatients.Count} новых. Итого в БД {total}.");
+            MainRegionService.SetCompleteStatus($"В файле найдено {newPatients.Count} человек(а). В БД добавлено {newUniqPatients.Count} новых. Итого в БД {total}.");
         }
         private void SaveExampleExecute()
         {
@@ -90,8 +83,8 @@ namespace PatientsFomsRepository.ViewModels
             var saveExampleFilePath = fileDialogService.FullPath;
 
             MainRegionService.SetBusyStatus("Открытие файла.");
-            ImportPatientsFile.SaveExample(saveExampleFilePath);
-            MainRegionService.SetCompleteStatus ($"Файл сохранен: {saveExampleFilePath}");
+            PatientsFileService.SaveImportFileExample(saveExampleFilePath);
+            MainRegionService.SetCompleteStatus($"Файл сохранен: {saveExampleFilePath}");
         }
         private void ClearDatabaseExecute()
         {
@@ -107,7 +100,7 @@ namespace PatientsFomsRepository.ViewModels
             if (db.Database.Exists())
                 db.Database.Delete();
             db.Database.Create();
-            MainRegionService.SetCompleteStatus ("База данных очищена.");
+            MainRegionService.SetCompleteStatus("База данных очищена.");
         }
         #endregion
     }

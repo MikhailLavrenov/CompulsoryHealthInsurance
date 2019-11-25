@@ -1,4 +1,5 @@
-﻿using PatientsFomsRepository.Infrastructure;
+﻿using CHI.Services.SRZ;
+using PatientsFomsRepository.Infrastructure;
 using System;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -337,7 +338,7 @@ namespace PatientsFomsRepository.Models
         {
             Parallel.ForEach(Credentials, credential =>
             {
-                using (var site = new SRZ(SiteAddress, ProxyAddress, ProxyPort))
+                using (var site = new SRZService(SiteAddress, ProxyAddress, ProxyPort))
                 {
                     if (site.TryAuthorize(credential))
                     {

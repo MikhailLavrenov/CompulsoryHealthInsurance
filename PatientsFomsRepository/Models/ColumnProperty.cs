@@ -9,7 +9,7 @@ namespace PatientsFomsRepository.Models
     /// Аттрибуты столбца файла пациентов
     /// </summary>
     [Serializable]
-    public class ColumnProperties : DomainObject, IColumnProperties
+    public class ColumnProperty : DomainObject, IColumnProperties
     {
         #region Поля
         private string name;
@@ -19,11 +19,11 @@ namespace PatientsFomsRepository.Models
         #endregion
 
         #region Констукторы
-        public ColumnProperties()
+        public ColumnProperty()
         : this(null, null)
         {
         }
-        public ColumnProperties(string name, string altName)
+        public ColumnProperty(string name, string altName)
         {
             Name = name;
             AltName = altName;

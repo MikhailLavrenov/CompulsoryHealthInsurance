@@ -1,4 +1,6 @@
-﻿using PatientsFomsRepository.Infrastructure;
+﻿using CHI.Services.AttachedPatients;
+using CHI.Services.SRZ;
+using PatientsFomsRepository.Infrastructure;
 using PatientsFomsRepository.Models;
 using Prism.Commands;
 using Prism.Regions;
@@ -69,20 +71,20 @@ namespace PatientsFomsRepository.ViewModels
 
                 MainRegionService.SetBusyStatus("Загрузка файла из СРЗ.");
 
-                SRZ site;
+                SRZService service;
                 if (Settings.UseProxy)
-                    site = new SRZ(Settings.SiteAddress, Settings.ProxyAddress, Settings.ProxyPort);
+                    service = new SRZService(Settings.SiteAddress, Settings.ProxyAddress, Settings.ProxyPort);
                 else
-                    site = new SRZ(Settings.SiteAddress);
+                    service = new SRZService(Settings.SiteAddress);
 
                 var credential = Settings.Credentials.First(x => x.RequestsLimit > 0);
-                site.TryAuthorize(credential);
-                site.GetPatientsFile(Settings.PatientsFilePath, FileDate);
+                service.TryAuthorize(credential);
+                service.GetPatientsFile(Settings.PatientsFilePath, FileDate);
             }
 
             MainRegionService.SetBusyStatus("Подстановка ФИО из кэша.");
             var db = new Models.Database();
-            var file = new PatientsFile();
+            var file = new PatientsFileService();
 
             db.Patients.Load();
             file.Open(Settings.PatientsFilePath, Settings.ColumnProperties);
@@ -149,9 +151,9 @@ namespace PatientsFomsRepository.ViewModels
 
             var robinRoundCredentials = new RoundRobinCredentials(Settings.Credentials);
             var verifiedPatients = new ConcurrentBag<Patient>();
-            var tasks = new Task<SRZ>[threadsLimit];
+            var tasks = new Task<SRZService>[threadsLimit];
             for (int i = 0; i < threadsLimit; i++)
-                tasks[i] = Task.Run(() => { return (SRZ)null; });
+                tasks[i] = Task.Run(() => { return (SRZService)null; });
 
             for (int i = 0; i < insuranceNumbers.Count; i++)
             {
@@ -159,23 +161,23 @@ namespace PatientsFomsRepository.ViewModels
                 var index = Task.WaitAny(tasks);
                 tasks[index] = tasks[index].ContinueWith((task) =>
                 {
-                    var site = task.Result;
-                    if (site == null || site.Credential.TryReserveRequest() == false)
+                    var site = task.ConfigureAwait(false).GetAwaiter().GetResult();
+                    var credential = (Credential)site.Credential;
+                    if (site == null || !credential.TryReserveRequest())
                     {
-                        if (site != null)
-                            site.Logout();
+                        site?.Logout();
 
                         while (true)
                         {
-                            if (robinRoundCredentials.TryGetNext(out Credential credential) == false)
+                            if (!robinRoundCredentials.TryGetNext(out  credential))
                                 return null;
 
                             if (credential.TryReserveRequest())
                             {
                                 if (Settings.UseProxy)
-                                    site = new SRZ(Settings.SiteAddress, Settings.ProxyAddress, Settings.ProxyPort);
+                                    site = new SRZService(Settings.SiteAddress, Settings.ProxyAddress, Settings.ProxyPort);
                                 else
-                                    site = new SRZ(Settings.SiteAddress);
+                                    site = new SRZService(Settings.SiteAddress);
 
                                 if (site.TryAuthorize(credential))
                                     break;
@@ -183,7 +185,9 @@ namespace PatientsFomsRepository.ViewModels
                         }
                     }
 
-                    if (site.TryGetPatient(insuranceNumber, out Patient patient))
+                    var patient = site.GetPatient(insuranceNumber);
+
+                    if (patient != null)
                         verifiedPatients.Add(patient);
 
                     return site;

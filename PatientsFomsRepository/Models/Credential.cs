@@ -1,10 +1,11 @@
-﻿using PatientsFomsRepository.Infrastructure;
+﻿using CHI.Services;
+using PatientsFomsRepository.Infrastructure;
 using System;
 using System.Security.Cryptography;
 using System.Text;
 using System.Xml.Serialization;
 
-namespace CHI.Services.SRZ
+namespace PatientsFomsRepository.Models
 {
     public class Credential : DomainObject,ICredential
     {

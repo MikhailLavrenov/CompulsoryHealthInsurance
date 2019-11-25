@@ -62,7 +62,7 @@ namespace CHI.Services.SRZ
             Authorized = false;
         }
         //запрашивает данные пациента
-        public void GetPatient(string insuranceNumber, out Patient patient)
+        public Patient GetPatient(string insuranceNumber)
         {
             CheckAuthorization();
 
@@ -76,9 +76,9 @@ namespace CHI.Services.SRZ
             var responseLines = responseText.Split(new string[] { "||" }, 7, StringSplitOptions.None);
 
             if (responseLines[0] != "0")
-                patient = new Patient(responseLines[2], responseLines[3], responseLines[4], responseLines[5]);
+                return  new Patient(responseLines[2], responseLines[3], responseLines[4], responseLines[5]);
             else
-                patient = null;
+                return null;
         }
         //получает excel файл прикрепленных пациентов на дату
         public void GetPatientsFile(string excelFile, DateTime onDate)
