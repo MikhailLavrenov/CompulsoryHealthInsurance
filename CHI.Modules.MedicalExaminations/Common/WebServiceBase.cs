@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Net.Http;
 
@@ -52,6 +53,16 @@ namespace CHI.Services.Common
             response.EnsureSuccessStatusCode();
 
             return response.Content.ReadAsStringAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+        }
+        protected Stream SendGetRequest(string urn)
+        {
+            var requestMessage = new HttpRequestMessage(HttpMethod.Get, urn);
+
+            var response = client.SendAsync(requestMessage).ConfigureAwait(false).GetAwaiter().GetResult();
+
+            response.EnsureSuccessStatusCode();
+
+            return response.Content.ReadAsStreamAsync().ConfigureAwait(false).GetAwaiter().GetResult();
         }
         protected void CheckAuthorization()
         {

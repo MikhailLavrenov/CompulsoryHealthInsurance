@@ -148,6 +148,7 @@
     <Compile Include="Infrastructure\ErrorMessages.cs" />
     <Compile Include="Models\ColumnProperty.cs" />
     <Compile Include="Models\Credential.cs" />
+    <Compile Include="Models\CredentialScope.cs" />
     <Compile Include="Models\Settings.cs" />
     <Compile Include="ViewModels\AboutApplicationViewModel.cs" />
     <Compile Include="ViewModels\NotificationDialogViewModel.cs" />

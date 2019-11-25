@@ -79,7 +79,7 @@
     <Compile Include="Common\CircularList.cs" />
     <Compile Include="Common\ICredential.cs" />
     <Compile Include="AttachedPatients\Patient.cs" />
-    <Compile Include="AttachedPatients\ImportPatientsFileSrvice.cs" />
+    <Compile Include="AttachedPatients\ImportPatientsFileService.cs" />
     <Compile Include="MedicalExaminations\Examination.cs" />
     <Compile Include="MedicalExaminations\ExaminationServiceClient.cs" />
     <Compile Include="MedicalExaminations\ExaminationStep.cs" />
@@ -94,10 +94,7 @@
     <Compile Include="MedicalExaminations\ExaminationService.cs" />
     <Compile Include="MedicalExaminations\ExaminationServiceApi.cs" />
     <Compile Include="Common\WebServiceBase.cs" />
-    <Compile Include="SRZ\CredentialScope.cs" />
-    <Compile Include="SRZ\CircularCredentials.cs" />
     <Compile Include="SRZ\SRZService.cs" />
-    <Compile Include="SRZ\SRZServiceClient.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

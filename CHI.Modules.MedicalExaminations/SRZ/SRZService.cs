@@ -1,10 +1,10 @@
 ﻿using CHI.Services.AttachedPatients;
+using CHI.Services.Common;
 using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
-using System.Net;
 using System.Net.Http;
 using System.Text;
 
@@ -13,54 +13,37 @@ namespace CHI.Services.SRZ
     /// <summary>
     /// Работа с веб-порталом СРЗ
     /// </summary>
-    public class SRZService : IDisposable
+    public class SRZService : WebServiceBase, IDisposable
     {
         #region Поля
-        private HttpClient client;
         #endregion
 
         #region Свойства
-        public Credential Credential { get; private set; }
-        public bool Authorized { get; private set; }
+        public ICredential Credential { get; private set; }
         #endregion
 
         #region Конструкторы
-        public SRZService(string URL) 
+        public SRZService(string URL)
             : this(URL, null, 0)
         { }
         public SRZService(string URL, string proxyAddress, int proxyPort)
-        {
-            Authorized = false;
-            var clientHandler = new HttpClientHandler();
-            clientHandler.CookieContainer = new CookieContainer();
-
-            if (proxyAddress != null && proxyPort != 0)
-            {
-                clientHandler.UseProxy = true;
-                clientHandler.Proxy = new WebProxy($"{proxyAddress}:{proxyPort}");
-            }
-
-            client = new HttpClient(clientHandler);
-            client.BaseAddress = new Uri(URL);
-        }
+            : base(URL, proxyAddress, proxyPort)
+        { }
         #endregion
 
         #region Методы
         //авторизация на сайте
-        public bool TryAuthorize(Credential credential)
+        public bool TryAuthorize(ICredential credential)
         {
             Credential = credential;
-            var content = new FormUrlEncodedContent(new[]
-            {
-                new KeyValuePair<string, string>("lg", credential.Login),
-                new KeyValuePair<string, string>("pw", credential.Password),
-            });
+            var content = new Dictionary<string, string> {
+                { "lg", credential.Login },
+                { "pw", credential.Password},
+            };
 
             try
             {
-                var response = client.PostAsync("data/user.ajax.logon.php", content).GetAwaiter().GetResult();
-                response.EnsureSuccessStatusCode();
-                var responseText = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+                var responseText = SendRequest(HttpMethod.Post, @"data/user.ajax.logon.php", content);
 
                 if (responseText == "")
                     return Authorized = true;
@@ -75,94 +58,68 @@ namespace CHI.Services.SRZ
         //выход с сайта
         public void Logout()
         {
+            SendRequest(HttpMethod.Get, @"?show=logoff", null);
             Authorized = false;
-            var response = client.GetAsync("?show=logoff").GetAwaiter().GetResult();
-            response.EnsureSuccessStatusCode();
         }
         //запрашивает данные пациента
-        public bool TryGetPatient(string insuranceNumber, out Patient patient)
+        public void GetPatient(string insuranceNumber, out Patient patient)
         {
-            patient = null;
+            CheckAuthorization();
 
-            var content = new FormUrlEncodedContent(new[]
-            {
-                new KeyValuePair<string, string>("mode", "1"),
-                new KeyValuePair<string, string>("person_enp", insuranceNumber),
-            });
+            var content = new Dictionary<string, string> {
+                { "mode", "1" },
+                { "person_enp", insuranceNumber },
+            };
 
-            try
-            {
-                var response = client.PostAsync("data/reg.person.polis.search.php", content).GetAwaiter().GetResult();
-                response.EnsureSuccessStatusCode();
-                var responseText = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
-                var responseLines = responseText.Split(new string[] { "||" }, 7, StringSplitOptions.None);
+            var responseText = SendRequest(HttpMethod.Post, @"data/reg.person.polis.search.php", content);
 
-                if (responseLines[0] != "0")
-                {
-                    patient = new Patient(responseLines[2], responseLines[3], responseLines[4], responseLines[5]);
-                    return true;
-                }
-                else
-                    return false;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
+            var responseLines = responseText.Split(new string[] { "||" }, 7, StringSplitOptions.None);
+
+            if (responseLines[0] != "0")
+                patient = new Patient(responseLines[2], responseLines[3], responseLines[4], responseLines[5]);
+            else
+                patient = null;
         }
         //получает excel файл прикрепленных пациентов на дату
         public void GetPatientsFile(string excelFile, DateTime onDate)
         {
-            var fileReference = GetFileReference(onDate);
-            var dbfFile = GetDbfFile(fileReference);
-            DbfToExcel(dbfFile, excelFile);
-        }
-        //Освобождает ресурсы
-        public void Dispose()
-        {
-            client.Dispose();
-        }
-        //получает ссылку на файл заданной даты
-        private string GetFileReference(DateTime fileDate)
-        {
-            string shortFileDate = fileDate.ToShortDateString();
-            var content = new FormUrlEncodedContent(new[]
-                {
-                new KeyValuePair<string, string>("export_date_on", shortFileDate),
-                new KeyValuePair<string, string>("exportlist_id", "25"),
-                });
+            CheckAuthorization();
 
-            var response = client.PostAsync("data/dbase.export.php", content).GetAwaiter().GetResult();
-            response.EnsureSuccessStatusCode();
-            string responseText = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+            var reference = GetPatientsFileReference(onDate);
 
-            int begin = responseText.IndexOf(@"<a href='") + 9;
-            int end = responseText.IndexOf(@"' ", begin) - begin;
-
-            return responseText.Substring(begin, end);
-        }
-        //получает dbf файл прикрепленных пацентов
-        private Stream GetDbfFile(string downloadReference)
-        {
             //скачивает zip архив
-            var response = client.GetAsync(downloadReference).GetAwaiter().GetResult();
-            response.EnsureSuccessStatusCode();
-            var zipFile = response.Content.ReadAsStreamAsync().GetAwaiter().GetResult();
+            var zipFile = SendGetRequest(reference);
 
             //извлекает dbf файл
             Stream dbfFile = new MemoryStream();
+
             using (var archive = new ZipArchive(zipFile, ZipArchiveMode.Read))
-            {
                 archive.Entries[0].Open().CopyTo(dbfFile);
-            }
 
-            dbfFile.Position = 0;
+            ConvertDbfToExcel(dbfFile, excelFile);
+        }
+        //получает ссылку на скачивание файла прикрепленных пациентов
+        private string GetPatientsFileReference(DateTime onDate)
+        {            
+            string shortFileDate = onDate.ToShortDateString();
 
-            return dbfFile;
+            var content = new Dictionary<string, string> {
+                { "export_date_on", shortFileDate },
+                { "exportlist_id", "25" },
+            };
+
+            var responseText = SendRequest(HttpMethod.Post, @"data/dbase.export.php", content);
+
+            int begin = responseText.IndexOf(@"<a href='") + 9;
+            int length = responseText.IndexOf(@"' ", begin) - begin;
+
+            return responseText.Substring(begin, length);
         }
         //преобразует dbf в excel
-        private void DbfToExcel(Stream dbfFile, string excelFilePath)
+        private static void ConvertDbfToExcel(Stream dbfFile, string excelFilePath)
         {
+            dbfFile.Position = 0;
+
             using (var table = NDbfReader.Table.Open(dbfFile))
             using (var excel = new ExcelPackage())
             {

@@ -10,7 +10,5 @@ namespace CHI.Services
     {
          string Login { get; }
          string Password { get; }
-
-
     }
 }

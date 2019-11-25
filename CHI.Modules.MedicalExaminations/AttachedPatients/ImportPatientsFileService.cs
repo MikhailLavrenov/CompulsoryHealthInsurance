@@ -8,7 +8,7 @@ namespace CHI.Services.AttachedPatients
     /// <summary>
     /// Работа с excel файлом для загрузки пациентов пациентов
     /// </summary>
-    public class ImportPatientsFileSrvice : IDisposable
+    public class ImportPatientsFileService : IDisposable
     {
         #region Поля
         private ExcelPackage excel;
