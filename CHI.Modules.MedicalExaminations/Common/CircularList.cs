@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace CHI.Services.Common
 {
     public class CircularList<T>
-    { 
-        private IEnumerable<T> list;
+    {
+        private readonly object locker = new object();
+        protected IEnumerable<T> list;
         private IEnumerator<T> enumerator;
 
         public CircularList(IEnumerable<T> elements)
@@ -18,13 +15,16 @@ namespace CHI.Services.Common
         }
         public T GetNext()
         {
-            if (!enumerator.MoveNext())
+            lock (locker)
             {
-                enumerator.Reset();
-                enumerator.MoveNext();
-            }
+                if (!enumerator.MoveNext())
+                {
+                    enumerator.Reset();
+                    enumerator.MoveNext();
+                }
 
-            return enumerator.Current;
+                return enumerator.Current;
+            }
         }
 
     }
