@@ -1,5 +1,5 @@
-﻿using CHI.Services.SRZ;
-using CHI.Application.Infrastructure;
+﻿using CHI.Application.Infrastructure;
+using CHI.Services.SRZ;
 using System;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -16,7 +16,8 @@ namespace CHI.Application.Models
         #region Поля
         //SRZ
         private readonly int timeoutConnection = 3000;
-        private string siteAddress;
+        private string srzAddress;
+        private string medicalExaminationsAddress;
         private bool useProxy;
         private string proxyAddress;
         private ushort proxyPort;
@@ -36,27 +37,9 @@ namespace CHI.Application.Models
         public static string SettingsFileName { get; }
         public static Settings Instance { get; private set; }
 
-        //SRZ
-        public string SiteAddress
-        {
-            get => siteAddress;
-            set
-            {
-                var compare = StringComparison.OrdinalIgnoreCase;
-                value = value.Trim();
-
-                if (string.IsNullOrEmpty(value) == false)
-                {
-                    if (value.StartsWith(@"http://", compare) == false && value.StartsWith(@"https://", compare) == false)
-                        value = $@"http://{value}";
-
-                    if (value.EndsWith(@"/") == false)
-                        value = $@"{value}/";
-                }
-
-                SetProperty(ref siteAddress, value);
-            }
-        }
+        //Services
+        public string SRZAddress { get => srzAddress; set => SetProperty(ref srzAddress, FixUrl(value)); }
+        public string MedicalExaminationsAddress { get => medicalExaminationsAddress; set => SetProperty(ref medicalExaminationsAddress, FixUrl(value)); }
         public bool UseProxy
         {
             get => useProxy;
@@ -115,7 +98,7 @@ namespace CHI.Application.Models
         //проверить настройки
         public void TestConnection()
         {
-            RemoveError(ErrorMessages.Connection, nameof(SiteAddress));
+            RemoveError(ErrorMessages.Connection, nameof(SRZAddress));
             Credentials.ToList().ForEach(x => x.RemoveErrorsMessage(ErrorMessages.Connection));
 
             if (UseProxy && !TryConnectProxy())
@@ -131,12 +114,22 @@ namespace CHI.Application.Models
                 RemoveError(ErrorMessages.Connection, nameof(ProxyPort));
             }
 
-            if (!TryConnectSite())
+            var connectedSrz = TryConnectSite(SRZAddress);
+            if (!connectedSrz)
             {
-                AddError(ErrorMessages.Connection, nameof(SiteAddress));
+                AddError(ErrorMessages.Connection, nameof(SRZAddress));
                 ConnectionIsValid = false;
+            }
+
+            var connectedMedicaExaminations = TryConnectSite(MedicalExaminationsAddress);
+            if (!connectedMedicaExaminations)
+            {
+                AddError(ErrorMessages.Connection, nameof(MedicalExaminationsAddress));
+                ConnectionIsValid = false;
+            }
+
+            if (!connectedSrz || !connectedMedicaExaminations)
                 return;
-            }              
 
             if (!TryAuthorizeCredentials())
             {
@@ -223,9 +216,10 @@ namespace CHI.Application.Models
              };
         }
         //устанавливает по-умолчанию настройки для СРЗ-сайта
-        public void SetDefaultSRZ()
+        public void SetDefaultFomsServices()
         {
-            SiteAddress = @"http://11.0.0.1/";
+            SRZAddress = @"http://11.0.0.1/";
+            MedicalExaminationsAddress = @"http://11.0.0.2/";
             UseProxy = false;
             ProxyAddress = "";
             ProxyPort = 0;
@@ -257,12 +251,18 @@ namespace CHI.Application.Models
         {
             switch (propertyName)
             {
-                case nameof(SiteAddress):
-                    if (string.IsNullOrEmpty(SiteAddress) || Uri.TryCreate(SiteAddress, UriKind.Absolute, out _) == false)
+                case nameof(SRZAddress):
+                    if (string.IsNullOrEmpty(SRZAddress) || Uri.TryCreate(SRZAddress, UriKind.Absolute, out _) == false)
                         AddError(ErrorMessages.UriFormat, propertyName);
                     else
                         RemoveError(ErrorMessages.UriFormat, propertyName);
+                    break;
 
+                case nameof(MedicalExaminationsAddress):
+                    if (string.IsNullOrEmpty(MedicalExaminationsAddress) || Uri.TryCreate(MedicalExaminationsAddress, UriKind.Absolute, out _) == false)
+                        AddError(ErrorMessages.UriFormat, propertyName);
+                    else
+                        RemoveError(ErrorMessages.UriFormat, propertyName);
                     break;
 
                 case nameof(UseProxy):
@@ -310,13 +310,13 @@ namespace CHI.Application.Models
             return connected;
         }
         //проверяет доступность сайта, в случае успеха - true
-        private bool TryConnectSite()
+        private bool TryConnectSite(string url)
         {
             var connected = false;
 
             try
             {
-                var webRequest = (HttpWebRequest)WebRequest.Create(SiteAddress);
+                var webRequest = (HttpWebRequest)WebRequest.Create(url);
 
                 webRequest.Timeout = timeoutConnection;
 
@@ -338,7 +338,7 @@ namespace CHI.Application.Models
         {
             Parallel.ForEach(Credentials, credential =>
             {
-                using (var site = new SRZService(SiteAddress, ProxyAddress, ProxyPort))
+                using (var site = new SRZService(SRZAddress, ProxyAddress, ProxyPort))
                 {
                     if (site.TryAuthorize(credential))
                     {
@@ -354,6 +354,21 @@ namespace CHI.Application.Models
             });
 
             return !Credentials.Any(x => x.HasErrors);
+        }
+        private static string FixUrl(string url)
+        {
+            url = url.Trim().ToLower();
+
+            if (!string.IsNullOrEmpty(url))
+            {
+                if (!url.StartsWith(@"http://") && !url.StartsWith(@"https://"))
+                    url = $@"http://{url}";
+
+                if (url.EndsWith(@"/") == false)
+                    url = $@"{url}/";
+            }
+
+            return url;
         }
         #endregion
     }

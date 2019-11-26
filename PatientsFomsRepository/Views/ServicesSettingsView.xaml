@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="CHI.Application.Views.SRZSettingsView"
+﻿<UserControl x:Class="CHI.Application.Views.ServicesSettingsView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -40,13 +40,20 @@
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
+        
+        <TextBlock Grid.Row="0"
+                   Grid.Column="0"
+                   Text="Адрес сайта СРЗ" />
+        <TextBox Grid.Row="0"
+                 Grid.Column="1"
+                 Text="{Binding Settings.SRZAddress, ValidatesOnDataErrors=True}" />
 
         <TextBlock Grid.Row="1"
                    Grid.Column="0"
-                   Text="Адрес сайта СРЗ" />
+                   Text="Адрес сайта Диспансеризации" />
         <TextBox Grid.Row="1"
                  Grid.Column="1"
-                 Text="{Binding Settings.SiteAddress, ValidatesOnDataErrors=True}" />
+                 Text="{Binding Settings.MedicalExaminationsAddress, ValidatesOnDataErrors=True}" />
 
         <TextBlock Grid.Row="2"
                    Grid.Column="0"

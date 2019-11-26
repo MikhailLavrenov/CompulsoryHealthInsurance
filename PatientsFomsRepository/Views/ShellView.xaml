@@ -38,22 +38,22 @@
             <WrapPanel DockPanel.Dock="Top"
                        Margin="0,3,0,3">
 
-                <Button Content="Получить ФИО"
+                <Button Content="Прикрепленные пациенты"
                         Style="{StaticResource HeaderReferenceButton}"
                         Command="{Binding ShowViewCommand}"
                         CommandParameter="{x:Type v:PatientsFileView}" />
 
-                <Button Content="Загрузить в БД"
+                <!--<Button Content="Загрузить в БД"
                         Style="{StaticResource HeaderReferenceButton}"
                         Command="{Binding ShowViewCommand}"
-                        CommandParameter="{x:Type v:ImportPatientsView}" />
+                        CommandParameter="{x:Type v:ImportPatientsView}" />-->
 
-                <Button Content="Настройки СРЗ"
+                <Button Content="Настройки сервисов"
                         Style="{StaticResource HeaderReferenceButton}"
                         Command="{Binding ShowViewCommand}"
-                        CommandParameter="{x:Type v:SRZSettingsView}" />
+                        CommandParameter="{x:Type v:ServicesSettingsView}" />
 
-                <Button Content="Настройки файла пациентов"
+                <Button Content="Настройки прикрепленных пациентов"
                         Style="{StaticResource HeaderReferenceButton}"
                         Command="{Binding ShowViewCommand}"
                         CommandParameter="{x:Type v:PatientsFileSettingsView}" />
@@ -74,8 +74,7 @@
                     <SkewTransform x:Name="AnimatedSkewTransform" />
                 </DockPanel.RenderTransform>
 
-                <TextBlock DockPanel.Dock="Top"
-                           Margin="5,10,5,20"
+                <TextBlock DockPanel.Dock="Top"                           
                            Style="{StaticResource TextBlockHeader}"
                            Text="{Binding MainRegionService.Header, NotifyOnTargetUpdated=True}">
 

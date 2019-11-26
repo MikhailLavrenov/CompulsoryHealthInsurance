@@ -1,8 +1,8 @@
-﻿using CHI.Services.AttachedPatients;
+﻿using CHI.Application.Infrastructure;
+using CHI.Application.Models;
+using CHI.Services.AttachedPatients;
 using CHI.Services.Common;
 using CHI.Services.SRZ;
-using CHI.Application.Infrastructure;
-using CHI.Application.Models;
 using Prism.Commands;
 using Prism.Regions;
 using System;
@@ -20,6 +20,7 @@ namespace CHI.Application.ViewModels
         #region Поля
         private Settings settings;
         private DateTime fileDate;
+
         private readonly IFileDialogService fileDialogService;
         #endregion
 
@@ -30,6 +31,7 @@ namespace CHI.Application.ViewModels
         public DateTime FileDate { get => fileDate; set => SetProperty(ref fileDate, value); }
         public DelegateCommandAsync ProcessFileCommand { get; }
         public DelegateCommand ShowFileDialogCommand { get; }
+
         #endregion
 
         #region Конструкторы
@@ -39,7 +41,7 @@ namespace CHI.Application.ViewModels
             MainRegionService = mainRegionService;
 
             Settings = Settings.Instance;
-            MainRegionService.Header = "Получить полные ФИО пациентов";
+            MainRegionService.Header = "Файл выгрузки прикрепленных пациентов";
             FileDate = DateTime.Today;
 
             ProcessFileCommand = new DelegateCommandAsync(ProcessFileExecute, ProcessFileCanExecute);
@@ -74,9 +76,9 @@ namespace CHI.Application.ViewModels
 
                 SRZService service;
                 if (Settings.UseProxy)
-                    service = new SRZService(Settings.SiteAddress, Settings.ProxyAddress, Settings.ProxyPort);
+                    service = new SRZService(Settings.SRZAddress, Settings.ProxyAddress, Settings.ProxyPort);
                 else
-                    service = new SRZService(Settings.SiteAddress);
+                    service = new SRZService(Settings.SRZAddress);
 
                 var credential = Settings.Credentials.First(x => x.RequestsLimit > 0);
                 service.TryAuthorize(credential);
@@ -175,15 +177,15 @@ namespace CHI.Application.ViewModels
 
                         while (true)
                         {
-                            if (!circularRestrictedList.TryGetNext(out  credential))
+                            if (!circularRestrictedList.TryGetNext(out credential))
                                 return null;
 
                             if (circularRestrictedList.TryReserve(credential))
                             {
                                 if (Settings.UseProxy)
-                                    service = new SRZService(Settings.SiteAddress, Settings.ProxyAddress, Settings.ProxyPort);
+                                    service = new SRZService(Settings.SRZAddress, Settings.ProxyAddress, Settings.ProxyPort);
                                 else
-                                    service = new SRZService(Settings.SiteAddress);
+                                    service = new SRZService(Settings.SRZAddress);
 
                                 if (service.TryAuthorize(credential))
                                     break;

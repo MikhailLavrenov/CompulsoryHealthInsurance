@@ -152,19 +152,15 @@
     <Compile Include="Models\Settings.cs" />
     <Compile Include="ViewModels\AboutApplicationViewModel.cs" />
     <Compile Include="ViewModels\NotificationDialogViewModel.cs" />
-    <Compile Include="ViewModels\ImportPatientsViewModel.cs" />
     <Compile Include="ViewModels\ShellViewModel.cs" />
     <Compile Include="ViewModels\PatientsFileSettingsViewModel.cs" />
     <Compile Include="ViewModels\PatientsFileViewModel.cs" />
-    <Compile Include="ViewModels\SRZSettingsViewModel.cs" />
+    <Compile Include="ViewModels\ServicesSettingsViewModel.cs" />
     <Compile Include="Views\AboutApplicationView.xaml.cs">
       <DependentUpon>AboutApplicationView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\NotificationDialogView.xaml.cs">
       <DependentUpon>NotificationDialogView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\ImportPatientsView.xaml.cs">
-      <DependentUpon>ImportPatientsView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\PatientsFileSettingsView.xaml.cs">
       <DependentUpon>PatientsFileSettingsView.xaml</DependentUpon>
@@ -172,18 +168,14 @@
     <Compile Include="Views\ProgressBarView.xaml.cs">
       <DependentUpon>ProgressBarView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\SRZSettingsView.xaml.cs">
-      <DependentUpon>SRZSettingsView.xaml</DependentUpon>
+    <Compile Include="Views\ServicesSettingsView.xaml.cs">
+      <DependentUpon>ServicesSettingsView.xaml</DependentUpon>
     </Compile>
     <Page Include="Views\AboutApplicationView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\NotificationDialogView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\ImportPatientsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -218,7 +210,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\SRZSettingsView.xaml">
+    <Page Include="Views\ServicesSettingsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

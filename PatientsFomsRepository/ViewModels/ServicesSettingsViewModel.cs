@@ -7,7 +7,7 @@ using System.Text;
 
 namespace CHI.Application.ViewModels
 {
-    public class SRZSettingsViewModel : DomainObject, IRegionMemberLifetime
+    public class ServicesSettingsViewModel : DomainObject, IRegionMemberLifetime
     {
         #region Поля
         private Settings settings;
@@ -29,12 +29,12 @@ namespace CHI.Application.ViewModels
         #endregion
 
         #region Конструкторы
-        public SRZSettingsViewModel(IMainRegionService mainRegionService)
+        public ServicesSettingsViewModel(IMainRegionService mainRegionService)
         {
             MainRegionService = mainRegionService;
             Settings = Settings.Instance;
 
-            MainRegionService.Header = "Настройки подключения к СРЗ ХК ФОМС";
+            MainRegionService.Header = "Настройки подключения к сервисам ФОМС";
             ShowTextPassword = false;
             ShowProtectedPassword = !ShowTextPassword;
 
@@ -59,7 +59,7 @@ namespace CHI.Application.ViewModels
         }
         private void SetDefaultExecute()
         {
-            Settings.SetDefaultSRZ();
+            Settings.SetDefaultFomsServices();
             MainRegionService.SetCompleteStatus("Настройки установлены по умолчанию.");
         }
         private void TestExecute()
@@ -71,7 +71,7 @@ namespace CHI.Application.ViewModels
                 MainRegionService.SetCompleteStatus("Настройки корректны.");
             else if (Settings.ContainsErrorMessage(nameof(Settings.ProxyAddress),ErrorMessages.Connection))
                 MainRegionService.SetCompleteStatus("Прокси сервер не доступен.");
-            else if (Settings.ContainsErrorMessage(nameof(Settings.SiteAddress), ErrorMessages.Connection))
+            else if (Settings.ContainsErrorMessage(nameof(Settings.SRZAddress), ErrorMessages.Connection))
                 MainRegionService.SetCompleteStatus("Web-сайт СРЗ не доступен.");
             else
                 MainRegionService.SetCompleteStatus($"Не удалось авторизоваться под некоторыми учетными записями.");

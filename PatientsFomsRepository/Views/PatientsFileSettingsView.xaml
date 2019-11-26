@@ -7,12 +7,11 @@
              xmlns:i="clr-namespace:CHI.Application.Infrastructure"
              xmlns:vm="clr-namespace:CHI.Application.ViewModels"
              xmlns:prism="http://prismlibrary.com/"
-             
              mc:Ignorable="d"
              d:DesignHeight="600"
              d:DesignWidth="800"
              prism:ViewModelLocator.AutoWireViewModel="True">
-    
+
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -30,7 +29,8 @@
         </Grid.ColumnDefinitions>
 
         <Grid.RowDefinitions>
-            
+
+            <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
@@ -50,8 +50,7 @@
                 </RowDefinition.Style>
             </RowDefinition>
             <RowDefinition Height="auto" />
-            <RowDefinition Height="auto" />
-
+            
         </Grid.RowDefinitions>
 
         <TextBlock Grid.Row="0"
@@ -85,15 +84,32 @@
                    Name="CheckBoxFormat"
                    IsChecked="{Binding Path=Settings.FormatPatientsFile}" />
 
-        <DockPanel Grid.Row="3"
+
+        <TextBlock Grid.Row="3"
+                   Grid.Column="0"
+                   Text="Локальная БД пациентов" />
+        <StackPanel VerticalAlignment="Top"
+                    Grid.Row="3"
+                    Grid.Column="1"
+                    Grid.ColumnSpan="2"
+                    Orientation="Horizontal">
+            <Button Content="Импорт"
+                    Command="{Binding ImportPatientsCommand}" />
+            <Button Content="Скачать пример"
+                    Command="{Binding SaveExampleCommand}" />
+            <Button Content="Очистить"
+                    Command="{Binding ClearDatabaseCommand}" />
+        </StackPanel>
+
+        <DockPanel Grid.Row="4"
                    Grid.Column="0"
                    Grid.ColumnSpan="2">
-            
+
             <StackPanel  DockPanel.Dock="Right"
                          Margin="4"
                          Visibility="{Binding Path=IsChecked, ElementName=CheckBoxFormat, Converter={i:BoolToVisibleConverter}}"
                          VerticalAlignment="Center">
-                
+
                 <Button Style="{StaticResource PictureButton}"
                         Width="20"
                         Height="25"
@@ -101,7 +117,7 @@
                         CommandParameter="{Binding SelectedItem, ElementName=DataGrid1}">
                     <ContentControl Content="{Binding Source={StaticResource ArrowUp}}" />
                 </Button>
-                
+
                 <Button Style="{StaticResource PictureButton}"
                         Width="20"
                         Height="25"
@@ -109,16 +125,16 @@
                         CommandParameter="{Binding SelectedItem, ElementName=DataGrid1}">
                     <ContentControl Content="{Binding Source={StaticResource ArrowDown}}" />
                 </Button>
-                
+
             </StackPanel>
-            
+
             <i:CustomDataGrid x:Name="DataGrid1"
                               MinHeight="200"
                               Visibility="{Binding Path=IsChecked, ElementName=CheckBoxFormat, Converter={i:BoolToVisibleConverter}}"
                               ItemsSource="{Binding Settings.ColumnProperties}">
-                
+
                 <DataGrid.Columns>
-                    
+
                     <DataGridTextColumn     Header="Название столбца"
                                             Binding="{Binding Path=Name, ValidatesOnDataErrors=True}"
                                             MinWidth="160" />
@@ -132,28 +148,27 @@
                                             Binding="{Binding Path=Delete}"
                                             MinWidth="65"
                                             Width="*" />
-                    
+
                 </DataGrid.Columns>
-                
+
             </i:CustomDataGrid>
 
         </DockPanel>
 
 
 
-        <StackPanel Grid.Row="4"
+        <StackPanel Grid.Row="5"
                     Grid.Column="0"
                     Grid.ColumnSpan="2"
                     Orientation="Horizontal"
                     VerticalAlignment="Top">
-            
+
             <Button Content="Сохранить"
                     Command="{Binding SaveCommand}" />
             <Button Content="Отмена"
                     Command="{Binding LoadCommand}" />
             <Button Content="По умолчанию"
                     Command="{Binding SetDefaultCommand}" />
-
         </StackPanel>
     </Grid>
 </UserControl>

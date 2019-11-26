@@ -34,8 +34,7 @@ namespace CHI.Application
             containerRegistry.RegisterDialog<NotificationDialogView, NotificationDialogViewModel>();
 
             containerRegistry.RegisterForNavigation<PatientsFileView>();
-            containerRegistry.RegisterForNavigation<ImportPatientsView>();
-            containerRegistry.RegisterForNavigation<SRZSettingsView>();
+            containerRegistry.RegisterForNavigation<ServicesSettingsView>();
             containerRegistry.RegisterForNavigation<PatientsFileSettingsView>();
             containerRegistry.RegisterForNavigation<AboutApplicationView>();
             containerRegistry.RegisterForNavigation<ProgressBarView>();
