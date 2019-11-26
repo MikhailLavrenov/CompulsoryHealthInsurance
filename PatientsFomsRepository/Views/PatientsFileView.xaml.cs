@@ -3,7 +3,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace PatientsFomsRepository.Views
+namespace CHI.Application.Views
 {
     /// <summary>
     /// Логика взаимодействия для AttachedPatientsView.xaml

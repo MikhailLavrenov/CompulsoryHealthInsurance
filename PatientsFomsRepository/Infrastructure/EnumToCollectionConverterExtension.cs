@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Markup;
 
-namespace PatientsFomsRepository.Infrastructure
+namespace CHI.Application.Infrastructure
 {
     //Расширение разметки xaml, конвертирует значение enum в Description
     [ValueConversion(typeof(Enum), typeof(IEnumerable<KeyValuePair<Enum, string>>))]

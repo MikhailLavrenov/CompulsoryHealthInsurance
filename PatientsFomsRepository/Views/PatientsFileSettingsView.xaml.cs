@@ -1,10 +1,10 @@
 ﻿using Microsoft.Win32;
-using PatientsFomsRepository.ViewModels;
+using CHI.Application.ViewModels;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace PatientsFomsRepository.Views
+namespace CHI.Application.Views
 {
     /// <summary>
     /// Логика взаимодействия для AdditionalSettingsView.xaml

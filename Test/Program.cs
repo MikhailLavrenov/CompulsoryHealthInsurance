@@ -1,6 +1,6 @@
-﻿using CHI.Services;
-using CHI.Services.BillsRegister;
+﻿using CHI.Services.BillsRegister;
 using CHI.Services.MedicalExaminations;
+using CHI.Application.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,8 +37,9 @@ namespace CHI.Test
             var url = "http://11.0.0.205/";
             var proxyServer = "10.10.45.40";
             var proxyPort = 3128;
-            var login = "UshanovaTA";
-            var password = "UshanovaTA1";
+            var credential = new Credential();
+            credential.Login = "UshanovaTA";
+            credential.Password = "UshanovaTA1";
 
             var web = new ExaminationService(url, proxyServer, proxyPort);
 
@@ -64,7 +65,7 @@ namespace CHI.Test
             };
             var patientExaminations = new PatientExaminations("2751530822000157", new List<Examination> { examination2Stage, examination1Stage });
 
-            web.Authorize(login, password);
+            web.Authorize(credential);
             web.AddPatientExaminations(patientExaminations);
 
         }
@@ -76,7 +77,10 @@ namespace CHI.Test
             { }
             public TestExaminationServiceApi(string URL, string proxyAddress, int proxyPort) : base(URL, proxyAddress, proxyPort)
             {
-                Authorize("UshanovaTA", "UshanovaTA1");
+                var credential = new Credential();
+                credential.Login = "UshanovaTA";
+                credential.Password = "UshanovaTA1";
+                Authorize(credential);
                 var webPlanPatientData = GetPatientDataFromPlan("2751530822000157", ExaminationKind.Dispanserizacia1, 2019);
                 DeletePatientFromPlan(webPlanPatientData.Id);
                 var srzPatientId = GetPatientIdFromSRZ("2751530822000157", 2019);

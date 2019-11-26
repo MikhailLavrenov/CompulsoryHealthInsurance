@@ -1,7 +1,8 @@
 ﻿using CHI.Services.AttachedPatients;
+using CHI.Services.Common;
 using CHI.Services.SRZ;
-using PatientsFomsRepository.Infrastructure;
-using PatientsFomsRepository.Models;
+using CHI.Application.Infrastructure;
+using CHI.Application.Models;
 using Prism.Commands;
 using Prism.Regions;
 using System;
@@ -12,7 +13,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace PatientsFomsRepository.ViewModels
+namespace CHI.Application.ViewModels
 {
     class PatientsFileViewModel : DomainObject, IRegionMemberLifetime
     {
@@ -149,7 +150,11 @@ namespace PatientsFomsRepository.ViewModels
             if (insuranceNumbers.Count < threadsLimit)
                 threadsLimit = insuranceNumbers.Count;
 
-            var robinRoundCredentials = new RoundRobinCredentials(Settings.Credentials);
+            var dictionary = new Dictionary<Credential, uint>();
+            foreach (var credential in Settings.Credentials)
+                dictionary.Add(credential, credential.RequestsLimit);
+
+            var circularRestrictedList = new CircularListWithCounter<Credential>(dictionary);
             var verifiedPatients = new ConcurrentBag<Patient>();
             var tasks = new Task<SRZService>[threadsLimit];
             for (int i = 0; i < threadsLimit; i++)
@@ -161,36 +166,37 @@ namespace PatientsFomsRepository.ViewModels
                 var index = Task.WaitAny(tasks);
                 tasks[index] = tasks[index].ContinueWith((task) =>
                 {
-                    var site = task.ConfigureAwait(false).GetAwaiter().GetResult();
-                    var credential = (Credential)site.Credential;
-                    if (site == null || !credential.TryReserveRequest())
+                    var service = task.ConfigureAwait(false).GetAwaiter().GetResult();
+                    var credential = (Credential)service?.Credential;
+
+                    if (credential == null || !circularRestrictedList.TryReserve(credential))
                     {
-                        site?.Logout();
+                        service?.Logout();
 
                         while (true)
                         {
-                            if (!robinRoundCredentials.TryGetNext(out  credential))
+                            if (!circularRestrictedList.TryGetNext(out  credential))
                                 return null;
 
-                            if (credential.TryReserveRequest())
+                            if (circularRestrictedList.TryReserve(credential))
                             {
                                 if (Settings.UseProxy)
-                                    site = new SRZService(Settings.SiteAddress, Settings.ProxyAddress, Settings.ProxyPort);
+                                    service = new SRZService(Settings.SiteAddress, Settings.ProxyAddress, Settings.ProxyPort);
                                 else
-                                    site = new SRZService(Settings.SiteAddress);
+                                    service = new SRZService(Settings.SiteAddress);
 
-                                if (site.TryAuthorize(credential))
+                                if (service.TryAuthorize(credential))
                                     break;
                             }
                         }
                     }
 
-                    var patient = site.GetPatient(insuranceNumber);
+                    var patient = service.GetPatient(insuranceNumber);
 
                     if (patient != null)
                         verifiedPatients.Add(patient);
 
-                    return site;
+                    return service;
                 });
             }
             Task.WaitAll(tasks);

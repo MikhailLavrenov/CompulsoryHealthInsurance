@@ -3,7 +3,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 
-namespace PatientsFomsRepository.Infrastructure
+namespace CHI.Application.Infrastructure
 {
     /// <summary>
     /// DataGrid с настроенным поведением при редактировании ячеек

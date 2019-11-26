@@ -1,8 +1,8 @@
-﻿using PatientsFomsRepository.Infrastructure;
+﻿using CHI.Application.Infrastructure;
 using Prism.Commands;
 using System;
 
-namespace PatientsFomsRepository.ViewModels
+namespace CHI.Application.ViewModels
 {
     public class ShellViewModel : DomainObject
     {

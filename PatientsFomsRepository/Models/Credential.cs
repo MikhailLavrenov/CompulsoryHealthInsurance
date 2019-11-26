@@ -1,20 +1,19 @@
 ﻿using CHI.Services;
-using PatientsFomsRepository.Infrastructure;
+using CHI.Application.Infrastructure;
 using System;
 using System.Security.Cryptography;
 using System.Text;
 using System.Xml.Serialization;
 
-namespace PatientsFomsRepository.Models
+namespace CHI.Application.Models
 {
-    public class Credential : DomainObject,ICredential
+    public class Credential : DomainObject, ICredential
     {
         #region Поля
         private readonly object locker = new object();
         private string login;
         private string password;
         private uint requestsLimit;
-        private uint requestsLeft;
         #endregion
 
         #region Свойства
@@ -23,15 +22,7 @@ namespace PatientsFomsRepository.Models
         public string ProtectedLogin { get => Encrypt(Login); set => Login = Decrypt(value); }
         [XmlIgnore] public string Password { get => password; set => SetProperty(ref password, value); }
         public string ProtectedPassword { get => Encrypt(Password); set => Password = Decrypt(value); }
-        public uint RequestsLimit
-        {
-            get => requestsLimit;
-            set
-            {
-                SetProperty(ref requestsLimit, value);
-                requestsLeft = value;
-            }
-        }
+        public uint RequestsLimit { get => requestsLimit; set => SetProperty(ref requestsLimit, value); }
         #endregion
 
         #region Конструкторы
@@ -43,22 +34,8 @@ namespace PatientsFomsRepository.Models
         {
             return MemberwiseClone() as Credential;
         }
-        //попытка зарезервировать разрешение на запрос к серверу
-        public bool TryReserveRequest()
-        {
-            lock (locker)
-            {
-                if (requestsLeft != 0)
-                {
-                    requestsLeft--;
-                    return true;
-                }
-                else
-                    return false;
-            }
-        }
         //валидация свойств
-        public override void Validate(string propertyName=null)
+        public override void Validate(string propertyName = null)
         {
             if (propertyName == nameof(Login) || propertyName == null)
                 ValidateIsNullOrEmptyString(nameof(Login), Login);

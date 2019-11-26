@@ -6,7 +6,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
-namespace PatientsFomsRepository.Infrastructure
+namespace CHI.Application.Infrastructure
 {
     /// <summary>
     /// Упрощает присваивание свойству значения с уведомлением об измении и валидацией значения.

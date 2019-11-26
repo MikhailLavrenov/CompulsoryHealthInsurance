@@ -4,7 +4,7 @@ using System.Windows;
 using System.Windows.Data;
 using System.Windows.Markup;
 
-namespace PatientsFomsRepository.Infrastructure
+namespace CHI.Application.Infrastructure
 {
     /// <summary>
     /// Расширение разметки xaml, конвертирует bool в Visibility

@@ -1,6 +1,6 @@
-﻿using PatientsFomsRepository.Infrastructure;
-using PatientsFomsRepository.ViewModels;
-using PatientsFomsRepository.Views;
+﻿using CHI.Application.Infrastructure;
+using CHI.Application.ViewModels;
+using CHI.Application.Views;
 using Prism.DryIoc;
 using Prism.Ioc;
 using Prism.Mvvm;
@@ -8,7 +8,7 @@ using Prism.Regions;
 using Prism.Services.Dialogs;
 using System.Windows;
 
-namespace PatientsFomsRepository
+namespace CHI.Application
 {
     /// <summary>
     /// Логика взаимодействия для App.xaml

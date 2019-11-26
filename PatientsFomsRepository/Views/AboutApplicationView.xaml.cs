@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace PatientsFomsRepository.Views
+namespace CHI.Application.Views
 {
     /// <summary>
     /// Логика взаимодействия для AboutApplicationView.xaml

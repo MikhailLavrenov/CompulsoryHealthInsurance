@@ -2,7 +2,7 @@
 using System.Windows.Controls;
 using System.Windows.Data;
 
-namespace PatientsFomsRepository.Infrastructure
+namespace CHI.Application.Infrastructure
 {
     //Присоединненное свойство для привязки пароля в PasswordBox
     public static class PasswordBoxHelper

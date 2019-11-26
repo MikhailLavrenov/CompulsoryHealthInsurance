@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
-namespace PatientsFomsRepository.Infrastructure
+namespace CHI.Application.Infrastructure
 {
     /// <summary>
     /// Реализация <see cref="ICommand"/> параметризованная местом заполнения типа T, <see cref="Execute(T)"/> выполняется асинхронно."/>.

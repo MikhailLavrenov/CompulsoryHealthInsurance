@@ -1,11 +1,11 @@
-﻿<UserControl x:Class="PatientsFomsRepository.Views.NotificationDialogView"
+﻿<UserControl x:Class="CHI.Application.Views.NotificationDialogView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:local="clr-namespace:PatientsFomsRepository.Views"
-             xmlns:i="clr-namespace:PatientsFomsRepository.Infrastructure"
-             xmlns:vm="clr-namespace:PatientsFomsRepository.ViewModels"
+             xmlns:local="clr-namespace:CHI.Application.Views"
+             xmlns:i="clr-namespace:CHI.Application.Infrastructure"
+             xmlns:vm="clr-namespace:CHI.Application.ViewModels"
              xmlns:prism="http://prismlibrary.com/"
                          
              mc:Ignorable="d"
@@ -26,8 +26,8 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="/PatientsFomsRepository;component/Views/Resources/DefaultStyle.xaml" />
-                <ResourceDictionary Source="/PatientsFomsRepository;component/Views/Resources/Icons.xaml" />
+                <ResourceDictionary Source="/CHI.Application;component/Views/Resources/DefaultStyle.xaml" />
+                <ResourceDictionary Source="/CHI.Application;component/Views/Resources/Icons.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>

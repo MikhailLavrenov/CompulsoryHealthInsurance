@@ -1,8 +1,8 @@
 ﻿using CHI.Services.AttachedPatients;
-using PatientsFomsRepository.Infrastructure;
+using CHI.Application.Infrastructure;
 using System;
 
-namespace PatientsFomsRepository.Models
+namespace CHI.Application.Models
 {
 
     /// <summary>

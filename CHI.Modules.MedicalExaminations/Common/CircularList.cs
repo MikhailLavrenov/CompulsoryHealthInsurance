@@ -4,14 +4,15 @@ namespace CHI.Services.Common
 {
     public class CircularList<T>
     {
-        private readonly object locker = new object();
-        protected IEnumerable<T> list;
+        private readonly object locker = new object();        
         private IEnumerator<T> enumerator;
+
+        public IEnumerable<T> Elements { get; private set; }
 
         public CircularList(IEnumerable<T> elements)
         {
-            list = elements;
-            enumerator = list.GetEnumerator();
+            Elements = elements;
+            enumerator = Elements.GetEnumerator();
         }
         public T GetNext()
         {

@@ -13,9 +13,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using PatientsFomsRepository.Models;
+using CHI.Application.Models;
 
-namespace PatientsFomsRepository.Views
+namespace CHI.Application.Views
 {
     /// <summary>
     /// Логика взаимодействия для MainWindow.xaml

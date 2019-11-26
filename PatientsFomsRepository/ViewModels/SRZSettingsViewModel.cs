@@ -1,11 +1,11 @@
-﻿using PatientsFomsRepository.Infrastructure;
-using PatientsFomsRepository.Models;
+﻿using CHI.Application.Infrastructure;
+using CHI.Application.Models;
 using Prism.Commands;
 using Prism.Regions;
 using System.Linq;
 using System.Text;
 
-namespace PatientsFomsRepository.ViewModels
+namespace CHI.Application.ViewModels
 {
     public class SRZSettingsViewModel : DomainObject, IRegionMemberLifetime
     {

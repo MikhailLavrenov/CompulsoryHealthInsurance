@@ -1,11 +1,11 @@
-﻿using PatientsFomsRepository.Infrastructure;
+﻿using CHI.Application.Infrastructure;
 using Prism.Commands;
 using Prism.Regions;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 
-namespace PatientsFomsRepository.ViewModels
+namespace CHI.Application.ViewModels
 {
     class AboutApplicationViewModel : DomainObject, IRegionMemberLifetime, INavigationAware
     {

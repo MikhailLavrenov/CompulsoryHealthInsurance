@@ -1,12 +1,12 @@
 ﻿using CHI.Services.AttachedPatients;
-using PatientsFomsRepository.Infrastructure;
+using CHI.Application.Infrastructure;
 using Prism.Regions;
 using Prism.Services.Dialogs;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 
-namespace PatientsFomsRepository.ViewModels
+namespace CHI.Application.ViewModels
 {
     class ImportPatientsViewModel : DomainObject, IRegionMemberLifetime
     {

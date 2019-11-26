@@ -1,5 +1,5 @@
 ﻿using CHI.Services.SRZ;
-using PatientsFomsRepository.Infrastructure;
+using CHI.Application.Infrastructure;
 using System;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -9,7 +9,7 @@ using System.Net.Sockets;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 
-namespace PatientsFomsRepository.Models
+namespace CHI.Application.Models
 {
     public class Settings : DomainObject
     {

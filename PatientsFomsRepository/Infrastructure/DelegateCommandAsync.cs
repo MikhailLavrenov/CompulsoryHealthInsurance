@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
-namespace PatientsFomsRepository.Infrastructure
+namespace CHI.Application.Infrastructure
 {
     /// <summary>
     /// Реализация <see cref="ICommand"/> без параметров,  <see cref="Execute()"/> выполняется асинхронно."/>.

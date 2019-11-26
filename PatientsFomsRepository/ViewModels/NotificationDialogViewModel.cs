@@ -1,9 +1,9 @@
-﻿using PatientsFomsRepository.Infrastructure;
+﻿using CHI.Application.Infrastructure;
 using Prism.Commands;
 using Prism.Services.Dialogs;
 using System;
 
-namespace PatientsFomsRepository.ViewModels
+namespace CHI.Application.ViewModels
 {
     class NotificationDialogViewModel : DomainObject, IDialogAware
     {

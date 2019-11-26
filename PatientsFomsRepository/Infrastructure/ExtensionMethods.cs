@@ -1,9 +1,9 @@
-﻿using PatientsFomsRepository.Views;
+﻿using CHI.Application.Views;
 using Prism.Services.Dialogs;
 using System;
 using System.Windows;
 
-namespace PatientsFomsRepository.Infrastructure
+namespace CHI.Application.Infrastructure
 {
     /// <summary>
     /// Содержит все расширяющие методы
@@ -20,7 +20,7 @@ namespace PatientsFomsRepository.Infrastructure
             var dialogParameters = new DialogParameters();
             dialogParameters.Add("title", title);
             dialogParameters.Add("message", message);
-            var dispatcher = Application.Current.Dispatcher;
+            var dispatcher = System.Windows.Application.Current.Dispatcher;
 
             var showDialog = (Action)(() => dialogService.ShowDialog(dialogName, dialogParameters, x => result = x));
 

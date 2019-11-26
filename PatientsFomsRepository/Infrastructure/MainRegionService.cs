@@ -1,8 +1,8 @@
-﻿using PatientsFomsRepository.Views;
+﻿using CHI.Application.Views;
 using Prism.Regions;
 using System.Windows;
 
-namespace PatientsFomsRepository.Infrastructure
+namespace CHI.Application.Infrastructure
 {
     /// <summary>
     /// Сервис MainRegion
@@ -41,7 +41,8 @@ namespace PatientsFomsRepository.Infrastructure
         }
         private void SwitchProgressBar()
         {
-            Application.Current.Dispatcher.Invoke(() =>
+
+            System.Windows.Application.Current.Dispatcher.Invoke(() =>
             {
                 if (IsBusy)
                     regionManager.RequestNavigate(RegionNames.ProgressBarRegion, nameof(ProgressBarView));

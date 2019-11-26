@@ -1,8 +1,8 @@
-﻿<prism:PrismApplication x:Class="PatientsFomsRepository.App"
+﻿<prism:PrismApplication x:Class="CHI.Application.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:prism="http://prismlibrary.com/"
-             xmlns:local="clr-namespace:PatientsFomsRepository">
+             xmlns:local="clr-namespace:CHI.Application">
 
     <!--<Application.Resources>
         <ResourceDictionary>

@@ -1,6 +1,6 @@
 ﻿using System.Windows.Controls;
 
-namespace PatientsFomsRepository.Views
+namespace CHI.Application.Views
 {
     /// <summary>
     /// Логика взаимодействия для SettingsView.xaml
