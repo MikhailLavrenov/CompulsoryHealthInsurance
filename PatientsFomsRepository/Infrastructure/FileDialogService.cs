@@ -10,7 +10,9 @@ namespace CHI.Application.Infrastructure
     {
         public FileDialogType DialogType { get; set; }
         public string Filter { get; set; }
-        public string FullPath { get; set; }
+        public bool MiltiSelect { get; set; }
+        public string[] FileNames { get; set; }
+        public string FileName { get; set; }
 
         /// <summary>
         /// Показать диалоговое окно модально
@@ -23,18 +25,21 @@ namespace CHI.Application.Infrastructure
             if (DialogType == FileDialogType.Save)
                 fileDialog = new SaveFileDialog();
             else if (DialogType == FileDialogType.Open)
-                fileDialog = new OpenFileDialog();
+                fileDialog = new OpenFileDialog() { Multiselect= MiltiSelect };
 
             fileDialog.Filter = Filter;
+            
 
-            if (!string.IsNullOrEmpty(FullPath))
+            if (!string.IsNullOrEmpty(FileName))
             {
-                fileDialog.InitialDirectory = Path.GetDirectoryName(FullPath);
-                fileDialog.FileName = Path.GetFileName(FullPath);
+                fileDialog.InitialDirectory = Path.GetDirectoryName(FileName);
+                fileDialog.FileName = Path.GetFileName(FileName);
             }
-           
+
             var result = fileDialog.ShowDialog();
-            FullPath = fileDialog.FileName;
+
+            FileName = fileDialog.FileName;
+            FileNames= fileDialog.FileNames;
 
             return result;
         }

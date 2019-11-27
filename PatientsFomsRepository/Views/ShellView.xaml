@@ -43,11 +43,11 @@
                         Command="{Binding ShowViewCommand}"
                         CommandParameter="{x:Type v:PatientsFileView}" />
 
-                <!--<Button Content="Загрузить в БД"
+                <Button Content="Загрузка осмотров"
                         Style="{StaticResource HeaderReferenceButton}"
                         Command="{Binding ShowViewCommand}"
-                        CommandParameter="{x:Type v:ImportPatientsView}" />-->
-
+                        CommandParameter="{x:Type v:ExaminationsView}" />
+                
                 <Button Content="Настройки сервисов"
                         Style="{StaticResource HeaderReferenceButton}"
                         Command="{Binding ShowViewCommand}"
@@ -57,6 +57,11 @@
                         Style="{StaticResource HeaderReferenceButton}"
                         Command="{Binding ShowViewCommand}"
                         CommandParameter="{x:Type v:PatientsFileSettingsView}" />
+
+                <Button Content="Настройки загрузки осмотров"
+                        Style="{StaticResource HeaderReferenceButton}"
+                        Command="{Binding ShowViewCommand}"
+                        CommandParameter="{x:Type v:ExaminationsSettingView}" />
 
                 <Button Content="О программе"
                         Style="{StaticResource HeaderReferenceButton}"

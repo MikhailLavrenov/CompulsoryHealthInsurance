@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CHI.Services.MedicalExaminations
 {
-    public class ExaminationServiceClient
+    public class ExaminationServiceParallel
     {
         public IEnumerable<ICredential> Credentials { get; private set; }
         public string URL { get; private set; }
@@ -15,11 +15,11 @@ namespace CHI.Services.MedicalExaminations
         public int ThreadsLimit { get; private set; }
         public bool UseProxy { get; private set; }
 
-        public ExaminationServiceClient(string url, int threadsLimit, IEnumerable<ICredential> credentials)
+        public ExaminationServiceParallel(string url, int threadsLimit, IEnumerable<ICredential> credentials)
             :this(url,null,0, threadsLimit, credentials)
         {
         }
-        public ExaminationServiceClient(string url, string proxyAddress, int proxyPort, int threadsLimit, IEnumerable<ICredential> credentials)
+        public ExaminationServiceParallel(string url, string proxyAddress, int proxyPort, int threadsLimit, IEnumerable<ICredential> credentials)
         {
             URL = url;
             ProxyAddress = proxyAddress;

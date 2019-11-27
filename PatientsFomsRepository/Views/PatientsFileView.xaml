@@ -60,7 +60,6 @@
                    Text="Путь к файлу: " />
         <DockPanel  Grid.Row="2"
                     Grid.Column="1">
-            <!--Файловый диалог в CodeBehind-->
             <Button  DockPanel.Dock="Right"
                      Style="{StaticResource PictureButton}"
                      Command="{Binding ShowFileDialogCommand}">

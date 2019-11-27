@@ -3,9 +3,6 @@ using CHI.Application.ViewModels;
 using CHI.Application.Views;
 using Prism.DryIoc;
 using Prism.Ioc;
-using Prism.Mvvm;
-using Prism.Regions;
-using Prism.Services.Dialogs;
 using System.Windows;
 
 namespace CHI.Application
@@ -29,13 +26,15 @@ namespace CHI.Application
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
-            containerRegistry.RegisterSingleton<IMainRegionService,MainRegionService>();
+            containerRegistry.RegisterSingleton<IMainRegionService, MainRegionService>();
             containerRegistry.Register<IFileDialogService, FileDialogService>();
             containerRegistry.RegisterDialog<NotificationDialogView, NotificationDialogViewModel>();
 
             containerRegistry.RegisterForNavigation<PatientsFileView>();
+            containerRegistry.RegisterForNavigation<ExaminationsView>();
             containerRegistry.RegisterForNavigation<ServicesSettingsView>();
             containerRegistry.RegisterForNavigation<PatientsFileSettingsView>();
+            containerRegistry.RegisterForNavigation<ExaminationsSettingView>();
             containerRegistry.RegisterForNavigation<AboutApplicationView>();
             containerRegistry.RegisterForNavigation<ProgressBarView>();
         }

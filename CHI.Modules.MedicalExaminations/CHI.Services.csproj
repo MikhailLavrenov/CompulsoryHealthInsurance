@@ -81,7 +81,7 @@
     <Compile Include="Common\ICredential.cs" />
     <Compile Include="AttachedPatients\Patient.cs" />
     <Compile Include="MedicalExaminations\Examination.cs" />
-    <Compile Include="MedicalExaminations\ExaminationServiceClient.cs" />
+    <Compile Include="MedicalExaminations\ExaminationServiceParallel.cs" />
     <Compile Include="MedicalExaminations\ExaminationStep.cs" />
     <Compile Include="MedicalExaminations\ExaminationStepKind.cs" />
     <Compile Include="MedicalExaminations\ExaminationKind.cs" />

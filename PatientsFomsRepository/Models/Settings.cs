@@ -31,6 +31,10 @@ namespace CHI.Application.Models
         private string patientsFilePath;
         private bool formatPatientsFile;
         private ObservableCollection<ColumnProperty> columnProperties;
+
+        //MedicalExaminations
+        private string examinationFileNames;
+        private string patientFileNames;
         #endregion
 
         #region Свойства       
@@ -78,6 +82,10 @@ namespace CHI.Application.Models
         public string PatientsFilePath { get => patientsFilePath; set => SetProperty(ref patientsFilePath, value); }
         public bool FormatPatientsFile { get => formatPatientsFile; set => SetProperty(ref formatPatientsFile, value); }
         public ObservableCollection<ColumnProperty> ColumnProperties { get => columnProperties; set => SetProperty(ref columnProperties, value); }
+
+        //MedicalExaminations
+        public string ExaminationFileNames { get => examinationFileNames; set => SetProperty(ref examinationFileNames, value); }
+        public string PatientFileNames { get => patientFileNames; set => SetProperty(ref patientFileNames, value); }
         #endregion
 
         #region Конструкторы
@@ -231,6 +239,12 @@ namespace CHI.Application.Models
                     new Credential{Login="МойЛогин2", Password="МойПароль2", RequestsLimit=300},
                     new Credential{Login="МойЛогин3", Password="МойПароль3", RequestsLimit=500}
              };
+        }
+        //Устанавливает значения по умолчанию для портала диспансеризации
+        public void SetDefaultMedicalExaminations()
+        {
+            PatientFileNames = @"LPM, LVM, LOM";
+            ExaminationFileNames = @"DPM, DVM, DOM";
         }
         //сдвигает вверх элемент коллекции ColumnProperties
         public void MoveUpColumnProperty(ColumnProperty item)

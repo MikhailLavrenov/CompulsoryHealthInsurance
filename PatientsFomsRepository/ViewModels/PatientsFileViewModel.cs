@@ -53,11 +53,11 @@ namespace CHI.Application.ViewModels
         private void ShowFileDialogExecute()
         {
             fileDialogService.DialogType = settings.DownloadNewPatientsFile ? FileDialogType.Save : FileDialogType.Open;
-            fileDialogService.FullPath = settings.PatientsFilePath;
+            fileDialogService.FileName = settings.PatientsFilePath;
             fileDialogService.Filter = "Excel files (*.xslx)|*.xlsx";
 
             if (fileDialogService.ShowDialog() == true)
-                settings.PatientsFilePath = fileDialogService.FullPath;
+                settings.PatientsFilePath = fileDialogService.FileName;
         }
         private void ProcessFileExecute()
         {

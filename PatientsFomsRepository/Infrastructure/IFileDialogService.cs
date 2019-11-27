@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CHI.Application.Infrastructure
+﻿namespace CHI.Application.Infrastructure
 {
     /// <summary>
     /// Интерфейс сервиса файлового диалога
@@ -13,7 +7,9 @@ namespace CHI.Application.Infrastructure
     {
         FileDialogType DialogType { get; set; }
         string Filter { get; set; }
-        string FullPath { get; set; }
+        bool MiltiSelect { get; set; }
+        string[] FileNames { get; set; }
+        string FileName { get; set; }
         bool? ShowDialog();
     }
 }

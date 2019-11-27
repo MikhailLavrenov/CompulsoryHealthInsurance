@@ -109,7 +109,7 @@
         <i:CustomDataGrid Grid.Row="7"
                           Grid.Column="0"
                           Grid.ColumnSpan="2"
-                          MinHeight="200"
+                          MinHeight="100"
                           ItemsSource="{Binding Settings.Credentials}">
 
             <DataGrid.Columns>

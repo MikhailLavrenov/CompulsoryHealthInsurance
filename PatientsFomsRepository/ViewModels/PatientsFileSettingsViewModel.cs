@@ -59,11 +59,11 @@ namespace CHI.Application.ViewModels
         private void ShowFileDialogExecute()
         {
             fileDialogService.DialogType = settings.DownloadNewPatientsFile ? FileDialogType.Save : FileDialogType.Open;
-            fileDialogService.FullPath = settings.PatientsFilePath;
+            fileDialogService.FileName = settings.PatientsFilePath;
             fileDialogService.Filter = "Excel files (*.xslx)|*.xlsx";
 
             if (fileDialogService.ShowDialog() == true)
-                settings.PatientsFilePath = fileDialogService.FullPath;
+                settings.PatientsFilePath = fileDialogService.FileName;
         }
         private void SaveExecute()
         {
@@ -88,7 +88,7 @@ namespace CHI.Application.ViewModels
             if (fileDialogService.ShowDialog() != true)
                 return;
 
-            var importFilePath = fileDialogService.FullPath;
+            var importFilePath = fileDialogService.FileName;
 
             MainRegionService.SetBusyStatus("Открытие файла.");
 
@@ -115,13 +115,13 @@ namespace CHI.Application.ViewModels
         private void SaveExampleExecute()
         {
             fileDialogService.DialogType = FileDialogType.Save;
-            fileDialogService.FullPath = "Пример для загрузки ФИО";
+            fileDialogService.FileName = "Пример для загрузки ФИО";
             fileDialogService.Filter = "Excel files (*.xslx)|*.xlsx";
 
             if (fileDialogService.ShowDialog() != true)
                 return;
 
-            var saveExampleFilePath = fileDialogService.FullPath;
+            var saveExampleFilePath = fileDialogService.FileName;
 
             MainRegionService.SetBusyStatus("Открытие файла.");
             PatientsFileService.SaveImportFileExample(saveExampleFilePath);
