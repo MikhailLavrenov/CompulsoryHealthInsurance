@@ -9,13 +9,13 @@ using System.Windows.Markup;
 
 namespace CHI.Application.Infrastructure
 {
-    //Расширение разметки xaml, конвертирует  enum в коллекцию всех значений Description
-    [ValueConversion(typeof(Enum), typeof(IEnumerable<KeyValuePair<Enum, string>>))]
-    public class EnumToCollectionConverterExtension : MarkupExtension,IValueConverter
+    //Расширение разметки xaml, конвертирует  значение enum в Description
+    [ValueConversion(typeof(Enum), typeof(KeyValuePair<Enum, string>))]
+    public class EnumToDescriptionConverterExtension : MarkupExtension, IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return EnumHelper.GetAllValuesAndDescriptions(value.GetType());
+            return EnumHelper.GetDescription((Enum)value);
         }
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {

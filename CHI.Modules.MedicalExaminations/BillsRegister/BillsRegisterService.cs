@@ -147,15 +147,12 @@ namespace CHI.Services.BillsRegister
 
                     var examination = new Examination();
 
-                    examination.Stage = examinationStage;
-                    examination.Year = examinationYear;
-
                     var foundPatient = patients.FirstOrDefault(x => x.Item1 == treatmentCase.PACIENT.ID_PAC);
 
                     if (foundPatient == default)
                         continue;
 
-                    examination.Kind = DispToExaminationType(examinationsRegister.SCHET.DISP, examinationYear - foundPatient.Item2);
+                    var examinationKind = DispToExaminationType(examinationsRegister.SCHET.DISP, examinationYear - foundPatient.Item2);
 
                     if (examinationStage == 1)
                         examination.BeginDate = treatmentCase.Z_SL.SL.USL.First(x => x.CODE_USL == "024101").DATE_IN;
@@ -169,12 +166,15 @@ namespace CHI.Services.BillsRegister
                     if (examination.HealthGroup == ExaminationHealthGroup.None)
                         continue;
 
-                    var patientExamination = result.FirstOrDefault(x => x.InsuranceNumber.Equals(insuranceNumber,comparer) && x.Year == examination.Year && x.ExaminationKind == examination.Kind);
+                    var patientExamination = result.FirstOrDefault(x => x.InsuranceNumber.Equals(insuranceNumber, comparer) && x.Year == examinationYear && x.Kind == examinationKind);
 
-                    if (patientExamination != default)
-                        patientExamination.Examinations.Add(examination);
-                    else
-                        patientExamination = new PatientExaminations(insuranceNumber,  examination);
+                    if (patientExamination == default)
+                        patientExamination = new PatientExaminations(insuranceNumber, examinationYear, examinationKind);
+
+                    if (examinationStage == 1)
+                        patientExamination.Stage1 = examination;
+                    else if (examinationStage == 2)
+                        patientExamination.Stage2 = examination;
 
                     result.Add(patientExamination);
                 }

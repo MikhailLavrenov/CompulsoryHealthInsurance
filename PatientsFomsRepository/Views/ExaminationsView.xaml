@@ -1,8 +1,8 @@
 ﻿<UserControl x:Class="CHI.Application.Views.ExaminationsView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:CHI.Application.Views"
              xmlns:i="clr-namespace:CHI.Application.Infrastructure"
              xmlns:vm="clr-namespace:CHI.Application.ViewModels"
@@ -22,7 +22,7 @@
     </UserControl.Resources>
 
     <Grid d:DataContext="{d:DesignInstance vm:ExaminationsViewModel }">
-        
+
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="130" />
             <ColumnDefinition Width="350" />
@@ -32,26 +32,80 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
-            <RowDefinition Height="auto" />
-            <RowDefinition Height="auto" />
-            <RowDefinition Height="auto" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
 
-
-
-        <Button Grid.Row="1"
+        <Button Grid.Row="0"
                 Grid.Column="0"
-                Grid.ColumnSpan="2"
                 Content="Загрузить"
                 Command="{Binding ExportExaminationsCommand}" />
 
+        <TextBlock Grid.Row="1"
+                   Grid.Column="0"
+                   Text="Ошибки загрузки"
+                   Visibility="{Binding Path=ShowErrors,  Converter={i:BoolToVisibleConverter}}" />
+        
+        <ListView Grid.Row="2"
+                  Grid.Column="0"
+                  Grid.ColumnSpan="2"
+                  HorizontalAlignment="Stretch"
+                  VerticalAlignment="Stretch"
+                  MinHeight="200"
+                  ItemsSource="{Binding Errors}"
+                  Visibility="{Binding Path=ShowErrors,  Converter={i:BoolToVisibleConverter}}">
 
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Полис"
+                                    DisplayMemberBinding="{Binding InsuranceNumber}"
+                                    Width="130" />
 
+                    <GridViewColumn Header="Вид осмотра"
+                                    DisplayMemberBinding="{Binding Kind, Converter={i:EnumToDescriptionConverter}}"
+                                    Width="190" />
 
+                    <GridViewColumn Header="Год"
+                                    DisplayMemberBinding="{Binding Year}"
+                                    Width="50" />
 
+                    <GridViewColumn Header="1эт Начало"
+                                    DisplayMemberBinding="{Binding Stage1.BeginDate, StringFormat='dd.MM.yyyy'}"
+                                    Width="90" />
 
+                    <GridViewColumn Header="1эт Конец"
+                                    DisplayMemberBinding="{Binding Stage1.EndDate, StringFormat='dd.MM.yyyy'}"
+                                    Width="90" />
+
+                    <GridViewColumn Header="1эт Гр.здоровья"
+                                    DisplayMemberBinding="{Binding Stage1.HealthGroup, Converter={i:EnumToDescriptionConverter}}"
+                                    Width="100" />
+
+                    <GridViewColumn Header="1эт Направлен"
+                                    DisplayMemberBinding="{Binding Stage1.Referral, Converter={i:EnumToDescriptionConverter}}"
+                                    Width="200" />
+
+                    <GridViewColumn Header="2эт Начало"
+                                    DisplayMemberBinding="{Binding Stage2.BeginDate, StringFormat='dd.MM.yyyy'}"
+                                    Width="90" />
+
+                    <GridViewColumn Header="2эт Конец"
+                                    DisplayMemberBinding="{Binding Stage2.EndDate, StringFormat='dd.MM.yyyy'}"
+                                    Width="90" />
+
+                    <GridViewColumn Header="2эт Гр.здоровья"
+                                    DisplayMemberBinding="{Binding Stage2.HealthGroup, Converter={i:EnumToDescriptionConverter}}"
+                                    Width="100" />
+
+                    <GridViewColumn Header="2эт Направлен"
+                                    DisplayMemberBinding="{Binding Stage2.Referral, Converter={i:EnumToDescriptionConverter}}"
+                                    Width="200" />
+
+                </GridView>
+            </ListView.View>
+
+        </ListView>
 
     </Grid>
-    
+
 </UserControl>

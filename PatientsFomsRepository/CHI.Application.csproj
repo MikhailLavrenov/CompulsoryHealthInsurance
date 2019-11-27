@@ -131,6 +131,7 @@
     </ApplicationDefinition>
     <Compile Include="Infrastructure\CustomDataGrid.cs" />
     <Compile Include="Infrastructure\BoolToVisibleConverterExtension.cs" />
+    <Compile Include="Infrastructure\EnumToDescriptionConverterExtension.cs" />
     <Compile Include="Infrastructure\FileDialogType.cs" />
     <Compile Include="Infrastructure\EnumHelper.cs" />
     <Compile Include="Infrastructure\EnumToCollectionConverterExtension.cs" />

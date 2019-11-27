@@ -1,26 +1,35 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-
-namespace CHI.Services.MedicalExaminations
+﻿namespace CHI.Services.MedicalExaminations
 {
     public class PatientExaminations
     {
-        public string InsuranceNumber { get; }
-        public List<Examination> Examinations { get; }
-        public int Year { get; }
-        public ExaminationKind ExaminationKind { get; }
+        private Examination stage1;
+        private Examination stage2;
 
-        public PatientExaminations(string insuranceNumber, List<Examination> examinations)
+        public string InsuranceNumber { get; set; }
+        public Examination Stage1 { get => stage1; set => stage1 = value; }
+        public Examination Stage2 { get => stage2; set => stage2 = value; }
+        public int Year { get; private set; }
+        public ExaminationKind Kind { get; private set; }
+
+        public PatientExaminations(string insuranceNumber, int year, ExaminationKind examinationKind)
         {
             InsuranceNumber = insuranceNumber;
-            Examinations = examinations;
+            Year = year;
+            Kind = examinationKind;
 
-            Year = Examinations.First().Year;
-            ExaminationKind = Examinations.First().Kind;
         }
-        public PatientExaminations(string insuranceNumber, Examination examination)
-            : this(insuranceNumber, new List<Examination> { examination })
-        {
-        }
+
+        //public PatientExaminations(string insuranceNumber, List<Examination> examinations)
+        //{
+        //    InsuranceNumber = insuranceNumber;
+        //    Examinations = examinations;
+
+        //    Year = Examinations.First().Year;
+        //    ExaminationKind = Examinations.First().Kind;
+        //}
+        //public PatientExaminations(string insuranceNumber, Examination examination)
+        //    : this(insuranceNumber, new List<Examination> { examination })
+        //{
+        //}
     }
 }

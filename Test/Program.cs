@@ -1,8 +1,7 @@
-﻿using CHI.Services.BillsRegister;
+﻿using CHI.Application.Models;
+using CHI.Services.BillsRegister;
 using CHI.Services.MedicalExaminations;
-using CHI.Application.Models;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace CHI.Test
@@ -23,7 +22,6 @@ namespace CHI.Test
             var patientsNames = new string[] { @"LPM", @"LVM", @"LOM" };
 
             var patientsExaminations = register.GetPatientsExaminations(examinationNames, patientsNames);
-            var t = patientsExaminations.Where(x => x.Examinations.Count > 1).ToList();
         }
         static void TestWebSiteApiMethod()
         {
@@ -45,9 +43,6 @@ namespace CHI.Test
 
             var examination1Stage = new Examination
             {
-                Kind = ExaminationKind.Dispanserizacia1,
-                Stage = 1,
-                Year = 2019,
                 BeginDate = new DateTime(2019, 10, 10),
                 EndDate = new DateTime(2019, 10, 15),
                 HealthGroup = ExaminationHealthGroup.ThirdA,
@@ -55,19 +50,19 @@ namespace CHI.Test
             };
             var examination2Stage = new Examination
             {
-                Kind = ExaminationKind.Dispanserizacia1,
-                Stage = 2,
-                Year = 2019,
                 BeginDate = new DateTime(2019, 10, 20),
                 EndDate = new DateTime(2019, 10, 25),
                 HealthGroup = ExaminationHealthGroup.ThirdB,
                 Referral = ExaminationReferral.AnotherClinic
             };
-            var patientExaminations = new PatientExaminations("2751530822000157", new List<Examination> { examination2Stage, examination1Stage });
+            var patientExaminations = new PatientExaminations("2751530822000157", 2019, ExaminationKind.Dispanserizacia1)
+            {
+                Stage1 = examination1Stage,
+                Stage2 = examination2Stage
+            };
 
             web.Authorize(credential);
             web.AddPatientExaminations(patientExaminations);
-
         }
 
         class TestExaminationServiceApi : ExaminationServiceApi
