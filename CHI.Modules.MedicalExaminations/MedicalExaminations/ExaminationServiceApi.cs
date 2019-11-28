@@ -11,7 +11,7 @@ namespace CHI.Services.MedicalExaminations
     public class ExaminationServiceApi : WebServiceBase
     {
         #region Поля        
-        
+
         #endregion
 
         #region Конструкторы
@@ -106,7 +106,7 @@ namespace CHI.Services.MedicalExaminations
 
             if (response.IsError)
                 throw new WebServerOperationException();
-        }        
+        }
         protected int GetPatientIdFromSRZ(string insuranceNumber, int year)
         {
             CheckAuthorization();
@@ -141,7 +141,7 @@ namespace CHI.Services.MedicalExaminations
 
             var availableStagesResponse = new JavaScriptSerializer().Deserialize<AvailableStagesResponse>(responseText);
 
-            return availableStagesResponse?.AvailableStages?? new List<AvailableStage>();
+            return availableStagesResponse?.AvailableStages ?? new List<AvailableStage>();
         }
         protected void AddStep(int patientId, ExaminationStepKind step, DateTime date, ExaminationHealthGroup healthGroup, ExaminationReferral referralTo)
         {
@@ -151,8 +151,8 @@ namespace CHI.Services.MedicalExaminations
             {
                 { "stageId", ((int)step).ToString() },
                 { "stageDate", date.ToString("dd.MM.yyyy", CultureInfo.InvariantCulture) },
-                { "resultId", ((int)healthGroup).ToString()  },
-                { "destId", referralTo==ExaminationReferral.None? string.Empty:((int)referralTo).ToString() },
+                { "resultId", healthGroup==0? null:((int)healthGroup).ToString()  },
+                { "destId", referralTo==0? null:((int)referralTo).ToString() },
                 { "dispId", patientId.ToString() },
             };
 
@@ -162,7 +162,7 @@ namespace CHI.Services.MedicalExaminations
 
             if (response.IsError)
                 throw new WebServerOperationException();
-        }        
+        }
         protected ExaminationStepKind DeleteLastStep(int patientId)
         {
             CheckAuthorization();
@@ -179,7 +179,7 @@ namespace CHI.Services.MedicalExaminations
                 throw new WebServerOperationException();
 
             return response.Data?.FirstOrDefault()?.DispStage?.DispStageId ?? 0;
-        }        
+        }
         protected static int ConvertToYearId(int year)
         {
             return (year - 2017);

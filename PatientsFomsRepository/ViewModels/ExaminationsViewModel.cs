@@ -66,11 +66,6 @@ namespace CHI.Application.ViewModels
            // };
            // Errors = new List<PatientExaminations> { pe, pe, pe, pe, pe, pe, pe, pe, pe, pe, pe, pe, pe, pe, pe, pe, pe, pe, pe, pe, pe, pe };
         }
-
-        public ExaminationsViewModel(bool showErrors)
-        {
-            this.showErrors = showErrors;
-        }
         #endregion
 
         #region Методы
@@ -95,7 +90,7 @@ namespace CHI.Application.ViewModels
 
             MainRegionService.SetBusyStatus("Экспорт осмотров на портал диспансеризации.");
 
-            var examinationService = new ExaminationServiceParallel(Settings.MedicalExaminationsAddress, Settings.ProxyAddress, Settings.ProxyPort, Settings.ThreadsLimit, Settings.Credentials);
+            var examinationService = new ExaminationServiceParallel(Settings.MedicalExaminationsAddress, Settings.UseProxy, Settings.ProxyAddress, Settings.ProxyPort, Settings.ThreadsLimit, Settings.Credentials);
             var Errors = examinationService.AddPatientsExaminations(patientsExaminations);
             ShowErrors = true;
 

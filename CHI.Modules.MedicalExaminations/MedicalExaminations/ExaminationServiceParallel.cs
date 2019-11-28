@@ -16,12 +16,13 @@ namespace CHI.Services.MedicalExaminations
         public bool UseProxy { get; private set; }
 
         public ExaminationServiceParallel(string url, int threadsLimit, IEnumerable<ICredential> credentials)
-            :this(url,null,0, threadsLimit, credentials)
+            : this(url, false, null, 0, threadsLimit, credentials)
         {
         }
-        public ExaminationServiceParallel(string url, string proxyAddress, int proxyPort, int threadsLimit, IEnumerable<ICredential> credentials)
+        public ExaminationServiceParallel(string url, bool useProxy, string proxyAddress, int proxyPort, int threadsLimit, IEnumerable<ICredential> credentials)
         {
             URL = url;
+            UseProxy = useProxy;
             ProxyAddress = proxyAddress;
             ProxyPort = proxyPort;
             ThreadsLimit = threadsLimit;
@@ -59,7 +60,7 @@ namespace CHI.Services.MedicalExaminations
                         service.Authorize(circularList.GetNext());
                     }
 
-                    if(!service.TryAddPatientExaminations(patientExaminations))
+                    if (!service.TryAddPatientExaminations(patientExaminations))
                         errors.Add(patientExaminations);
 
                     return service;
