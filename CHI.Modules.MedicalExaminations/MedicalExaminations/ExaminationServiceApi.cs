@@ -175,10 +175,10 @@ namespace CHI.Services.MedicalExaminations
 
             var response = new JavaScriptSerializer().Deserialize<DeleteLastStepResponse>(responseText);
 
-            if (response.IsError)
+            if (response == null || response.IsError)
                 throw new WebServerOperationException();
 
-            return response.Data?.FirstOrDefault()?.DispStage?.DispStageId ?? 0;
+            return response.Data?.LastOrDefault()?.DispStage?.DispStageId ?? 0;
         }
         protected static int ConvertToYearId(int year)
         {
@@ -228,18 +228,18 @@ namespace CHI.Services.MedicalExaminations
             public object PreviousStageId { get; set; }
         }
 
-        public class DeletedStep
+        public class Step
         {
             public ExaminationStepKind DispStageId { get; set; }
         }
-        public class DeletedData
+        public class StepData
         {
-            public DeletedStep DispStage { get; set; }
+            public Step DispStage { get; set; }
         }
         public class DeleteLastStepResponse
         {
             public bool IsError { get; set; }
-            public List<DeletedData> Data { get; set; }
+            public List<StepData> Data { get; set; }
         }
         #endregion
     }

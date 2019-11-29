@@ -2,11 +2,8 @@
 using CHI.Application.Models;
 using CHI.Services.BillsRegister;
 using CHI.Services.MedicalExaminations;
-using Prism.Commands;
 using Prism.Regions;
-using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 
 namespace CHI.Application.ViewModels
@@ -43,56 +40,73 @@ namespace CHI.Application.ViewModels
             ExportExaminationsCommand = new DelegateCommandAsync(ExportExaminationsExecute);
 
 
-           // var examination1Stage = new Examination
-           // {
-           //     BeginDate = new DateTime(2019, 10, 10),
-           //     EndDate = new DateTime(2019, 10, 15),
-           //     HealthGroup = ExaminationHealthGroup.ThirdA,
-           //     Referral = ExaminationReferral.LocalClinic
-           // };
-           // var examination2Stage = new Examination
-           // {
-           //     BeginDate = new DateTime(2019, 10, 20),
-           //     EndDate = new DateTime(2019, 10, 25),
-           //     HealthGroup = ExaminationHealthGroup.ThirdB,
-           //     Referral = ExaminationReferral.AnotherClinic
-           // };
+            // var examination1Stage = new Examination
+            // {
+            //     BeginDate = new DateTime(2019, 10, 10),
+            //     EndDate = new DateTime(2019, 10, 15),
+            //     HealthGroup = ExaminationHealthGroup.ThirdA,
+            //     Referral = ExaminationReferral.LocalClinic
+            // };
+            // var examination2Stage = new Examination
+            // {
+            //     BeginDate = new DateTime(2019, 10, 20),
+            //     EndDate = new DateTime(2019, 10, 25),
+            //     HealthGroup = ExaminationHealthGroup.ThirdB,
+            //     Referral = ExaminationReferral.AnotherClinic
+            // };
 
-           // ShowErrors = true;
-           //var pe = new PatientExaminations("2751530822000157", 2019, ExaminationKind.Dispanserizacia1)
-           // {
-           //     Stage1 = examination1Stage,
-           //     Stage2 = examination2Stage
-           // };
-           // Errors = new List<PatientExaminations> { pe, pe, pe, pe, pe, pe, pe, pe, pe, pe, pe, pe, pe, pe, pe, pe, pe, pe, pe, pe, pe, pe };
+            // ShowErrors = true;
+            //var pe = new PatientExaminations("2751530822000157", 2019, ExaminationKind.Dispanserizacia1)
+            // {
+            //     Stage1 = examination1Stage,
+            //     Stage2 = examination2Stage
+            // };
+            // Errors = new List<PatientExaminations> { pe, pe, pe, pe, pe, pe, pe, pe, pe, pe, pe, pe, pe, pe, pe, pe, pe, pe, pe, pe, pe, pe };
         }
         #endregion
 
         #region Методы
         private void ExportExaminationsExecute()
         {
+            Errors?.Clear();
+            ShowErrors = false;
+
+            MainRegionService.SetBusyStatus("Выбор файлов.");
+
             fileDialogService.DialogType = FileDialogType.Open;
             fileDialogService.FileName = settings.PatientsFilePath;
             fileDialogService.MiltiSelect = true;
             fileDialogService.Filter = "Zip files (*.zip)|*.zip|Xml files (*.xml)|*.xml";
 
             if (fileDialogService.ShowDialog() != true)
+            {
+                MainRegionService.SetCompleteStatus("Отменено.");
                 return;
+            }
 
             var files = fileDialogService.FileNames;
 
-            MainRegionService.SetBusyStatus("Открытие файла.");
+            MainRegionService.SetBusyStatus("Чтение файлов.");
 
             var registers = new BillsRegisterService(files);
-            var patientsFileNames = Settings.PatientFileNames.Split(',');
-            var examinationFileNames= Settings.ExaminationFileNames.Split(',');
-            var patientsExaminations=registers.GetPatientsExaminations(examinationFileNames, patientsFileNames);
+            var patientsFileNames = Settings.PatientFileNames.Split(',');           
+            var examinationFileNames = Settings.ExaminationFileNames.Split(',');
 
-            MainRegionService.SetBusyStatus("Экспорт осмотров на портал диспансеризации.");
+            for (int i = 0; i < patientsFileNames.Length; i++)
+                patientsFileNames[i] = patientsFileNames[i].Trim();
+            for (int i = 0; i < examinationFileNames.Length; i++)
+                examinationFileNames[i] = examinationFileNames[i].Trim();
+
+            var patientsExaminations = registers.GetPatientsExaminations(examinationFileNames, patientsFileNames);
+
+            MainRegionService.SetBusyStatus($"Загрузка осмотров. Всего пациентов: {patientsExaminations.Count}.");
 
             var examinationService = new ExaminationServiceParallel(Settings.MedicalExaminationsAddress, Settings.UseProxy, Settings.ProxyAddress, Settings.ProxyPort, Settings.ThreadsLimit, Settings.Credentials);
-            var Errors = examinationService.AddPatientsExaminations(patientsExaminations);
-            ShowErrors = true;
+
+            Errors=examinationService.AddPatientsExaminations(patientsExaminations);
+
+            if (Errors?.Count > 0)
+                ShowErrors=true;
 
             MainRegionService.SetCompleteStatus("Успешно завершено.");
         }

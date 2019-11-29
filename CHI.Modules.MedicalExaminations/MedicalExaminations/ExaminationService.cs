@@ -111,7 +111,7 @@ namespace CHI.Services.MedicalExaminations
                     {
                         if (!userStep.Equals(userStep, webStep))
                         {
-                            if (webStep == null)
+                            if (webStep == null && realWebStep<step)
                                 realWebStep = AddStep(patientId, userStep);
                             else
                             {

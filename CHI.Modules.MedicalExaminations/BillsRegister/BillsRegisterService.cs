@@ -76,13 +76,13 @@ namespace CHI.Services.BillsRegister
                     using (var archive = ZipFile.OpenRead(path))
                     {
                         foreach (var entry in archive.Entries)
-                            result.AddRange(GetFilesRecursive(entry, fileNamesStartsWithFilter));
+                            result.AddRange(ArchiveEntryGetFilesRecursive(entry, fileNamesStartsWithFilter));
                     }
             }
 
             return result;
         }
-        private List<Stream> GetFilesRecursive(ZipArchiveEntry archiveEntry, IEnumerable<string> fileNamesStartsWithFilter)
+        private List<Stream> ArchiveEntryGetFilesRecursive(ZipArchiveEntry archiveEntry, IEnumerable<string> fileNamesStartsWithFilter)
         {
             var result = new List<Stream>();
 
@@ -91,8 +91,7 @@ namespace CHI.Services.BillsRegister
 
             var extension = Path.GetExtension(archiveEntry.Name);
 
-            if (extension.Equals(".xml", comparer)
-                && fileNamesStartsWithFilter.Any(x => archiveEntry.Name.StartsWith(x, comparer)))
+            if (extension.Equals(".xml", comparer) && fileNamesStartsWithFilter.Any(x => archiveEntry.Name.StartsWith(x, comparer)))
             {
                 var extractedEntry = new MemoryStream();
                 archiveEntry.Open().CopyTo(extractedEntry);
@@ -106,7 +105,7 @@ namespace CHI.Services.BillsRegister
                 using (var archive = new ZipArchive(extractedEntry))
                 {
                     foreach (var entry in archive.Entries)
-                        result.AddRange(GetFilesRecursive(entry, fileNamesStartsWithFilter));
+                        result.AddRange(ArchiveEntryGetFilesRecursive(entry, fileNamesStartsWithFilter));
                 }
             }
 
