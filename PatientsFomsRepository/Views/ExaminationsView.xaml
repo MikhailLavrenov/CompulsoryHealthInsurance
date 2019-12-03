@@ -52,53 +52,57 @@
                   HorizontalAlignment="Stretch"
                   VerticalAlignment="Stretch"
                   MinHeight="200"
-                  ItemsSource="{Binding Errors}"
+                  ItemsSource="{Binding Result}"
                   Visibility="{Binding Path=ShowErrors,  Converter={i:BoolToVisibleConverter}}">
 
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Полис"
-                                    DisplayMemberBinding="{Binding InsuranceNumber}"
+                                    DisplayMemberBinding="{Binding Key.InsuranceNumber}"
                                     Width="130" />
 
                     <GridViewColumn Header="Вид осмотра"
-                                    DisplayMemberBinding="{Binding Kind, Converter={i:EnumToDescriptionConverter}}"
+                                    DisplayMemberBinding="{Binding Key.Kind, Converter={i:EnumToDescriptionConverter}}"
                                     Width="190" />
 
                     <GridViewColumn Header="Год"
-                                    DisplayMemberBinding="{Binding Year}"
+                                    DisplayMemberBinding="{Binding Key.Year}"
                                     Width="50" />
 
                     <GridViewColumn Header="1эт Начало"
-                                    DisplayMemberBinding="{Binding Stage1.BeginDate, StringFormat='dd.MM.yyyy'}"
+                                    DisplayMemberBinding="{Binding Key.Stage1.BeginDate, StringFormat='dd.MM.yyyy'}"
                                     Width="90" />
 
                     <GridViewColumn Header="1эт Конец"
-                                    DisplayMemberBinding="{Binding Stage1.EndDate, StringFormat='dd.MM.yyyy'}"
+                                    DisplayMemberBinding="{Binding Key.Stage1.EndDate, StringFormat='dd.MM.yyyy'}"
                                     Width="90" />
 
                     <GridViewColumn Header="1эт Гр.здоровья"
-                                    DisplayMemberBinding="{Binding Stage1.HealthGroup, Converter={i:EnumToDescriptionConverter}}"
+                                    DisplayMemberBinding="{Binding Key.Stage1.HealthGroup, Converter={i:EnumToDescriptionConverter}}"
                                     Width="100" />
 
                     <GridViewColumn Header="1эт Направлен"
-                                    DisplayMemberBinding="{Binding Stage1.Referral, Converter={i:EnumToDescriptionConverter}}"
+                                    DisplayMemberBinding="{Binding Key.Stage1.Referral, Converter={i:EnumToDescriptionConverter}}"
                                     Width="200" />
 
                     <GridViewColumn Header="2эт Начало"
-                                    DisplayMemberBinding="{Binding Stage2.BeginDate, StringFormat='dd.MM.yyyy'}"
+                                    DisplayMemberBinding="{Binding Key.Stage2.BeginDate, StringFormat='dd.MM.yyyy'}"
                                     Width="90" />
 
                     <GridViewColumn Header="2эт Конец"
-                                    DisplayMemberBinding="{Binding Stage2.EndDate, StringFormat='dd.MM.yyyy'}"
+                                    DisplayMemberBinding="{Binding Key.Stage2.EndDate, StringFormat='dd.MM.yyyy'}"
                                     Width="90" />
 
                     <GridViewColumn Header="2эт Гр.здоровья"
-                                    DisplayMemberBinding="{Binding Stage2.HealthGroup, Converter={i:EnumToDescriptionConverter}}"
+                                    DisplayMemberBinding="{Binding Key.Stage2.HealthGroup, Converter={i:EnumToDescriptionConverter}}"
                                     Width="100" />
 
                     <GridViewColumn Header="2эт Направлен"
-                                    DisplayMemberBinding="{Binding Stage2.Referral, Converter={i:EnumToDescriptionConverter}}"
+                                    DisplayMemberBinding="{Binding Key.Stage2.Referral, Converter={i:EnumToDescriptionConverter}}"
+                                    Width="200" />
+
+                    <GridViewColumn Header="Статус"
+                                    DisplayMemberBinding="{Binding Value}"
                                     Width="200" />
 
                 </GridView>

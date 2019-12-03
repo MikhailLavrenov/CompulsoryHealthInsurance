@@ -11,7 +11,6 @@ namespace CHI.Services.MedicalExaminations
     public class ExaminationServiceApi : WebServiceBase
     {
         #region Поля        
-
         #endregion
 
         #region Конструкторы
@@ -89,7 +88,7 @@ namespace CHI.Services.MedicalExaminations
             var response = new JavaScriptSerializer().Deserialize<WebResponse>(responseText);
 
             if (response.IsError)
-                throw new WebServerOperationException();
+                throw new WebServiceOperationException();
         }
         protected void DeletePatientFromPlan(int patientId)
         {
@@ -105,7 +104,7 @@ namespace CHI.Services.MedicalExaminations
             var response = new JavaScriptSerializer().Deserialize<WebResponse>(responseText);
 
             if (response.IsError)
-                throw new WebServerOperationException();
+                throw new WebServiceOperationException();
         }
         protected int GetPatientIdFromSRZ(string insuranceNumber, int year)
         {
@@ -120,22 +119,20 @@ namespace CHI.Services.MedicalExaminations
 
             var responseText = SendRequest(HttpMethod.Post, @"disp/SrzSearch", contentParameters);
 
-            var startIndex = responseText.IndexOf("personId") + 1;
-            var idBegin = responseText.IndexOf('\"', startIndex) + 1;
-            var idLength = responseText.IndexOf('\"', idBegin) - idBegin;
-            var idString = responseText.Substring(idBegin, idLength);
+            var idString = SubstringBetween(responseText, "personId", "\"", "\"");
 
             if (int.TryParse(idString, out var srzPatientId))
                 return srzPatientId;
             else
                 throw new InvalidOperationException(ParseResponseErrorMessage);
         }
-        protected int GetPatientIdFromSRZ(string surname, string name, string patronymic, DateTime birthdate, int year)
+        protected string GetInsuranceNumberFromSRZ(string surname, string name, string patronymic, DateTime birthdate, int year)
         {
             CheckAuthorization();
 
             var contentParameters = new Dictionary<string, string>
             {
+                {"SearchData.DispYearId", ConvertToYearId(year).ToString() },
                 {"SearchData.Surname", surname },
                 {"SearchData.Firstname", name },
                 {"SearchData.Secname", patronymic },
@@ -145,15 +142,7 @@ namespace CHI.Services.MedicalExaminations
 
             var responseText = SendRequest(HttpMethod.Post, @"disp/SrzSearch", contentParameters);
 
-            var startIndex = responseText.IndexOf("personId") + 1;
-            var idBegin = responseText.IndexOf('\"', startIndex) + 1;
-            var idLength = responseText.IndexOf('\"', idBegin) - idBegin;
-            var idString = responseText.Substring(idBegin, idLength);
-
-            if (int.TryParse(idString, out var srzPatientId))
-                return srzPatientId;
-            else
-                throw new InvalidOperationException(ParseResponseErrorMessage);
+            return SubstringBetween(responseText, ">Номер полиса<", "<td>", "</td>");
         }
         protected List<AvailableStage> GetAvailableSteps(int patientId)
         {
@@ -186,7 +175,7 @@ namespace CHI.Services.MedicalExaminations
             var response = new JavaScriptSerializer().Deserialize<WebResponse>(responseText);
 
             if (response.IsError)
-                throw new WebServerOperationException();
+                throw new WebServiceOperationException();
         }
         protected ExaminationStepKind DeleteLastStep(int patientId)
         {
@@ -201,7 +190,7 @@ namespace CHI.Services.MedicalExaminations
             var response = new JavaScriptSerializer().Deserialize<DeleteLastStepResponse>(responseText);
 
             if (response == null || response.IsError)
-                throw new WebServerOperationException();
+                throw new WebServiceOperationException();
 
             return response.Data?.LastOrDefault()?.DispStage?.DispStageId ?? 0;
         }
@@ -212,6 +201,43 @@ namespace CHI.Services.MedicalExaminations
         protected static int ConvertToYear(int yearId)
         {
             return (yearId + 2017);
+        }
+        private static string SubstringBetween(string text, string offsetStr, string leftStr, string rightStr)
+        {
+            int offset;
+
+            if (string.IsNullOrEmpty(offsetStr))
+                offset = 0;
+            else
+            {
+                offset = text.IndexOf(offsetStr);
+
+                if (offset == -1)
+                    return string.Empty;
+
+                offset += offsetStr.Length + 1;
+            }
+
+            var begin = text.IndexOf(leftStr, offset);
+
+            if (begin == -1)
+                return string.Empty;
+
+             begin +=leftStr.Length + 1;
+
+            var end = text.IndexOf(rightStr, begin);
+
+            if (end == -1)
+                return string.Empty;
+
+            end--;
+
+            var length = end - begin;
+
+            if (length > 0)
+                return text.Substring(begin, length);
+
+            return string.Empty;
         }
         #endregion
 

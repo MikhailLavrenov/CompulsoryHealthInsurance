@@ -3,6 +3,7 @@ using CHI.Application.Models;
 using CHI.Services.BillsRegister;
 using CHI.Services.MedicalExaminations;
 using Prism.Regions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -12,7 +13,7 @@ namespace CHI.Application.ViewModels
     {
         #region Поля
         private Settings settings;
-        private List<PatientExaminations> errors;
+        private Dictionary<PatientExaminations, string> result;
         private bool showErrors;
 
         private readonly IFileDialogService fileDialogService;
@@ -22,7 +23,7 @@ namespace CHI.Application.ViewModels
         public IMainRegionService MainRegionService { get; set; }
         public bool KeepAlive { get => false; }
         public bool ShowErrors { get => showErrors; set => SetProperty(ref showErrors, value); }
-        public List<PatientExaminations> Errors { get => errors; set => SetProperty(ref errors, value); }
+        public Dictionary<PatientExaminations, string> Result { get => result; set => SetProperty(ref result, value); }
         public Settings Settings { get => settings; set => SetProperty(ref settings, value); }
         public DelegateCommandAsync ExportExaminationsCommand { get; }
         #endregion
@@ -40,35 +41,35 @@ namespace CHI.Application.ViewModels
             ExportExaminationsCommand = new DelegateCommandAsync(ExportExaminationsExecute);
 
 
-            // var examination1Stage = new Examination
-            // {
-            //     BeginDate = new DateTime(2019, 10, 10),
-            //     EndDate = new DateTime(2019, 10, 15),
-            //     HealthGroup = ExaminationHealthGroup.ThirdA,
-            //     Referral = ExaminationReferral.LocalClinic
-            // };
-            // var examination2Stage = new Examination
-            // {
-            //     BeginDate = new DateTime(2019, 10, 20),
-            //     EndDate = new DateTime(2019, 10, 25),
-            //     HealthGroup = ExaminationHealthGroup.ThirdB,
-            //     Referral = ExaminationReferral.AnotherClinic
-            // };
+            //var examination1Stage = new Examination
+            //{
+            //    BeginDate = new DateTime(2019, 10, 10),
+            //    EndDate = new DateTime(2019, 10, 15),
+            //    HealthGroup = ExaminationHealthGroup.ThirdA,
+            //    Referral = ExaminationReferral.LocalClinic
+            //};
+            //var examination2Stage = new Examination
+            //{
+            //    BeginDate = new DateTime(2019, 10, 20),
+            //    EndDate = new DateTime(2019, 10, 25),
+            //    HealthGroup = ExaminationHealthGroup.ThirdB,
+            //    Referral = ExaminationReferral.AnotherClinic
+            //};
 
-            // ShowErrors = true;
+            //ShowErrors = true;
             //var pe = new PatientExaminations("2751530822000157", 2019, ExaminationKind.Dispanserizacia1)
-            // {
-            //     Stage1 = examination1Stage,
-            //     Stage2 = examination2Stage
-            // };
-            // Errors = new List<PatientExaminations> { pe, pe, pe, pe, pe, pe, pe, pe, pe, pe, pe, pe, pe, pe, pe, pe, pe, pe, pe, pe, pe, pe };
+            //{
+            //    Stage1 = examination1Stage,
+            //    Stage2 = examination2Stage
+            //};
+            //Result = new Dictionary<PatientExaminations, string> { {pe, "success" } };
         }
         #endregion
 
         #region Методы
         private void ExportExaminationsExecute()
         {
-            Errors?.Clear();
+            Result?.Clear();
             ShowErrors = false;
 
             MainRegionService.SetBusyStatus("Выбор файлов.");
@@ -103,9 +104,9 @@ namespace CHI.Application.ViewModels
 
             var examinationService = new ExaminationServiceParallel(Settings.MedicalExaminationsAddress, Settings.UseProxy, Settings.ProxyAddress, Settings.ProxyPort, Settings.ThreadsLimit, Settings.Credentials);
 
-            Errors=examinationService.AddPatientsExaminations(patientsExaminations);
+            Result=examinationService.AddPatientsExaminations(patientsExaminations);
 
-            if (Errors?.Count > 0)
+            if (Result?.Count > 0)
                 ShowErrors=true;
 
             MainRegionService.SetCompleteStatus("Успешно завершено.");

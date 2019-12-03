@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 
 namespace CHI.Services.Common
 {
-    public class WebServerOperationException:ApplicationException
+    public class WebServiceOperationException:ApplicationException
     {
         private static readonly string defaultErrorMessage="Произошла ошибка выполнения операции на стороне web-сервер";
 
-        public WebServerOperationException():this(defaultErrorMessage)
+        public WebServiceOperationException():this(defaultErrorMessage)
         { 
         }
-        public WebServerOperationException(string message):base (message)
+        public WebServiceOperationException(string message):base (message)
         {
         }
     }

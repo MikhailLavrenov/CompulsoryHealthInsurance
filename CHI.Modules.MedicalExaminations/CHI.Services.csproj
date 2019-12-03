@@ -88,7 +88,7 @@
     <Compile Include="MedicalExaminations\ExaminationHealthGroup.cs" />
     <Compile Include="MedicalExaminations\ExaminationReferral.cs" />
     <Compile Include="MedicalExaminations\PatientExaminations.cs" />
-    <Compile Include="Common\WebServerOperationException.cs" />
+    <Compile Include="Common\WebServiceOperationException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="BillsRegister\BillsRegisterService.cs" />
     <Compile Include="MedicalExaminations\ExaminationService.cs" />

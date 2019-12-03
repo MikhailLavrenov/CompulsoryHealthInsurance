@@ -1,4 +1,5 @@
 ﻿using CHI.Services.Common;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,7 +30,7 @@ namespace CHI.Services.MedicalExaminations
             Credentials = credentials;
         }
 
-        public List<PatientExaminations> AddPatientsExaminations(List<PatientExaminations> patientsExaminations)
+        public Dictionary<PatientExaminations,string> AddPatientsExaminations(List<PatientExaminations> patientsExaminations)
         {
             var threadsLimit = ThreadsLimit;
 
@@ -37,7 +38,7 @@ namespace CHI.Services.MedicalExaminations
                 threadsLimit = patientsExaminations.Count;
 
             var circularList = new CircularList<ICredential>(Credentials);
-            var errors = new ConcurrentBag<PatientExaminations>();
+            var result = new ConcurrentDictionary<PatientExaminations,string>();
             var tasks = new Task<ExaminationService>[threadsLimit];
 
             for (int i = 0; i < threadsLimit; i++)
@@ -60,15 +61,29 @@ namespace CHI.Services.MedicalExaminations
                         service.Authorize(circularList.GetNext());
                     }
 
-                    if (!service.TryAddPatientExaminations(patientExaminations))
-                        errors.Add(patientExaminations);
+                    var status = "Загружен";
+
+                    try
+                    {
+                        service.AddPatientExaminations(patientExaminations);                      
+                    }
+                    catch (InvalidOperationException ex)
+                    {
+                        status = $"Ошибка: {ex.Message}";
+                    }
+                    catch (WebServiceOperationException ex)
+                    {
+                        status = $"Ошибка: {ex.Message}";
+                    }
+
+                    result.TryAdd(patientExaminations, status);
 
                     return service;
                 });
             }
             Task.WaitAll(tasks);
 
-            return errors.ToList();
+            return result.ToDictionary(x=>x.Key, x=>x.Value);
         }
     }
 }
