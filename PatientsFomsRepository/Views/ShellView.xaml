@@ -13,7 +13,7 @@
         WindowStartupLocation="CenterScreen"
         Title="Хранилище пациентов из СРЗ"
         Height="600"
-        Width="600"
+        Width="750"
         prism:ViewModelLocator.AutoWireViewModel="True"
         IsEnabled="{Binding MainRegionService.IsBusy, Converter={i:InvertBoolConverter}}">
 
@@ -35,7 +35,7 @@
                    Panel.ZIndex="0"
                    Background="White">
 
-            <WrapPanel DockPanel.Dock="Top"
+            <WrapPanel DockPanel.Dock="Left" Orientation="Vertical" Width="150"
                        Margin="0,3,0,3">
 
                 <Button Content="Прикрепленные пациенты"
@@ -70,7 +70,9 @@
 
             </WrapPanel>
 
-            <Separator DockPanel.Dock="Top" />
+
+                <Separator DockPanel.Dock="Left" Margin="10,0,10,0" Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+        
 
             <DockPanel x:Name="MainRegionPanel"
                        RenderTransformOrigin="0.1,0.1">

@@ -64,11 +64,14 @@
                 Value="0" />
         <Setter Property="Foreground"
                 Value="#FF019BE2" />
+        <Setter Property="Margin"
+                Value="5,7,5,7" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Button}">
-                    <TextBlock>                     
-                        <ContentPresenter />
+                    <TextBlock Text="{TemplateBinding Content}"
+                               TextWrapping="WrapWithOverflow">                     
+                        <!--<ContentPresenter />-->
                     </TextBlock>
                 </ControlTemplate>
             </Setter.Value>
