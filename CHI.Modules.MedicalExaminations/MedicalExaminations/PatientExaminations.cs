@@ -1,13 +1,17 @@
-﻿namespace CHI.Services.MedicalExaminations
+﻿using System;
+
+namespace CHI.Services.MedicalExaminations
 {
     public class PatientExaminations
     {
-        private Examination stage1;
-        private Examination stage2;
-
         public string InsuranceNumber { get; set; }
-        public Examination Stage1 { get => stage1; set => stage1 = value; }
-        public Examination Stage2 { get => stage2; set => stage2 = value; }
+        public string Initials { get; set; }
+        public string Surname { get; set; }
+        public string Name { get; set; }
+        public string Patronymic { get; set; }
+        public DateTime Birthdate { get; set; }
+        public Examination Stage1 { get; set; }
+        public Examination Stage2 { get; set; }
         public int Year { get; private set; }
         public ExaminationKind Kind { get; private set; }
 

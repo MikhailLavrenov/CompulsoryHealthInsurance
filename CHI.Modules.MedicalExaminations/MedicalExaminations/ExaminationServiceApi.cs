@@ -130,6 +130,31 @@ namespace CHI.Services.MedicalExaminations
             else
                 throw new InvalidOperationException(ParseResponseErrorMessage);
         }
+        protected int GetPatientIdFromSRZ(string surname, string name, string patronymic, DateTime birthdate, int year)
+        {
+            CheckAuthorization();
+
+            var contentParameters = new Dictionary<string, string>
+            {
+                {"SearchData.Surname", surname },
+                {"SearchData.Firstname", name },
+                {"SearchData.Secname", patronymic },
+                {"SearchData.Birthday", birthdate.ToShortDateString() },
+                {"SearchData.SelectSearchValues", "fio"}
+            };
+
+            var responseText = SendRequest(HttpMethod.Post, @"disp/SrzSearch", contentParameters);
+
+            var startIndex = responseText.IndexOf("personId") + 1;
+            var idBegin = responseText.IndexOf('\"', startIndex) + 1;
+            var idLength = responseText.IndexOf('\"', idBegin) - idBegin;
+            var idString = responseText.Substring(idBegin, idLength);
+
+            if (int.TryParse(idString, out var srzPatientId))
+                return srzPatientId;
+            else
+                throw new InvalidOperationException(ParseResponseErrorMessage);
+        }
         protected List<AvailableStage> GetAvailableSteps(int patientId)
         {
             var contentParameters = new Dictionary<string, string>

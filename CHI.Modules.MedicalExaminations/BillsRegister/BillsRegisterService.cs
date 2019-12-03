@@ -115,11 +115,10 @@ namespace CHI.Services.BillsRegister
         {
             var result = new List<PatientExaminations>();
 
-            var patients = new List<(Guid, int)>();
+            var patients = new List<PERS>();
 
             foreach (var patientsRegister in patientsRegisters)
-                foreach (var patient in patientsRegister.PERS)
-                    patients.Add((patient.ID_PAC, patient.DR.Year));
+                patients.AddRange(patientsRegister?.PERS);
 
             patients = patients.Distinct().ToList();
 
@@ -146,12 +145,12 @@ namespace CHI.Services.BillsRegister
 
                     var examination = new Examination();
 
-                    var foundPatient = patients.FirstOrDefault(x => x.Item1 == treatmentCase.PACIENT.ID_PAC);
+                    var foundPatient = patients.FirstOrDefault(x => x.ID_PAC == treatmentCase.PACIENT.ID_PAC);
 
                     if (foundPatient == default)
                         continue;
 
-                    var examinationKind = DispToExaminationType(examinationsRegister.SCHET.DISP, examinationYear - foundPatient.Item2);
+                    var examinationKind = DispToExaminationType(examinationsRegister.SCHET.DISP, examinationYear - foundPatient.DR.Year);
 
                     if (examinationStage == 1)
                         examination.BeginDate = treatmentCase.Z_SL.SL.USL.First(x => x.CODE_USL == "024101").DATE_IN;
@@ -162,13 +161,22 @@ namespace CHI.Services.BillsRegister
                     examination.HealthGroup = RSLT_DToHealthGroup(treatmentCase.Z_SL.RSLT_D);
                     examination.Referral = (ExaminationReferral)(treatmentCase.Z_SL.SL.NAZ.FirstOrDefault()?.NAZ_R ?? 0);
 
+                    //для 3 гр здоровья направление обязательно
+                    if (examination.Referral == 0 && (examination.HealthGroup == ExaminationHealthGroup.ThirdA || examination.HealthGroup == ExaminationHealthGroup.ThirdB))
+                        examination.Referral = ExaminationReferral.LocalClinic;
+
                     if (examination.HealthGroup == ExaminationHealthGroup.None)
                         continue;
 
                     var patientExamination = result.FirstOrDefault(x => x.InsuranceNumber.Equals(insuranceNumber, comparer) && x.Year == examinationYear && x.Kind == examinationKind);
 
                     if (patientExamination == default)
-                        patientExamination = new PatientExaminations(insuranceNumber, examinationYear, examinationKind);
+                           patientExamination = new PatientExaminations(insuranceNumber, examinationYear, examinationKind) { 
+                               Surname= foundPatient.FAM, 
+                               Name= foundPatient.IM, 
+                               Patronymic= foundPatient.OT, 
+                               Birthdate= foundPatient.DR 
+                           };
 
                     if (examinationStage == 1)
                         patientExamination.Stage1 = examination;
@@ -377,6 +385,12 @@ namespace CHI.Services.BillsRegister
             //guid пациента
             [XmlElement(ElementName = "ID_PAC")]
             public Guid ID_PAC { get; set; }
+            [XmlElement(ElementName = "FAM")]
+            public string FAM { get; set; }
+            [XmlElement(ElementName = "IM")]
+            public string IM { get; set; }
+            [XmlElement(ElementName = "OT")]
+            public string OT { get; set; }
             //Дата рождения
             [XmlElement(ElementName = "DR")]
             public DateTime DR { get; set; }
