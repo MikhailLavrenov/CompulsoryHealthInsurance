@@ -3,6 +3,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace CHI.Services.MedicalExaminations
@@ -15,6 +16,8 @@ namespace CHI.Services.MedicalExaminations
         public int ProxyPort { get; private set; }
         public int ThreadsLimit { get; private set; }
         public bool UseProxy { get; private set; }
+
+        public event EventHandler<CounterEventArgs> AddCounterChangeEvent;
 
         public ExaminationServiceParallel(string url, int threadsLimit, IEnumerable<ICredential> credentials)
             : this(url, false, null, 0, threadsLimit, credentials)
@@ -40,6 +43,7 @@ namespace CHI.Services.MedicalExaminations
             var circularList = new CircularList<ICredential>(Credentials);
             var result = new ConcurrentBag<Tuple<PatientExaminations, string>>();
             var tasks = new Task<ExaminationService>[threadsLimit];
+            var counter = 0;
 
             for (int i = 0; i < threadsLimit; i++)
                 tasks[i] = Task.Run(() => { return (ExaminationService)null; });
@@ -77,6 +81,8 @@ namespace CHI.Services.MedicalExaminations
                     }
 
                     result.Add(new Tuple<PatientExaminations, string>(patientExaminations, status));
+                    Interlocked.Increment(ref counter);
+                    AddCounterChangeEvent(null, new CounterEventArgs(counter, patientsExaminations.Count));
 
                     return service;
                 });

@@ -78,6 +78,7 @@
     <Compile Include="AttachedPatients\IColumnProperties.cs" />
     <Compile Include="Common\CircularList.cs" />
     <Compile Include="Common\CircularListWithCounter.cs" />
+    <Compile Include="Common\CounterEventArgs.cs" />
     <Compile Include="Common\ICredential.cs" />
     <Compile Include="AttachedPatients\Patient.cs" />
     <Compile Include="MedicalExaminations\Examination.cs" />

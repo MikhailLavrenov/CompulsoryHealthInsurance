@@ -237,7 +237,7 @@ namespace CHI.Services.MedicalExaminations
                     ExaminationStepKind = ExaminationStepKind.FirstResult,
                     Date = webPatientData.Disp1Date.Value,
                     HealthGroup = webPatientData.Stage1ResultId.Value,
-                    Referral = webPatientData.Stage1DestId ?? ExaminationReferral.No
+                    Referral = webPatientData.Stage1DestId ?? 0
                 });
 
             if (webPatientData.Disp2DirectDate != default)

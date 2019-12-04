@@ -1,6 +1,7 @@
 ﻿using CHI.Application.Infrastructure;
 using CHI.Application.Models;
 using CHI.Services.BillsRegister;
+using CHI.Services.Common;
 using CHI.Services.MedicalExaminations;
 using Prism.Regions;
 using System;
@@ -62,7 +63,12 @@ namespace CHI.Application.ViewModels
             //    Stage1 = examination1Stage,
             //    Stage2 = examination2Stage
             //};
-            //Result = new List<Tuple<PatientExaminations, string>> { new Tuple<PatientExaminations, string>( pe, "success") };
+            //Result = new List<Tuple<PatientExaminations, string>> {
+            //    new Tuple<PatientExaminations, string>(pe, "success"),
+            //    new Tuple<PatientExaminations, string>(pe, "success"),
+            //    new Tuple<PatientExaminations, string>(pe, "success"),
+            //    new Tuple<PatientExaminations, string>(pe, "error")
+            //};
         }
         #endregion
 
@@ -72,10 +78,22 @@ namespace CHI.Application.ViewModels
             Result?.Clear();
             ShowErrors = false;
 
+            if (!Settings.ConnectionIsValid)
+            {
+                MainRegionService.SetBusyStatus("Проверка настроек.");
+
+                Settings.TestConnection();
+                if (!Settings.ConnectionIsValid)
+                {
+                    MainRegionService.SetCompleteStatus("Не удалось подключиться к web-сервису.");
+                    return;
+                }
+            }
+            
             MainRegionService.SetBusyStatus("Выбор файлов.");
 
             fileDialogService.DialogType = FileDialogType.Open;
-            fileDialogService.FileName = settings.PatientsFilePath;
+            fileDialogService.FileName = Settings.PatientsFilePath;
             fileDialogService.MiltiSelect = true;
             fileDialogService.Filter = "Zip files (*.zip)|*.zip|Xml files (*.xml)|*.xml";
 
@@ -104,6 +122,8 @@ namespace CHI.Application.ViewModels
 
             var examinationService = new ExaminationServiceParallel(Settings.MedicalExaminationsAddress, Settings.UseProxy, Settings.ProxyAddress, Settings.ProxyPort, Settings.ThreadsLimit, Settings.Credentials);
 
+            examinationService.AddCounterChangeEvent += UpdateProgress;
+
             Result = examinationService.AddPatientsExaminations(patientsExaminations)
                 .OrderBy(x => x.Item1.Kind)
                 .ThenBy(x => x.Item1.Year)
@@ -113,7 +133,13 @@ namespace CHI.Application.ViewModels
             if (Result?.Count > 0)
                 ShowErrors=true;
 
-            MainRegionService.SetCompleteStatus("Успешно завершено.");
+            examinationService.AddCounterChangeEvent -= UpdateProgress;
+
+            MainRegionService.SetCompleteStatus("Успешно завершено.");            
+        }
+        private void UpdateProgress(object sender, CounterEventArgs args)
+        {
+            MainRegionService.SetBusyStatus($"Загрузка осмотров. Загружено пациентов: {args.Counter} из {args.Total}.");
         }
         #endregion
 

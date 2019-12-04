@@ -25,7 +25,7 @@
 
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="130" />
-            <ColumnDefinition Width="350" />
+            <ColumnDefinition Width="400" />
             <ColumnDefinition Width="auto" />
         </Grid.ColumnDefinitions>
 
@@ -55,6 +55,7 @@
                           CanUserSortColumns="True"
                           CanUserReorderColumns="True"
                           SelectionUnit="Cell"
+                          SelectionMode="Extended"
                           ItemsSource="{Binding Result}"                  
                           Visibility="{Binding Path=ShowErrors,  Converter={i:BoolToVisibleConverter}}">
 
@@ -62,7 +63,7 @@
 
                 <DataGridTextColumn Header="Полис"
                                     Binding="{Binding Item1.InsuranceNumber, Mode=OneWay}"
-                                    Width="130" />
+                                    Width="120" />
 
                 <DataGridTextColumn Header="Вид осмотра"
                                     Binding="{Binding Item1.Kind, Mode=OneWay, Converter={i:EnumToDescriptionConverter}}"

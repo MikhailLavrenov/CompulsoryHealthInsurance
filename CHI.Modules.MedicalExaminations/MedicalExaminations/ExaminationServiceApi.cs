@@ -182,7 +182,7 @@ namespace CHI.Services.MedicalExaminations
 
             return availableStagesResponse?.AvailableStages ?? new List<AvailableStage>();
         }
-        protected void AddStep(int patientId, ExaminationStepKind step, DateTime date, ExaminationHealthGroup healthGroup, ExaminationReferral referralTo)
+        protected void AddStep(int patientId, ExaminationStepKind step, DateTime date, ExaminationHealthGroup healthGroup, ExaminationReferral referral)
         {
             CheckAuthorization();
 
@@ -191,7 +191,7 @@ namespace CHI.Services.MedicalExaminations
                 { "stageId", ((int)step).ToString() },
                 { "stageDate", date.ToString("dd.MM.yyyy", CultureInfo.InvariantCulture) },
                 { "resultId", ((int)healthGroup).ToString()  },
-                { "destId", referralTo==0 ? string.Empty : ((int)referralTo).ToString() },
+                { "destId", referral==0 ? string.Empty : ((int)referral).ToString() },
                 { "dispId", patientId.ToString() },
             };
 

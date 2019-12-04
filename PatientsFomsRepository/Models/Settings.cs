@@ -150,6 +150,8 @@ namespace CHI.Application.Models
         //сохраняет настройки в xml
         public void Save()
         {
+            ConnectionIsValid = false;
+
             // Т.к. при создании экзмпляра класса если свойства не инициализируются - не срабатывает валидация. Поэтому принудительно проверяем все. 
             // Свойства не инициализируются сразу т.к. иначе сразу после создания на них будут отображаться ошибки, и во View тоже, это плохо.
             foreach (var item in Credentials)
@@ -166,7 +168,7 @@ namespace CHI.Application.Models
         }
         //загружает настройки из xml
         public static Settings Load()
-        {
+        {           
             if (File.Exists(SettingsFileName))
                 using (var stream = new FileStream(SettingsFileName, FileMode.Open))
                 {
