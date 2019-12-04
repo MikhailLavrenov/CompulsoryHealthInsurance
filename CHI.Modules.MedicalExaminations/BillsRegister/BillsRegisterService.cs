@@ -171,8 +171,8 @@ namespace CHI.Services.BillsRegister
                     {
                         if (examination.HealthGroup == ExaminationHealthGroup.ThirdA || examination.HealthGroup == ExaminationHealthGroup.ThirdB)
                             examination.Referral = ExaminationReferral.LocalClinic;
-                        //else
-                        //    examination.Referral = ExaminationReferral.No;
+                        else
+                            examination.Referral = ExaminationReferral.No;
                     }
 
                     if (examination.HealthGroup == ExaminationHealthGroup.None)
