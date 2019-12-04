@@ -43,14 +43,26 @@ namespace CHI.Services.MedicalExaminations
             SendRequest(HttpMethod.Get, @"account/logout", null);
 
         }
-        //поиск пациента в плане
-        protected WebPatientData GetPatientDataFromPlan(string insuranceNumber, ExaminationKind examinationType, int year)
+        //поиск пациента в плане       
+        //protected WebPatientData GetPatientDataFromPlan(string insuranceNumber, ExaminationKind examinationType, int year)
+        //{
+        //    return GetPatientDataFromPlan(null, insuranceNumber, examinationType, year);
+        //}
+        //protected WebPatientData GetPatientDataFromPlan(int srzPatientId, ExaminationKind examinationType, int year)
+        //{
+        //    return GetPatientDataFromPlan(srzPatientId, null, examinationType, year);
+        //}
+        protected WebPatientData GetPatientDataFromPlan(int? srzPatientId, string insuranceNumber, ExaminationKind examinationType, int year)
         {
             CheckAuthorization();
 
+            if (srzPatientId != null)
+                insuranceNumber = null;
+
             var uriParameters = new Dictionary<string, string> {
                 {"Filter.Year", ConvertToYearId(year).ToString() },
-                {"Filter.PolisNum", insuranceNumber },
+                {"Filter.PolisNum", insuranceNumber??string.Empty },
+                {"Filter.PersonId", srzPatientId?.ToString()??string.Empty },
                 {"Filter.DispType", ((int)examinationType).ToString() },
             };
 
@@ -88,7 +100,7 @@ namespace CHI.Services.MedicalExaminations
             var response = new JavaScriptSerializer().Deserialize<WebResponse>(responseText);
 
             if (response.IsError)
-                throw new WebServiceOperationException();
+                throw new WebServiceOperationException("Произошла ошибка при добавлении пациента в план");
         }
         protected void DeletePatientFromPlan(int patientId)
         {
@@ -106,44 +118,57 @@ namespace CHI.Services.MedicalExaminations
             if (response.IsError)
                 throw new WebServiceOperationException();
         }
-        protected int GetPatientIdFromSRZ(string insuranceNumber, int year)
+        protected int? GetPatientIdFromSRZ(string insuranceNumber, int year)
+        {
+            return GetPatientIdFromSRZ(insuranceNumber, null, null, null, null, year);
+        }
+        protected int? GetPatientIdFromSRZ(string surname, string name, string patronymic, DateTime birthdate, int year)
+        {
+            return GetPatientIdFromSRZ(null, surname, name, patronymic, birthdate, year);
+        }
+        private int? GetPatientIdFromSRZ(string insuranceNumber, string surname, string name, string patronymic, DateTime? birthdate, int year)
         {
             CheckAuthorization();
+
+            var selector = string.IsNullOrEmpty(insuranceNumber) ? "fio" : "polis";
 
             var contentParameters = new Dictionary<string, string>
             {
                 {"SearchData.DispYearId", ConvertToYearId(year).ToString() },
-                {"SearchData.SelectSearchValues", "polis"},
-                {"SearchData.PolisNum", insuranceNumber }
+                {"SearchData.Surname", surname??string.Empty },
+                {"SearchData.Firstname", name??string.Empty },
+                {"SearchData.Secname", patronymic??string.Empty },
+                {"SearchData.Birthday", birthdate?.ToShortDateString() ?? string.Empty },
+                {"SearchData.PolisNum", insuranceNumber??string.Empty },
+                {"SearchData.SelectSearchValues", selector}
             };
 
             var responseText = SendRequest(HttpMethod.Post, @"disp/SrzSearch", contentParameters);
 
             var idString = SubstringBetween(responseText, "personId", "\"", "\"");
 
-            if (int.TryParse(idString, out var srzPatientId))
-                return srzPatientId;
-            else
-                throw new InvalidOperationException(ParseResponseErrorMessage);
+            int.TryParse(idString, out var srzPatientId);
+
+            return srzPatientId == 0 ? (int?)null : srzPatientId;
         }
-        protected string GetInsuranceNumberFromSRZ(string surname, string name, string patronymic, DateTime birthdate, int year)
-        {
-            CheckAuthorization();
+        //protected string GetInsuranceNumberFromSRZ(string surname, string name, string patronymic, DateTime birthdate, int year)
+        //{
+        //    CheckAuthorization();
 
-            var contentParameters = new Dictionary<string, string>
-            {
-                {"SearchData.DispYearId", ConvertToYearId(year).ToString() },
-                {"SearchData.Surname", surname },
-                {"SearchData.Firstname", name },
-                {"SearchData.Secname", patronymic },
-                {"SearchData.Birthday", birthdate.ToShortDateString() },
-                {"SearchData.SelectSearchValues", "fio"}
-            };
+        //    var contentParameters = new Dictionary<string, string>
+        //    {
+        //        {"SearchData.DispYearId", ConvertToYearId(year).ToString() },
+        //        {"SearchData.Surname", surname },
+        //        {"SearchData.Firstname", name },
+        //        {"SearchData.Secname", patronymic },
+        //        {"SearchData.Birthday", birthdate.ToShortDateString() },
+        //        {"SearchData.SelectSearchValues", "fio"}
+        //    };
 
-            var responseText = SendRequest(HttpMethod.Post, @"disp/SrzSearch", contentParameters);
+        //    var responseText = SendRequest(HttpMethod.Post, @"disp/SrzSearch", contentParameters);
 
-            return SubstringBetween(responseText, ">Номер полиса<", "<td>", "</td>");
-        }
+        //    return SubstringBetween(responseText, ">Номер полиса<", "<td>", "</td>");
+        //}
         protected List<AvailableStage> GetAvailableSteps(int patientId)
         {
             var contentParameters = new Dictionary<string, string>
@@ -165,8 +190,8 @@ namespace CHI.Services.MedicalExaminations
             {
                 { "stageId", ((int)step).ToString() },
                 { "stageDate", date.ToString("dd.MM.yyyy", CultureInfo.InvariantCulture) },
-                { "resultId", healthGroup==0? null:((int)healthGroup).ToString()  },
-                { "destId", referralTo==0? null:((int)referralTo).ToString() },
+                { "resultId", ((int)healthGroup).ToString()  },
+                { "destId", referralTo==0 ? string.Empty : ((int)referralTo).ToString() },
                 { "dispId", patientId.ToString() },
             };
 
@@ -202,6 +227,7 @@ namespace CHI.Services.MedicalExaminations
         {
             return (yearId + 2017);
         }
+
         private static string SubstringBetween(string text, string offsetStr, string leftStr, string rightStr)
         {
             int offset;
@@ -215,7 +241,7 @@ namespace CHI.Services.MedicalExaminations
                 if (offset == -1)
                     return string.Empty;
 
-                offset += offsetStr.Length + 1;
+                offset += offsetStr.Length;
             }
 
             var begin = text.IndexOf(leftStr, offset);
@@ -223,14 +249,12 @@ namespace CHI.Services.MedicalExaminations
             if (begin == -1)
                 return string.Empty;
 
-             begin +=leftStr.Length + 1;
+            begin += leftStr.Length;
 
             var end = text.IndexOf(rightStr, begin);
 
             if (end == -1)
                 return string.Empty;
-
-            end--;
 
             var length = end - begin;
 

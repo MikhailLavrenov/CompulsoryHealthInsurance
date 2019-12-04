@@ -13,7 +13,7 @@ namespace CHI.Application.ViewModels
     {
         #region Поля
         private Settings settings;
-        private Dictionary<PatientExaminations, string> result;
+        private List<Tuple<PatientExaminations, string>> result;
         private bool showErrors;
 
         private readonly IFileDialogService fileDialogService;
@@ -23,7 +23,7 @@ namespace CHI.Application.ViewModels
         public IMainRegionService MainRegionService { get; set; }
         public bool KeepAlive { get => false; }
         public bool ShowErrors { get => showErrors; set => SetProperty(ref showErrors, value); }
-        public Dictionary<PatientExaminations, string> Result { get => result; set => SetProperty(ref result, value); }
+        public List<Tuple<PatientExaminations, string>> Result { get => result; set => SetProperty(ref result, value); }
         public Settings Settings { get => settings; set => SetProperty(ref settings, value); }
         public DelegateCommandAsync ExportExaminationsCommand { get; }
         #endregion
@@ -62,7 +62,7 @@ namespace CHI.Application.ViewModels
             //    Stage1 = examination1Stage,
             //    Stage2 = examination2Stage
             //};
-            //Result = new Dictionary<PatientExaminations, string> { {pe, "success" } };
+            //Result = new List<Tuple<PatientExaminations, string>> { new Tuple<PatientExaminations, string>( pe, "success") };
         }
         #endregion
 
@@ -104,7 +104,11 @@ namespace CHI.Application.ViewModels
 
             var examinationService = new ExaminationServiceParallel(Settings.MedicalExaminationsAddress, Settings.UseProxy, Settings.ProxyAddress, Settings.ProxyPort, Settings.ThreadsLimit, Settings.Credentials);
 
-            Result=examinationService.AddPatientsExaminations(patientsExaminations);
+            Result = examinationService.AddPatientsExaminations(patientsExaminations)
+                .OrderBy(x => x.Item1.Kind)
+                .ThenBy(x => x.Item1.Year)
+                .ThenByDescending(x => x.Item2)
+                .ToList();           
 
             if (Result?.Count > 0)
                 ShowErrors=true;

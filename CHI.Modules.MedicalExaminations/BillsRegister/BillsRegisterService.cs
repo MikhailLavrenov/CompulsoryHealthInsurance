@@ -138,7 +138,12 @@ namespace CHI.Services.BillsRegister
                     if (treatmentCase?.PACIENT == null || treatmentCase.Z_SL?.SL?.USL == null || treatmentCase.Z_SL.SL.NAZ == null)
                         continue;
 
-                    var insuranceNumber = $@"{treatmentCase.PACIENT.SPOLIS}{treatmentCase.PACIENT.NPOLIS}";
+                    string insuranceNumber;
+
+                    if (string.IsNullOrEmpty(treatmentCase.PACIENT.SPOLIS))
+                        insuranceNumber = $@"{ treatmentCase.PACIENT.NPOLIS}";
+                    else
+                        insuranceNumber = $@"{treatmentCase.PACIENT.SPOLIS} {treatmentCase.PACIENT.NPOLIS}";
 
                     if (string.IsNullOrEmpty(insuranceNumber))
                         continue;
@@ -161,9 +166,14 @@ namespace CHI.Services.BillsRegister
                     examination.HealthGroup = RSLT_DToHealthGroup(treatmentCase.Z_SL.RSLT_D);
                     examination.Referral = (ExaminationReferral)(treatmentCase.Z_SL.SL.NAZ.FirstOrDefault()?.NAZ_R ?? 0);
 
-                    //для 3 гр здоровья направление обязательно
-                    if (examination.Referral == 0 && (examination.HealthGroup == ExaminationHealthGroup.ThirdA || examination.HealthGroup == ExaminationHealthGroup.ThirdB))
-                        examination.Referral = ExaminationReferral.LocalClinic;
+                    //если не заполнено направление
+                    if (examination.Referral == 0)
+                    {
+                        if (examination.HealthGroup == ExaminationHealthGroup.ThirdA || examination.HealthGroup == ExaminationHealthGroup.ThirdB)
+                            examination.Referral = ExaminationReferral.LocalClinic;
+                        //else
+                        //    examination.Referral = ExaminationReferral.No;
+                    }
 
                     if (examination.HealthGroup == ExaminationHealthGroup.None)
                         continue;
@@ -171,12 +181,13 @@ namespace CHI.Services.BillsRegister
                     var patientExamination = result.FirstOrDefault(x => x.InsuranceNumber.Equals(insuranceNumber, comparer) && x.Year == examinationYear && x.Kind == examinationKind);
 
                     if (patientExamination == default)
-                           patientExamination = new PatientExaminations(insuranceNumber, examinationYear, examinationKind) { 
-                               Surname= foundPatient.FAM, 
-                               Name= foundPatient.IM, 
-                               Patronymic= foundPatient.OT, 
-                               Birthdate= foundPatient.DR 
-                           };
+                        patientExamination = new PatientExaminations(insuranceNumber, examinationYear, examinationKind)
+                        {
+                            Surname = foundPatient.FAM,
+                            Name = foundPatient.IM,
+                            Patronymic = foundPatient.OT,
+                            Birthdate = foundPatient.DR
+                        };
 
                     if (examinationStage == 1)
                         patientExamination.Stage1 = examination;

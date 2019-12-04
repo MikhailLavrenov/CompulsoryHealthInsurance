@@ -76,10 +76,10 @@ namespace CHI.Test
                 credential.Login = "UshanovaTA";
                 credential.Password = "UshanovaTA1";
                 Authorize(credential);
-                var webPlanPatientData = GetPatientDataFromPlan("2751530822000157", ExaminationKind.Dispanserizacia1, 2019);
+                var webPlanPatientData = GetPatientDataFromPlan(null,"2751530822000157", ExaminationKind.Dispanserizacia1, 2019);
                 DeletePatientFromPlan(webPlanPatientData.Id);
                 var srzPatientId = GetPatientIdFromSRZ("2751530822000157", 2019);
-                AddPatientToPlan(srzPatientId, ExaminationKind.Dispanserizacia1, 2019);
+                AddPatientToPlan(srzPatientId.Value, ExaminationKind.Dispanserizacia1, 2019);
 
                 AddStep(webPlanPatientData.Id, ExaminationStepKind.FirstBegin, new DateTime(2019, 10, 25), 0, 0);
                 AddStep(webPlanPatientData.Id, ExaminationStepKind.FirstEnd, new DateTime(2019, 10, 28), 0, 0);

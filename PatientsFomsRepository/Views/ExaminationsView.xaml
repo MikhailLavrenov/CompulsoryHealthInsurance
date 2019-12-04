@@ -43,72 +43,74 @@
 
         <TextBlock Grid.Row="1"
                    Grid.Column="0"
-                   Text="Ошибки загрузки"
+                   Text="Результаты загрузки"
                    Visibility="{Binding Path=ShowErrors,  Converter={i:BoolToVisibleConverter}}" />
-        
-        <ListView Grid.Row="2"
-                  Grid.Column="0"
-                  Grid.ColumnSpan="2"
-                  HorizontalAlignment="Stretch"
-                  VerticalAlignment="Stretch"
-                  MinHeight="200"
-                  ItemsSource="{Binding Result}"
-                  Visibility="{Binding Path=ShowErrors,  Converter={i:BoolToVisibleConverter}}">
 
-            <ListView.View>
-                <GridView>
-                    <GridViewColumn Header="Полис"
-                                    DisplayMemberBinding="{Binding Key.InsuranceNumber}"
+        <i:CustomDataGrid Grid.Row="2"                  
+                          Grid.Column="0"                            
+                          Grid.ColumnSpan="2"                 
+                          MinHeight="200"                                                        
+                          CanUserAddRows="False"                              
+                          CanUserDeleteRows="False"   
+                          CanUserSortColumns="True"
+                          CanUserReorderColumns="True"
+                          SelectionUnit="Cell"
+                          ItemsSource="{Binding Result}"                  
+                          Visibility="{Binding Path=ShowErrors,  Converter={i:BoolToVisibleConverter}}">
+
+            <DataGrid.Columns>
+
+                <DataGridTextColumn Header="Полис"
+                                    Binding="{Binding Item1.InsuranceNumber, Mode=OneWay}"
                                     Width="130" />
 
-                    <GridViewColumn Header="Вид осмотра"
-                                    DisplayMemberBinding="{Binding Key.Kind, Converter={i:EnumToDescriptionConverter}}"
+                <DataGridTextColumn Header="Вид осмотра"
+                                    Binding="{Binding Item1.Kind, Mode=OneWay, Converter={i:EnumToDescriptionConverter}}"
                                     Width="190" />
 
-                    <GridViewColumn Header="Год"
-                                    DisplayMemberBinding="{Binding Key.Year}"
+                <DataGridTextColumn Header="Год"
+                                    Binding="{Binding Item1.Year, Mode=OneWay}"
                                     Width="50" />
 
-                    <GridViewColumn Header="1эт Начало"
-                                    DisplayMemberBinding="{Binding Key.Stage1.BeginDate, StringFormat='dd.MM.yyyy'}"
+                <DataGridTextColumn Header="Статус"
+                                    Binding="{Binding Item2, Mode=OneWay}"
+                                    Width="200" />
+
+                <DataGridTextColumn Header="1эт Начало"
+                                    Binding="{Binding Item1.Stage1.BeginDate, Mode=OneWay, StringFormat='dd.MM.yyyy'}"
                                     Width="90" />
 
-                    <GridViewColumn Header="1эт Конец"
-                                    DisplayMemberBinding="{Binding Key.Stage1.EndDate, StringFormat='dd.MM.yyyy'}"
+                <DataGridTextColumn Header="1эт Конец"
+                                    Binding="{Binding Item1.Stage1.EndDate, Mode=OneWay, StringFormat='dd.MM.yyyy'}"
                                     Width="90" />
 
-                    <GridViewColumn Header="1эт Гр.здоровья"
-                                    DisplayMemberBinding="{Binding Key.Stage1.HealthGroup, Converter={i:EnumToDescriptionConverter}}"
+                <DataGridTextColumn Header="1эт Гр.здоровья"
+                                    Binding="{Binding Item1.Stage1.HealthGroup, Mode=OneWay, Converter={i:EnumToDescriptionConverter}}"
                                     Width="100" />
 
-                    <GridViewColumn Header="1эт Направлен"
-                                    DisplayMemberBinding="{Binding Key.Stage1.Referral, Converter={i:EnumToDescriptionConverter}}"
+                <DataGridTextColumn Header="1эт Направлен"
+                                    Binding="{Binding Item1.Stage1.Referral, Mode=OneWay, Converter={i:EnumToDescriptionConverter}}"
                                     Width="200" />
 
-                    <GridViewColumn Header="2эт Начало"
-                                    DisplayMemberBinding="{Binding Key.Stage2.BeginDate, StringFormat='dd.MM.yyyy'}"
+                <DataGridTextColumn Header="2эт Начало"
+                                    Binding="{Binding Item1.Stage2.BeginDate, Mode=OneWay, StringFormat='dd.MM.yyyy'}"
                                     Width="90" />
 
-                    <GridViewColumn Header="2эт Конец"
-                                    DisplayMemberBinding="{Binding Key.Stage2.EndDate, StringFormat='dd.MM.yyyy'}"
+                <DataGridTextColumn Header="2эт Конец"
+                                    Binding="{Binding Item1.Stage2.EndDate, Mode=OneWay, StringFormat='dd.MM.yyyy'}"
                                     Width="90" />
 
-                    <GridViewColumn Header="2эт Гр.здоровья"
-                                    DisplayMemberBinding="{Binding Key.Stage2.HealthGroup, Converter={i:EnumToDescriptionConverter}}"
+                <DataGridTextColumn Header="2эт Гр.здоровья"
+                                    Binding="{Binding Item1.Stage2.HealthGroup, Mode=OneWay, Converter={i:EnumToDescriptionConverter}}"
                                     Width="100" />
 
-                    <GridViewColumn Header="2эт Направлен"
-                                    DisplayMemberBinding="{Binding Key.Stage2.Referral, Converter={i:EnumToDescriptionConverter}}"
+                <DataGridTextColumn Header="2эт Направлен"
+                                    Binding="{Binding Item1.Stage2.Referral, Mode=OneWay, Converter={i:EnumToDescriptionConverter}}"
                                     Width="200" />
 
-                    <GridViewColumn Header="Статус"
-                                    DisplayMemberBinding="{Binding Value}"
-                                    Width="200" />
+            </DataGrid.Columns>
 
-                </GridView>
-            </ListView.View>
-
-        </ListView>
+        </i:CustomDataGrid>
 
     </Grid>
 

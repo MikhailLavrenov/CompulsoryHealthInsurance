@@ -40,8 +40,8 @@
                                                         BeginTime="00:00:00"                                             
                                                         Duration="00:00:04"                                                                                                    
                                                         RepeatBehavior="Forever">
-                            <SplineDoubleKeyFrame Value="300" KeyTime="50%" KeySpline="0.0,0.9 0.9,0.0" />
-                            <SplineDoubleKeyFrame Value="300"/>
+                            <SplineDoubleKeyFrame Value="400" KeyTime="50%" KeySpline="0.0,0.9 0.9,0.0" />
+                            <SplineDoubleKeyFrame Value="400"/>
                         </DoubleAnimationUsingKeyFrames>
 
                         <DoubleAnimationUsingKeyFrames  Storyboard.TargetName="Ellipse1"                                          
@@ -57,8 +57,8 @@
                                                         BeginTime="00:00:00.15"                                                                                                  
                                                         Duration="00:00:04"                                                                                                          
                                                         RepeatBehavior="Forever">
-                            <SplineDoubleKeyFrame Value="300" KeyTime="50%" KeySpline="0.0,0.9 0.9,0.0" />
-                            <SplineDoubleKeyFrame Value="300"/>
+                            <SplineDoubleKeyFrame Value="400" KeyTime="50%" KeySpline="0.0,0.9 0.9,0.0" />
+                            <SplineDoubleKeyFrame Value="400"/>
                         </DoubleAnimationUsingKeyFrames>
 
                         <DoubleAnimationUsingKeyFrames  Storyboard.TargetName="Ellipse2"                                          
@@ -74,8 +74,8 @@
                                                         BeginTime="00:00:00.3"                                                                                                  
                                                         Duration="00:00:04"                                                                                                         
                                                         RepeatBehavior="Forever">
-                            <SplineDoubleKeyFrame Value="300" KeyTime="50%" KeySpline="0.0,0.9 0.9,0.0" />
-                            <SplineDoubleKeyFrame Value="300"/>
+                            <SplineDoubleKeyFrame Value="400" KeyTime="50%" KeySpline="0.0,0.9 0.9,0.0" />
+                            <SplineDoubleKeyFrame Value="400"/>
                         </DoubleAnimationUsingKeyFrames>
 
                         <DoubleAnimationUsingKeyFrames  Storyboard.TargetName="Ellipse3"                                          
@@ -91,8 +91,8 @@
                                                         BeginTime="00:00:00.45"                                                                                                 
                                                         Duration="00:00:04"                                                                                                          
                                                         RepeatBehavior="Forever">
-                            <SplineDoubleKeyFrame Value="300" KeyTime="50%" KeySpline="0.0,0.9 0.9,0.0" />
-                            <SplineDoubleKeyFrame Value="300"/>
+                            <SplineDoubleKeyFrame Value="400" KeyTime="50%" KeySpline="0.0,0.9 0.9,0.0" />
+                            <SplineDoubleKeyFrame Value="400"/>
                         </DoubleAnimationUsingKeyFrames>
 
                         <DoubleAnimationUsingKeyFrames  Storyboard.TargetName="Ellipse4"                                          
@@ -108,8 +108,8 @@
                                                         BeginTime="00:00:00.6"                                                                                                  
                                                         Duration="00:00:04"                                                                                                          
                                                         RepeatBehavior="Forever">
-                            <SplineDoubleKeyFrame Value="300" KeyTime="50%" KeySpline="0.0,0.9 0.9,0.0" />
-                            <SplineDoubleKeyFrame Value="300"/>
+                            <SplineDoubleKeyFrame Value="400" KeyTime="50%" KeySpline="0.0,0.9 0.9,0.0" />
+                            <SplineDoubleKeyFrame Value="400"/>
                         </DoubleAnimationUsingKeyFrames>
 
                         <DoubleAnimationUsingKeyFrames  Storyboard.TargetName="Ellipse5"                                          
@@ -125,7 +125,7 @@
                                                         BeginTime="00:00:00.75"                                                                                                  
                                                         Duration="00:00:04"                                                                                                          
                                                         RepeatBehavior="Forever">
-                            <SplineDoubleKeyFrame Value="300" KeyTime="50%" KeySpline="0.0,0.9 0.9,0.0" />
+                            <SplineDoubleKeyFrame Value="400" KeyTime="50%" KeySpline="0.0,0.9 0.9,0.0" />
                         </DoubleAnimationUsingKeyFrames>
 
                         <DoubleAnimationUsingKeyFrames  Storyboard.TargetName="Ellipse6"                                          
@@ -177,38 +177,38 @@
 
                 <Ellipse Style="{StaticResource ProgressBarEllipse}" x:Name="Ellipse1">
                     <Ellipse.RenderTransform>
-                        <TranslateTransform X="-300" />
+                        <TranslateTransform X="-400" />
                     </Ellipse.RenderTransform>
                 </Ellipse>
 
                 <!--FFEBBA16-->
                 <Ellipse Style="{StaticResource ProgressBarEllipse}" x:Name="Ellipse2">
                     <Ellipse.RenderTransform>
-                        <TranslateTransform   X="-300" />
+                        <TranslateTransform   X="-400" />
                     </Ellipse.RenderTransform>
                 </Ellipse>
 
                 <Ellipse Style="{StaticResource ProgressBarEllipse}" x:Name="Ellipse3">
                     <Ellipse.RenderTransform>
-                        <TranslateTransform  X="-300" />
+                        <TranslateTransform  X="-400" />
                     </Ellipse.RenderTransform>
                 </Ellipse>
 
                 <Ellipse Style="{StaticResource ProgressBarEllipse}" x:Name="Ellipse4">
                     <Ellipse.RenderTransform>
-                        <TranslateTransform  X="-300" />
+                        <TranslateTransform  X="-400" />
                     </Ellipse.RenderTransform>
                 </Ellipse>
 
                 <Ellipse Style="{StaticResource ProgressBarEllipse}" x:Name="Ellipse5">
                     <Ellipse.RenderTransform>
-                        <TranslateTransform  X="-300" />
+                        <TranslateTransform  X="-400" />
                     </Ellipse.RenderTransform>
                 </Ellipse>
 
                 <Ellipse Style="{StaticResource ProgressBarEllipse}" x:Name="Ellipse6">
                     <Ellipse.RenderTransform>
-                        <TranslateTransform  X="-300" />
+                        <TranslateTransform  X="-400" />
                     </Ellipse.RenderTransform>
                 </Ellipse>
 

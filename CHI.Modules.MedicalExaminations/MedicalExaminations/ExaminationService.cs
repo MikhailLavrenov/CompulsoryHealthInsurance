@@ -54,9 +54,9 @@ namespace CHI.Services.MedicalExaminations
 
             AddPatientExaminations(webPatientData.Id, userSteps, webSteps);
         }
-        private WebPatientData GetOrAddPatientToPlan(PatientExaminations patientExaminations)
+        private WebPatientData GetOrAddPatientToPlan(PatientExaminations patientExaminations, int? srzPatientId = null)
         {
-            var webPatientData = GetPatientDataFromPlan(patientExaminations.InsuranceNumber, patientExaminations.Kind, patientExaminations.Year);
+            var webPatientData = GetPatientDataFromPlan(srzPatientId, patientExaminations.InsuranceNumber, patientExaminations.Kind, patientExaminations.Year);
 
             //пациент найден в нужном плане
             if (webPatientData == null)
@@ -69,7 +69,7 @@ namespace CHI.Services.MedicalExaminations
                 //ищем в др. планах
                 foreach (var examinationType in otherExaminationKinds)
                 {
-                    webPatientData = GetPatientDataFromPlan(patientExaminations.InsuranceNumber, patientExaminations.Kind, patientExaminations.Year);
+                    webPatientData = GetPatientDataFromPlan(srzPatientId, patientExaminations.InsuranceNumber, patientExaminations.Kind, patientExaminations.Year);
                     //пациент найден в другом план
                     if (webPatientData != null)
                     {
@@ -83,24 +83,20 @@ namespace CHI.Services.MedicalExaminations
                     }
                 }
 
-                var srzPatientId = webPatientData?.PersonId ?? GetPatientIdFromSRZ(patientExaminations.InsuranceNumber, patientExaminations.Year);
+                if (srzPatientId == null)
+                    srzPatientId = webPatientData?.PersonId ?? GetPatientIdFromSRZ(patientExaminations.InsuranceNumber, patientExaminations.Year);
 
                 //если пациент не найден по полису - возможно неправильный полис, ищем по ФИО и ДР
-                if (srzPatientId == 0)
+                if (srzPatientId == null)
                 {
-                    var insuranceNumber = GetInsuranceNumberFromSRZ(patientExaminations.Surname, patientExaminations.Name, patientExaminations.Patronymic, patientExaminations.Birthdate, patientExaminations.Year);
+                    srzPatientId = GetPatientIdFromSRZ(patientExaminations.Surname, patientExaminations.Name, patientExaminations.Patronymic, patientExaminations.Birthdate, patientExaminations.Year);
 
-                    if (string.IsNullOrEmpty(insuranceNumber) || insuranceNumber == patientExaminations.InsuranceNumber)
-                        return null;
-
-                    patientExaminations.InsuranceNumber = insuranceNumber;
-
-                    return GetOrAddPatientToPlan(patientExaminations);
+                    return srzPatientId == null ? null : GetOrAddPatientToPlan(patientExaminations, srzPatientId);
                 }
 
-                AddPatientToPlan(srzPatientId, patientExaminations.Kind, patientExaminations.Year);
+                AddPatientToPlan(srzPatientId.Value, patientExaminations.Kind, patientExaminations.Year);
 
-                webPatientData = GetPatientDataFromPlan(patientExaminations.InsuranceNumber, patientExaminations.Kind, patientExaminations.Year);
+                webPatientData = GetPatientDataFromPlan(srzPatientId, null, patientExaminations.Kind, patientExaminations.Year);
             }
 
             return webPatientData;

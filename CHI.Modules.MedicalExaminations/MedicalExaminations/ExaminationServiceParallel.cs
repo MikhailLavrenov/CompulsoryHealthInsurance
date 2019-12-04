@@ -30,7 +30,7 @@ namespace CHI.Services.MedicalExaminations
             Credentials = credentials;
         }
 
-        public Dictionary<PatientExaminations,string> AddPatientsExaminations(List<PatientExaminations> patientsExaminations)
+        public List<Tuple<PatientExaminations, string>> AddPatientsExaminations(List<PatientExaminations> patientsExaminations)
         {
             var threadsLimit = ThreadsLimit;
 
@@ -38,7 +38,7 @@ namespace CHI.Services.MedicalExaminations
                 threadsLimit = patientsExaminations.Count;
 
             var circularList = new CircularList<ICredential>(Credentials);
-            var result = new ConcurrentDictionary<PatientExaminations,string>();
+            var result = new ConcurrentBag<Tuple<PatientExaminations, string>>();
             var tasks = new Task<ExaminationService>[threadsLimit];
 
             for (int i = 0; i < threadsLimit; i++)
@@ -76,14 +76,14 @@ namespace CHI.Services.MedicalExaminations
                         status = $"Ошибка: {ex.Message}";
                     }
 
-                    result.TryAdd(patientExaminations, status);
+                    result.Add(new Tuple<PatientExaminations, string>(patientExaminations, status));
 
                     return service;
                 });
             }
             Task.WaitAll(tasks);
 
-            return result.ToDictionary(x=>x.Key, x=>x.Value);
+            return result.ToList();
         }
     }
 }
