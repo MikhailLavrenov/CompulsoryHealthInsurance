@@ -125,9 +125,9 @@ namespace CHI.Application.ViewModels
             examinationService.AddCounterChangeEvent += UpdateProgress;
 
             Result = examinationService.AddPatientsExaminations(patientsExaminations)
-                .OrderBy(x => x.Item1.Kind)
+                .OrderByDescending(x => x.Item2)
+                .ThenBy(x => x.Item1.Kind)
                 .ThenBy(x => x.Item1.Year)
-                .ThenByDescending(x => x.Item2)
                 .ToList();           
 
             if (Result?.Count > 0)

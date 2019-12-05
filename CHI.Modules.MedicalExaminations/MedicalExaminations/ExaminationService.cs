@@ -69,7 +69,7 @@ namespace CHI.Services.MedicalExaminations
                 //ищем в др. планах
                 foreach (var examinationType in otherExaminationKinds)
                 {
-                    webPatientData = GetPatientDataFromPlan(srzPatientId, patientExaminations.InsuranceNumber, patientExaminations.Kind, patientExaminations.Year);
+                    webPatientData = GetPatientDataFromPlan(srzPatientId, patientExaminations.InsuranceNumber, examinationType, patientExaminations.Year);
                     //пациент найден в другом план
                     if (webPatientData != null)
                     {

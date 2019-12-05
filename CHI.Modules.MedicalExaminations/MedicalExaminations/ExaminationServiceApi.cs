@@ -151,24 +151,6 @@ namespace CHI.Services.MedicalExaminations
 
             return srzPatientId == 0 ? (int?)null : srzPatientId;
         }
-        //protected string GetInsuranceNumberFromSRZ(string surname, string name, string patronymic, DateTime birthdate, int year)
-        //{
-        //    CheckAuthorization();
-
-        //    var contentParameters = new Dictionary<string, string>
-        //    {
-        //        {"SearchData.DispYearId", ConvertToYearId(year).ToString() },
-        //        {"SearchData.Surname", surname },
-        //        {"SearchData.Firstname", name },
-        //        {"SearchData.Secname", patronymic },
-        //        {"SearchData.Birthday", birthdate.ToShortDateString() },
-        //        {"SearchData.SelectSearchValues", "fio"}
-        //    };
-
-        //    var responseText = SendRequest(HttpMethod.Post, @"disp/SrzSearch", contentParameters);
-
-        //    return SubstringBetween(responseText, ">Номер полиса<", "<td>", "</td>");
-        //}
         protected List<AvailableStage> GetAvailableSteps(int patientId)
         {
             var contentParameters = new Dictionary<string, string>
