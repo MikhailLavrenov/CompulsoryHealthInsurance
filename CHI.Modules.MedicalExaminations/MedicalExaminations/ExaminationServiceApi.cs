@@ -147,6 +147,9 @@ namespace CHI.Services.MedicalExaminations
 
             var idString = SubstringBetween(responseText, "personId", "\"", "\"");
 
+            if (responseText.IndexOf(">Застрахованное лицо находится в плане диспансеризации другой МО<") != -1)
+                throw new InvalidOperationException("Пациент находится в плане др. ЛПУ");
+
             int.TryParse(idString, out var srzPatientId);
 
             return srzPatientId == 0 ? (int?)null : srzPatientId;
