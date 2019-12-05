@@ -14,7 +14,7 @@ namespace CHI.Application.ViewModels
     {
         #region Поля
         private Settings settings;
-        private List<Tuple<PatientExaminations, string>> result;
+        private List<Tuple<PatientExaminations, bool, string>> result;
         private bool showErrors;
 
         private readonly IFileDialogService fileDialogService;
@@ -24,7 +24,7 @@ namespace CHI.Application.ViewModels
         public IMainRegionService MainRegionService { get; set; }
         public bool KeepAlive { get => false; }
         public bool ShowErrors { get => showErrors; set => SetProperty(ref showErrors, value); }
-        public List<Tuple<PatientExaminations, string>> Result { get => result; set => SetProperty(ref result, value); }
+        public List<Tuple<PatientExaminations, bool, string>> Result { get => result; set => SetProperty(ref result, value); }
         public Settings Settings { get => settings; set => SetProperty(ref settings, value); }
         public DelegateCommandAsync ExportExaminationsCommand { get; }
         #endregion
@@ -63,11 +63,11 @@ namespace CHI.Application.ViewModels
             //    Stage1 = examination1Stage,
             //    Stage2 = examination2Stage
             //};
-            //Result = new List<Tuple<PatientExaminations, string>> {
-            //    new Tuple<PatientExaminations, string>(pe, "success"),
-            //    new Tuple<PatientExaminations, string>(pe, "success"),
-            //    new Tuple<PatientExaminations, string>(pe, "success"),
-            //    new Tuple<PatientExaminations, string>(pe, "error")
+            //Result = new List<Tuple<PatientExaminations, bool, string>> {
+            //    new Tuple<PatientExaminations, bool,string>(pe, true, ""),
+            //    new Tuple<PatientExaminations,bool, string>(pe, true, ""),
+            //    new Tuple<PatientExaminations,bool, string>(pe, false, "Потеря потерь"),
+            //    new Tuple<PatientExaminations, bool,string>(pe, false, "Потеря потерь"),
             //};
         }
         #endregion
@@ -89,7 +89,7 @@ namespace CHI.Application.ViewModels
                     return;
                 }
             }
-            
+
             MainRegionService.SetBusyStatus("Выбор файлов.");
 
             fileDialogService.DialogType = FileDialogType.Open;
@@ -108,7 +108,7 @@ namespace CHI.Application.ViewModels
             MainRegionService.SetBusyStatus("Чтение файлов.");
 
             var registers = new BillsRegisterService(files);
-            var patientsFileNames = Settings.PatientFileNames.Split(',');           
+            var patientsFileNames = Settings.PatientFileNames.Split(',');
             var examinationFileNames = Settings.ExaminationFileNames.Split(',');
 
             for (int i = 0; i < patientsFileNames.Length; i++)
@@ -128,14 +128,14 @@ namespace CHI.Application.ViewModels
                 .OrderByDescending(x => x.Item2)
                 .ThenBy(x => x.Item1.Kind)
                 .ThenBy(x => x.Item1.Year)
-                .ToList();           
+                .ToList();
 
             if (Result?.Count > 0)
-                ShowErrors=true;
+                ShowErrors = true;
 
             examinationService.AddCounterChangeEvent -= UpdateProgress;
 
-            MainRegionService.SetCompleteStatus("Успешно завершено.");            
+            MainRegionService.SetCompleteStatus("Успешно завершено.");
         }
         private void UpdateProgress(object sender, CounterEventArgs args)
         {

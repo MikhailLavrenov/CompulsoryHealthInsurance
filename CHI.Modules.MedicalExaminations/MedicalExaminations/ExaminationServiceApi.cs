@@ -118,15 +118,7 @@ namespace CHI.Services.MedicalExaminations
             if (response.IsError)
                 throw new WebServiceOperationException();
         }
-        protected int? GetPatientIdFromSRZ(string insuranceNumber, int year)
-        {
-            return GetPatientIdFromSRZ(insuranceNumber, null, null, null, null, year);
-        }
-        protected int? GetPatientIdFromSRZ(string surname, string name, string patronymic, DateTime birthdate, int year)
-        {
-            return GetPatientIdFromSRZ(null, surname, name, patronymic, birthdate, year);
-        }
-        private int? GetPatientIdFromSRZ(string insuranceNumber, string surname, string name, string patronymic, DateTime? birthdate, int year)
+        protected int? GetPatientIdFromSRZ(string insuranceNumber, IPatient patient, int year)
         {
             CheckAuthorization();
 
@@ -135,10 +127,10 @@ namespace CHI.Services.MedicalExaminations
             var contentParameters = new Dictionary<string, string>
             {
                 {"SearchData.DispYearId", ConvertToYearId(year).ToString() },
-                {"SearchData.Surname", surname??string.Empty },
-                {"SearchData.Firstname", name??string.Empty },
-                {"SearchData.Secname", patronymic??string.Empty },
-                {"SearchData.Birthday", birthdate?.ToShortDateString() ?? string.Empty },
+                {"SearchData.Surname", patient?.Surname??string.Empty },
+                {"SearchData.Firstname", patient?.Name??string.Empty },
+                {"SearchData.Secname", patient?.Patronymic??string.Empty },
+                {"SearchData.Birthday", patient?.Birthdate.ToShortDateString() ?? string.Empty },
                 {"SearchData.PolisNum", insuranceNumber??string.Empty },
                 {"SearchData.SelectSearchValues", selector}
             };

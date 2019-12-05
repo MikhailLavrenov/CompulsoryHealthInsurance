@@ -2,7 +2,7 @@
 
 namespace CHI.Services.MedicalExaminations
 {
-    public class PatientExaminations
+    public class PatientExaminations:IPatient
     {
         public string InsuranceNumber { get; set; }
         public string Initials { get; set; }

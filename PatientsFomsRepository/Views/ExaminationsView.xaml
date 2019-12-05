@@ -73,8 +73,12 @@
                                     Binding="{Binding Item1.Year, Mode=OneWay}"
                                     Width="50" />
 
-                <DataGridTextColumn Header="Статус"
-                                    Binding="{Binding Item2, Mode=OneWay}"
+                <DataGridCheckBoxColumn Header="Загружено"                                    
+                                        Binding="{Binding Item2, Mode=OneWay}"                                    
+                                        Width="80" />
+
+                <DataGridTextColumn Header="Сообщение об ошибке"
+                                    Binding="{Binding Item3, Mode=OneWay}"
                                     Width="200" />
 
                 <DataGridTextColumn Header="1эт Начало"

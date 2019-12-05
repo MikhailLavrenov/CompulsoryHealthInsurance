@@ -33,7 +33,7 @@ namespace CHI.Services.MedicalExaminations
             Credentials = credentials;
         }
 
-        public List<Tuple<PatientExaminations, string>> AddPatientsExaminations(List<PatientExaminations> patientsExaminations)
+        public List<Tuple<PatientExaminations, bool, string>> AddPatientsExaminations(List<PatientExaminations> patientsExaminations)
         {
             var threadsLimit = ThreadsLimit;
 
@@ -41,7 +41,7 @@ namespace CHI.Services.MedicalExaminations
                 threadsLimit = patientsExaminations.Count;
 
             var circularList = new CircularList<ICredential>(Credentials);
-            var result = new ConcurrentBag<Tuple<PatientExaminations, string>>();
+            var result = new ConcurrentBag<Tuple<PatientExaminations, bool, string>>();
             var tasks = new Task<ExaminationService>[threadsLimit];
             var counter = 0;
 
@@ -65,7 +65,8 @@ namespace CHI.Services.MedicalExaminations
                         service.Authorize(circularList.GetNext());
                     }
 
-                    var status = "Загружен";
+                    var error = string.Empty;
+                    var isSuccessful = true;
 
                     try
                     {
@@ -73,14 +74,16 @@ namespace CHI.Services.MedicalExaminations
                     }
                     catch (InvalidOperationException ex)
                     {
-                        status = $"Ошибка: {ex.Message}";
+                        error = ex.Message;
+                        isSuccessful = false;
                     }
                     catch (WebServiceOperationException ex)
                     {
-                        status = $"Ошибка: {ex.Message}";
+                        error = ex.Message;
+                        isSuccessful = false;
                     }
 
-                    result.Add(new Tuple<PatientExaminations, string>(patientExaminations, status));
+                    result.Add(new Tuple<PatientExaminations,bool, string>(patientExaminations, isSuccessful, error));
                     Interlocked.Increment(ref counter);
                     AddCounterChangeEvent(null, new CounterEventArgs(counter, patientsExaminations.Count));
 

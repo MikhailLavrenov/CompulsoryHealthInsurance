@@ -84,12 +84,12 @@ namespace CHI.Services.MedicalExaminations
                 }
 
                 if (srzPatientId == null)
-                    srzPatientId = webPatientData?.PersonId ?? GetPatientIdFromSRZ(patientExaminations.InsuranceNumber, patientExaminations.Year);
+                    srzPatientId = webPatientData?.PersonId ?? GetPatientIdFromSRZ(patientExaminations.InsuranceNumber, null, patientExaminations.Year);
 
                 //если пациент не найден по полису - возможно неправильный полис, ищем по ФИО и ДР
                 if (srzPatientId == null)
                 {
-                    srzPatientId = GetPatientIdFromSRZ(patientExaminations.Surname, patientExaminations.Name, patientExaminations.Patronymic, patientExaminations.Birthdate, patientExaminations.Year);
+                    srzPatientId = GetPatientIdFromSRZ(null, patientExaminations, patientExaminations.Year);
 
                     return srzPatientId == null ? null : GetOrAddPatientToPlan(patientExaminations, srzPatientId);
                 }

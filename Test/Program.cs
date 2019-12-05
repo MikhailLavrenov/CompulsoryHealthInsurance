@@ -73,12 +73,12 @@ namespace CHI.Test
             public TestExaminationServiceApi(string URL, string proxyAddress, int proxyPort) : base(URL, proxyAddress, proxyPort)
             {
                 var credential = new Credential();
-                credential.Login = "UshanovaTA";
-                credential.Password = "UshanovaTA1";
+                credential.Login = "";
+                credential.Password = "";
                 Authorize(credential);
                 var webPlanPatientData = GetPatientDataFromPlan(null,"2751530822000157", ExaminationKind.Dispanserizacia1, 2019);
                 DeletePatientFromPlan(webPlanPatientData.Id);
-                var srzPatientId = GetPatientIdFromSRZ("2751530822000157", 2019);
+                var srzPatientId = GetPatientIdFromSRZ("2751530822000157",null, 2019);
                 AddPatientToPlan(srzPatientId.Value, ExaminationKind.Dispanserizacia1, 2019);
 
                 AddStep(webPlanPatientData.Id, ExaminationStepKind.FirstBegin, new DateTime(2019, 10, 25), 0, 0);
