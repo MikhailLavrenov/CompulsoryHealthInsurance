@@ -9,7 +9,6 @@ namespace CHI.Services.MedicalExaminations
     {
         #region Поля
         private static readonly ExaminationStepKind[] examinationSteps;
-        private static readonly string AddPlanErrorMessage = "Не удалось добавить пациента в план";
         #endregion
 
         #region Конструкторы
@@ -21,10 +20,8 @@ namespace CHI.Services.MedicalExaminations
                 .OrderBy(x => (int)x)
                 .ToArray();
         }
-        public ExaminationService(string URL)
-            : this(URL, null, 0)
-        { }
-        public ExaminationService(string URL, string proxyAddress, int proxyPort) : base(URL, proxyAddress, proxyPort)
+        public ExaminationService(string URL,bool useProxy, string proxyAddress=null, int? proxyPort=null) 
+            : base(URL, useProxy, proxyAddress, proxyPort)
         { }
         #endregion
 
@@ -46,7 +43,7 @@ namespace CHI.Services.MedicalExaminations
             var webPatientData = GetOrAddPatientToPlan(patientExaminations);
 
             if (webPatientData == null)
-                throw new InvalidOperationException(AddPlanErrorMessage);
+                throw new InvalidOperationException("Ошибка добавления пациента в план");
 
             var transfer2StageDate = patientExaminations.Stage1?.EndDate ?? webPatientData.Disp1Date;
             var userSteps = ConvertToExaminationsSteps(patientExaminations, transfer2StageDate);

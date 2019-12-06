@@ -14,11 +14,8 @@ namespace CHI.Services.MedicalExaminations
         #endregion
 
         #region Конструкторы
-        protected ExaminationServiceApi(string URL)
-            : base(URL)
-        { }
-        protected ExaminationServiceApi(string URL, string proxyAddress, int proxyPort)
-            : base(URL, proxyAddress, proxyPort)
+        protected ExaminationServiceApi(string URL, bool useProxy, string proxyAddress = null, int? proxyPort = null)
+            : base(URL, useProxy, proxyAddress, proxyPort)
         { }
         #endregion
 
@@ -82,7 +79,7 @@ namespace CHI.Services.MedicalExaminations
             if (planResponse != null)
                 return planResponse.Data?.FirstOrDefault();
             else
-                throw new InvalidOperationException(ParseResponseErrorMessage);
+                throw new InvalidOperationException("Ошибка получения информации из плана");
         }
         protected void AddPatientToPlan(int srzPatientId, ExaminationKind examinationType, int year)
         {
@@ -100,7 +97,7 @@ namespace CHI.Services.MedicalExaminations
             var response = new JavaScriptSerializer().Deserialize<WebResponse>(responseText);
 
             if (response.IsError)
-                throw new WebServiceOperationException("Произошла ошибка при добавлении пациента в план");
+                throw new WebServiceOperationException("Ошибка при добавлении пациента в план");
         }
         protected void DeletePatientFromPlan(int patientId)
         {
@@ -140,7 +137,7 @@ namespace CHI.Services.MedicalExaminations
             var idString = SubstringBetween(responseText, "personId", "\"", "\"");
 
             if (responseText.IndexOf(">Застрахованное лицо находится в плане диспансеризации другой МО<") != -1)
-                throw new InvalidOperationException("Пациент находится в плане др. ЛПУ");
+                throw new WebServiceOperationException("Пациент находится в плане др. ЛПУ");
 
             int.TryParse(idString, out var srzPatientId);
 

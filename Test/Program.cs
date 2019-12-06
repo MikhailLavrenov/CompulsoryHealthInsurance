@@ -28,7 +28,7 @@ namespace CHI.Test
             var url = "http://11.0.0.205/";
             var proxyServer = "10.10.45.40";
             var proxyPort = 3128;
-            var web = new TestExaminationServiceApi(url, proxyServer, proxyPort);
+            var web = new TestExaminationServiceApi(url,true, proxyServer, proxyPort);
         }
         static void TestWebService()
         {
@@ -39,7 +39,7 @@ namespace CHI.Test
             credential.Login = "UshanovaTA";
             credential.Password = "UshanovaTA1";
 
-            var web = new ExaminationService(url, proxyServer, proxyPort);
+            var web = new ExaminationService(url,true, proxyServer, proxyPort);
 
             var examination1Stage = new Examination
             {
@@ -67,10 +67,7 @@ namespace CHI.Test
 
         class TestExaminationServiceApi : ExaminationServiceApi
         {
-            public TestExaminationServiceApi(string URL)
-        : this(URL, null, 0)
-            { }
-            public TestExaminationServiceApi(string URL, string proxyAddress, int proxyPort) : base(URL, proxyAddress, proxyPort)
+            public TestExaminationServiceApi(string URL,bool useProxy, string proxyAddress, int? proxyPort) : base(URL, useProxy, proxyAddress, proxyPort)
             {
                 var credential = new Credential();
                 credential.Login = "";

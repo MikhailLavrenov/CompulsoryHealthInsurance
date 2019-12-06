@@ -74,11 +74,7 @@ namespace CHI.Application.ViewModels
 
                 MainRegionService.SetBusyStatus("Загрузка файла из СРЗ.");
 
-                SRZService service;
-                if (Settings.UseProxy)
-                    service = new SRZService(Settings.SRZAddress, Settings.ProxyAddress, Settings.ProxyPort);
-                else
-                    service = new SRZService(Settings.SRZAddress);
+                var service = new SRZService(Settings.SRZAddress, Settings.UseProxy, Settings.ProxyAddress, Settings.ProxyPort);
 
                 var credential = Settings.Credentials.First(x => x.RequestsLimit > 0);
                 service.TryAuthorize(credential);
@@ -182,10 +178,7 @@ namespace CHI.Application.ViewModels
 
                             if (circularRestrictedList.TryReserve(credential))
                             {
-                                if (Settings.UseProxy)
-                                    service = new SRZService(Settings.SRZAddress, Settings.ProxyAddress, Settings.ProxyPort);
-                                else
-                                    service = new SRZService(Settings.SRZAddress);
+                                service = new SRZService(Settings.SRZAddress, Settings.UseProxy, Settings.ProxyAddress, Settings.ProxyPort);
 
                                 if (service.TryAuthorize(credential))
                                     break;

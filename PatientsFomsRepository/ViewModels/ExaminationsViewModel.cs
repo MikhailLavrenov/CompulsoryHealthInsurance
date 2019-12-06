@@ -125,7 +125,7 @@ namespace CHI.Application.ViewModels
             examinationService.AddCounterChangeEvent += UpdateProgress;
 
             Result = examinationService.AddPatientsExaminations(patientsExaminations)
-                .OrderByDescending(x => x.Item2)
+                .OrderBy(x => x.Item2)
                 .ThenBy(x => x.Item1.Kind)
                 .ThenBy(x => x.Item1.Year)
                 .ToList();
@@ -135,11 +135,11 @@ namespace CHI.Application.ViewModels
 
             examinationService.AddCounterChangeEvent -= UpdateProgress;
 
-            MainRegionService.SetCompleteStatus("Успешно завершено.");
+            MainRegionService.SetCompleteStatus("Завершено.");
         }
         private void UpdateProgress(object sender, CounterEventArgs args)
         {
-            MainRegionService.SetBusyStatus($"Загрузка осмотров. Загружено пациентов: {args.Counter} из {args.Total}.");
+            MainRegionService.SetBusyStatus($"Загрузка осмотров. Обработано пациентов: {args.Counter} из {args.Total}.");
         }
         #endregion
 

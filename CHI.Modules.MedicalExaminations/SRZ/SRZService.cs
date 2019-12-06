@@ -23,11 +23,8 @@ namespace CHI.Services.SRZ
         #endregion
 
         #region Конструкторы
-        public SRZService(string URL)
-            : this(URL, null, 0)
-        { }
-        public SRZService(string URL, string proxyAddress, int proxyPort)
-            : base(URL, proxyAddress, proxyPort)
+        public SRZService(string URL, bool useProxy, string proxyAddress = null, int? proxyPort = null)
+            : base(URL, useProxy, proxyAddress, proxyPort)
         { }
         #endregion
 

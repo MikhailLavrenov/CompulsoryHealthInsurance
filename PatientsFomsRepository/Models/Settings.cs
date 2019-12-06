@@ -354,10 +354,12 @@ namespace CHI.Application.Models
         {
             Parallel.ForEach(Credentials, credential =>
             {
-                using (var site = new SRZService(SRZAddress, ProxyAddress, ProxyPort))
+                using (var site = new SRZService(SRZAddress,UseProxy, ProxyAddress, ProxyPort))
                 {
                     if (site.TryAuthorize(credential))
                     {
+                        site.Logout();
+
                         credential.RemoveErrors(nameof(credential.Login));
                         credential.RemoveErrors(nameof(credential.Password));
                     }

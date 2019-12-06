@@ -11,7 +11,6 @@ namespace CHI.Services.Common
         #region Поля   
         private HttpClient client;
         protected static readonly string UnauthorizedAccessErrorMessage = "Сначала необходимо авторизоваться.";
-        protected static readonly string ParseResponseErrorMessage = "Ошибка разбора ответа от web-сервера";
         #endregion
 
         #region Свойства
@@ -19,17 +18,14 @@ namespace CHI.Services.Common
         #endregion
 
         #region Конструкторы
-        public WebServiceBase(string URL)
-            : this(URL, null, 0)
-        { }
-        public WebServiceBase(string URL, string proxyAddress, int proxyPort)
+        public WebServiceBase(string URL,bool useProxy, string proxyAddress=null, int? proxyPort=null)
         {
             Authorized = false;
 
             var clientHandler = new HttpClientHandler();
             clientHandler.CookieContainer = new CookieContainer();
 
-            if (proxyAddress != null && proxyPort != 0)
+            if (useProxy)
             {
                 clientHandler.UseProxy = true;
                 clientHandler.Proxy = new WebProxy($"{proxyAddress}:{proxyPort}");

@@ -3,6 +3,8 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -55,41 +57,65 @@ namespace CHI.Services.MedicalExaminations
                 tasks[index] = tasks[index].ContinueWith((task) =>
                 {
                     var service = task.ConfigureAwait(false).GetAwaiter().GetResult();
-                    if (service == null)
-                    {
-                        if (UseProxy)
-                            service = new ExaminationService(URL, ProxyAddress, ProxyPort);
-                        else
-                            service = new ExaminationService(URL);
-
-                        service.Authorize(circularList.GetNext());
-                    }
-
                     var error = string.Empty;
                     var isSuccessful = true;
 
-                    try
+                    //3 попытки на загрузку осмотра, т.к. иногода веб-сервер обрывает сессии
+                    for (int j = 0; j < 3; j++)
                     {
-                        service.AddPatientExaminations(patientExaminations);                      
-                    }
-                    catch (InvalidOperationException ex)
-                    {
-                        error = ex.Message;
-                        isSuccessful = false;
-                    }
-                    catch (WebServiceOperationException ex)
-                    {
-                        error = ex.Message;
-                        isSuccessful = false;
+                        if (service == null)
+                        {
+                            service = new ExaminationService(URL, UseProxy, ProxyAddress, ProxyPort);
+
+                            service.Authorize(circularList.GetNext());
+                        }
+
+                        try
+                        {
+                            service.AddPatientExaminations(patientExaminations);
+                            break;
+                        }
+                        catch (HttpRequestException ex)
+                        {
+                            error = ex.Message;
+                            isSuccessful = false;
+                            service = null;
+                        }
+                        catch (InvalidOperationException ex)
+                        {
+                            error = ex.Message;
+                            isSuccessful = false;
+                        }
+                        catch (WebServiceOperationException ex)
+                        {
+                            error = ex.Message;
+                            isSuccessful = false;
+                            break;
+                        }
+
+                        Thread.Sleep(10000);
                     }
 
-                    result.Add(new Tuple<PatientExaminations,bool, string>(patientExaminations, isSuccessful, error));
+                    result.Add(new Tuple<PatientExaminations, bool, string>(patientExaminations, isSuccessful, error));
                     Interlocked.Increment(ref counter);
                     AddCounterChangeEvent(null, new CounterEventArgs(counter, patientsExaminations.Count));
 
                     return service;
                 });
             }
+
+            for (int i = 0; i < tasks.Length; i++)
+            {
+                var index = Task.WaitAny(tasks);
+
+                tasks[index] = tasks[index].ContinueWith((task) =>
+                {
+                    var service = task.ConfigureAwait(false).GetAwaiter().GetResult();
+                    service?.Logout();
+                    return service;
+                });
+            }
+
             Task.WaitAll(tasks);
 
             return result.ToList();
