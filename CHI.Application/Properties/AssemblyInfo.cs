@@ -7,9 +7,9 @@ using System.Windows;
 // Общие сведения об этой сборке предоставляются следующим набором
 // набор атрибутов. Измените значения этих атрибутов, чтобы изменить сведения,
 // связанные со сборкой.
-[assembly: AssemblyTitle("Хранилище пациентов из СРЗ")]
-[assembly: AssemblyDescription("Хранилище пациентов из СРЗ")]
-[assembly: AssemblyProduct("Хранилище пациентов из СРЗ")]
+[assembly: AssemblyTitle("ОМС Утилиты")]
+[assembly: AssemblyDescription("ОМС Утилиты")]
+[assembly: AssemblyProduct("ОМС Утилиты")]
 [assembly: AssemblyCopyright("Copyright ©  2019")]
 
 // Установка значения False для параметра ComVisible делает типы в этой сборке невидимыми

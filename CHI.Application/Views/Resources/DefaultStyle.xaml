@@ -27,7 +27,7 @@
                 Value="LightGray" />
     </Style>
 
-    
+
     <Style TargetType="Button"
            x:Key="PictureButton"
            BasedOn="{StaticResource ControlBase}">
@@ -224,7 +224,7 @@
         <Setter Property="FontWeight"
                 Value="DemiBold" />
         <Setter Property="Margin"
-                Value="5,10,5,20" />
+                Value="5,20,5,20" />
     </Style>
 
     <Style TargetType="TextBlock"
@@ -234,6 +234,19 @@
                 Value="14" />
         <Setter Property="FontWeight"
                 Value="DemiBold" />
+    </Style>
+
+    <Style TargetType="TextBlock"
+           x:Key="MainMenu"
+           BasedOn="{StaticResource ControlBase}">
+        <Setter Property="FontSize"
+                Value="12" />
+        <Setter Property="FontWeight"
+                Value="DemiBold" />
+        <Setter Property="Foreground" 
+                Value="Gray"/>
+        <Setter Property="Margin" 
+                Value="5,20,10,7"/>
     </Style>
 
     <!--TextBoxes-->

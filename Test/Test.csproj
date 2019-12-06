@@ -57,11 +57,11 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CHI.Modules.MedicalExaminations\CHI.Services.csproj">
+    <ProjectReference Include="..\CHI.Services\CHI.Services.csproj">
       <Project>{F0D0927C-270D-4BB2-9DAC-77DE973185E9}</Project>
       <Name>CHI.Services</Name>
     </ProjectReference>
-    <ProjectReference Include="..\PatientsFomsRepository\CHI.Application.csproj">
+    <ProjectReference Include="..\CHI.Application\CHI.Application.csproj">
       <Project>{519989BB-8C1C-4B58-B184-2310F23ED64A}</Project>
       <Name>CHI.Application</Name>
     </ProjectReference>

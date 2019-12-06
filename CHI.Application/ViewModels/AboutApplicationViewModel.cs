@@ -3,6 +3,7 @@ using Prism.Commands;
 using Prism.Regions;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 
 namespace CHI.Application.ViewModels
@@ -31,12 +32,12 @@ namespace CHI.Application.ViewModels
         public AboutApplicationViewModel(IMainRegionService mainRegionService)
         {
             MainRegionService = mainRegionService;
+            var assembly = Assembly.GetExecutingAssembly();
 
-            
             manualPath = "Инструкция.docx";
-            repositoryPath = @"https://github.com/MikhailLavrenov/PatientsFomsRepository";
-            Name = "Хранилище пациентов из СРЗ";
-            Version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            repositoryPath = @"https://github.com/MikhailLavrenov/CompulsoryHealthInsurance";
+            Name = ((AssemblyTitleAttribute)assembly.GetCustomAttributes(typeof(AssemblyTitleAttribute), false).First()).Title;
+            Version = assembly.GetName().Version.ToString();
             Copyright = @"©  2019";
             Author = "Лавренов Михаил Владимирович";
             Email = "mvlavrenov@mail.ru";

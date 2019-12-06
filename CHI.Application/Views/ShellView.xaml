@@ -11,7 +11,7 @@
         xmlns:prism="http://prismlibrary.com/"
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
-        Title="Хранилище пациентов из СРЗ"
+        Title="{Binding ApplicationTitle}"
         Height="600"
         Width="750"
         prism:ViewModelLocator.AutoWireViewModel="True"
@@ -38,7 +38,9 @@
             <WrapPanel DockPanel.Dock="Left" Orientation="Vertical" Width="150"
                        Margin="0,3,0,3">
 
-                <Button Content="Прикрепленные пациенты"
+                <TextBlock Text="Основное" Style="{StaticResource MainMenu}"/>
+
+                <Button Content="Файл прикрепленных пациентов"
                         Style="{StaticResource HeaderReferenceButton}"
                         Command="{Binding ShowViewCommand}"
                         CommandParameter="{x:Type v:PatientsFileView}" />
@@ -47,13 +49,15 @@
                         Style="{StaticResource HeaderReferenceButton}"
                         Command="{Binding ShowViewCommand}"
                         CommandParameter="{x:Type v:ExaminationsView}" />
-                
-                <Button Content="Настройки сервисов"
+
+                <TextBlock Text="Настройки" Style="{StaticResource MainMenu}"/>
+
+                <Button Content="Настройки подключения к сервисам"
                         Style="{StaticResource HeaderReferenceButton}"
                         Command="{Binding ShowViewCommand}"
                         CommandParameter="{x:Type v:ServicesSettingsView}" />
 
-                <Button Content="Настройки прикрепленных пациентов"
+                <Button Content="Настройки файла прикрепленных пациентов"
                         Style="{StaticResource HeaderReferenceButton}"
                         Command="{Binding ShowViewCommand}"
                         CommandParameter="{x:Type v:PatientsFileSettingsView}" />
@@ -63,6 +67,8 @@
                         Command="{Binding ShowViewCommand}"
                         CommandParameter="{x:Type v:ExaminationsSettingView}" />
 
+                <TextBlock Text="Прочее" Style="{StaticResource MainMenu}" />
+                
                 <Button Content="О программе"
                         Style="{StaticResource HeaderReferenceButton}"
                         Command="{Binding ShowViewCommand}"

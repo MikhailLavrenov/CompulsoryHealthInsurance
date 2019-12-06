@@ -41,7 +41,7 @@ namespace CHI.Application.ViewModels
             MainRegionService = mainRegionService;
 
             Settings = Settings.Instance;
-            MainRegionService.Header = "Файл выгрузки прикрепленных пациентов";
+            MainRegionService.Header = "Файл прикрепленных пациентов";
             FileDate = DateTime.Today;
 
             ProcessFileCommand = new DelegateCommandAsync(ProcessFileExecute, ProcessFileCanExecute);
