@@ -33,6 +33,7 @@ namespace CHI.Services.Common
 
             client = new HttpClient(clientHandler);
             client.BaseAddress = new Uri(URL);
+            client.Timeout = new TimeSpan(0, 2, 0);
         }
         #endregion
 

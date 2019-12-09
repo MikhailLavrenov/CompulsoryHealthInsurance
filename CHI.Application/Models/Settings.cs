@@ -233,7 +233,7 @@ namespace CHI.Application.Models
             UseProxy = false;
             ProxyAddress = "";
             ProxyPort = 0;
-            ThreadsLimit = 20;
+            ThreadsLimit = 5;
             CredentialsScope = CredentialScope.ТекущийПользователь;
             Credentials = new ObservableCollection<Credential>()
              {
