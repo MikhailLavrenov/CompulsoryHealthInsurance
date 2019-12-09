@@ -84,10 +84,10 @@
     <Compile Include="MedicalExaminations\Examination.cs" />
     <Compile Include="MedicalExaminations\ExaminationServiceParallel.cs" />
     <Compile Include="MedicalExaminations\ExaminationStep.cs" />
-    <Compile Include="MedicalExaminations\ExaminationStepKind.cs" />
+    <Compile Include="MedicalExaminations\StepKind.cs" />
     <Compile Include="MedicalExaminations\ExaminationKind.cs" />
-    <Compile Include="MedicalExaminations\ExaminationHealthGroup.cs" />
-    <Compile Include="MedicalExaminations\ExaminationReferral.cs" />
+    <Compile Include="MedicalExaminations\HealthGroup.cs" />
+    <Compile Include="MedicalExaminations\Referral.cs" />
     <Compile Include="MedicalExaminations\IPatient.cs" />
     <Compile Include="MedicalExaminations\PatientExaminations.cs" />
     <Compile Include="Common\WebServiceOperationException.cs" />

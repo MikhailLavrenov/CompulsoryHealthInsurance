@@ -1,15 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel;
 
 namespace CHI.Services.MedicalExaminations
 {
-    public enum ExaminationStepKind
+    /// <summary>
+    /// Шаг прохождения профилактического осмотра
+    /// </summary>
+    public enum StepKind
     {
-        [Description ("Не выбрано")] None=0,
+        [Description("Не выбрано")] None = 0,
         [Description("Начало 1 этапа")] FirstBegin = 12,
         [Description("Завершен 1 этап")] FirstEnd = 15,
         [Description("Результат 1 этапа")] FirstResult = 16,

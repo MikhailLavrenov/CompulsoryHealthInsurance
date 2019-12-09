@@ -11,7 +11,7 @@ using System.Text;
 namespace CHI.Services.SRZ
 {
     /// <summary>
-    /// Работа с веб-порталом СРЗ
+    /// Представляет сервис для работы в веб-порталом СРЗ
     /// </summary>
     public class SRZService : WebServiceBase, IDisposable
     {
@@ -43,20 +43,20 @@ namespace CHI.Services.SRZ
                 var responseText = SendRequest(HttpMethod.Post, @"data/user.ajax.logon.php", content);
 
                 if (responseText == "")
-                    return Authorized = true;
+                    return IsAuthorized = true;
                 else
-                    return Authorized = false;
+                    return IsAuthorized = false;
             }
             catch (Exception)
             {
-                return Authorized = false;
+                return IsAuthorized = false;
             }
         }
         //выход с сайта
         public void Logout()
         {
             SendRequest(HttpMethod.Get, @"?show=logoff", null);
-            Authorized = false;
+            IsAuthorized = false;
         }
         //запрашивает данные пациента
         public Patient GetPatient(string insuranceNumber)

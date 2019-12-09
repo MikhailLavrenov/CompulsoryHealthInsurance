@@ -1,20 +1,26 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CHI.Services.Common
 {
-    public class WebServiceOperationException:ApplicationException
+    /// <summary>
+    /// Исключение, которое выдается при возврате web-сервером ответа с сообщением об ошибке.
+    /// </summary>
+    public class WebServiceOperationException : ApplicationException
     {
-        private static readonly string defaultErrorMessage="Произошла ошибка выполнения операции на стороне web-сервер";
+        private static readonly string defaultErrorMessage = "Произошла ошибка выполнения операции на стороне web-сервер";
 
-        public WebServiceOperationException():this(defaultErrorMessage)
-        { 
-        }
-        public WebServiceOperationException(string message):base (message)
-        {
-        }
+        /// <summary>
+        /// Конструктор по-умолчанию. Использует стандартное сообщение об ошибке.
+        /// </summary>
+        public WebServiceOperationException()
+            : this(defaultErrorMessage)
+        { }
+
+        /// <summary>
+        /// Конструктор.
+        /// </summary>
+        /// <param name="message">Сообщение об ошибке</param>
+        public WebServiceOperationException(string message) : base(message)
+        { }
     }
 }

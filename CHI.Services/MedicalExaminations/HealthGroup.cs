@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel;
 
 namespace CHI.Services.MedicalExaminations
 {
-    public enum ExaminationHealthGroup
+    /// <summary>
+    /// Группа здоровья
+    /// </summary>
+    public enum HealthGroup
     {
         [Description("Не выбрано")] None = 0,
         [Description("1")] First = 1,

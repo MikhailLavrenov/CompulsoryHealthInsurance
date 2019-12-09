@@ -2,7 +2,10 @@
 
 namespace CHI.Services.MedicalExaminations
 {
-    public enum ExaminationReferral
+    /// <summary>
+    /// Направление
+    /// </summary>
+    public enum Referral
     {
         [Description("Не выбрано")] None = 0,
         [Description("Консультацию в МО по месту прикрепления")] LocalClinic = 1,

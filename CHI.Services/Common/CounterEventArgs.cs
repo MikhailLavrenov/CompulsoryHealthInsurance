@@ -15,7 +15,7 @@
         public int Total { get; set; }
 
         /// <summary>
-        /// Контсруктор
+        /// Конструктор
         /// </summary>
         /// <param name="counter">Текущее значение счетчика</param>
         /// <param name="total">Итоговое значение счетчика</param>

@@ -1,19 +1,27 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CHI.Services.MedicalExaminations
-{    
+{
+    /// <summary>
+    /// Представляет медицинский профилактический осмотр
+    /// </summary>
     public class Examination
     {
-        //public ExaminationKind Kind { get; set; }
-        //public int Stage { get; set; }
-        //public int Year { get; set; }
+        /// <summary>
+        /// Дата начала
+        /// </summary>
         public DateTime BeginDate { get; set; }
-        public DateTime EndDate { get; set; }        
-        public ExaminationHealthGroup HealthGroup { get; set; }
-        public ExaminationReferral Referral { get; set; }
+        /// <summary>
+        /// Дата окончания
+        /// </summary>
+        public DateTime EndDate { get; set; }
+        /// <summary>
+        /// Группа здоровья
+        /// </summary>
+        public HealthGroup HealthGroup { get; set; }
+        /// <summary>
+        /// Направление
+        /// </summary>
+        public Referral Referral { get; set; }
     }
 }

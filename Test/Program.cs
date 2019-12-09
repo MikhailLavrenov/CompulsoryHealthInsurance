@@ -45,15 +45,15 @@ namespace CHI.Test
             {
                 BeginDate = new DateTime(2019, 10, 10),
                 EndDate = new DateTime(2019, 10, 15),
-                HealthGroup = ExaminationHealthGroup.ThirdA,
-                Referral = ExaminationReferral.LocalClinic
+                HealthGroup = HealthGroup.ThirdA,
+                Referral = Referral.LocalClinic
             };
             var examination2Stage = new Examination
             {
                 BeginDate = new DateTime(2019, 10, 20),
                 EndDate = new DateTime(2019, 10, 25),
-                HealthGroup = ExaminationHealthGroup.ThirdB,
-                Referral = ExaminationReferral.AnotherClinic
+                HealthGroup = HealthGroup.ThirdB,
+                Referral = Referral.AnotherClinic
             };
             var patientExaminations = new PatientExaminations("2751530822000157", 2019, ExaminationKind.Dispanserizacia1)
             {
@@ -78,9 +78,9 @@ namespace CHI.Test
                 var srzPatientId = GetPatientIdFromSRZ("2751530822000157",null, 2019);
                 AddPatientToPlan(srzPatientId.Value, ExaminationKind.Dispanserizacia1, 2019);
 
-                AddStep(webPlanPatientData.Id, ExaminationStepKind.FirstBegin, new DateTime(2019, 10, 25), 0, 0);
-                AddStep(webPlanPatientData.Id, ExaminationStepKind.FirstEnd, new DateTime(2019, 10, 28), 0, 0);
-                AddStep(webPlanPatientData.Id, ExaminationStepKind.FirstResult, new DateTime(2019, 10, 28), ExaminationHealthGroup.First, ExaminationReferral.None);
+                AddStep(webPlanPatientData.Id, StepKind.FirstBegin, new DateTime(2019, 10, 25), 0, 0);
+                AddStep(webPlanPatientData.Id, StepKind.FirstEnd, new DateTime(2019, 10, 28), 0, 0);
+                AddStep(webPlanPatientData.Id, StepKind.FirstResult, new DateTime(2019, 10, 28), HealthGroup.First, Referral.None);
 
                 DeleteLastStep(webPlanPatientData.Id);
                 DeleteLastStep(webPlanPatientData.Id);

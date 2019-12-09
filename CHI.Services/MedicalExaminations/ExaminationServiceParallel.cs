@@ -3,28 +3,66 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace CHI.Services.MedicalExaminations
 {
+    /// <summary>
+    /// Представляет сервис для многопоточной загрузки профилактических осмотров на портал диспансеризации
+    /// </summary>
     public class ExaminationServiceParallel
     {
+        /// <summary>
+        /// Коллекция учетных записей
+        /// </summary>
         public IEnumerable<ICredential> Credentials { get; private set; }
+        /// <summary>
+        /// URL
+        /// </summary>
         public string URL { get; private set; }
-        public string ProxyAddress { get; private set; }
-        public int ProxyPort { get; private set; }
-        public int ThreadsLimit { get; private set; }
+        /// <summary>
+        /// Исползовать прокси-сервер
+        /// </summary>
         public bool UseProxy { get; private set; }
-
+        /// <summary>
+        /// Адрес прокси-сервера
+        /// </summary>
+        public string ProxyAddress { get; private set; }
+        /// <summary>
+        /// Порт прокси-сервера
+        /// </summary>
+        public int ProxyPort { get; private set; }
+        /// <summary>
+        /// Лимит параллельных потоков
+        /// </summary>
+        public int ThreadsLimit { get; private set; }
+        
+        /// <summary>
+        /// Событие возникает при изменении кол-ва пациентов с загруженными осмотрами. 
+        /// </summary>
         public event EventHandler<CounterEventArgs> AddCounterChangeEvent;
 
+        /// <summary>
+        /// Конструктор
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="threadsLimit"></param>
+        /// <param name="credentials"></param>
         public ExaminationServiceParallel(string url, int threadsLimit, IEnumerable<ICredential> credentials)
             : this(url, false, null, 0, threadsLimit, credentials)
         {
         }
+        /// <summary>
+        /// Конструктор
+        /// </summary>
+        /// <param name="url">URL</param>
+        /// <param name="useProxy">Использовать прокси-сервер</param>
+        /// <param name="proxyAddress">Адрес прокси-сервера</param>
+        /// <param name="proxyPort">Порт прокси-сервера</param>
+        /// <param name="threadsLimit">Лимит параллельных потоков</param>
+        /// <param name="credentials">Коллекция учетных записей</param>
         public ExaminationServiceParallel(string url, bool useProxy, string proxyAddress, int proxyPort, int threadsLimit, IEnumerable<ICredential> credentials)
         {
             URL = url;
@@ -35,6 +73,11 @@ namespace CHI.Services.MedicalExaminations
             Credentials = credentials;
         }
 
+        /// <summary>
+        /// Загружает осмотры на портал диспансеризации. В случае возникновения исключений при загрузке осмотра - предпринимает несколько попыток.
+        /// </summary>
+        /// <param name="patientsExaminations">Список профилактических осмотров пациентов.</param>
+        /// <returns>Список кортежей состоящий из PatientExaminations, флага успешной загрузки (true-успешно, false-иначе), строки с сообщением об ошибке.</returns>
         public List<Tuple<PatientExaminations, bool, string>> AddPatientsExaminations(List<PatientExaminations> patientsExaminations)
         {
             var threadsLimit = ThreadsLimit;

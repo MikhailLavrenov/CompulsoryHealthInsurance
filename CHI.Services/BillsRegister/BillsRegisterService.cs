@@ -164,18 +164,18 @@ namespace CHI.Services.BillsRegister
 
                     examination.EndDate = treatmentCase.Z_SL.SL.DATE_2;
                     examination.HealthGroup = RSLT_DToHealthGroup(treatmentCase.Z_SL.RSLT_D);
-                    examination.Referral = (ExaminationReferral)(treatmentCase.Z_SL.SL.NAZ.FirstOrDefault()?.NAZ_R ?? 0);
+                    examination.Referral = (Referral)(treatmentCase.Z_SL.SL.NAZ.FirstOrDefault()?.NAZ_R ?? 0);
 
                     //если не заполнено направление
                     if (examination.Referral == 0)
                     {
-                        if (examination.HealthGroup == ExaminationHealthGroup.ThirdA || examination.HealthGroup == ExaminationHealthGroup.ThirdB)
-                            examination.Referral = ExaminationReferral.LocalClinic;
+                        if (examination.HealthGroup == HealthGroup.ThirdA || examination.HealthGroup == HealthGroup.ThirdB)
+                            examination.Referral = Referral.LocalClinic;
                         else
-                            examination.Referral = ExaminationReferral.No;
+                            examination.Referral = Referral.No;
                     }
 
-                    if (examination.HealthGroup == ExaminationHealthGroup.None)
+                    if (examination.HealthGroup == HealthGroup.None)
                         continue;
 
                     var patientExamination = result.FirstOrDefault(x => x.InsuranceNumber.Equals(insuranceNumber, comparer) && x.Year == examinationYear && x.Kind == examinationKind);
@@ -226,23 +226,23 @@ namespace CHI.Services.BillsRegister
                     return ExaminationKind.None;
             }
         }
-        private static ExaminationHealthGroup RSLT_DToHealthGroup(int RSLT_D)
+        private static HealthGroup RSLT_DToHealthGroup(int RSLT_D)
         {
             switch (RSLT_D)
             {
                 case 1:
-                    return ExaminationHealthGroup.First;
+                    return HealthGroup.First;
                 case 2:
                 case 12:
-                    return ExaminationHealthGroup.Second;
+                    return HealthGroup.Second;
                 case 31:
                 case 14:
-                    return ExaminationHealthGroup.ThirdA;
+                    return HealthGroup.ThirdA;
                 case 32:
                 case 15:
-                    return ExaminationHealthGroup.ThirdB;
+                    return HealthGroup.ThirdB;
                 default:
-                    return ExaminationHealthGroup.None;
+                    return HealthGroup.None;
             }
         }
         private static List<T> DeserializeCollection<T>(IEnumerable<Stream> files) where T : class
