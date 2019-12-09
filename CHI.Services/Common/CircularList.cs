@@ -8,7 +8,7 @@ namespace CHI.Services.Common
     /// <typeparam name="T">Тип элементов</typeparam>
     public class CircularList<T>
     {
-        private readonly object locker = new object();        
+        private readonly object locker = new object();
         private IEnumerator<T> enumerator;
 
         /// <summary>

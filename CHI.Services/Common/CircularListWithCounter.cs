@@ -1,5 +1,4 @@
-﻿using CHI.Services.Common;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace CHI.Services.Common
@@ -7,7 +6,7 @@ namespace CHI.Services.Common
     /// <summary>
     /// Возвращает элементы коллекции типа Т по замкнутому кругу по одному пока лимит запросов не исчерпан
     /// </summary>
-    public class CircularListWithCounter<T> where T: class
+    public class CircularListWithCounter<T> where T : class
     {
         #region Поля
         private readonly object locker = new object();
@@ -20,7 +19,7 @@ namespace CHI.Services.Common
         /// Конструктор
         /// </summary>
         /// <param name="keyValuePairs">Универсальная коллекция объектов "ключ-значение", где ключ - элемент коллекции, значение - лимит счетчика </param>
-        public CircularListWithCounter(IDictionary<T,uint> keyValuePairs)
+        public CircularListWithCounter(IDictionary<T, uint> keyValuePairs)
         {
             var countableObjects = new List<CountableObject>();
             totalCounter = 0;
