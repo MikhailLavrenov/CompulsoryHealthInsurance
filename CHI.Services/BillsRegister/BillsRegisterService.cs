@@ -8,6 +8,9 @@ using System.Xml.Serialization;
 
 namespace CHI.Services.BillsRegister
 {
+    /// <summary>
+    /// Представляет сервис для работы с xml выгрузкой реестров-счетов по программе ОМС ХК ФОМС
+    /// </summary>
     public class BillsRegisterService
     {
         #region Поля
@@ -16,10 +19,18 @@ namespace CHI.Services.BillsRegister
         #endregion
 
         #region Конструкторы
+        /// <summary>
+        /// Конструктор
+        /// </summary>
+        /// <param name="filePaths">Коллекиця путей к xml файлам. Могут быть многократно упакованны в zip-архив.</param>
         public BillsRegisterService(ICollection<string> filePaths)
         {
             this.filePaths = filePaths.ToList();
         }
+        /// <summary>
+        /// Конструктор
+        /// </summary>
+        /// <param name="filePath">Путь к xml файлу. Может быть многократно упакованн в zip-архив.</param>
         public BillsRegisterService(string filePath)
         {
             filePaths = new List<string>() { filePath };
@@ -27,6 +38,12 @@ namespace CHI.Services.BillsRegister
         #endregion
 
         #region Методы
+        /// <summary>
+        /// Получает список профилактических осмотров пациентов из xml файлов реестров-счетов. Среди всех файлов выбирает только необходимые.
+        /// </summary>
+        /// <param name="examinationsFileNamesStartsWith">Коллекция начала имен файлов с услугами.</param>
+        /// <param name="patientsFileNamesStartsWith">Коллекция начала имен файлов с пациентами.</param>
+        /// <returns>Список профилактических осмотров пациентовю</returns>
         public List<PatientExaminations> GetPatientsExaminations(IEnumerable<string> examinationsFileNamesStartsWith, IEnumerable<string> patientsFileNamesStartsWith)
         {
             var patientsFiles = GetFiles(patientsFileNamesStartsWith);
@@ -41,8 +58,13 @@ namespace CHI.Services.BillsRegister
             foreach (var file in examinationsFiles)
                 file.Dispose();
 
-            return GetPatientsExaminations(examinationsRegisters, patientsRegisters);
+            return ConvertToPatientExaminations(examinationsRegisters, patientsRegisters);
         }
+        /// <summary>
+        /// Получает список потоков  на файлы из указанных расположений  файла/файлов, начинающихся с заданных имен.
+        /// </summary>
+        /// <param name="fileNamesStartsWithFilter">Коллекция начала имен файлов.</param>
+        /// <returns>Список потоков файлов.</returns>
         private List<Stream> GetFiles(IEnumerable<string> fileNamesStartsWithFilter)
         {
             var files = new List<Stream>();
@@ -52,6 +74,12 @@ namespace CHI.Services.BillsRegister
 
             return files;
         }
+        /// <summary>
+        ///  Получает список потоков на файлы по заданному пути и имена которых начинаются с опеределенных строк.
+        /// </summary>
+        /// <param name="path">Путь к файлу.</param>
+        /// <param name="fileNamesStartsWithFilter">Коллекция начала имен файлов.</param>
+        /// <returns>Список потоков файлов.</returns>
         private List<Stream> GetFilesRecursive(string path, IEnumerable<string> fileNamesStartsWithFilter)
         {
             var result = new List<Stream>();
@@ -82,6 +110,12 @@ namespace CHI.Services.BillsRegister
 
             return result;
         }
+        /// <summary>
+        /// Получает список потоков на файлы в архиве, имена которых начинаются с опеределенных строк.
+        /// </summary>
+        /// <param name="archiveEntry">Файл внутри zip архива.</param>
+        /// <param name="fileNamesStartsWithFilter">Коллекция начала имен файлов.</param>
+        /// <returns>Список потоков файлов.</returns>
         private List<Stream> ArchiveEntryGetFilesRecursive(ZipArchiveEntry archiveEntry, IEnumerable<string> fileNamesStartsWithFilter)
         {
             var result = new List<Stream>();
@@ -111,7 +145,13 @@ namespace CHI.Services.BillsRegister
 
             return result;
         }
-        private List<PatientExaminations> GetPatientsExaminations(IEnumerable<ZL_LIST> examinationsRegisters, IEnumerable<PERS_LIST> patientsRegisters)
+        /// <summary>
+        /// Конвертирует десериализованные классы xml реестров-счетов в список профилактических осмотров пациентов.
+        /// </summary>
+        /// <param name="examinationsRegisters">Десериализованные классы услуг xml реестров-счетов.</param>
+        /// <param name="patientsRegisters">>Десериализованные классы пациентов xml реестров-счетов.</param>
+        /// <returns>Список профилактических осмотров пациентов.</returns>
+        private static List<PatientExaminations> ConvertToPatientExaminations(IEnumerable<ZL_LIST> examinationsRegisters, IEnumerable<PERS_LIST> patientsRegisters)
         {
             var result = new List<PatientExaminations>();
 
@@ -200,6 +240,11 @@ namespace CHI.Services.BillsRegister
 
             return result;
         }
+        /// <summary>
+        /// Определяет этап профилактического осмотра по его типу.
+        /// </summary>
+        /// <param name="disp">Тип профилактического осмотра.</param>
+        /// <returns>Этап профилактического осмотра.</returns>
         private static int DispToExaminationStage(string disp)
         {
             switch (disp.ToUpper())
@@ -213,6 +258,12 @@ namespace CHI.Services.BillsRegister
                     return 0;
             }
         }
+        /// <summary>
+        /// Опеределяет вид осмотра по его типу и возрасту пациента.
+        /// </summary>
+        /// <param name="disp">Тип профилактического осмотра.</param>
+        /// <param name="age">Возраст пациента.</param>
+        /// <returns>Вид осмотра.</returns>
         private static ExaminationKind DispToExaminationType(string disp, int age)
         {
             switch (disp.ToUpper())
@@ -226,6 +277,11 @@ namespace CHI.Services.BillsRegister
                     return ExaminationKind.None;
             }
         }
+        /// <summary>
+        /// Опеределяет группу здоровья по результату профилактического осмотра.
+        /// </summary>
+        /// <param name="RSLT_D">Результат профилактического осмотра.</param>
+        /// <returns>Группа здоровья</returns>
         private static HealthGroup RSLT_DToHealthGroup(int RSLT_D)
         {
             switch (RSLT_D)
@@ -245,6 +301,12 @@ namespace CHI.Services.BillsRegister
                     return HealthGroup.None;
             }
         }
+        /// <summary>
+        /// Десериализует коллекцию потоков в список указанного типа T.
+        /// </summary>
+        /// <typeparam name="T">Тип Т в который десериализуется поток.</typeparam>
+        /// <param name="files">Коллекция потоков.</param>
+        /// <returns>Список экземпляров типа Т.</returns>
         private static List<T> DeserializeCollection<T>(IEnumerable<Stream> files) where T : class
         {
             var result = new List<T>();
@@ -264,145 +326,222 @@ namespace CHI.Services.BillsRegister
         #endregion
 
         #region Классы для десериализации случаев реестров-счетов
+        /// <summary>
+        /// Представляет информацию о законченных случаях реестра-счетов.
+        /// </summary>
         [XmlRoot(ElementName = "ZL_LIST")]
         public class ZL_LIST
         {
-            //Счёт
+            /// <summary>
+            /// Счет
+            /// </summary>
             [XmlElement(ElementName = "SCHET")]
             public SCHET SCHET { get; set; }
-            //Записи
+            /// <summary>
+            /// Записи
+            /// </summary>
             [XmlElement(ElementName = "ZAP")]
             public List<ZAP> ZAP { get; set; }
         }
-
+        /// <summary>
+        /// Представляет информацию о счете.
+        /// </summary>
         [XmlRoot(ElementName = "SCHET")]
         public class SCHET
         {
-            //год
+            /// <summary>
+            /// Год реестра-счетов
+            /// </summary>
             [XmlElement(ElementName = "YEAR")]
             public int YEAR { get; set; }
-            //Реестровый номер медицинской организации
+            /// <summary>
+            /// Код медицинской организации.
+            /// </summary>
             [XmlElement(ElementName = "CODE_MO")]
             public string CODE_MO { get; set; }
-            //Тип диспансеризации
-            //ДВ2	Второй этап диспансеризации определенных групп взрослого населения с периодичностью 1 раз в 3 года
-            //ОПВ	Профилактические медицинские осмотры взрослого населения
-            //ДВ4	Первый этап диспансеризации определенных групп взрослого населения с периодичностью 1 раз в год
+            /// <summary>
+            /// Тип диспансеризации
+            /// ДВ2 Второй этап диспансеризации определенных групп взрослого населения с периодичностью 1 раз в 3 года
+            /// ОПВ Профилактические медицинские осмотры взрослого населения
+            /// ДВ4 Первый этап диспансеризации определенных групп взрослого населения с периодичностью 1 раз в год
+            /// </summary>
             [XmlElement(ElementName = "DISP")]
             public string DISP { get; set; }
         }
-
+        /// <summary>
+        /// Представляет информацию о записи в реестре-счетов
+        /// </summary>
         [XmlRoot(ElementName = "ZAP")]
         public class ZAP
         {
-            //Сведения о пациенте
+            /// <summary>
+            /// Сведения о пациенте
+            /// </summary>
             [XmlElement(ElementName = "PACIENT")]
             public PACIENT PACIENT { get; set; }
-            //Сведения о законченном случае
+            /// <summary>
+            /// Сведения о законченном случае
+            /// </summary>
             [XmlElement(ElementName = "Z_SL")]
             public Z_SL Z_SL { get; set; }
         }
-
+        /// <summary>
+        /// Представляет информацию о пациенте
+        /// </summary>
         [XmlRoot(ElementName = "PACIENT")]
         public class PACIENT
         {
-            //guid пациента
+            /// <summary>
+            /// Guid пациента
+            /// </summary>
             [XmlElement(ElementName = "ID_PAC")]
             public Guid ID_PAC { get; set; }
-            //Серия документа, подтверждающего факт страхования по ОМС
+            /// <summary>
+            /// Серия полиса ОМС
+            /// </summary>
             [XmlElement(ElementName = "SPOLIS")]
             public string SPOLIS { get; set; }
-            //Номер документа, подтверждающего факт страхования по ОМС
+            /// <summary>
+            /// Номер полиса ОМС
+            /// </summary>
             [XmlElement(ElementName = "NPOLIS")]
             public string NPOLIS { get; set; }
         }
-
+        /// <summary>
+        /// Представляет информацию о законченном случае мед. помощи
+        /// </summary>
         [XmlRoot(ElementName = "Z_SL")]
         public class Z_SL
         {
-            //результат диспансеризации
-            //1	Присвоена I группа здоровья
-            //2	Присвоена II группа здоровья
-            //12 Направлен на II этап профилактического медицинского осмотра несовершеннолетних или диспансеризации всех типов, предварительно присвоена II группа здоровья
-            //3	Присвоена III группа здоровья
-            //14 Направлен на II этап диспансеризации определенных групп взрослого населения, предварительно присвоена IIIа группа здоровья
-            //31 Присвоена IIIа группа здоровья	
-            //15 Направлен на II этап диспансеризации определенных групп взрослого населения, предварительно присвоена IIIб группа здоровья
-            //32 Присвоена IIIб группа здоровья
+            /// <summary>
+            /// Результат диспансеризации
+            /// 1	Присвоена I группа здоровья
+            /// 2	Присвоена II группа здоровья
+            /// 12  Направлен на II этап профилактического медицинского осмотра несовершеннолетних или диспансеризации всех типов, предварительно присвоена II группа здоровья
+            /// 3	Присвоена III группа здоровья
+            /// 14  Направлен на II этап диспансеризации определенных групп взрослого населения, предварительно присвоена IIIа группа здоровья
+            /// 31  Присвоена IIIа группа здоровья	
+            /// 15  Направлен на II этап диспансеризации определенных групп взрослого населения, предварительно присвоена IIIб группа здоровья
+            /// 32  Присвоена IIIб группа здоровья
+            /// </summary>
             [XmlElement(ElementName = "RSLT_D")]
             public int RSLT_D { get; set; }
-            //сведения о случае
+            /// <summary>
+            /// Случай обращения за мед. помощью
+            /// </summary>
             [XmlElement(ElementName = "SL")]
             public SL SL { get; set; }
         }
-
+        /// <summary>
+        /// Представляет информацию о случае обращения за мед. помощью
+        /// </summary>
         [XmlRoot(ElementName = "SL")]
         public class SL
         {
-            //Цель обращения
+            /// <summary>
+            /// Цель обращения
+            /// </summary>
             public string CEL { get; set; }
+            /// <summary>
+            /// Дата начала лечения
+            /// </summary>
             [XmlElement(ElementName = "DATE_1")]
-            //Дата начала лечения
             public DateTime DATE_1 { get; set; }
-            //Дата оконча-ния лечения
+            /// <summary>
+            /// Дата окончания лечения
+            /// </summary>
             [XmlElement(ElementName = "DATE_2")]
             public DateTime DATE_2 { get; set; }
-            //Назначения
+            /// <summary>
+            /// Список назначений
+            /// </summary>
             [XmlElement(ElementName = "NAZ")]
             public List<NAZ> NAZ { get; set; }
-            //Услуги
+            /// <summary>
+            /// Список оказанных услуг
+            /// </summary>
             [XmlElement(ElementName = "USL")]
             public List<USL> USL { get; set; }
         }
-
+        /// <summary>
+        /// Представляет информацию о назначении
+        /// </summary>
         [XmlRoot(ElementName = "NAZ")]
         public class NAZ
         {
-            //Вид назначения
-            //1 – направлен на консультацию в медицинскую организацию по месту прикрепления;
-            //2 – направлен на консультацию в иную медицинскую организацию;
-            //3 – направлен на обследование;
-            //4 – направлен в дневной стационар;
-            //5 – направлен на госпитализацию;
-            //6 – направлен в реабилитационное отделение.
+            /// <summary>
+            /// Вид назначения
+            /// 1 – направлен на консультацию в медицинскую организацию по месту прикрепления;
+            /// 2 – направлен на консультацию в иную медицинскую организацию;
+            /// 3 – направлен на обследование;
+            /// 4 – направлен в дневной стационар;
+            /// 5 – направлен на госпитализацию;
+            /// 6 – направлен в реабилитационное отделение.
+            /// </summary>
             [XmlElement(ElementName = "NAZ_R")]
             public int NAZ_R { get; set; }
         }
-
+        /// <summary>
+        /// Представляет информацию об оказанной услуге
+        /// </summary>
         [XmlRoot(ElementName = "USL")]
         public class USL
         {
-            //Дата начала оказания услуги
+            /// <summary>
+            /// Дата начала оказания услуги
+            /// </summary>
             [XmlElement(ElementName = "DATE_IN")]
             public DateTime DATE_IN { get; set; }
-            //Код услуги
+            /// <summary>
+            /// Код услуги
+            /// </summary>
             [XmlElement(ElementName = "CODE_USL")]
             public string CODE_USL { get; set; }
         }
         #endregion
 
         #region Классы для десериализации пациентов реестров-счетов
+        /// <summary>
+        /// Представляет информацию о пациентах реестра-счетов.
+        /// </summary>
         [XmlRoot(ElementName = "PERS_LIST")]
         public class PERS_LIST
         {
-            //сведения о пациенте
+            /// <summary>
+            /// Список сведений о пациентах
+            /// </summary>
             [XmlElement(ElementName = "PERS")]
             public List<PERS> PERS { get; set; }
         }
-
+        /// <summary>
+        /// Представляет сведения о пациенте
+        /// </summary>
         [XmlRoot(ElementName = "PERS")]
         public class PERS
         {
-            //guid пациента
+            /// <summary>
+            /// Guid пациента
+            /// </summary>
             [XmlElement(ElementName = "ID_PAC")]
             public Guid ID_PAC { get; set; }
+            /// <summary>
+            /// Фамилия
+            /// </summary>
             [XmlElement(ElementName = "FAM")]
             public string FAM { get; set; }
+            /// <summary>
+            /// Имя
+            /// </summary>
             [XmlElement(ElementName = "IM")]
             public string IM { get; set; }
+            /// <summary>
+            /// Отчество
+            /// </summary>
             [XmlElement(ElementName = "OT")]
             public string OT { get; set; }
-            //Дата рождения
+            /// <summary>
+            /// Дата рождения
+            /// </summary>
             [XmlElement(ElementName = "DR")]
             public DateTime DR { get; set; }
         }

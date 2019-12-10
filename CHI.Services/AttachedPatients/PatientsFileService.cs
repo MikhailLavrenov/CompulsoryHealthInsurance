@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace CHI.Services.AttachedPatients
 {
     /// <summary>
-    /// Работа с excel файлом пациентов
+    /// Представляет сервис для работа с файлом прикрепленных пациентов
     /// </summary>
     public class PatientsFileService : IDisposable
     {
@@ -28,7 +28,11 @@ namespace CHI.Services.AttachedPatients
         #endregion
 
         #region Методы
-        //открывает файл
+        /// <summary>
+        /// Открывает файл прикрепленных пациентов
+        /// </summary>
+        /// <param name="filePath">Полный путь к файлу.</param>
+        /// <param name="columnProperties">Коллекиця настроиваемых свойств столбоц файла.</param>
         public void Open(string filePath, IEnumerable<IColumnProperties> columnProperties)
         {
             excel = new ExcelPackage(new FileInfo(filePath));
@@ -44,12 +48,18 @@ namespace CHI.Services.AttachedPatients
 
             CheckOrFixStructure();
         }
-        //сохраняет изменения в файл
+        /// <summary>
+        /// Cохраняет изменения в файле
+        /// </summary>
         public void Save()
         {
             excel.Save();
         }
-        //Возвращает полиса пациентов без полных ФИО
+        /// <summary>
+        /// Получает список серии и/или номера полиса пациентов без полных ФИО
+        /// </summary>
+        /// <param name="limitCount">Предельное кол-во возвращаемого списка</param>
+        /// <returns>Список серии и/или номера полиса пациентов без полных ФИО</returns>
         public List<string> GetUnknownInsuaranceNumbers(long limitCount)
         {
             var patients = new List<string>();
@@ -71,7 +81,10 @@ namespace CHI.Services.AttachedPatients
 
             return patients;
         }
-        //вставляет полные ФИО в файл
+        /// <summary>
+        /// Вставляет полные ФИО в файл.
+        /// </summary>
+        /// <param name="cachedPatients">Коллекиця сведений о пациентах.</param>
         public void SetFullNames(IEnumerable<Patient> cachedPatients)
         {
             Parallel.For(headerIndex + 1, maxRow + 1, (row, state) =>
@@ -103,7 +116,9 @@ namespace CHI.Services.AttachedPatients
                 }
             });
         }
-        //Применяет все форматирования
+        /// <summary>
+        /// Применяет форматирования к файлу в соотвествии с настройками свойств столбцов
+        /// </summary>
         public void Format()
         {
             ApplyColumnProperty();
@@ -112,7 +127,11 @@ namespace CHI.Services.AttachedPatients
             sheet.Cells.AutoFitColumns();
             sheet.Cells[sheet.Dimension.Address].AutoFilter = true;
         }
-        //читает файл импорта пациентов и возвращает их список
+        /// <summary>
+        /// Читает файл для загрузки пациентов в локальную БД и возвращает список сведений о них
+        /// </summary>
+        /// <param name="filePath">Путь к файлу импорта пациентов</param>
+        /// <returns>Список сведений о пациентах</returns>
         public static List<Patient> ReadImportPatientsFile(string filePath)
         {
             var patients = new List<Patient>();
@@ -155,7 +174,10 @@ namespace CHI.Services.AttachedPatients
 
             return patients;
         }
-        //Сорханяет пример файла для загрузки
+        /// <summary>
+        /// Генерирует и сохраняет пример файла для загрузки пациентов в локальную БД
+        /// </summary>
+        /// <param name="path">Путь к файлу</param>
         public static void SaveImportFileExample(string path)
         {
             using (var excel = new ExcelPackage())
@@ -189,13 +211,19 @@ namespace CHI.Services.AttachedPatients
                 excel.SaveAs(new FileInfo(path));
             }
         }
-        //освобождение неуправляемых ресурсов
+        /// <summary>
+        /// Освобождает неуправляемые ресурсы
+        /// </summary>
         public void Dispose()
         {
             sheet?.Dispose();
             excel?.Dispose();
         }
-        //ищет номер столбца по заголовку или его алтернативному названию, если столбец не найден возвращает -1
+        /// <summary>
+        /// Ищет номер столбца в файле по названию заголовка.
+        /// </summary>
+        /// <param name="columnName">Название столбца</param>
+        /// <returns>Индекс искомого столбца, если столбец не найден возвращает -1.</returns>
         private int GetColumnIndex(string columnName)
         {
             var columnProperty = columnProperties
@@ -207,6 +235,12 @@ namespace CHI.Services.AttachedPatients
 
             return GetColumnIndex(columnProperty.Name, columnProperty.AltName);
         }
+        /// <summary>
+        /// Ищет номер столбца в файле по названию заголовка или его алтернативному названию.
+        /// </summary>
+        /// <param name="name">Название столбца.</param>
+        /// <param name="altName">Альтернативное название столбца.</param>
+        /// <returns>Индекс искомого столбца, если столбец не найден возвращает -1.</returns>
         private int GetColumnIndex(string name, string altName)
         {
             for (int col = 1; col <= maxCol; col++)
@@ -222,7 +256,13 @@ namespace CHI.Services.AttachedPatients
             }
             return -1;
         }
-        //ищет номер столбца по названию заголовка, если столбец не найден возвращает -1
+        /// <summary>
+        /// Ищет номер столбца в файле по названию заголовка
+        /// </summary>
+        /// <param name="columnName">Название столбца.</param>
+        /// <param name="sheet">Ссылка на лист excel файла</param>
+        /// <param name="headerIndex">Номер строки с заголовками.</param>
+        /// <returns>Индекс искомого столбца, если столбец не найден возвращает -1.</returns>
         private static int GetColumnIndex(string columnName, ExcelWorksheet sheet, int headerIndex)
         {
             for (int col = 1; col <= sheet.Dimension.Columns; col++)
@@ -249,7 +289,10 @@ namespace CHI.Services.AttachedPatients
 
             return null;
         }
-        //проверяет структуру файла, при необходимости добавляет столбцы Фамилия, Имя, Отчество
+        /// <summary>
+        /// Проверяет структуру файла, при необходимости добавляет столбцы Фамилия, Имя, Отчество.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">Возникает в случае если невозможно исправить структуру файла.</exception>
         private void CheckOrFixStructure()
         {
             if (insuranceColumn == -1)
@@ -282,7 +325,9 @@ namespace CHI.Services.AttachedPatients
                 maxCol++;
             }
         }
-        //изменяет порядок столбоцов в соотвествии с порядком следования IColumnProperties
+        /// <summary>
+        /// Изменяет порядок столбоцов в соотвествии с порядком следования свойств настроек столбцов.
+        /// </summary>
         private void SetColumnsOrder()
         {
             int correctIndex = 1;
@@ -307,7 +352,9 @@ namespace CHI.Services.AttachedPatients
                 }
             }
         }
-        //переименовывает цифры с полом в нормальные названия
+        /// <summary>
+        /// Заменяет цифры с полом в понятные названия
+        /// </summary>
         private void RenameSex()
         {
             int sexColumn = GetColumnIndex("SEX");
@@ -323,7 +370,10 @@ namespace CHI.Services.AttachedPatients
                     .Replace("1", "Мужской")
                     .Replace("2", "Женский");
         }
-        //применяет свойства столбца к таблице: заменяет названия столбцов на русские, скрывает и удаляет столбцы
+        /// <summary>
+        /// Применяет свойства столбцов к таблице в соотвествии с настройками свойств столбцов:
+        /// заменяет названия столбцов на настроенные, скрывает и удаляет столбцы.
+        /// </summary>
         private void ApplyColumnProperty()
         {
             for (int i = 1; i <= maxCol; i++)

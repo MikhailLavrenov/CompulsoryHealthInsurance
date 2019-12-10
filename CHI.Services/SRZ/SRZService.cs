@@ -19,17 +19,31 @@ namespace CHI.Services.SRZ
         #endregion
 
         #region Свойства
+        /// <summary>
+        /// Используемые учетные данные для авторизации
+        /// </summary>
         public ICredential Credential { get; private set; }
         #endregion
 
         #region Конструкторы
+        /// <summary>
+        /// Конструктор
+        /// </summary>
+        /// <param name="URL">URL</param>
+        /// <param name="useProxy">Использовать прокси-сервер</param>
+        /// <param name="proxyAddress">Адрес прокси-сервера</param>
+        /// <param name="proxyPort">Порт прокси-сервера</param>
         public SRZService(string URL, bool useProxy, string proxyAddress = null, int? proxyPort = null)
             : base(URL, useProxy, proxyAddress, proxyPort)
         { }
         #endregion
 
         #region Методы
-        //авторизация на сайте
+        /// <summary>
+        /// Авторизация в веб-портале
+        /// </summary>
+        /// <param name="credential">Учетные данные</param>
+        /// <returns>True-успешно авторизован, False-иначе.</returns>
         public bool TryAuthorize(ICredential credential)
         {
             Credential = credential;
@@ -52,13 +66,19 @@ namespace CHI.Services.SRZ
                 return IsAuthorized = false;
             }
         }
-        //выход с сайта
+        /// <summary>
+        /// Выход с сайта
+        /// </summary>
         public void Logout()
         {
             SendRequest(HttpMethod.Get, @"?show=logoff", null);
             IsAuthorized = false;
         }
-        //запрашивает данные пациента
+        /// <summary>
+        /// Запрашивает данные о пациенте по полису
+        /// </summary>
+        /// <param name="insuranceNumber">Серия и/или номер полиса.</param>
+        /// <returns>Сведения о пациенте.</returns>
         public Patient GetPatient(string insuranceNumber)
         {
             CheckAuthorization();
@@ -77,7 +97,11 @@ namespace CHI.Services.SRZ
             else
                 return null;
         }
-        //получает excel файл прикрепленных пациентов на дату
+        /// <summary>
+        /// Скачивает и записывает на диск excel файл прикрепленных пациентов на дату.
+        /// </summary>
+        /// <param name="excelFile">Путь к файлу для записи.</param>
+        /// <param name="onDate">Дата на которую выгружается файл.</param>
         public void GetPatientsFile(string excelFile, DateTime onDate)
         {
             CheckAuthorization();
@@ -95,7 +119,11 @@ namespace CHI.Services.SRZ
 
             ConvertDbfToExcel(dbfFile, excelFile);
         }
-        //получает ссылку на скачивание файла прикрепленных пациентов
+        /// <summary>
+        /// Получает ссылку на скачивание файла прикрепленных пациентов.
+        /// </summary>
+        /// <param name="onDate">Дата на которую сформирован файл.</param>
+        /// <returns>Ссылку на скачивание файла прикрепленных пациентов.</returns>
         private string GetPatientsFileReference(DateTime onDate)
         {            
             string shortFileDate = onDate.ToShortDateString();
@@ -112,7 +140,11 @@ namespace CHI.Services.SRZ
 
             return responseText.Substring(begin, length);
         }
-        //преобразует dbf в excel
+        /// <summary>
+        /// Конвертирует dbf файл в excel
+        /// </summary>
+        /// <param name="dbfFile">Поток dbf файла.</param>
+        /// <param name="excelFilePath">Путь для сохранения excel файла.</param>
         private static void ConvertDbfToExcel(Stream dbfFile, string excelFilePath)
         {
             dbfFile.Position = 0;

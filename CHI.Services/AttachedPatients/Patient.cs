@@ -4,22 +4,47 @@ using System.Text;
 
 namespace CHI.Services.AttachedPatients
 {
+    /// <summary>
+    /// Представляет сведения о прикрепленном пациенте
+    /// </summary>
     public class Patient
     {
         #region Свойства
-        //[Key]
-        //[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        //public int PatientId { get; set; }
+        /// <summary>
+        /// Серия и/или номер полиса
+        /// </summary>
         [Key]
         public string InsuranceNumber { get; set; }
+        /// <summary>
+        /// Инициалы ФИО
+        /// </summary>
         public string Initials { get; set; }
+        /// <summary>
+        /// Фамилия
+        /// </summary>
         public string Surname { get; set; }
+        /// <summary>
+        /// Имя
+        /// </summary>
         public string Name { get; set; }
+        /// <summary>
+        /// Отчество
+        /// </summary>
         public string Patronymic { get; set; }
+        /// <summary>
+        /// Имеется полное ФИО
+        /// </summary>
         public bool FullNameExist { get; set; }
         #endregion
 
         #region Конструкторы
+        /// <summary>
+        /// Конструктор.
+        /// </summary>
+        /// <param name="insuranceNumber">Серия и/или номер полиса</param>
+        /// <param name="surname">Фамилия</param>
+        /// <param name="name">Имя</param>
+        /// <param name="patronymic">Отчество</param>
         public Patient(string insuranceNumber, string surname, string name, string patronymic)
         {
             InsuranceNumber = insuranceNumber;
@@ -29,17 +54,27 @@ namespace CHI.Services.AttachedPatients
             SetInitialsFromFullName();
             FullNameExist = true;
         }
+        /// <summary>
+        /// Конструктор.
+        /// </summary>
+        /// <param name="insuranceNumber">Серия и/или номер полиса/</param>
+        /// <param name="initials">Инициалы ФИО/</param>
         public Patient(string insuranceNumber, string initials)
         {
             InsuranceNumber = insuranceNumber;
             Initials = initials;
             FullNameExist = false;
         }
+        /// <summary>
+        /// Конструктор по умолчанию.
+        /// </summary>
         public Patient() { }
         #endregion
 
         #region Методы
-        //определяет инициалы по ФИО
+        /// <summary>
+        /// определяет инициалы по полному ФИО/
+        /// </summary>
         private void SetInitialsFromFullName()
         {
             var str = new StringBuilder();
@@ -53,7 +88,11 @@ namespace CHI.Services.AttachedPatients
 
             Initials = str.ToString().ToUpper();
         }
-        //Сравнивает экземпляры класса по значениям свойств
+        /// <summary>
+        /// Сравнивает экземпляры класса по значениям свойств
+        /// </summary>
+        /// <param name="patient">Ссылка на экземпляр с которым сравнивается/</param>
+        /// <returns>True-совпадают, False-не совпадают.</returns>
         public bool Equals(Patient patient)
         {
             if (InsuranceNumber.Equals(patient.InsuranceNumber, StringComparison.OrdinalIgnoreCase)
@@ -65,7 +104,9 @@ namespace CHI.Services.AttachedPatients
                 return false;
 
         }
-        //убирает лишние пробелы, приводит буквы к верхнему регистру, переопределяет инициалы
+        /// <summary>
+        /// убирает лишние пробелы, приводит буквы к верхнему регистру, переопределяет инициалы/
+        /// </summary>
         public void Normalize()
         {
             InsuranceNumber = InsuranceNumber.Replace(" ", "").ToUpper();

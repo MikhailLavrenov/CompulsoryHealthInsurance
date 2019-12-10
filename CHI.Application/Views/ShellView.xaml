@@ -52,7 +52,7 @@
 
                 <TextBlock Text="Настройки" Style="{StaticResource MainMenu}"/>
 
-                <Button Content="Настройки подключения к сервисам"
+                <Button Content="Настройки  подключения к сервисам"
                         Style="{StaticResource HeaderReferenceButton}"
                         Command="{Binding ShowViewCommand}"
                         CommandParameter="{x:Type v:ServicesSettingsView}" />
