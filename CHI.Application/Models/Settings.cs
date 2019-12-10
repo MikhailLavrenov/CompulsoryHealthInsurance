@@ -1,4 +1,5 @@
 ﻿using CHI.Application.Infrastructure;
+using CHI.Services.MedicalExaminations;
 using CHI.Services.SRZ;
 using System;
 using System.Collections.ObjectModel;
@@ -24,7 +25,7 @@ namespace CHI.Application.Models
         private byte threadsLimit;
         private CredentialScope credentialsScope;
         private ObservableCollection<Credential> credentials;
-        private bool connectionIsValid;
+        private bool srzConnectionIsValid;     
 
         //PatientsFile
         private bool downloadNewPatientsFile;
@@ -35,15 +36,18 @@ namespace CHI.Application.Models
         //MedicalExaminations
         private string examinationFileNames;
         private string patientFileNames;
+        private bool examinationsConnectionIsValid;
         #endregion
 
         #region Свойства       
         public static string SettingsFileName { get; }
         public static Settings Instance { get; private set; }
 
-        //Services
+        //SRZ
         public string SRZAddress { get => srzAddress; set => SetProperty(ref srzAddress, FixUrl(value)); }
-        public string MedicalExaminationsAddress { get => medicalExaminationsAddress; set => SetProperty(ref medicalExaminationsAddress, FixUrl(value)); }
+        [XmlIgnore] public bool SrzConnectionIsValid { get => srzConnectionIsValid; set => SetProperty(ref srzConnectionIsValid, value); }
+
+        //Services 
         public bool UseProxy
         {
             get => useProxy;
@@ -74,8 +78,7 @@ namespace CHI.Application.Models
         }
         public byte ThreadsLimit { get => threadsLimit; set => SetProperty(ref threadsLimit, value); }
         public CredentialScope CredentialsScope { get => credentialsScope; set { Credential.Scope = value; SetProperty(ref credentialsScope, value); } }
-        public ObservableCollection<Credential> Credentials { get => credentials; set => SetProperty(ref credentials, value); }
-        [XmlIgnore] public bool ConnectionIsValid { get => connectionIsValid; set => SetProperty(ref connectionIsValid, value); }
+        public ObservableCollection<Credential> Credentials { get => credentials; set => SetProperty(ref credentials, value); }               
 
         //PatientsFile
         public bool DownloadNewPatientsFile { get => downloadNewPatientsFile; set => SetProperty(ref downloadNewPatientsFile, value); }
@@ -84,8 +87,10 @@ namespace CHI.Application.Models
         public ObservableCollection<ColumnProperty> ColumnProperties { get => columnProperties; set => SetProperty(ref columnProperties, value); }
 
         //MedicalExaminations
+        public string MedicalExaminationsAddress { get => medicalExaminationsAddress; set => SetProperty(ref medicalExaminationsAddress, FixUrl(value)); }
         public string ExaminationFileNames { get => examinationFileNames; set => SetProperty(ref examinationFileNames, value); }
         public string PatientFileNames { get => patientFileNames; set => SetProperty(ref patientFileNames, value); }
+        [XmlIgnore] public bool ExaminationsConnectionIsValid { get => examinationsConnectionIsValid; set => SetProperty(ref examinationsConnectionIsValid, value); }
         #endregion
 
         #region Конструкторы
@@ -113,7 +118,8 @@ namespace CHI.Application.Models
             {
                 AddError(ErrorMessages.Connection, nameof(ProxyAddress));
                 AddError(ErrorMessages.Connection, nameof(ProxyPort));
-                ConnectionIsValid = false;
+                SrzConnectionIsValid = false;
+                ExaminationsConnectionIsValid = false;
                 return;
             }
             else
@@ -126,31 +132,40 @@ namespace CHI.Application.Models
             if (!connectedSrz)
             {
                 AddError(ErrorMessages.Connection, nameof(SRZAddress));
-                ConnectionIsValid = false;
+                SrzConnectionIsValid = false;
             }
 
             var connectedMedicaExaminations = TryConnectSite(MedicalExaminationsAddress);
             if (!connectedMedicaExaminations)
             {
                 AddError(ErrorMessages.Connection, nameof(MedicalExaminationsAddress));
-                ConnectionIsValid = false;
+                ExaminationsConnectionIsValid = false;
             }
 
-            if (!connectedSrz || !connectedMedicaExaminations)
+            if (!connectedSrz && !connectedMedicaExaminations)
                 return;
 
-            if (!TryAuthorizeCredentials())
+            if (connectedSrz && !TryAuthorizeCredentialsInSrzService())
             {
-                ConnectionIsValid = false;
+                SrzConnectionIsValid = false;
+                ExaminationsConnectionIsValid = false;
+                return;
+            }
+            else if (connectedMedicaExaminations && !TryAuthorizeCredentialsInExaminationsService())
+            {
+                SrzConnectionIsValid = false;
+                ExaminationsConnectionIsValid = false;
                 return;
             }
 
-            ConnectionIsValid = true;
+            SrzConnectionIsValid = connectedSrz && true;
+            ExaminationsConnectionIsValid = connectedMedicaExaminations && true;
         }
         //сохраняет настройки в xml
         public void Save()
         {
-            ConnectionIsValid = false;
+            SrzConnectionIsValid = false;
+            ExaminationsConnectionIsValid = false;
 
             // Т.к. при создании экзмпляра класса если свойства не инициализируются - не срабатывает валидация. Поэтому принудительно проверяем все. 
             // Свойства не инициализируются сразу т.к. иначе сразу после создания на них будут отображаться ошибки, и во View тоже, это плохо.
@@ -168,7 +183,7 @@ namespace CHI.Application.Models
         }
         //загружает настройки из xml
         public static Settings Load()
-        {           
+        {
             if (File.Exists(SettingsFileName))
                 using (var stream = new FileStream(SettingsFileName, FileMode.Open))
                 {
@@ -350,15 +365,15 @@ namespace CHI.Application.Models
             return connected;
         }
         //проверяет учетные данные, в случае успеха - true
-        private bool TryAuthorizeCredentials()
+        private bool TryAuthorizeCredentialsInSrzService()
         {
             Parallel.ForEach(Credentials, credential =>
             {
-                using (var site = new SRZService(SRZAddress,UseProxy, ProxyAddress, ProxyPort))
+                using (var service = new SRZService(SRZAddress, UseProxy, ProxyAddress, ProxyPort))
                 {
-                    if (site.TryAuthorize(credential))
+                    if (service.Authorize(credential))
                     {
-                        site.Logout();
+                        service.Logout();
 
                         credential.RemoveErrors(nameof(credential.Login));
                         credential.RemoveErrors(nameof(credential.Password));
@@ -369,6 +384,31 @@ namespace CHI.Application.Models
                         credential.AddError(ErrorMessages.Connection, nameof(credential.Password));
                     }
                 }
+
+            });
+
+            return !Credentials.Any(x => x.HasErrors);
+        }
+        private bool TryAuthorizeCredentialsInExaminationsService()
+        {
+            Parallel.ForEach(Credentials, credential =>
+            {
+                using (var service = new ExaminationService(SRZAddress, UseProxy, ProxyAddress, ProxyPort))
+                {
+                    if (service.Authorize(credential))
+                    {
+                        service.Logout();
+
+                        credential.RemoveErrors(nameof(credential.Login));
+                        credential.RemoveErrors(nameof(credential.Password));
+                    }
+                    else
+                    {
+                        credential.AddError(ErrorMessages.Connection, nameof(credential.Login));
+                        credential.AddError(ErrorMessages.Connection, nameof(credential.Password));
+                    }
+                }
+
             });
 
             return !Credentials.Any(x => x.HasErrors);

@@ -67,12 +67,14 @@ namespace CHI.Application.ViewModels
             MainRegionService.SetBusyStatus("Проверка настроек.");
             Settings.TestConnection();
 
-            if (Settings.ConnectionIsValid)
+            if (Settings.SrzConnectionIsValid && Settings.ExaminationsConnectionIsValid)
                 MainRegionService.SetCompleteStatus("Настройки корректны.");
             else if (Settings.ContainsErrorMessage(nameof(Settings.ProxyAddress),ErrorMessages.Connection))
                 MainRegionService.SetCompleteStatus("Прокси сервер не доступен.");
             else if (Settings.ContainsErrorMessage(nameof(Settings.SRZAddress), ErrorMessages.Connection))
                 MainRegionService.SetCompleteStatus("Web-сайт СРЗ не доступен.");
+            else if (Settings.ContainsErrorMessage(nameof(Settings.MedicalExaminationsAddress), ErrorMessages.Connection))
+                MainRegionService.SetCompleteStatus("Портал диспансеризации не доступен.");
             else
                 MainRegionService.SetCompleteStatus($"Не удалось авторизоваться под некоторыми учетными записями.");
         }

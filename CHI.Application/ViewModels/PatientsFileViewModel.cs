@@ -66,7 +66,7 @@ namespace CHI.Application.ViewModels
 
             if (Settings.DownloadNewPatientsFile)
             {
-                if (Settings.ConnectionIsValid == false)
+                if (!Settings.SrzConnectionIsValid)
                 {
                     MainRegionService.SetCompleteStatus("Не удалось подключиться к СРЗ, проверьте настройки и работоспособность сайта. Без подключения к СРЗ возможно только подставить ФИО из кэша в существующий файл.");
                     return;
@@ -77,7 +77,7 @@ namespace CHI.Application.ViewModels
                 var service = new SRZService(Settings.SRZAddress, Settings.UseProxy, Settings.ProxyAddress, Settings.ProxyPort);
 
                 var credential = Settings.Credentials.First(x => x.RequestsLimit > 0);
-                service.TryAuthorize(credential);
+                service.Authorize(credential);
                 service.GetPatientsFile(Settings.PatientsFilePath, FileDate);
             }
 
@@ -91,7 +91,7 @@ namespace CHI.Application.ViewModels
 
             string resultReport;
 
-            if (Settings.ConnectionIsValid)
+            if (Settings.SrzConnectionIsValid)
             {
                 MainRegionService.SetBusyStatus("Поиск пациентов без ФИО в файле.");
                 var limitCount = Settings.Credentials.Sum(x => x.RequestsLimit);
@@ -180,7 +180,7 @@ namespace CHI.Application.ViewModels
                             {
                                 service = new SRZService(Settings.SRZAddress, Settings.UseProxy, Settings.ProxyAddress, Settings.ProxyPort);
 
-                                if (service.TryAuthorize(credential))
+                                if (service.Authorize(credential))
                                     break;
                             }
                         }

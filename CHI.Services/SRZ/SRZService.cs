@@ -44,7 +44,7 @@ namespace CHI.Services.SRZ
         /// </summary>
         /// <param name="credential">Учетные данные</param>
         /// <returns>True-успешно авторизован, False-иначе.</returns>
-        public bool TryAuthorize(ICredential credential)
+        public bool Authorize(ICredential credential)
         {
             Credential = credential;
             var content = new Dictionary<string, string> {

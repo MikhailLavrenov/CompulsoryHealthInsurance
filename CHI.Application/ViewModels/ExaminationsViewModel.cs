@@ -78,12 +78,12 @@ namespace CHI.Application.ViewModels
             Result?.Clear();
             ShowErrors = false;
 
-            if (!Settings.ConnectionIsValid)
+            if (!Settings.ExaminationsConnectionIsValid)
             {
                 MainRegionService.SetBusyStatus("Проверка настроек.");
 
                 Settings.TestConnection();
-                if (!Settings.ConnectionIsValid)
+                if (!Settings.ExaminationsConnectionIsValid)
                 {
                     MainRegionService.SetCompleteStatus("Не удалось подключиться к web-сервису.");
                     return;
