@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using System.Security.Cryptography;
+using System.Xml.Serialization;
 
 namespace CHI.Licensing
 {
@@ -9,24 +9,28 @@ namespace CHI.Licensing
     {
         private static readonly int KeySize = 2048;
         private static readonly StringComparison comparer = StringComparison.OrdinalIgnoreCase;
-        private RSACryptoServiceProvider rsaProvider;
+        private RSACryptoServiceProvider cryptoProvider;
+        private readonly bool secretKeyLoaded = false;
         private static readonly string secretKeyPath = $"{KeysDirectory}licensing.skey";
         private static readonly string publicKeyPath = $"{KeysDirectory}licensing.pkey";
 
-        public static string KeysDirectory { get; } = $@"{Directory.GetCurrentDirectory()}\Licensing\";               
+        public static string KeysDirectory { get; } = $@"{Directory.GetCurrentDirectory()}\Licensing\";
 
         public Licensor()
         {
             string key;
 
             if (File.Exists(secretKeyPath))
-                key=File.ReadAllText(secretKeyPath);
-            else if (File.Exists(publicKeyPath))         
-                key = File.ReadAllText(publicKeyPath);            
+            {
+                key = File.ReadAllText(secretKeyPath);
+                secretKeyLoaded = true;
+            }
+            else if (File.Exists(publicKeyPath))
+                key = File.ReadAllText(publicKeyPath);
             else
                 throw new InvalidOperationException("Ошибка инициализации подсистемы лицензирования: не найден ключ шифрования.");
 
-            rsaProvider.FromXmlString(key);
+            cryptoProvider.FromXmlString(key);
         }
 
         public static void GenerateNewKeyPair()
@@ -44,11 +48,47 @@ namespace CHI.Licensing
             }
         }
 
-        public void GenerateLicense<T>(T obj)
+        public void SaveNewLicense<T>(T obj)
         {
+            if (!secretKeyLoaded)
+                throw new InvalidOperationException("Ошибка генерации лицензии: отсутствует закрытый ключ.");
+
+            var dateTimeStr = DateTime.Now.ToString("dd_MM_yyyy_HH_mm_ss_FFF");
+            var filePath = $"{KeysDirectory}License {nameof(T)} {dateTimeStr}.lic";
 
 
+            using (var mStream = new MemoryStream())
+            using (var fStream = new FileStream(filePath, FileMode.CreateNew))
+            {
+                var formatter = new XmlSerializer(typeof(T));
 
+                formatter.Serialize(mStream, obj);
+
+                var encryptedBytes = cryptoProvider.Encrypt(mStream.ToArray(), true);
+
+                fStream.Write(encryptedBytes, 0, encryptedBytes.Length);
+            }
+        }
+
+        public T LoadLicense<T>(string filePath)
+        {
+            T result;
+
+            using (var fStream = new FileStream(filePath, FileMode.Open, FileAccess.ReadWrite))
+            using (var mStream = new MemoryStream())
+            {
+                fStream.CopyTo(mStream);
+
+                var bytes = cryptoProvider.Decrypt(mStream.ToArray(), true);
+
+                var stream = new MemoryStream(bytes);
+
+                var formatter = new XmlSerializer(typeof(T));
+
+                result = (T)formatter.Deserialize(stream);
+            }
+
+            return result;
 
         }
     }
