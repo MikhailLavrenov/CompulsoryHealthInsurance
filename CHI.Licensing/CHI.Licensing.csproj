@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{CE8C3E85-928E-4849-B182-AA1DCFA923EC}</ProjectGuid>
+    <ProjectGuid>{9829BFAA-730F-4D46-A50A-7C31EEFF8FF7}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>CHI.Licensing</RootNamespace>
     <AssemblyName>CHI.Licensing</AssemblyName>
@@ -43,7 +43,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Licensor.cs" />
+    <Compile Include="Claim.cs" />
+    <Compile Include="License.cs" />
+    <Compile Include="LicenseManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
