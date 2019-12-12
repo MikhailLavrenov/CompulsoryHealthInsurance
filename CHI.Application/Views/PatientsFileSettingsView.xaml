@@ -22,6 +22,7 @@
     </UserControl.Resources>
 
     <Grid d:DataContext="{d:DesignInstance vm:PatientsFileViewModel }">
+        
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="180" />
             <ColumnDefinition Width="350" />

@@ -9,6 +9,7 @@ namespace CHI.Licensing
     [Serializable]
     public class License
     {
+        public string Owner { get; set; }
         public List<Claim> Claims { get; set; }
 
         public License()

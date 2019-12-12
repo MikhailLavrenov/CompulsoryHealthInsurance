@@ -7,7 +7,7 @@ using System.Text;
 
 namespace CHI.Application.ViewModels
 {
-    public class ServicesSettingsViewModel : DomainObject, IRegionMemberLifetime
+    class ServicesSettingsViewModel : DomainObject, IRegionMemberLifetime
     {
         #region Поля
         private Settings settings;

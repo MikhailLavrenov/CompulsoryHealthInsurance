@@ -30,7 +30,7 @@ namespace CHI.Licensing
             else if (File.Exists(publicKeyPath))
                 key = File.ReadAllText(publicKeyPath);
             else
-                throw new InvalidOperationException("Ошибка инициализации менеджера лицензий: не найден ключ шифрования.");
+                throw new InvalidOperationException("Ошибка инициализации менеджера лицензий: не найден криптографический ключ.");
 
             cryptoProvider.FromXmlString(key);
         }
@@ -96,13 +96,13 @@ namespace CHI.Licensing
             return licenses;
         }
 
-        public License LoadCombinedLicense()
-        {
-            var claims = new List<Claim>();
+        //public License LoadCombinedLicense()
+        //{
+        //    var claims = new List<Claim>();
 
-            LoadLicenses().ForEach(x=>claims.AddRange(x.Claims));
+        //    LoadLicenses().ForEach(x=>claims.AddRange(x.Claims));
 
-            return new License { Claims = claims };
-        }
+        //    return new License { Claims = claims };
+        //}
     }
 }

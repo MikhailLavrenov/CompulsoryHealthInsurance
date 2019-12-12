@@ -13,6 +13,8 @@ namespace CHI.Services.MedicalExaminations
     /// </summary>
     public class ExaminationServiceApi : WebServiceBase
     {
+        public string FomsCodeMO { get; private set; }
+
         #region Конструкторы
         /// <summary>
         /// Конструктор
@@ -31,7 +33,7 @@ namespace CHI.Services.MedicalExaminations
         /// Авторизация на сайте
         /// </summary>
         /// <param name="credential">Учетные данные</param>
-        /// <returns>true-в случае успешной авторизации, false-иначе</returns>
+        /// <returns>В случае успешной авторизации - ФОМС код МО, иначе null</returns>
         public bool Authorize(ICredential credential)
         {
             var requestValues = new Dictionary<string, string> {
@@ -42,9 +44,15 @@ namespace CHI.Services.MedicalExaminations
             var responseText = SendRequest(HttpMethod.Post, @"account/login", requestValues);
 
             if (!string.IsNullOrEmpty(responseText) && !responseText.Contains(@"<li>Пользователь не найден</li>"))
+            {                
+                FomsCodeMO= SubstringBetween(responseText, "<div>", "<div>", "</div>");
                 return IsAuthorized = true;
+            }
             else
+            {                
+                FomsCodeMO = null;
                 return IsAuthorized = false;
+            }
         }
         /// <summary>
         /// Выход
@@ -274,7 +282,7 @@ namespace CHI.Services.MedicalExaminations
         /// <param name="leftStr">Левая подстрока</param>
         /// <param name="rightStr">Правая подстрока</param>
         /// <returns>Искомая или пустая строка</returns>
-        private static string SubstringBetween(string text, string offsetStr, string leftStr, string rightStr)
+        protected static string SubstringBetween(string text, string offsetStr, string leftStr, string rightStr)
         {
             int offset;
 

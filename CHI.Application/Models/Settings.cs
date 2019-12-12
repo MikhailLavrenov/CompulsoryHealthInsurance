@@ -2,6 +2,7 @@
 using CHI.Services.MedicalExaminations;
 using CHI.Services.SRZ;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -25,7 +26,7 @@ namespace CHI.Application.Models
         private byte threadsLimit;
         private CredentialScope credentialsScope;
         private ObservableCollection<Credential> credentials;
-        private bool srzConnectionIsValid;     
+        private bool srzConnectionIsValid;
 
         //PatientsFile
         private bool downloadNewPatientsFile;
@@ -78,7 +79,7 @@ namespace CHI.Application.Models
         }
         public byte ThreadsLimit { get => threadsLimit; set => SetProperty(ref threadsLimit, value); }
         public CredentialScope CredentialsScope { get => credentialsScope; set { Credential.Scope = value; SetProperty(ref credentialsScope, value); } }
-        public ObservableCollection<Credential> Credentials { get => credentials; set => SetProperty(ref credentials, value); }               
+        public ObservableCollection<Credential> Credentials { get => credentials; set => SetProperty(ref credentials, value); }
 
         //PatientsFile
         public bool DownloadNewPatientsFile { get => downloadNewPatientsFile; set => SetProperty(ref downloadNewPatientsFile, value); }
@@ -91,6 +92,7 @@ namespace CHI.Application.Models
         public string ExaminationFileNames { get => examinationFileNames; set => SetProperty(ref examinationFileNames, value); }
         public string PatientFileNames { get => patientFileNames; set => SetProperty(ref patientFileNames, value); }
         [XmlIgnore] public bool ExaminationsConnectionIsValid { get => examinationsConnectionIsValid; set => SetProperty(ref examinationsConnectionIsValid, value); }
+        [XmlIgnore] public string FomsCodeMO { get; private set; }
         #endregion
 
         #region Конструкторы
@@ -367,7 +369,7 @@ namespace CHI.Application.Models
         //проверяет учетные данные, в случае успеха - true
         private bool TryAuthorizeCredentialsInSrzService()
         {
-            Parallel.ForEach(Credentials, credential =>
+            Parallel.ForEach(Credentials, new ParallelOptions { MaxDegreeOfParallelism = ThreadsLimit }, credential =>
             {
                 using (var service = new SRZService(SRZAddress, UseProxy, ProxyAddress, ProxyPort))
                 {
@@ -391,25 +393,35 @@ namespace CHI.Application.Models
         }
         private bool TryAuthorizeCredentialsInExaminationsService()
         {
-            Parallel.ForEach(Credentials, credential =>
-            {
-                using (var service = new ExaminationService(SRZAddress, UseProxy, ProxyAddress, ProxyPort))
-                {
-                    if (service.Authorize(credential))
-                    {
-                        service.Logout();
+            var codesMO = new ConcurrentBag<string>();
 
-                        credential.RemoveErrors(nameof(credential.Login));
-                        credential.RemoveErrors(nameof(credential.Password));
-                    }
-                    else
-                    {
-                        credential.AddError(ErrorMessages.Connection, nameof(credential.Login));
-                        credential.AddError(ErrorMessages.Connection, nameof(credential.Password));
-                    }
-                }
+            Parallel.ForEach(Credentials, new ParallelOptions { MaxDegreeOfParallelism = ThreadsLimit }, credential =>
+               {
+                   using (var service = new ExaminationService(MedicalExaminationsAddress, UseProxy, ProxyAddress, ProxyPort))
+                   {
+                       if (service.Authorize(credential))
+                       {
+                           codesMO.Add(service.FomsCodeMO);
 
-            });
+                           service.Logout();
+
+                           credential.RemoveErrors(nameof(credential.Login));
+                           credential.RemoveErrors(nameof(credential.Password));
+                       }
+                       else
+                       {
+                           credential.AddError(ErrorMessages.Connection, nameof(credential.Login));
+                           credential.AddError(ErrorMessages.Connection, nameof(credential.Password));
+                       }
+                   }
+               });
+
+            var uniqCodes = codesMO.ToList().Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+
+            if (uniqCodes.Count != 1)
+                throw new InvalidOperationException("Ошибка: учетные записи не должны принадлежать разным ЛПУ");
+
+            FomsCodeMO = uniqCodes.First();
 
             return !Credentials.Any(x => x.HasErrors);
         }
