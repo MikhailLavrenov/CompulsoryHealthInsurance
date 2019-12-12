@@ -62,7 +62,7 @@ namespace CHI.Application.ViewModels
         private void ProcessFileExecute()
         {
             MainRegionService.SetBusyStatus("Проверка подключения к СРЗ.");
-            Settings.TestConnection();
+            Settings.TestConnectionSRZ();
 
             if (Settings.DownloadNewPatientsFile)
             {

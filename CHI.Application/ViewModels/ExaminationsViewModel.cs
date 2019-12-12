@@ -1,5 +1,6 @@
 ﻿using CHI.Application.Infrastructure;
 using CHI.Application.Models;
+using CHI.Licensing;
 using CHI.Services.BillsRegister;
 using CHI.Services.Common;
 using CHI.Services.MedicalExaminations;
@@ -22,6 +23,7 @@ namespace CHI.Application.ViewModels
 
         #region Свойства
         public IMainRegionService MainRegionService { get; set; }
+        public ILicenseManager LicenseManager { get; set; }
         public bool KeepAlive { get => false; }
         public bool ShowErrors { get => showErrors; set => SetProperty(ref showErrors, value); }
         public List<Tuple<PatientExaminations, bool, string>> Result { get => result; set => SetProperty(ref result, value); }
@@ -30,10 +32,11 @@ namespace CHI.Application.ViewModels
         #endregion
 
         #region Конструкторы
-        public ExaminationsViewModel(IMainRegionService mainRegionService, IFileDialogService fileDialogService)
+        public ExaminationsViewModel(IMainRegionService mainRegionService, IFileDialogService fileDialogService, ILicenseManager licenseManager)
         {
             this.fileDialogService = fileDialogService;
             MainRegionService = mainRegionService;
+            LicenseManager = licenseManager;
 
             ShowErrors = false;
             Settings = Settings.Instance;
@@ -82,7 +85,7 @@ namespace CHI.Application.ViewModels
             {
                 MainRegionService.SetBusyStatus("Проверка настроек.");
 
-                Settings.TestConnection();
+                Settings.TestConnectionExaminations();
                 if (!Settings.ExaminationsConnectionIsValid)
                 {
                     MainRegionService.SetCompleteStatus("Не удалось подключиться к web-сервису.");
@@ -117,6 +120,10 @@ namespace CHI.Application.ViewModels
                 examinationFileNames[i] = examinationFileNames[i].Trim();
 
             var patientsExaminations = registers.GetPatientsExaminations(examinationFileNames, patientsFileNames);
+
+            var maxDate = patientsExaminations.Max(x => x.Stage1?.EndDate > x.Stage2?.EndDate ? x.Stage1?.EndDate : x.Stage2?.EndDate);
+
+            var licenses= LicenseManager.Licenses.Where(x=>x.)
 
             MainRegionService.SetBusyStatus($"Загрузка осмотров. Всего пациентов: {patientsExaminations.Count}.");
 

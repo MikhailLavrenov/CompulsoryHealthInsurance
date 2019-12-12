@@ -7,7 +7,7 @@ using System.Xml.Serialization;
 
 namespace CHI.Licensing
 {
-    public class LicenseManager
+    public class LicenseManager: ILicenseManager
     {
         private static readonly int KeySize = 2048;
         //private static readonly StringComparison comparer = StringComparison.OrdinalIgnoreCase;
@@ -17,6 +17,7 @@ namespace CHI.Licensing
         internal static string secretKeyPath { get; } = $"{KeysDirectory}licensing.skey";
         internal static string publicKeyPath { get; } = $"{KeysDirectory}licensing.pkey";
         public static string KeysDirectory { get; } = $@"{Directory.GetCurrentDirectory()}\Licensing\";
+        public List<License> Licenses { get; set; }
 
         public LicenseManager()
         {
@@ -33,6 +34,8 @@ namespace CHI.Licensing
                 throw new InvalidOperationException("Ошибка инициализации менеджера лицензий: не найден криптографический ключ.");
 
             cryptoProvider.FromXmlString(key);
+            
+            LoadLicenses();
         }
 
         internal static void GenerateNewKeyPair()
@@ -71,10 +74,11 @@ namespace CHI.Licensing
             }
         }
 
-        public List<License> LoadLicenses()
+        public void LoadLicenses()
         {
+            Licenses = new List<License>();
+
             var filePaths = Directory.GetFiles(KeysDirectory, ".lic").ToList();
-            var licenses = new List<License>();
 
             foreach (var filePath in filePaths)
             {
@@ -89,11 +93,14 @@ namespace CHI.Licensing
 
                     var formatter = new XmlSerializer(typeof(License));
 
-                    licenses.Add((License)formatter.Deserialize(stream));
+                    Licenses.Add((License)formatter.Deserialize(stream));
                 }
             }
+        }
 
-            return licenses;
+        public License GetLicense(LicenseDestination destination)
+        {
+            return Licenses.Where(x=>x.Claims.)
         }
 
         //public License LoadCombinedLicense()

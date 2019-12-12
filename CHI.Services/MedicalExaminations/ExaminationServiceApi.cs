@@ -13,7 +13,12 @@ namespace CHI.Services.MedicalExaminations
     /// </summary>
     public class ExaminationServiceApi : WebServiceBase
     {
+        #region Свойства
+        /// <summary>
+        /// ФОМС код медицинской организации
+        /// </summary>
         public string FomsCodeMO { get; private set; }
+        #endregion
 
         #region Конструкторы
         /// <summary>
@@ -30,10 +35,10 @@ namespace CHI.Services.MedicalExaminations
 
         #region Методы
         /// <summary>
-        /// Авторизация на сайте
+        /// Авторизация на сайте. При успешной авторизации инициализирует FomsCodeMO.
         /// </summary>
-        /// <param name="credential">Учетные данные</param>
-        /// <returns>В случае успешной авторизации - ФОМС код МО, иначе null</returns>
+        /// <param name="credential">Учетные данные.</param>
+        /// <returns>true-в случае успешной авторизации, false-иначе.</returns>
         public bool Authorize(ICredential credential)
         {
             var requestValues = new Dictionary<string, string> {
@@ -61,6 +66,7 @@ namespace CHI.Services.MedicalExaminations
         {
             SendRequest(HttpMethod.Get, @"account/logout", null);
             IsAuthorized = false;
+            FomsCodeMO = null;
         }
         /// <summary>
         /// Получает информацию о прохождении пациентом профилактического осмотра из плана.

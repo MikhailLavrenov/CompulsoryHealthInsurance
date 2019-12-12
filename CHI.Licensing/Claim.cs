@@ -9,11 +9,10 @@ namespace CHI.Licensing
     [Serializable]
     public class Claim
     {
-        public string Destination { get; set; }
-        public int Priority { get; set; }
-        public string Key { get; set; }
-        public string Value { get; set; }
         public string Description { get; set; }
-
+        public LicenseDestination Destination { get; set; }
+        public int Priority { get; set; }
+        public ClaimKey Key { get; set; }
+        public string Value { get; set; }       
     }
 }

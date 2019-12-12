@@ -13,8 +13,6 @@ namespace CHI.Application.ViewModels
     class LicenseManagerViewModel : DomainObject, IRegionMemberLifetime
     {
         #region Поля
-        private bool showErrors;
-
         private readonly IFileDialogService fileDialogService;
         #endregion
 

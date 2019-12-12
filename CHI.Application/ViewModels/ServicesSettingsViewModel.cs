@@ -65,7 +65,8 @@ namespace CHI.Application.ViewModels
         private void TestExecute()
         {
             MainRegionService.SetBusyStatus("Проверка настроек.");
-            Settings.TestConnection();
+            Settings.TestConnectionExaminations();
+            Settings.TestConnectionSRZ();
 
             if (Settings.SrzConnectionIsValid && Settings.ExaminationsConnectionIsValid)
                 MainRegionService.SetCompleteStatus("Настройки корректны.");

@@ -297,6 +297,10 @@
     <Resource Include="Application\AppIcon.ico" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CHI.Licensing\CHI.Licensing.csproj">
+      <Project>{9829BFAA-730F-4D46-A50A-7C31EEFF8FF7}</Project>
+      <Name>CHI.Licensing</Name>
+    </ProjectReference>
     <ProjectReference Include="..\CHI.Services\CHI.Services.csproj">
       <Project>{f0d0927c-270d-4bb2-9dac-77de973185e9}</Project>
       <Name>CHI.Services</Name>

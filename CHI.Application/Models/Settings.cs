@@ -111,57 +111,41 @@ namespace CHI.Application.Models
 
         #region Методы
         //проверить настройки
-        public void TestConnection()
+        public void TestConnectionSRZ()
         {
+            SrzConnectionIsValid = false;
+
             RemoveError(ErrorMessages.Connection, nameof(SRZAddress));
             Credentials.ToList().ForEach(x => x.RemoveErrorsMessage(ErrorMessages.Connection));
 
-            if (UseProxy && !TryConnectProxy())
-            {
-                AddError(ErrorMessages.Connection, nameof(ProxyAddress));
-                AddError(ErrorMessages.Connection, nameof(ProxyPort));
-                SrzConnectionIsValid = false;
-                ExaminationsConnectionIsValid = false;
-                return;
-            }
-            else
-            {
-                RemoveError(ErrorMessages.Connection, nameof(ProxyAddress));
-                RemoveError(ErrorMessages.Connection, nameof(ProxyPort));
-            }
-
-            var connectedSrz = TryConnectSite(SRZAddress);
-            if (!connectedSrz)
-            {
-                AddError(ErrorMessages.Connection, nameof(SRZAddress));
-                SrzConnectionIsValid = false;
-            }
-
-            var connectedMedicaExaminations = TryConnectSite(MedicalExaminationsAddress);
-            if (!connectedMedicaExaminations)
-            {
-                AddError(ErrorMessages.Connection, nameof(MedicalExaminationsAddress));
-                ExaminationsConnectionIsValid = false;
-            }
-
-            if (!connectedSrz && !connectedMedicaExaminations)
+            if (!TryConnectProxy())
                 return;
 
-            if (connectedSrz && !TryAuthorizeCredentialsInSrzService())
-            {
-                SrzConnectionIsValid = false;
-                ExaminationsConnectionIsValid = false;
+            if (!TryConnectSite(SRZAddress, nameof(SRZAddress)))
                 return;
-            }
-            else if (connectedMedicaExaminations && !TryAuthorizeCredentialsInExaminationsService())
-            {
-                SrzConnectionIsValid = false;
-                ExaminationsConnectionIsValid = false;
-                return;
-            }
 
-            SrzConnectionIsValid = connectedSrz && true;
-            ExaminationsConnectionIsValid = connectedMedicaExaminations && true;
+            if (!TryAuthorizeCredentialsInSrzService())
+                return;
+
+            SrzConnectionIsValid = true;
+        }
+        public void TestConnectionExaminations()
+        {
+            ExaminationsConnectionIsValid = false;
+
+            RemoveError(ErrorMessages.Connection, nameof(MedicalExaminationsAddress));
+            Credentials.ToList().ForEach(x => x.RemoveErrorsMessage(ErrorMessages.Connection));
+
+            if (!TryConnectProxy())
+                return;
+
+            if (!TryConnectSite(MedicalExaminationsAddress, nameof(MedicalExaminationsAddress)))
+                return;
+
+            if (!TryAuthorizeCredentialsInExaminationsService())
+                return;
+
+            ExaminationsConnectionIsValid = true;
         }
         //сохраняет настройки в xml
         public void Save()
@@ -323,30 +307,43 @@ namespace CHI.Application.Models
                     break;
             }
         }
-        //проверяет настройки прокси-сервера, в случае успеха - true
+        //проверяет настройки прокси-сервера, true-соединение установлено или прокси-сервер не используется, false-иначе
         private bool TryConnectProxy()
         {
-            //if (!UseProxy)
-            //    return true;
-
             var connected = false;
 
-            using (var client = new TcpClient())
-            {
-                try
+            if (UseProxy)
+                using (var client = new TcpClient())
                 {
-                    connected = client.ConnectAsync(ProxyAddress, ProxyPort).Wait(timeoutConnection);
+                    try
+                    {
+                        client.ConnectAsync(ProxyAddress, ProxyPort).Wait(timeoutConnection);
+                        connected = client.Connected;
+                    }
+                    catch (Exception)
+                    { }
                 }
-                catch (Exception)
-                { }
+
+            if (UseProxy && !connected)
+            {
+                AddError(ErrorMessages.Connection, nameof(ProxyAddress));
+                AddError(ErrorMessages.Connection, nameof(ProxyPort));
+                SrzConnectionIsValid = false;
+                ExaminationsConnectionIsValid = false;
+
+                return false;
             }
-            return connected;
+            else
+            {
+                RemoveError(ErrorMessages.Connection, nameof(ProxyAddress));
+                RemoveError(ErrorMessages.Connection, nameof(ProxyPort));
+
+                return true;
+            }
         }
         //проверяет доступность сайта, в случае успеха - true
-        private bool TryConnectSite(string url)
+        private bool TryConnectSite(string url, string nameOfAddress)
         {
-            var connected = false;
-
             try
             {
                 var webRequest = (HttpWebRequest)WebRequest.Create(url);
@@ -359,12 +356,15 @@ namespace CHI.Application.Models
                 webRequest.GetResponse();
                 webRequest.Abort();
 
-                connected = true;
+                RemoveError(ErrorMessages.Connection, nameOfAddress);
+                return true;
             }
             catch (Exception)
-            { }
+            {
+                AddError(ErrorMessages.Connection, nameOfAddress);
+                return false;
+            }
 
-            return connected;
         }
         //проверяет учетные данные, в случае успеха - true
         private bool TryAuthorizeCredentialsInSrzService()
@@ -386,7 +386,6 @@ namespace CHI.Application.Models
                         credential.AddError(ErrorMessages.Connection, nameof(credential.Password));
                     }
                 }
-
             });
 
             return !Credentials.Any(x => x.HasErrors);

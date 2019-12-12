@@ -1,6 +1,7 @@
 ﻿using CHI.Application.Infrastructure;
 using CHI.Application.ViewModels;
 using CHI.Application.Views;
+using CHI.Licensing;
 using NLog;
 using Prism.DryIoc;
 using Prism.Ioc;
@@ -37,6 +38,7 @@ namespace CHI.Application
         {
             containerRegistry.RegisterInstance<ILogger>(LogManager.GetCurrentClassLogger());
             containerRegistry.RegisterSingleton<IMainRegionService, MainRegionService>();
+            containerRegistry.RegisterSingleton<ILicenseManager, LicenseManager>();
             containerRegistry.Register<IFileDialogService, FileDialogService>();
             containerRegistry.RegisterDialog<NotificationDialogView, NotificationDialogViewModel>();
 
