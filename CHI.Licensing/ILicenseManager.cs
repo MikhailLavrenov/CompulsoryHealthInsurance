@@ -8,6 +8,6 @@ namespace CHI.Licensing
 {
     public interface ILicenseManager
     {
-        List<License> Licenses { get; set; }
+        List<Claim> GetClaims(Type type);
     }
 }

@@ -10,8 +10,7 @@ namespace CHI.Licensing
     public class Claim
     {
         public string Description { get; set; }
-        public LicenseDestination Destination { get; set; }
-        public int Priority { get; set; }
+        public Type TargetType { get; set; }
         public ClaimKey Key { get; set; }
         public string Value { get; set; }       
     }

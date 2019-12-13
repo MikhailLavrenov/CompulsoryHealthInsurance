@@ -7,17 +7,18 @@ using System.Xml.Serialization;
 
 namespace CHI.Licensing
 {
-    public class LicenseManager: ILicenseManager
+    public class LicenseManager : ILicenseManager
     {
         private static readonly int KeySize = 2048;
         //private static readonly StringComparison comparer = StringComparison.OrdinalIgnoreCase;
         private readonly RSACryptoServiceProvider cryptoProvider;
         private readonly bool secretKeyLoaded = false;
 
+        public static string KeysDirectory { get; } = $@"{Directory.GetCurrentDirectory()}\Licensing\";
         internal static string secretKeyPath { get; } = $"{KeysDirectory}licensing.skey";
         internal static string publicKeyPath { get; } = $"{KeysDirectory}licensing.pkey";
-        public static string KeysDirectory { get; } = $@"{Directory.GetCurrentDirectory()}\Licensing\";
-        public List<License> Licenses { get; set; }
+        
+        public License ActiveLicense { get; set; }
 
         public LicenseManager()
         {
@@ -33,9 +34,13 @@ namespace CHI.Licensing
             else
                 throw new InvalidOperationException("Ошибка инициализации менеджера лицензий: не найден криптографический ключ.");
 
+            cryptoProvider = new RSACryptoServiceProvider();
             cryptoProvider.FromXmlString(key);
-            
-            LoadLicenses();
+
+            var licensePaths = new DirectoryInfo(KeysDirectory).GetFiles(".lic").OrderBy(x => x.CreationTime).ToList();
+
+            if (licensePaths.Count>0)
+                ActiveLicense = LoadLicense(licensePaths.First().FullName);
         }
 
         internal static void GenerateNewKeyPair()
@@ -52,7 +57,7 @@ namespace CHI.Licensing
             }
         }
 
-        public void SaveNewLicense(License license)
+        public void SaveLicense(License license)
         {
             if (!secretKeyLoaded)
                 throw new InvalidOperationException("Ошибка генерации лицензии: отсутствует закрытый ключ.");
@@ -74,42 +79,31 @@ namespace CHI.Licensing
             }
         }
 
-        public void LoadLicenses()
+        public License LoadLicense(string path)
         {
-            Licenses = new List<License>();
+            License license;
 
-            var filePaths = Directory.GetFiles(KeysDirectory, ".lic").ToList();
-
-            foreach (var filePath in filePaths)
+            using (var fStream = new FileStream(path, FileMode.Open, FileAccess.ReadWrite))
+            using (var mStream = new MemoryStream())
             {
-                using (var fStream = new FileStream(filePath, FileMode.Open, FileAccess.ReadWrite))
-                using (var mStream = new MemoryStream())
-                {
-                    fStream.CopyTo(mStream);
+                fStream.CopyTo(mStream);
 
-                    var bytes = cryptoProvider.Decrypt(mStream.ToArray(), true);
+                var bytes = cryptoProvider.Decrypt(mStream.ToArray(), true);
 
-                    var stream = new MemoryStream(bytes);
+                var stream = new MemoryStream(bytes);
 
-                    var formatter = new XmlSerializer(typeof(License));
+                var formatter = new XmlSerializer(typeof(License));
 
-                    Licenses.Add((License)formatter.Deserialize(stream));
-                }
+                license = (License)formatter.Deserialize(stream);
             }
+
+            return license;
         }
 
-        public License GetLicense(LicenseDestination destination)
+        public List<Claim> GetClaims(Type type)
         {
-            return Licenses.Where(x=>x.Claims.)
+            return ActiveLicense?.Claims?.Where(x => x.TargetType == type).ToList()??new List<Claim>();
         }
-
-        //public License LoadCombinedLicense()
-        //{
-        //    var claims = new List<Claim>();
-
-        //    LoadLicenses().ForEach(x=>claims.AddRange(x.Claims));
-
-        //    return new License { Claims = claims };
-        //}
     }
 }
+
