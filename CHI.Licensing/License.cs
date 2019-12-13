@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Prism.Mvvm;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -7,14 +9,18 @@ using System.Threading.Tasks;
 namespace CHI.Licensing
 {
     [Serializable]
-    public class License
+    public class License: BindableBase
     {
-        public string Owner { get; set; }
-        public List<Claim> Claims { get; set; }
+        private string owner;
+        private string examinationsFomsCodeMO;
+        private DateTime? examinationsMaxDate;
+        private bool examinationsUnlimited;
 
-        public License()
-        {
-            Claims = new List<Claim>();
-        }
+
+        public string Owner { get => owner; set => SetProperty(ref owner,value); }
+        public string ExaminationsFomsCodeMO { get => examinationsFomsCodeMO; set => SetProperty(ref examinationsFomsCodeMO, value); }
+        public DateTime? ExaminationsMaxDate { get => examinationsMaxDate; set => SetProperty(ref examinationsMaxDate, value); }
+        public bool ExaminationsUnlimited { get => examinationsUnlimited; set => SetProperty(ref examinationsUnlimited, value); }
+
     }
 }

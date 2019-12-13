@@ -35,20 +35,72 @@
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal">
+        <StackPanel Grid.Row="0"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2"
+                    Orientation="Horizontal">
 
-            <Button Content="Новая лицензия" Command="{Binding }"/>
+            <Button Content="Новая"
+                    Command="{Binding NewLicenseCommand  }" />
 
-            <Button Content="Открыть лицензию" Command="{Binding }"/>
+            <Button Content="Открыть"
+                    Command="{Binding OpenLicenseCommand }" />
+
+            <Button Content="Сохранить"
+                    Command="{Binding  SaveLicenseCommand}" />
 
         </StackPanel>
-        
-        
-        
-        
-        
+
+        <TextBlock Grid.Row="1"
+                   Grid.Column="0"
+                   Text="Лицензия" />
+
+        <TextBlock Grid.Row="2"
+                   Grid.Column="0"
+                   Text="Владелец" />
+        <TextBox Grid.Row="2"
+                 Grid.Column="1"
+                 Text="{Binding CurrentLicense.Owner}" />
+
+        <TextBlock Grid.Row="3"
+                   Grid.Column="0"
+                   Text="Загрузка осмотров" />
+
+
+        <TextBlock Grid.Row="4"
+                   Grid.Column="0"
+                   Text="Без ограничений" />
+        <CheckBox Grid.Row="4"
+                  Grid.Column="1"
+                  IsChecked="{Binding CurrentLicense.ExaminationsUnlimited }" />
+
+        <TextBlock Grid.Row="5"
+                   Grid.Column="0"
+                   Text="Код ЛПУ (ФОМС)" />
+        <TextBox Grid.Row="5"
+                 Grid.Column="1"
+                 Text="{Binding CurrentLicense.ExaminationsFomsCodeMO}" />
+
+        <TextBlock Grid.Row="6"
+                   Grid.Column="0"
+                   Text="Дата до" />
+        <DatePicker Grid.Row="6"
+                    Grid.Column="1"
+                    SelectedDate="{Binding CurrentLicense.ExaminationsMaxDate}" />
+
+
+
+
+
+
+
+
     </Grid>
-    
+
 </UserControl>

@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CHI.Licensing
+﻿namespace CHI.Licensing
 {
     public interface ILicenseManager
     {
-        List<Claim> GetClaims(Type type);
+        License ActiveLicense { get; set; }
+        bool SecretKeyLoaded { get; }
+
+        License LoadLicense(string path);
+        void SaveLicense(License license, string path);
     }
 }

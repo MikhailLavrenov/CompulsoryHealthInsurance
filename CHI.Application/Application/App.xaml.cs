@@ -48,6 +48,7 @@ namespace CHI.Application
             containerRegistry.RegisterForNavigation<PatientsFileSettingsView>();
             containerRegistry.RegisterForNavigation<ExaminationsSettingView>();
             containerRegistry.RegisterForNavigation<AboutApplicationView>();
+            containerRegistry.RegisterForNavigation<LicenseManagerView>();
             containerRegistry.RegisterForNavigation<ProgressBarView>();
         }
         private void LogUnhandledException(object sender, UnhandledExceptionEventArgs args)

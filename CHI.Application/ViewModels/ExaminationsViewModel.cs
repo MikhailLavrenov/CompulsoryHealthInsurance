@@ -123,14 +123,9 @@ namespace CHI.Application.ViewModels
 
             var maxDate = patientsExaminations.Max(x => x.Stage1?.EndDate > x.Stage2?.EndDate ? x.Stage1?.EndDate : x.Stage2?.EndDate);
 
-            var claims = LicenseManager.GetClaims(GetType());
+            var license = LicenseManager.ActiveLicense;
 
-            var dateClaim = claims.Where(x => x.Key == ClaimKey.Date).FirstOrDefault();
-            var codeClaim = claims.Where(x => x.Key == ClaimKey.Code).FirstOrDefault();
-
-            if ((codeClaim != null && codeClaim.Value != "*" && codeClaim.Value != Settings.FomsCodeMO)
-                || (dateClaim != null && DateTime.TryParse(dateClaim.Value, out var claimDate) && claimDate > maxDate)
-                || (codeClaim == null && dateClaim == null))
+            if (!(license.ExaminationsUnlimited || license.ExaminationsFomsCodeMO == Settings.FomsCodeMO || license.ExaminationsMaxDate > maxDate))
             {
                 MainRegionService.SetCompleteStatus("Отсутствует лицензия.");
                 return;

@@ -12,40 +12,43 @@ namespace CHI.Licensing
         private static readonly int KeySize = 2048;
         //private static readonly StringComparison comparer = StringComparison.OrdinalIgnoreCase;
         private readonly RSACryptoServiceProvider cryptoProvider;
-        private readonly bool secretKeyLoaded = false;
 
-        public static string KeysDirectory { get; } = $@"{Directory.GetCurrentDirectory()}\Licensing\";
-        internal static string secretKeyPath { get; } = $"{KeysDirectory}licensing.skey";
-        internal static string publicKeyPath { get; } = $"{KeysDirectory}licensing.pkey";
-        
+        public bool SecretKeyLoaded { get; }
+        public static string DefaultDirectory { get; } = $@"{Directory.GetCurrentDirectory()}\Licensing\";
+        internal static string secretKeyPath { get; } = $"{DefaultDirectory}licensing.skey";
+        internal static string publicKeyPath { get; } = $"{DefaultDirectory}licensing.pkey";
+
         public License ActiveLicense { get; set; }
 
         public LicenseManager()
         {
-            string key;
+            string key;           
 
             if (File.Exists(secretKeyPath))
             {
                 key = File.ReadAllText(secretKeyPath);
-                secretKeyLoaded = true;
+                SecretKeyLoaded = true;
             }
             else if (File.Exists(publicKeyPath))
+            {
                 key = File.ReadAllText(publicKeyPath);
+                SecretKeyLoaded = false;
+            }
             else
                 throw new InvalidOperationException("Ошибка инициализации менеджера лицензий: не найден криптографический ключ.");
 
             cryptoProvider = new RSACryptoServiceProvider();
             cryptoProvider.FromXmlString(key);
 
-            var licensePaths = new DirectoryInfo(KeysDirectory).GetFiles(".lic").OrderBy(x => x.CreationTime).ToList();
+            var licensePaths = new DirectoryInfo(DefaultDirectory).GetFiles(".lic").OrderBy(x => x.CreationTime).ToList();
 
-            if (licensePaths.Count>0)
+            if (licensePaths.Count > 0)
                 ActiveLicense = LoadLicense(licensePaths.First().FullName);
         }
 
         internal static void GenerateNewKeyPair()
         {
-            new FileInfo(KeysDirectory).Directory.Create();
+            new FileInfo(DefaultDirectory).Directory.Create();
 
             using (var rsaProvider = new RSACryptoServiceProvider(KeySize))
             {
@@ -57,17 +60,13 @@ namespace CHI.Licensing
             }
         }
 
-        public void SaveLicense(License license)
+        public void SaveLicense(License license, string path)
         {
-            if (!secretKeyLoaded)
+            if (!SecretKeyLoaded)
                 throw new InvalidOperationException("Ошибка генерации лицензии: отсутствует закрытый ключ.");
 
-            var dateTimeStr = DateTime.Now.ToString("dd_MM_yyyy_HH_mm_ss_FFF");
-            var filePath = $"{KeysDirectory}License {dateTimeStr}.lic";
-
-
             using (var mStream = new MemoryStream())
-            using (var fStream = new FileStream(filePath, FileMode.CreateNew))
+            using (var fStream = new FileStream(path, FileMode.CreateNew))
             {
                 var formatter = new XmlSerializer(license.GetType());
 
@@ -98,11 +97,6 @@ namespace CHI.Licensing
             }
 
             return license;
-        }
-
-        public List<Claim> GetClaims(Type type)
-        {
-            return ActiveLicense?.Claims?.Where(x => x.TargetType == type).ToList()??new List<Claim>();
         }
     }
 }
