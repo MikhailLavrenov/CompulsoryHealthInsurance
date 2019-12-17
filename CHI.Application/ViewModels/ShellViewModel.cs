@@ -10,7 +10,6 @@ namespace CHI.Application.ViewModels
     public class ShellViewModel : DomainObject
     {
         #region Поля
-        ILicenseManager licenseManager;
         #endregion
 
         #region Свойства 

@@ -34,7 +34,7 @@ namespace CHI.Licensing
                             continue;
                     }
 
-                    LicenseManager.GenerateNewKeyPair();
+                    LicenseManager.CreateNewSigningKeyPair();
                     Console.WriteLine();
                     Console.WriteLine("Создан новый ключ лицензирования");
                 }

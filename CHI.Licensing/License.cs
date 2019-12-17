@@ -12,7 +12,6 @@ namespace CHI.Licensing
         private DateTime? examinationsMaxDate;
         private bool examinationsUnlimited;
 
-
         public string Owner { get => owner; set => SetProperty(ref owner, value); }
         public string ExaminationsFomsCodeMO { get => examinationsFomsCodeMO; set => SetProperty(ref examinationsFomsCodeMO, value); }
         public DateTime? ExaminationsMaxDate { get => examinationsMaxDate; set => SetProperty(ref examinationsMaxDate, value); }

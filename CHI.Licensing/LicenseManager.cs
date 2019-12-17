@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Security.Cryptography;
 using System.Text;
 using System.Xml.Serialization;
@@ -14,7 +16,6 @@ namespace CHI.Licensing
 
         public bool SecretKeyLoaded { get; }
         public static string DefaultDirectory { get; } = $@"{Directory.GetCurrentDirectory()}\Licensing\";
-        public static string LicenseExtension { get; } = ".lic";
         public static string SignExtension { get; } = ".sig";
         internal static string secretKeyPath { get; } = $"{DefaultDirectory}licensing.skey";
         internal static string publicKeyPath { get; } = $"{DefaultDirectory}licensing.pkey";
@@ -23,23 +24,24 @@ namespace CHI.Licensing
 
         public LicenseManager()
         {
-            string key;
+            byte[] key;
 
             if (File.Exists(secretKeyPath))
             {
-                key = File.ReadAllText(secretKeyPath);
+                key = File.ReadAllBytes(secretKeyPath);
                 SecretKeyLoaded = true;
             }
-            else if (File.Exists(publicKeyPath))
+            else// if (File.Exists(publicKeyPath))
             {
-                key = File.ReadAllText(publicKeyPath);
+                //key = File.ReadAllBytes(publicKeyPath);
+                key = ReadResource();
                 SecretKeyLoaded = false;
             }
-            else
-                throw new InvalidOperationException("Ошибка инициализации менеджера лицензий: не найден криптографический ключ.");
+            //else
+            //    throw new InvalidOperationException("Ошибка инициализации менеджера лицензий: не найден криптографический ключ.");
 
             cryptoProvider = new RSACryptoServiceProvider();
-            cryptoProvider.FromXmlString(key);
+            cryptoProvider.ImportCspBlob(key);
 
             var licensePaths = new DirectoryInfo(DefaultDirectory).GetFiles("*.lic").OrderBy(x => x.CreationTime).ToList();
 
@@ -47,17 +49,17 @@ namespace CHI.Licensing
                 ActiveLicense = LoadLicense(licensePaths.First().FullName);
         }
 
-        internal static void GenerateNewKeyPair()
+        internal static void CreateNewSigningKeyPair()
         {
             new FileInfo(DefaultDirectory).Directory.Create();
 
             using (var rsaProvider = new RSACryptoServiceProvider(KeySize))
             {
-                var secretKey = rsaProvider.ToXmlString(true);
-                File.WriteAllText(secretKeyPath, secretKey);
+                var secretKey = rsaProvider.ExportCspBlob(true);
+                File.WriteAllBytes(secretKeyPath, secretKey);
 
-                var publicKey = rsaProvider.ToXmlString(false);
-                File.WriteAllText(publicKeyPath, publicKey);
+                var publicKey = rsaProvider.ExportCspBlob(false);
+                File.WriteAllBytes(publicKeyPath, publicKey);
             }
         }
 
@@ -109,22 +111,7 @@ namespace CHI.Licensing
             return license;
         }
 
-        private byte[] GetBytes(Stream stream)
-        {
-            stream.Position = 0;
-
-            byte[] result;
-
-            using (var mStream = new MemoryStream())
-            {
-                stream.CopyTo(mStream);
-                result = mStream.ToArray();
-            }
-
-            return result;
-        }
-
-        public string GetLicenseInfo()
+        public string GetActiveLicenseInfo()
         {
             if (ActiveLicense == null)
                 return "Отсутствует";
@@ -145,6 +132,37 @@ namespace CHI.Licensing
                 sb.Append($"Недоступно");
 
             return sb.ToString();
+        }
+
+        private static byte[] GetBytes(Stream stream)
+        {
+            stream.Position = 0;
+
+            byte[] result;
+
+            using (var mStream = new MemoryStream())
+            {
+                stream.CopyTo(mStream);
+                result = mStream.ToArray();
+            }
+
+            return result;
+        }
+
+        public byte[] ReadResource()
+        {
+            var assembly = Assembly.GetExecutingAssembly();
+
+            var resourcePath = assembly.GetManifestResourceNames().Single(x => x.EndsWith("licensing.pkey"));
+
+            byte[] result;
+
+            using (var stream = assembly.GetManifestResourceStream(resourcePath))
+            {
+                result= GetBytes(stream);
+            }
+
+            return result;
         }
     }
 }

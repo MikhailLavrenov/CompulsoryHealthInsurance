@@ -44,7 +44,7 @@ namespace CHI.Application.ViewModels
             Author = "Лавренов Михаил Владимирович";
             Email = "mvlavrenov@mail.ru";
             Phone = "8-924-213-79-11";
-            License = licenseManager.GetLicenseInfo();
+            License = licenseManager.GetActiveLicenseInfo();
 
             OpenManualCommand = new DelegateCommand( ()=>Process.Start(manualPath), ()=> File.Exists(manualPath));
             OpenRepositoryCommand = new DelegateCommand(() => Process.Start(repositoryPath));
