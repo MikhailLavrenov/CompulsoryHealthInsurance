@@ -29,7 +29,9 @@
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
-            <RowDefinition Height="20" />
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="20"/>
             <RowDefinition Height="auto" />
             <RowDefinition Height="5" />
             <RowDefinition Height="auto" />
@@ -47,8 +49,6 @@
         <TextBlock Grid.Row="0"
                    Grid.Column="1"
                    Text="{Binding Name}" />
-
-
 
         <TextBlock Grid.Row="1"
                    Grid.Column="0"
@@ -85,20 +85,28 @@
                    Grid.Column="1"
                    Text="{Binding Phone}" />
 
-        <Button Grid.Row="7"                   
+        <TextBlock Grid.Row="7"
+                   Grid.Column="0"
+                   Text="Лицензия" 
+                   VerticalAlignment="top" />
+        <TextBlock Grid.Row="7"
+                   Grid.Column="1"
+                   TextWrapping="Wrap"
+                   Text="{Binding License}" />
+
+        <Button Grid.Row="9"                   
                 Grid.Column="0"
                 Grid.ColumnSpan="2"                   
                 Content="Открыть инструкцию"
                 Style="{StaticResource ReferenceButton}"                   
                 Command="{Binding OpenManualCommand}" />
 
-        <Button Grid.Row="9"                   
+        <Button Grid.Row="11"                   
                 Grid.Column="0"
                 Grid.ColumnSpan="2"                   
                 Content="Перейти в репозиторий исходного кода"
                 Style="{StaticResource ReferenceButton}"                   
                 Command="{Binding OpenRepositoryCommand}" />
-
 
     </Grid>
 </UserControl>

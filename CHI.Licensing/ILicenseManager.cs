@@ -7,5 +7,6 @@
 
         License LoadLicense(string path);
         void SaveLicense(License license, string path);
+        string GetLicenseInfo();
     }
 }

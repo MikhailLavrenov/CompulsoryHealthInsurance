@@ -21,29 +21,9 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <Grid d:DataContext="{d:DesignInstance vm:LicenseManagerViewModel }">
+    <DockPanel d:DataContext="{d:DesignInstance vm:LicenseManagerViewModel }">
 
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="180" />
-            <ColumnDefinition Width="350" />
-            <ColumnDefinition Width="auto" />
-        </Grid.ColumnDefinitions>
-
-        <Grid.RowDefinitions>
-            <RowDefinition Height="auto" />
-            <RowDefinition Height="auto" />
-            <RowDefinition Height="auto" />
-            <RowDefinition Height="auto" />
-            <RowDefinition Height="auto" />
-            <RowDefinition Height="auto" />
-            <RowDefinition Height="auto" />
-            <RowDefinition Height="auto" />
-            <RowDefinition Height="auto" />
-        </Grid.RowDefinitions>
-
-        <StackPanel Grid.Row="0"
-                    Grid.Column="0"
-                    Grid.ColumnSpan="2"
+        <StackPanel DockPanel.Dock="Top"
                     Orientation="Horizontal">
 
             <Button Content="Новая"
@@ -57,50 +37,70 @@
 
         </StackPanel>
 
-        <TextBlock Grid.Row="1"
+        <Grid DockPanel.Dock="Bottom" Visibility="{Binding ShowLicense, Converter={i:BoolToVisibleConverter}}">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="180" />
+                <ColumnDefinition Width="350" />
+                <ColumnDefinition Width="auto" />
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="1"
                    Grid.Column="0"
                    Text="Лицензия" />
+            <TextBlock Grid.Row="1"
+                   Grid.Column="1"
+                   Text="{Binding LicenseFileName}" />
 
-        <TextBlock Grid.Row="2"
+            <TextBlock Grid.Row="2"
                    Grid.Column="0"
                    Text="Владелец" />
-        <TextBox Grid.Row="2"
+            <TextBox Grid.Row="2"
                  Grid.Column="1"
                  Text="{Binding CurrentLicense.Owner}" />
 
-        <TextBlock Grid.Row="3"
+            <TextBlock Grid.Row="3"
                    Grid.Column="0"
                    Text="Загрузка осмотров" />
 
 
-        <TextBlock Grid.Row="4"
+            <TextBlock Grid.Row="4"
                    Grid.Column="0"
                    Text="Без ограничений" />
-        <CheckBox Grid.Row="4"
+            <CheckBox Grid.Row="4"
                   Grid.Column="1"
                   IsChecked="{Binding CurrentLicense.ExaminationsUnlimited }" />
 
-        <TextBlock Grid.Row="5"
+            <TextBlock Grid.Row="5"
                    Grid.Column="0"
                    Text="Код ЛПУ (ФОМС)" />
-        <TextBox Grid.Row="5"
+            <TextBox Grid.Row="5"
                  Grid.Column="1"
                  Text="{Binding CurrentLicense.ExaminationsFomsCodeMO}" />
 
-        <TextBlock Grid.Row="6"
+            <TextBlock Grid.Row="6"
                    Grid.Column="0"
                    Text="Дата до" />
-        <DatePicker Grid.Row="6"
+            <DatePicker Grid.Row="6"
                     Grid.Column="1"
                     SelectedDate="{Binding CurrentLicense.ExaminationsMaxDate}" />
 
+        </Grid>
+
+    </DockPanel>
 
 
-
-
-
-
-
-    </Grid>
 
 </UserControl>

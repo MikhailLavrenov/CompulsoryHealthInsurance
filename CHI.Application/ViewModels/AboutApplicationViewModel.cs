@@ -1,4 +1,5 @@
 ﻿using CHI.Application.Infrastructure;
+using CHI.Licensing;
 using Prism.Commands;
 using Prism.Regions;
 using System.Diagnostics;
@@ -24,12 +25,13 @@ namespace CHI.Application.ViewModels
         public string Author { get; }
         public string Email { get; }
         public string Phone { get; }
+        public string License { get; }
         public DelegateCommand OpenManualCommand { get; }
         public DelegateCommand OpenRepositoryCommand { get; }
         #endregion
 
         #region Конструкторы
-        public AboutApplicationViewModel(IMainRegionService mainRegionService)
+        public AboutApplicationViewModel(IMainRegionService mainRegionService, ILicenseManager licenseManager)
         {
             MainRegionService = mainRegionService;
             var assembly = Assembly.GetExecutingAssembly();
@@ -42,6 +44,7 @@ namespace CHI.Application.ViewModels
             Author = "Лавренов Михаил Владимирович";
             Email = "mvlavrenov@mail.ru";
             Phone = "8-924-213-79-11";
+            License = licenseManager.GetLicenseInfo();
 
             OpenManualCommand = new DelegateCommand( ()=>Process.Start(manualPath), ()=> File.Exists(manualPath));
             OpenRepositoryCommand = new DelegateCommand(() => Process.Start(repositoryPath));
