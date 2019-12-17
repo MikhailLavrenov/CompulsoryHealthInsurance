@@ -1,4 +1,4 @@
-﻿namespace CHI.Licensing
+﻿namespace CHI.Application
 {
     public interface ILicenseManager
     {

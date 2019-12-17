@@ -1,7 +1,6 @@
 ﻿using CHI.Application.Infrastructure;
 using CHI.Application.ViewModels;
 using CHI.Application.Views;
-using CHI.Licensing;
 using NLog;
 using Prism.DryIoc;
 using Prism.Ioc;

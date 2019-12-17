@@ -1,5 +1,4 @@
 ﻿using CHI.Application.Infrastructure;
-using CHI.Licensing;
 using Prism.Commands;
 using Prism.Regions;
 using System.Diagnostics;

@@ -2,7 +2,7 @@
 using System;
 using System.Text;
 
-namespace CHI.Licensing
+namespace CHI.Application
 {
     [Serializable]
     public class License : BindableBase

@@ -1,6 +1,5 @@
 ﻿using CHI.Application.Infrastructure;
 using CHI.Application.Models;
-using CHI.Licensing;
 using CHI.Services.BillsRegister;
 using CHI.Services.Common;
 using CHI.Services.MedicalExaminations;
