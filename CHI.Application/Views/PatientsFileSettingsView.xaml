@@ -25,7 +25,7 @@
         
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="180" />
-            <ColumnDefinition Width="350" />
+            <ColumnDefinition Width="368" />
             <ColumnDefinition Width="auto" />
         </Grid.ColumnDefinitions>
 
@@ -67,7 +67,6 @@
                    Text="Путь к файлу" />
         <DockPanel Grid.Row="1"
                    Grid.Column="1">
-            <!--Файловый диалог в CodeBehind-->
             <Button  DockPanel.Dock="Right"
                      Style="{StaticResource PictureButton}"
                      Command="{Binding ShowFileDialogCommand}">
@@ -79,18 +78,9 @@
 
         <TextBlock Grid.Row="2"
                    Grid.Column="0"
-                   Text="Применить форматирование" />
-        <CheckBox  Grid.Row="2"
-                   Grid.Column="1"
-                   Name="CheckBoxFormat"
-                   IsChecked="{Binding Path=Settings.FormatPatientsFile}" />
-
-
-        <TextBlock Grid.Row="3"
-                   Grid.Column="0"
                    Text="Локальная БД пациентов" />
         <StackPanel VerticalAlignment="Top"
-                    Grid.Row="3"
+                    Grid.Row="2"
                     Grid.Column="1"
                     Grid.ColumnSpan="2"
                     Orientation="Horizontal">
@@ -101,6 +91,17 @@
             <Button Content="Очистить"
                     Command="{Binding ClearDatabaseCommand}" />
         </StackPanel>
+
+        <TextBlock Grid.Row="3"
+                   Grid.Column="0"
+                   Text="Применить форматирование" />
+        <CheckBox  Grid.Row="3"
+                   Grid.Column="1"
+                   Name="CheckBoxFormat"
+                   IsChecked="{Binding Path=Settings.FormatPatientsFile}" />
+
+
+
 
         <DockPanel Grid.Row="4"
                    Grid.Column="0"

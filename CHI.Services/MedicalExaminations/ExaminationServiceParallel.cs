@@ -38,7 +38,7 @@ namespace CHI.Services.MedicalExaminations
         /// Лимит параллельных потоков
         /// </summary>
         public int ThreadsLimit { get; private set; }
-        
+
         /// <summary>
         /// Событие возникает при изменении кол-ва пациентов с загруженными осмотрами. 
         /// </summary>
@@ -89,9 +89,11 @@ namespace CHI.Services.MedicalExaminations
             var result = new ConcurrentBag<Tuple<PatientExaminations, bool, string>>();
             var tasks = new Task<ExaminationService>[threadsLimit];
             var counter = 0;
+            //задержка потока перед обращением к веб-серверу, увеличивается при росте неудачных попыток, и уменьшается при росте удачных
+            var sleepTime = 0;
 
             for (int i = 0; i < threadsLimit; i++)
-                tasks[i] = Task.Run(() => { return (ExaminationService)null; });
+                tasks[i] = Task.Run(() => (ExaminationService)null);
 
             for (int i = 0; i < patientsExaminations.Count; i++)
             {
@@ -103,19 +105,37 @@ namespace CHI.Services.MedicalExaminations
                     var error = string.Empty;
                     var isSuccessful = true;
 
-                    //3 попытки на загрузку осмотра, т.к. иногода веб-сервер обрывает сессии
-                    for (int j = 0; j < 3; j++)
+                    //3 попытки на загрузку осмотра, т.к. иногда веб-сервер обрывает сессии
+                    for (int j = 1; j < 4; j++)
                     {
-                        if (service == null)
-                        {
-                            service = new ExaminationService(URL, UseProxy, ProxyAddress, ProxyPort);
+                        if (j != 1)
+                            Interlocked.Add(ref sleepTime, 5000);
 
-                            service.Authorize(circularList.GetNext());
-                        }
+                        Thread.Sleep(sleepTime);
 
                         try
                         {
+                            if (service == null)
+                            {
+                                service = new ExaminationService(URL, UseProxy, ProxyAddress, ProxyPort);
+
+                                service.Authorize(circularList.GetNext());
+                            }
+
                             service.AddPatientExaminations(patientExaminations);
+
+                            //универсальный InterLocked-паттерн, потокобезопасно уменьшает sleepRate на 1 если он положительный
+                            int initial, desired;
+
+                            do
+                            {
+                                initial = sleepTime;
+                                desired = initial;
+                                if (desired >= 1000)
+                                    desired -= 1000;
+                            }
+                            while (initial != Interlocked.CompareExchange(ref sleepTime, desired, initial));
+
                             break;
                         }
                         catch (HttpRequestException ex)
@@ -135,8 +155,6 @@ namespace CHI.Services.MedicalExaminations
                             isSuccessful = false;
                             break;
                         }
-
-                        Thread.Sleep(10000);
                     }
 
                     result.Add(new Tuple<PatientExaminations, bool, string>(patientExaminations, isSuccessful, error));
