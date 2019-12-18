@@ -1,6 +1,7 @@
 ﻿using CHI.Application.Views;
 using Prism.Services.Dialogs;
 using System;
+using System.IO;
 using System.Windows;
 
 namespace CHI.Application.Infrastructure
@@ -27,6 +28,25 @@ namespace CHI.Application.Infrastructure
             dispatcher.BeginInvoke(showDialog).Task.GetAwaiter().GetResult();
 
             return result.Result;
+        }
+        /// <summary>
+        /// Возвращает массив байтов потока
+        /// </summary>
+        /// <param name="stream">Поток</param>
+        /// <returns>Массив байтов</returns>
+        public static byte[] GetBytes(this Stream stream)
+        {
+            stream.Position = 0;
+
+            byte[] result;
+
+            using (var mStream = new MemoryStream())
+            {
+                stream.CopyTo(mStream);
+                result = mStream.ToArray();
+            }
+
+            return result;
         }
     }
 }

@@ -1,42 +1,45 @@
-﻿using CHI.Application.Infrastructure;
+﻿using CHI.Application;
+using CHI.Application.Infrastructure;
+using CHI.Licensing;
 using Prism.Commands;
 using Prism.Regions;
 using System;
 using System.IO;
 
-namespace CHI.Application.ViewModels
+namespace CHI.Licensing
 {
-    class LicenseManagerViewModel : DomainObject, IRegionMemberLifetime
+    public class LicenseAdminViewModel : DomainObject
     {
         #region Поля
         private readonly IFileDialogService fileDialogService;
-        private readonly ILicenseManager licenseManager;
+        private readonly LicenseAdmin licenseAdmin;
         private License currentLicense;
         private bool showLicense;
         private bool showSave;
+        private string status;
         #endregion
 
         #region Свойства
-        public IMainRegionService MainRegionService { get; set; }
-        public bool KeepAlive { get => false; }
+        public DelegateCommand NewSignKeysCommand { get; }
         public DelegateCommand OpenLicenseCommand { get; }
         public DelegateCommand NewLicenseCommand { get; }
         public DelegateCommand SaveLicenseCommand { get; }
         public License CurrentLicense { get => currentLicense; set => SetProperty(ref currentLicense, value); }
         public bool ShowLicense { get => showLicense; set => SetProperty(ref showLicense, value); }
         public bool ShowSave { get => showSave; set { showSave = value; SaveLicenseCommand.RaiseCanExecuteChanged(); } }
+        public string Status { get => status; set => SetProperty(ref status, value); }
         #endregion
 
         #region Конструкторы
-        public LicenseManagerViewModel(IMainRegionService mainRegionService, IFileDialogService fileDialogService, ILicenseManager licenseManager)
+        public LicenseAdminViewModel(IFileDialogService fileDialogService)
         {
-            this.licenseManager = licenseManager;
+            licenseAdmin = new LicenseAdmin();
             this.fileDialogService = fileDialogService;
-            MainRegionService = mainRegionService;
 
-            MainRegionService.Header = "Менеджер лицензий";
+            Status = string.Empty;
             ShowLicense = false;
 
+            NewSignKeysCommand = new DelegateCommand(NewSignKeysExecute, NewSignKeysCanExecute);
             OpenLicenseCommand = new DelegateCommand(OpenLicenseExecute);
             NewLicenseCommand = new DelegateCommand(NewLicenseExecute);
             SaveLicenseCommand = new DelegateCommand(SaveLicenseExecute, () => ShowSave);
@@ -44,6 +47,20 @@ namespace CHI.Application.ViewModels
         #endregion
 
         #region Методы
+        private void NewSignKeysExecute()
+        {
+            LicenseAdmin.NewSignKeyPair();
+            licenseAdmin.Initialize();
+            NewSignKeysCommand.RaiseCanExecuteChanged();
+            Status = "Создана новая пара ключей для подписания лицензий.";
+        }
+        private bool NewSignKeysCanExecute()
+        {
+            if (File.Exists(LicenseAdmin.secretKeyPath) || File.Exists(LicenseAdmin.publicKeyPath))
+                return false;
+
+            return true;
+        }
         private void OpenLicenseExecute()
         {
             fileDialogService.DialogType = FileDialogType.Open;
@@ -51,17 +68,17 @@ namespace CHI.Application.ViewModels
 
             if (fileDialogService.ShowDialog() != true)
             {
-                MainRegionService.SetCompleteStatus("Отменено.");
+                Status="Отменено.";
                 return;
             }
 
-            CurrentLicense = licenseManager.LoadLicense(fileDialogService.FileName);
+            CurrentLicense = licenseAdmin.LoadLicense(fileDialogService.FileName);
 
             ShowLicense = true;
             ShowSave = false;
 
 
-            MainRegionService.SetCompleteStatus($"Лицензия открыта: {Path.GetFileName(fileDialogService.FileName)}");
+            Status=$"Лицензия открыта: {Path.GetFileName(fileDialogService.FileName)}";
         }
         private void NewLicenseExecute()
         {
@@ -69,7 +86,7 @@ namespace CHI.Application.ViewModels
             ShowSave = true;
 
             CurrentLicense = new License();
-            MainRegionService.SetCompleteStatus("Новая лицензия.");
+            Status="Новая лицензия.";
         }
         private void SaveLicenseExecute()
         {
@@ -81,15 +98,15 @@ namespace CHI.Application.ViewModels
 
             if (fileDialogService.ShowDialog() != true)
             {
-                MainRegionService.SetCompleteStatus("Отменено.");
+                Status = "Отменено.";
                 return;
             }
 
             ShowSave = false;
             ShowLicense = false;
 
-            licenseManager.SaveLicense(CurrentLicense, fileDialogService.FileName);
-            MainRegionService.SetCompleteStatus("Лицензия сохранена.");
+            licenseAdmin.SaveLicense(CurrentLicense, fileDialogService.FileName);
+            Status = "Лицензия сохранена.";
         }
         #endregion
     }

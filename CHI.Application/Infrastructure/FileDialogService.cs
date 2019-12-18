@@ -6,7 +6,7 @@ namespace CHI.Application.Infrastructure
     /// <summary>
     /// Сервис файлового диалога
     /// </summary>
-    class FileDialogService : IFileDialogService
+    public class FileDialogService : IFileDialogService
     {
         public FileDialogType DialogType { get; set; }
         public string Filter { get; set; }

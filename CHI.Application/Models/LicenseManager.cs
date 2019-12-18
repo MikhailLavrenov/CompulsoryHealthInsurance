@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CHI.Application.Infrastructure;
+using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -10,78 +11,37 @@ namespace CHI.Application
 {
     public class LicenseManager : ILicenseManager
     {
-        private static readonly int KeySize = 2048;
-        private readonly RSACryptoServiceProvider cryptoProvider;
+        protected readonly RSACryptoServiceProvider cryptoProvider;
+        protected static readonly string publicKeyName = "licensing.pkey";
 
-        public bool SecretKeyLoaded { get; }
         public static string DefaultDirectory { get; } = $@"{Directory.GetCurrentDirectory()}\Licensing\";
         public static string SignExtension { get; } = ".sig";
-        internal static string secretKeyPath { get; } = $"{DefaultDirectory}licensing.skey";
-        internal static string publicKeyPath { get; } = $"{DefaultDirectory}licensing.pkey";
-
+        public static string LicenseExtension { get; } = ".lic";
         public License ActiveLicense { get; set; }
-
+        
         public LicenseManager()
         {
-            byte[] key;
-
-            if (File.Exists(secretKeyPath))
-            {
-                key = File.ReadAllBytes(secretKeyPath);
-                SecretKeyLoaded = true;
-            }
-            else// if (File.Exists(publicKeyPath))
-            {
-                //key = File.ReadAllBytes(publicKeyPath);
-                key = ReadResource();
-                SecretKeyLoaded = false;
-            }
-            //else
-            //    throw new InvalidOperationException("Ошибка инициализации менеджера лицензий: не найден криптографический ключ.");
-
             cryptoProvider = new RSACryptoServiceProvider();
-            cryptoProvider.ImportCspBlob(key);
 
-            var licensePaths = new DirectoryInfo(DefaultDirectory).GetFiles("*.lic").OrderBy(x => x.CreationTime).ToList();
-
-            if (licensePaths.Count > 0)
-                ActiveLicense = LoadLicense(licensePaths.First().FullName);
+            Initialize();
         }
 
-        internal static void CreateNewSigningKeyPair()
+        public virtual void Initialize()
         {
-            new FileInfo(DefaultDirectory).Directory.Create();
+            var publicKeyBytes = ReadResource(publicKeyName);
 
-            using (var rsaProvider = new RSACryptoServiceProvider(KeySize))
-            {
-                var secretKey = rsaProvider.ExportCspBlob(true);
-                File.WriteAllBytes(secretKeyPath, secretKey);
+            if (publicKeyBytes == null)
+                throw new InvalidOperationException("Ошибка инициализации менеджера лицензий: не найден криптографический ключ.");
 
-                var publicKey = rsaProvider.ExportCspBlob(false);
-                File.WriteAllBytes(publicKeyPath, publicKey);
-            }
-        }
+            cryptoProvider.ImportCspBlob(publicKeyBytes);
 
-        public void SaveLicense(License license, string licensePath)
-        {
-            if (!SecretKeyLoaded)
-                throw new InvalidOperationException("Ошибка генерации лицензии: отсутствует закрытый ключ.");
+            var licensePaths = Directory.GetFiles(DefaultDirectory, $"*{LicenseExtension}").ToList();
 
-            var signPath = Path.ChangeExtension(licensePath, SignExtension);
+            if (licensePaths.Count > 1)
+                throw new InvalidOperationException("Ошибка загрузки лицензии: лицензий не может быть больше одной.");
 
-            using (var licenseStream = new FileStream(licensePath, FileMode.CreateNew))
-            using (var signStream = new FileStream(signPath, FileMode.CreateNew))
-            {
-                var formatter = new XmlSerializer(license.GetType());
-
-                formatter.Serialize(licenseStream, license);
-
-                licenseStream.Position = 0;
-
-                var licenseSign = cryptoProvider.SignData(licenseStream, new SHA512CryptoServiceProvider());
-
-                signStream.Write(licenseSign, 0, licenseSign.Length);
-            }
+            if (licensePaths.Count == 1)
+                ActiveLicense = LoadLicense(licensePaths.First());
         }
 
         public License LoadLicense(string licensePath)
@@ -93,8 +53,8 @@ namespace CHI.Application
             using (var licenseStream = new FileStream(licensePath, FileMode.Open, FileAccess.Read))
             using (var signStream = new FileStream(signPath, FileMode.Open, FileAccess.Read))
             {
-                var licenseBytes = GetBytes(licenseStream);
-                var signBytes = GetBytes(signStream);
+                var licenseBytes = licenseStream.GetBytes();
+                var signBytes = signStream.GetBytes();
 
                 if (cryptoProvider.VerifyData(licenseBytes, new SHA512CryptoServiceProvider(), signBytes))
                 {
@@ -133,33 +93,20 @@ namespace CHI.Application
             return sb.ToString();
         }
 
-        private static byte[] GetBytes(Stream stream)
-        {
-            stream.Position = 0;
-
-            byte[] result;
-
-            using (var mStream = new MemoryStream())
-            {
-                stream.CopyTo(mStream);
-                result = mStream.ToArray();
-            }
-
-            return result;
-        }
-
-        public byte[] ReadResource()
+        protected static byte[] ReadResource(string name)
         {
             var assembly = Assembly.GetExecutingAssembly();
 
-            var resourcePath = assembly.GetManifestResourceNames().Single(x => x.EndsWith("licensing.pkey"));
+            var resourcePath = assembly.GetManifestResourceNames().FirstOrDefault(x => x.EndsWith(name));
 
-            byte[] result;
+            byte[] result = null;
 
-            using (var stream = assembly.GetManifestResourceStream(resourcePath))
-            {
-                result = GetBytes(stream);
-            }
+
+            if (!string.IsNullOrEmpty(resourcePath))
+                using (var stream = assembly.GetManifestResourceStream(resourcePath))
+                {
+                    result = stream.GetBytes();
+                }
 
             return result;
         }

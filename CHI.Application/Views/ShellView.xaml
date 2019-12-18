@@ -68,12 +68,6 @@
                         CommandParameter="{x:Type v:ExaminationsSettingView}" />
 
                 <TextBlock Text="Прочее" Style="{StaticResource MainMenu}" />
-                
-                <Button Content="Менеджер лицензий"
-                        Style="{StaticResource HeaderReferenceButton}"
-                        Command="{Binding ShowViewCommand}"
-                        CommandParameter="{x:Type v:LicenseManagerView}"
-                        Visibility="{Binding ShowLicenseManager, Converter={i:BoolToVisibleConverter}}"/>
 
                 <Button Content="О программе"
                         Style="{StaticResource HeaderReferenceButton}"

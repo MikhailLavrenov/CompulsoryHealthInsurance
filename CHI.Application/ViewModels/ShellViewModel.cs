@@ -21,7 +21,6 @@ namespace CHI.Application.ViewModels
         #region Конструкторы
         public ShellViewModel(IMainRegionService mainRegionService, ILicenseManager licenseManager)
         {
-            ShowLicenseManager= licenseManager.SecretKeyLoaded;
              MainRegionService = mainRegionService;
             ApplicationTitle = ((AssemblyTitleAttribute)Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(AssemblyTitleAttribute), false).First()).Title;
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Prism.Ioc;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,11 +19,12 @@ namespace CHI.Licensing
     /// <summary>
     /// Логика взаимодействия для MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class LicenseAdminView : Window
     {
-        public MainWindow()
+        public LicenseAdminView()
         {
             InitializeComponent();
         }
     }
+
 }

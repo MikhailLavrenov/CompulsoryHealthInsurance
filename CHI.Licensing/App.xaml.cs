@@ -1,17 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using CHI.Application.Infrastructure;
+using CHI.Application.ViewModels;
+using CHI.Application.Views;
+using Prism.DryIoc;
+using Prism.Ioc;
+using System;
 using System.Windows;
+using System.Windows.Threading;
 
 namespace CHI.Licensing
 {
     /// <summary>
     /// Логика взаимодействия для App.xaml
     /// </summary>
-    public partial class App : System.Windows.Application
+    public partial class App : PrismApplication
     {
+        protected override Window CreateShell()
+        {
+            return Container.Resolve<LicenseAdminView>();
+        }
+        protected override void RegisterTypes(IContainerRegistry containerRegistry)
+        {
+            containerRegistry.Register<IFileDialogService, FileDialogService>();
+        }
     }
+
 }
