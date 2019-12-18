@@ -56,7 +56,7 @@ namespace CHI.Licensing
         }
         private bool NewSignKeysCanExecute()
         {
-            if (File.Exists(LicenseAdmin.secretKeyPath) || File.Exists(LicenseAdmin.publicKeyPath))
+            if (File.Exists(LicenseAdmin.SecretKeyPath) || File.Exists(LicenseAdmin.PublicKeyPath))
                 return false;
 
             return true;
@@ -105,7 +105,7 @@ namespace CHI.Licensing
             ShowSave = false;
             ShowLicense = false;
 
-            licenseAdmin.SaveLicense(CurrentLicense, fileDialogService.FileName);
+            licenseAdmin.SingAndSaveLicense(CurrentLicense, fileDialogService.FileName);
             Status = "Лицензия сохранена.";
         }
         #endregion

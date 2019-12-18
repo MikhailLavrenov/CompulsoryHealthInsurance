@@ -77,10 +77,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Page Include="old.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="LicenseAdminView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -90,9 +86,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="LicenseAdmin.cs" />
-    <Compile Include="old.xaml.cs">
-      <DependentUpon>old.xaml</DependentUpon>
-    </Compile>
     <Compile Include="LicenseAdminViewModel.cs" />
     <Compile Include="LicenseAdminView.xaml.cs">
       <DependentUpon>LicenseAdminView.xaml</DependentUpon>

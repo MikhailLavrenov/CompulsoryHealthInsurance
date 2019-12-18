@@ -9,16 +9,34 @@ using System.Xml.Serialization;
 
 namespace CHI.Application
 {
+    /// <summary>
+    /// Представляет менеджер лицензий, через который загружается и проверяется пользовательская лицензия
+    /// </summary>
     public class LicenseManager : ILicenseManager
     {
         protected readonly RSACryptoServiceProvider cryptoProvider;
         protected static readonly string publicKeyName = "licensing.pkey";
 
+        /// <summary>
+        /// Стандартная директория для подсистемы лицензирования
+        /// </summary>
         public static string DefaultDirectory { get; } = $@"{Directory.GetCurrentDirectory()}\Licensing\";
+        /// <summary>
+        /// Расширение файла проверки лицензии
+        /// </summary>
         public static string SignExtension { get; } = ".sig";
+        /// <summary>
+        /// Расширение файла лицензии
+        /// </summary>
         public static string LicenseExtension { get; } = ".lic";
+        /// <summary>
+        /// Текущая пользовательская лицензия
+        /// </summary>
         public License ActiveLicense { get; set; }
         
+        /// <summary>
+        /// Конструктор по-умочанию, вызывает инициализацию класса.
+        /// </summary>
         public LicenseManager()
         {
             cryptoProvider = new RSACryptoServiceProvider();
@@ -26,6 +44,9 @@ namespace CHI.Application
             Initialize();
         }
 
+        /// <summary>
+        /// Инициализирует класс: Загружает ключ проверки подписи, загружает пользовательскую лицензию и проверяет ее валидность.
+        /// </summary>
         public virtual void Initialize()
         {
             var publicKeyBytes = ReadResource(publicKeyName);
@@ -43,7 +64,11 @@ namespace CHI.Application
             if (licensePaths.Count == 1)
                 ActiveLicense = LoadLicense(licensePaths.First());
         }
-
+        /// <summary>
+        /// Загружает лицензию по заданному пути.
+        /// </summary>
+        /// <param name="licensePath">Путь для загружки лицензии</param>
+        /// <returns>Загруженная лицензия</returns>
         public License LoadLicense(string licensePath)
         {
             License license = null;
@@ -69,7 +94,10 @@ namespace CHI.Application
 
             return license;
         }
-
+        /// <summary>
+        /// Возвращает описание текущей лицензии в виде строк (включая предоставленные права)
+        /// </summary>
+        /// <returns>описание лицензии</returns>
         public string GetActiveLicenseInfo()
         {
             if (ActiveLicense == null)
@@ -92,7 +120,11 @@ namespace CHI.Application
 
             return sb.ToString();
         }
-
+        /// <summary>
+        /// Возвращает массив байт заданного ресурса текущей сборки.
+        /// </summary>
+        /// <param name="name">Название ресурса</param>
+        /// <returns>Массив байт ресурса сборки</returns>
         protected static byte[] ReadResource(string name)
         {
             var assembly = Assembly.GetExecutingAssembly();

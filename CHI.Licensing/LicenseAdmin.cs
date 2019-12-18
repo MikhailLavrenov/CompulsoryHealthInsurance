@@ -1,54 +1,71 @@
 ﻿using CHI.Application;
-using CHI.Application.Infrastructure;
 using System;
 using System.IO;
-using System.Linq;
-using System.Reflection;
 using System.Security.Cryptography;
-using System.Text;
 using System.Xml.Serialization;
 
 namespace CHI.Licensing
 {
-    public class LicenseAdmin : LicenseManager
+    /// <summary>
+    /// Представляет средства управления лицензированием приложения.
+    /// </summary>
+    internal sealed class LicenseAdmin : LicenseManager
     {
         private static readonly int KeySize = 2048;
         private static readonly string secretKeyName = "licensing.skey";
+        private bool SecretKeyLoaded;
 
-        public bool SecretKeyLoaded { get; private set; }
-        internal static string secretKeyPath { get; } = $"{DefaultDirectory}{secretKeyName}";
-        internal static string publicKeyPath { get; } = $"{DefaultDirectory}{publicKeyName}";
+        /// <summary>
+        /// Полный путь к ключевой паре подписи лицензий.
+        /// </summary>
+        internal static string SecretKeyPath { get; } = $"{DefaultDirectory}{secretKeyName}";
+        /// <summary>
+        /// Полный путь к открытому ключу проверки подписи лицензий.
+        /// </summary>
+        internal static string PublicKeyPath { get; } = $"{DefaultDirectory}{publicKeyName}";
 
-        public LicenseAdmin()
+        /// <summary>
+        /// Конструктор. Вызывает инициализацию класса.
+        /// </summary>
+        internal LicenseAdmin()
         {
             Initialize();
         }
 
+        /// <summary>
+        /// Инициализирует класс: загржуает ключевую пару подписи лицензий.
+        /// </summary>
         public override void Initialize()
         {
-            if (File.Exists(secretKeyPath))
+            if (File.Exists(SecretKeyPath))
             {
-                var key = File.ReadAllBytes(secretKeyPath);
+                var key = File.ReadAllBytes(SecretKeyPath);
                 cryptoProvider.ImportCspBlob(key);
                 SecretKeyLoaded = true;
             }
         }
-
-        public static void NewSignKeyPair()
+        /// <summary>
+        /// Генерирует и сохраняет в файлы новую ключевую пару для подписи лицензий.
+        /// </summary>
+        internal static void NewSignKeyPair()
         {
-            new FileInfo(DefaultDirectory).Directory.Create();          
+            new FileInfo(DefaultDirectory).Directory.Create();
 
             using (var rsaProvider = new RSACryptoServiceProvider(KeySize))
             {
                 var secretKey = rsaProvider.ExportCspBlob(true);
-                File.WriteAllBytes(secretKeyPath, secretKey);
+                File.WriteAllBytes(SecretKeyPath, secretKey);
 
                 var publicKey = rsaProvider.ExportCspBlob(false);
-                File.WriteAllBytes(publicKeyPath, publicKey);
+                File.WriteAllBytes(PublicKeyPath, publicKey);
             }
-        }
-
-        public void SaveLicense(License license, string licensePath)
+        }        
+        /// <summary>
+        /// Сохраняет лицензию в файл, генерирует его подпись и сохраняет подпись в файл по тому же пути и имени но с отличным расширением.
+        /// </summary>
+        /// <param name="license">Лицензия</param>
+        /// <param name="licensePath">Полный путь для сохранения лицензии.</param>
+        internal void SingAndSaveLicense(License license, string licensePath)
         {
             if (!SecretKeyLoaded)
                 throw new InvalidOperationException("Ошибка генерации лицензии: отсутствует закрытый ключ.");
