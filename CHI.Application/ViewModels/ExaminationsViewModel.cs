@@ -48,15 +48,15 @@ namespace CHI.Application.ViewModels
             //{
             //    BeginDate = new DateTime(2019, 10, 10),
             //    EndDate = new DateTime(2019, 10, 15),
-            //    HealthGroup = ExaminationHealthGroup.ThirdA,
-            //    Referral = ExaminationReferral.LocalClinic
+            //    HealthGroup = HealthGroup.ThirdA,
+            //    Referral = Referral.LocalClinic
             //};
             //var examination2Stage = new Examination
             //{
             //    BeginDate = new DateTime(2019, 10, 20),
             //    EndDate = new DateTime(2019, 10, 25),
-            //    HealthGroup = ExaminationHealthGroup.ThirdB,
-            //    Referral = ExaminationReferral.AnotherClinic
+            //    HealthGroup = HealthGroup.ThirdB,
+            //    Referral = Referral.AnotherClinic
             //};
 
             //ShowErrors = true;
@@ -68,8 +68,8 @@ namespace CHI.Application.ViewModels
             //Result = new List<Tuple<PatientExaminations, bool, string>> {
             //    new Tuple<PatientExaminations, bool,string>(pe, true, ""),
             //    new Tuple<PatientExaminations,bool, string>(pe, true, ""),
-            //    new Tuple<PatientExaminations,bool, string>(pe, false, "Потеря потерь"),
-            //    new Tuple<PatientExaminations, bool,string>(pe, false, "Потеря потерь"),
+            //    new Tuple<PatientExaminations,bool, string>(pe, false, "Какая то надпись"),
+            //    new Tuple<PatientExaminations, bool,string>(pe, false, "Еще одна надпись"),
             //};
         }
         #endregion
