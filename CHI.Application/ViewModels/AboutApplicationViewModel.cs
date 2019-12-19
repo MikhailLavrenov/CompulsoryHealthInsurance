@@ -12,7 +12,6 @@ namespace CHI.Application.ViewModels
     {
         #region Поля
         private readonly string manualPath;
-        private readonly string repositoryPath;
         #endregion
 
         #region Свойства
@@ -26,7 +25,6 @@ namespace CHI.Application.ViewModels
         public string Phone { get; }
         public string License { get; }
         public DelegateCommand OpenManualCommand { get; }
-        public DelegateCommand OpenRepositoryCommand { get; }
         #endregion
 
         #region Конструкторы
@@ -36,7 +34,6 @@ namespace CHI.Application.ViewModels
             var assembly = Assembly.GetExecutingAssembly();
 
             manualPath = "Инструкция.docx";
-            repositoryPath = @"https://github.com/MikhailLavrenov/CompulsoryHealthInsurance";
             Name = ((AssemblyTitleAttribute)assembly.GetCustomAttributes(typeof(AssemblyTitleAttribute), false).First()).Title;
             Version = assembly.GetName().Version.ToString();
             Copyright = @"©  2019";
@@ -46,7 +43,6 @@ namespace CHI.Application.ViewModels
             License = licenseManager.GetActiveLicenseInfo();
 
             OpenManualCommand = new DelegateCommand( ()=>Process.Start(manualPath), ()=> File.Exists(manualPath));
-            OpenRepositoryCommand = new DelegateCommand(() => Process.Start(repositoryPath));
         }
         #endregion
 

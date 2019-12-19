@@ -120,13 +120,15 @@ namespace CHI.Application.ViewModels
 
             var patientsExaminations = registers.GetPatientsExaminations(examinationFileNames, patientsFileNames);
 
-            var maxDate = patientsExaminations.Max(x => x.Stage1?.EndDate > x.Stage2?.EndDate ? x.Stage1?.EndDate : x.Stage2?.EndDate);
+            var maxDate1 = patientsExaminations.Max(x => x.Stage1?.EndDate);
+            var maxDate2 = patientsExaminations.Max(x => x.Stage2?.EndDate);
+            var maxDate = maxDate1 > maxDate2 ? maxDate1 : maxDate2;
 
             var license = LicenseManager.ActiveLicense;
 
             if (!(license.ExaminationsUnlimited || license.ExaminationsFomsCodeMO == Settings.FomsCodeMO || license.ExaminationsMaxDate > maxDate))
             {
-                MainRegionService.SetCompleteStatus("Отсутствует лицензия.");
+                MainRegionService.SetCompleteStatus("Отменено, ограничение лицензии.");
                 return;
             }
 

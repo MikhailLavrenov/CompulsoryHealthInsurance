@@ -65,6 +65,7 @@ namespace CHI.Licensing
         /// </summary>
         /// <param name="license">Лицензия</param>
         /// <param name="licensePath">Полный путь для сохранения лицензии.</param>
+        /// <exception cref="InvalidOperationException">Возникает когда не найден закрытый ключ для подписания лицензий.</exception>
         internal void SingAndSaveLicense(License license, string licensePath)
         {
             if (!SecretKeyLoaded)

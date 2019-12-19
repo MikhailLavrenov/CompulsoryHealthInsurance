@@ -47,12 +47,13 @@ namespace CHI.Application
         /// <summary>
         /// Инициализирует класс: Загружает ключ проверки подписи, загружает пользовательскую лицензию и проверяет ее валидность.
         /// </summary>
+        /// <exception cref="InvalidOperationException">Возникает когда не найден ключ проверки подписи или найдено более одной лицензии</exception>
         public virtual void Initialize()
         {
             var publicKeyBytes = ReadResource(publicKeyName);
 
             if (publicKeyBytes == null)
-                throw new InvalidOperationException("Ошибка инициализации менеджера лицензий: не найден криптографический ключ.");
+                throw new InvalidOperationException("Ошибка инициализации менеджера лицензий: не найден ключ проверки подписи.");
 
             cryptoProvider.ImportCspBlob(publicKeyBytes);
 
@@ -69,6 +70,7 @@ namespace CHI.Application
         /// </summary>
         /// <param name="licensePath">Путь для загружки лицензии</param>
         /// <returns>Загруженная лицензия</returns>
+        /// <exception cref="InvalidOperationException">Возникает когда подпись не соответствует файлу лицензии</exception>
         public License LoadLicense(string licensePath)
         {
             License license = null;
@@ -106,17 +108,19 @@ namespace CHI.Application
             var sb = new StringBuilder();
 
             sb.AppendLine($"Выдана: {ActiveLicense.Owner}");
-            sb.AppendLine($"Активные разрешения:");
-            sb.Append($@"Загрузка профилактических осмотров - ");
+            sb.AppendLine("Действующие разрешения:");            
+            sb.Append("Загрузка профилактических осмотров - ");
 
             if (ActiveLicense.ExaminationsUnlimited)
-                sb.Append($"Без ограничений");
+                sb.AppendLine($"Без ограничений");
             else if (!string.IsNullOrEmpty(ActiveLicense.ExaminationsFomsCodeMO))
-                sb.Append($"ЛПУ с кодом ФОМС {ActiveLicense.ExaminationsFomsCodeMO}");
+                sb.AppendLine($"ЛПУ с кодом ФОМС {ActiveLicense.ExaminationsFomsCodeMO}");
             else if (ActiveLicense.ExaminationsMaxDate != null)
-                sb.Append($"Дата осмотров до {ActiveLicense.ExaminationsMaxDate.Value.ToShortDateString()}");
+                sb.AppendLine($"Дата осмотров до {ActiveLicense.ExaminationsMaxDate.Value.ToShortDateString()}");
             else
-                sb.Append($"Недоступно");
+                sb.AppendLine($"Недоступно");
+
+            sb.AppendLine("Прочие возможности - Без ограничений");
 
             return sb.ToString();
         }
