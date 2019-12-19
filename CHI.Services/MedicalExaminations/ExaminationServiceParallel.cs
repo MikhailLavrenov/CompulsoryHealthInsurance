@@ -102,8 +102,8 @@ namespace CHI.Services.MedicalExaminations
                 tasks[index] = tasks[index].ContinueWith((task) =>
                 {
                     var service = task.ConfigureAwait(false).GetAwaiter().GetResult();
-                    var error = string.Empty;
-                    var isSuccessful = true;
+                    string error = string.Empty;
+                    bool isSuccessful = true;
 
                     //3 попытки на загрузку осмотра, т.к. иногда веб-сервер обрывает сессии
                     for (int j = 1; j < 4; j++)
@@ -124,17 +124,25 @@ namespace CHI.Services.MedicalExaminations
 
                             service.AddPatientExaminations(patientExaminations);
 
-                            //универсальный InterLocked-паттерн, потокобезопасно уменьшает sleepRate на 1 если он положительный
-                            int initial, desired;
+                            error = string.Empty;
+                            isSuccessful = true;
 
-                            do
+                            if (sleepTime != 0)
                             {
-                                initial = sleepTime;
-                                desired = initial;
-                                if (desired >= 1000)
-                                    desired -= 1000;
+                                //универсальный InterLocked-паттерн, потокобезопасно уменьшает sleepRate если он положительный
+                                int initial, desired;
+
+                                do
+                                {
+                                    initial = sleepTime;
+                                    desired = initial;
+                                    if (desired >= 1000)
+                                        desired -= 1000;
+                                    else if (desired > 0)
+                                        desired = 0;
+                                }
+                                while (initial != Interlocked.CompareExchange(ref sleepTime, desired, initial));
                             }
-                            while (initial != Interlocked.CompareExchange(ref sleepTime, desired, initial));
 
                             break;
                         }

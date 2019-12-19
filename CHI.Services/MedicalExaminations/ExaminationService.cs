@@ -49,6 +49,12 @@ namespace CHI.Services.MedicalExaminations
         /// </exception>
         public void AddPatientExaminations(PatientExaminations patientExaminations)
         {
+            if ((patientExaminations.Stage1?.BeginDate != null && patientExaminations.Stage1.BeginDate > DateTime.Today)
+                || (patientExaminations.Stage1?.EndDate != null && patientExaminations.Stage1.EndDate > DateTime.Today)
+                || (patientExaminations.Stage2?.BeginDate != null && patientExaminations.Stage2.BeginDate > DateTime.Today)
+                || (patientExaminations.Stage2?.EndDate != null && patientExaminations.Stage2.EndDate > DateTime.Today))
+                throw new InvalidOperationException("Осмотры будущей датой не могут быть загружены.");
+
             var webPatientData = GetOrAddPatientToPlan(patientExaminations);
 
             if (webPatientData == null)
@@ -115,7 +121,7 @@ namespace CHI.Services.MedicalExaminations
             return webPatientData;
         }
         /// <summary>
-        /// Сравнение каждого шаго, пропуск, добавление или замена информации о прохождении шагов профилактических осмотров. 
+        /// Сравнение каждого шага, пропуск, добавление или замена информации о прохождении шагов профилактических осмотров. 
         /// В случае возникновения ошибки на стороне сервера - возврат изменений назад.
         /// </summary>
         /// <param name="patientId">Id пациента</param>

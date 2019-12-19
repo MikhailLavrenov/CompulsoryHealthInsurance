@@ -184,8 +184,11 @@ namespace CHI.Services.MedicalExaminations
 
             var idString = SubstringBetween(responseText, "personId", "\"", "\"");
 
-            if (responseText.IndexOf(">Застрахованное лицо находится в плане диспансеризации другой МО<") != -1)
-                throw new WebServiceOperationException("Пациент находится в плане др. ЛПУ");
+            //if (responseText.IndexOf(">Застрахованное лицо находится в плане диспансеризации другой МО<") != -1)
+            //    throw new WebServiceOperationException("Пациент находится в плане др. ЛПУ");
+
+            if (responseText.IndexOf(">Начата диспансеризация другой МО<") != -1)
+                throw new WebServiceOperationException("Ошибка добавления в план: При поиске в СРЗ установлено - периодический осмотр был выполнен в др. ЛПУ.");
 
             int.TryParse(idString, out var srzPatientId);
 
