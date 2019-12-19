@@ -35,7 +35,7 @@
                    Panel.ZIndex="0"
                    Background="White">
 
-            <StackPanel DockPanel.Dock="Left" Orientation="Vertical" Width="150"
+            <WrapPanel DockPanel.Dock="Left" Orientation="Vertical" Width="150"
                        Margin="0,3,0,3">
 
                 <TextBlock Text="Основное" Style="{StaticResource MainMenu}"/>
@@ -74,7 +74,7 @@
                         Command="{Binding ShowViewCommand}"
                         CommandParameter="{x:Type v:AboutApplicationView}" />
 
-            </StackPanel>
+            </WrapPanel>
 
 
                 <Separator DockPanel.Dock="Left" Margin="10,0,10,0" Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
