@@ -8,23 +8,31 @@
         xmlns:v="clr-namespace:CHI.Application.Views"
         xmlns:vm="clr-namespace:CHI.Application.ViewModels"
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
-        xmlns:prism="http://prismlibrary.com/"
+        xmlns:prism="http://prismlibrary.com/"         
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
         Title="{Binding ApplicationTitle}"
         Height="600"
         Width="750"
+                       
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        Background="{DynamicResource MaterialDesignPaper}"
+        TextElement.FontWeight="Medium"
+        TextElement.FontSize="14"
+        FontFamily="{materialDesign:MaterialDesignFont}"
+        
         prism:ViewModelLocator.AutoWireViewModel="True"
         IsEnabled="{Binding MainRegionService.IsBusy, Converter={i:InvertBoolConverter}}">
 
-    <Window.Resources>
+    <!--<Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/CHI.Application;component/Views/Resources/DefaultStyle.xaml" />
                 <ResourceDictionary Source="/CHI.Application;component/Views/Resources/Icons.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
-    </Window.Resources>
+    </Window.Resources>-->
 
     <Grid>
 
@@ -35,89 +43,104 @@
                    Panel.ZIndex="0"
                    Background="White">
 
-            <StackPanel DockPanel.Dock="Left" Orientation="Vertical" Width="150"
-                       Margin="0,3,0,3">
+            
+               
+         
 
-                <TextBlock Text="Основное" Style="{StaticResource MainMenu}"/>
+            <materialDesign:ColorZone DockPanel.Dock="Left" Mode="Light">
+                
+                <StackPanel Orientation="Vertical" Width="200"
+                       Margin="0,3,0,3" >
 
-                <Button Content="Файл прикрепленных пациентов"
-                        Style="{StaticResource HeaderReferenceButton}"
+                <TextBlock Text="Основное" />
+
+                    <Button
+                            Style="{StaticResource LeftMenuButton}"
                         Command="{Binding ShowViewCommand}"
-                        CommandParameter="{x:Type v:PatientsFileView}" />
+                        CommandParameter="{x:Type v:PatientsFileView}" >
+                        <TextBlock Text="Файл прикрепленных пациентов" TextWrapping="Wrap"/>
+                    </Button>
 
-                <Button Content="Загрузка осмотров"
-                        Style="{StaticResource HeaderReferenceButton}"
+                    <Button Content="Загрузка осмотров"
+                        Style="{StaticResource LeftMenuButton}"
                         Command="{Binding ShowViewCommand}"
                         CommandParameter="{x:Type v:ExaminationsView}" />
 
-                <TextBlock Text="Настройки" Style="{StaticResource MainMenu}"/>
+                <TextBlock Text="Настройки" />
 
-                <Button Content="Настройки  подключения к сервисам"
-                        Style="{StaticResource HeaderReferenceButton}"
+                <Button Content="Настройки подключения к сервисам"
+                         Style="{StaticResource LeftMenuButton}"
                         Command="{Binding ShowViewCommand}"
                         CommandParameter="{x:Type v:ServicesSettingsView}" />
 
                 <Button Content="Настройки файла прикрепленных пациентов"
-                        Style="{StaticResource HeaderReferenceButton}"
+                         Style="{StaticResource LeftMenuButton}"
                         Command="{Binding ShowViewCommand}"
                         CommandParameter="{x:Type v:PatientsFileSettingsView}" />
 
                 <Button Content="Настройки загрузки осмотров"
-                        Style="{StaticResource HeaderReferenceButton}"
+                         Style="{StaticResource LeftMenuButton}"
                         Command="{Binding ShowViewCommand}"
                         CommandParameter="{x:Type v:ExaminationsSettingView}" />
 
-                <TextBlock Text="Прочее" Style="{StaticResource MainMenu}" />
+                <TextBlock Text="Прочее"  />
 
                 <Button Content="О программе"
-                        Style="{StaticResource HeaderReferenceButton}"
+                         Style="{StaticResource LeftMenuButton}"
                         Command="{Binding ShowViewCommand}"
                         CommandParameter="{x:Type v:AboutApplicationView}" />
 
             </StackPanel>
+            </materialDesign:ColorZone>
 
-
-                <Separator DockPanel.Dock="Left" Margin="10,0,10,0" Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+            <Separator DockPanel.Dock="Left" Margin="10,0,10,0" Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Background="red" />
         
 
             <DockPanel x:Name="MainRegionPanel"
                        RenderTransformOrigin="0.1,0.1">
+                
+                
 
                 <DockPanel.RenderTransform>
                     <SkewTransform x:Name="AnimatedSkewTransform" />
                 </DockPanel.RenderTransform>
 
-                <TextBlock DockPanel.Dock="Top"                           
-                           Style="{StaticResource TextBlockHeader}"
+                <materialDesign:ColorZone DockPanel.Dock="Top"  Mode="PrimaryLight">
+
+                    <TextBlock                           
+                           
+                           
                            Text="{Binding MainRegionService.Header, NotifyOnTargetUpdated=True}">
 
-                    <TextBlock.Triggers>
-                        <EventTrigger RoutedEvent="Binding.TargetUpdated">
-                            <BeginStoryboard>
-                                <Storyboard>
-                                    <DoubleAnimation Storyboard.TargetName="MainRegionPanel"
+                        <TextBlock.Triggers>
+                            <EventTrigger RoutedEvent="Binding.TargetUpdated">
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="MainRegionPanel"
                                                      Storyboard.TargetProperty="Opacity"
                                                      Duration="0:0:0.5"
                                                      From="0"
                                                      To="1" />
 
-                                    <DoubleAnimation Storyboard.TargetName="AnimatedSkewTransform"
+                                        <DoubleAnimation Storyboard.TargetName="AnimatedSkewTransform"
                                                      Storyboard.TargetProperty="AngleX"
                                                      Duration="0:0:0.5"
                                                      From="90"
                                                      To="0" />
 
-                                    <DoubleAnimation Storyboard.TargetName="AnimatedSkewTransform"
+                                        <DoubleAnimation Storyboard.TargetName="AnimatedSkewTransform"
                                                      Storyboard.TargetProperty="AngleY"
                                                      Duration="0:0:0.5"
                                                      From="90"
                                                      To="0" />
-                                </Storyboard>
-                            </BeginStoryboard>
-                        </EventTrigger>
-                    </TextBlock.Triggers>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger>
+                        </TextBlock.Triggers>
 
-                </TextBlock>
+                    </TextBlock>
+
+                </materialDesign:ColorZone>
 
                 <TextBlock DockPanel.Dock="Bottom"
                            TextWrapping="Wrap"

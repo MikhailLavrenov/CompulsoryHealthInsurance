@@ -12,14 +12,6 @@
              d:DesignWidth="800"
              prism:ViewModelLocator.AutoWireViewModel="True">
 
-    <UserControl.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="/CHI.Application;component/Views/Resources/DefaultStyle.xaml" />
-                <ResourceDictionary Source="/CHI.Application;component/Views/Resources/Icons.xaml" />
-            </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
-    </UserControl.Resources>
 
     <Grid>
         <Grid.ColumnDefinitions>
@@ -141,7 +133,7 @@
                                        Margin="0" />
 
                             <Button Grid.Column="2"
-                                    Style="{StaticResource PictureTransparentButton}"
+                                    
                                     Command="{Binding DataContext.SwitchShowPasswordCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}">
 
                                 <!--В кнопку вставляем 2 рисунка - пароль видно и пароль скрыт. Одновременно отображается только один-->
@@ -162,12 +154,12 @@
                         <DataTemplate>
                             <Grid>
                                 
-                                <PasswordBox Style="{StaticResource  DataGridTemplateColumnControl}"
+                                <PasswordBox 
                                              i:PasswordBoxHelper.BoundPassword="{Binding Password, UpdateSourceTrigger=LostFocus, ValidatesOnDataErrors=True}"
                                              Visibility="{Binding DataContext.ShowProtectedPassword, Source={x:Reference proxyElement}, Converter={i:BoolToVisibleConverter}}">
                                 </PasswordBox>
 
-                                <TextBox Style="{StaticResource  DataGridTemplateColumnControl}"
+                                <TextBox 
                                          Text="{Binding Password, UpdateSourceTrigger=LostFocus,  ValidatesOnDataErrors=True}"
                                          Visibility="{Binding DataContext.ShowTextPassword, Source={x:Reference proxyElement}, Converter={i:BoolToVisibleConverter}}">
                                 </TextBox>
