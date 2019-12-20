@@ -5,7 +5,9 @@ using NLog;
 using Prism.DryIoc;
 using Prism.Ioc;
 using System;
+using System.Globalization;
 using System.Windows;
+using System.Windows.Markup;
 using System.Windows.Threading;
 
 namespace CHI.Application
@@ -19,7 +21,10 @@ namespace CHI.Application
 
         protected override Window CreateShell()
         {
-            return Container.Resolve<ShellView>();
+            var window= Container.Resolve<ShellView>();
+            //устанавливает язык для DatePicker MaterialDesign
+            window.Language = XmlLanguage.GetLanguage(CultureInfo.CurrentCulture.IetfLanguageTag);
+            return window;
         }
         protected override void OnInitialized()
         {

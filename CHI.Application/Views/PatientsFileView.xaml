@@ -7,25 +7,18 @@
              xmlns:i="clr-namespace:CHI.Application.Infrastructure"
              xmlns:vm="clr-namespace:CHI.Application.ViewModels"
              xmlns:prism="http://prismlibrary.com/"
+             xmlns:materialDesign="clr-namespace:MaterialDesignThemes.Wpf;assembly=MaterialDesignThemes.Wpf"
              mc:Ignorable="d"
              d:DesignHeight="600"
              d:DesignWidth="800"
              prism:ViewModelLocator.AutoWireViewModel="True">
 
-    <!--<UserControl.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="/CHI.Application;component/Views/Resources/DefaultStyle.xaml" />
-                <ResourceDictionary Source="/CHI.Application;component/Views/Resources/Icons.xaml" />
-            </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
-    </UserControl.Resources>-->
 
     <Grid d:DataContext="{d:DesignInstance vm:PatientsFileViewModel }">
 
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="130" />
-            <ColumnDefinition Width="350" />
+            <ColumnDefinition Width="150" />
+            <ColumnDefinition Width="380" />
             <ColumnDefinition Width="auto" />
         </Grid.ColumnDefinitions>
 
@@ -60,18 +53,26 @@
                    Text="Путь к файлу: " />
         <DockPanel  Grid.Row="2"
                     Grid.Column="1">
-            <Button  DockPanel.Dock="Right"
-                     
+            <!--<Button  DockPanel.Dock="Right"
+                     MinWidth="0"
+                     Width="24"
+                     Height="16"
+                     Padding="0"
+                     BorderBrush="Transparent"
+                     Background="Transparent"                     
                      Command="{Binding ShowFileDialogCommand}">
                 <ContentControl Content="{Binding Source={StaticResource FileDialog}}" />
-            </Button>
-            <TextBox  Text="{Binding Settings.PatientsFilePath, ValidatesOnDataErrors=True}"
-                      Name="TextBoxFilePath" />
+            </Button>-->
+            <Button DockPanel.Dock="Right"
+                    Style="{StaticResource MaterialDesignFlatButton}"
+                    Content="{materialDesign:PackIcon FolderOpenOutline}"
+                    MinWidth="0" Padding="10,0,10,0"
+                    Command="{Binding ShowFileDialogCommand}" />
+            <TextBox  Text="{Binding Settings.PatientsFilePath, ValidatesOnDataErrors=True}" />
         </DockPanel>
 
         <Button Grid.Row="3"
                 Grid.Column="0"
-                Grid.ColumnSpan="2"
                 Content="ОК"
                 Command="{Binding ProcessFileCommand}" />
 

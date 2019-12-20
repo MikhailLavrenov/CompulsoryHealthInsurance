@@ -8,31 +8,20 @@
         xmlns:v="clr-namespace:CHI.Application.Views"
         xmlns:vm="clr-namespace:CHI.Application.ViewModels"
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
-        xmlns:prism="http://prismlibrary.com/"         
+        xmlns:prism="http://prismlibrary.com/"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
         Title="{Binding ApplicationTitle}"
         Height="600"
-        Width="750"
-                       
+        Width="800"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         Background="{DynamicResource MaterialDesignPaper}"
         TextElement.FontWeight="Medium"
         TextElement.FontSize="14"
         FontFamily="{materialDesign:MaterialDesignFont}"
-        
         prism:ViewModelLocator.AutoWireViewModel="True"
         IsEnabled="{Binding MainRegionService.IsBusy, Converter={i:InvertBoolConverter}}">
-
-    <!--<Window.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="/CHI.Application;component/Views/Resources/DefaultStyle.xaml" />
-                <ResourceDictionary Source="/CHI.Application;component/Views/Resources/Icons.xaml" />
-            </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
-    </Window.Resources>-->
 
     <Grid>
 
@@ -43,96 +32,111 @@
                    Panel.ZIndex="0"
                    Background="White">
 
-            
-               
-         
+            <materialDesign:ColorZone DockPanel.Dock="Left"
+                                      Mode="PrimaryMid" VerticalAlignment="Stretch">
 
-            <materialDesign:ColorZone DockPanel.Dock="Left" Mode="Light">
-                
-                <StackPanel Orientation="Vertical" Width="200"
-                       Margin="0,3,0,3" >
+                <StackPanel Orientation="Vertical"
+                            Width="210"
+                            Margin="0,3,0,3">
 
-                <TextBlock Text="Основное" />
+                    <ContentControl Height="40" />
 
-                    <Button
-                            Style="{StaticResource LeftMenuButton}"
-                        Command="{Binding ShowViewCommand}"
-                        CommandParameter="{x:Type v:PatientsFileView}" >
-                        <TextBlock Text="Файл прикрепленных пациентов" TextWrapping="Wrap"/>
+                    <TextBlock Text="Основное"
+                               Style="{StaticResource LeftMenuTextBlock}" />
+
+                    <Button Style="{StaticResource LeftMenuButton}"
+                            Command="{Binding ShowViewCommand}"
+                            CommandParameter="{x:Type v:PatientsFileView}">
+                        <TextBlock Text="Файл прикрепленных пациентов"
+                                   TextWrapping="Wrap"
+                                   Width="170" />
                     </Button>
 
-                    <Button Content="Загрузка осмотров"
-                        Style="{StaticResource LeftMenuButton}"
-                        Command="{Binding ShowViewCommand}"
-                        CommandParameter="{x:Type v:ExaminationsView}" />
+                    <Button Style="{StaticResource LeftMenuButton}"
+                            Command="{Binding ShowViewCommand}"
+                            CommandParameter="{x:Type v:ExaminationsView}">
+                        <TextBlock Text="Загрузка осмотров"
+                                   TextWrapping="Wrap"
+                                   Width="170" />
+                    </Button>
 
-                <TextBlock Text="Настройки" />
+                    <TextBlock Text="Настройки"
+                               Style="{StaticResource LeftMenuTextBlock}" />
 
-                <Button Content="Настройки подключения к сервисам"
-                         Style="{StaticResource LeftMenuButton}"
-                        Command="{Binding ShowViewCommand}"
-                        CommandParameter="{x:Type v:ServicesSettingsView}" />
+                    <Button Style="{StaticResource LeftMenuButton}"
+                            Command="{Binding ShowViewCommand}"
+                            CommandParameter="{x:Type v:ServicesSettingsView}">
+                        <TextBlock Text="Настройки подключения к сервисам"
+                                   TextWrapping="Wrap"
+                                   Width="170" />
+                    </Button>
 
-                <Button Content="Настройки файла прикрепленных пациентов"
-                         Style="{StaticResource LeftMenuButton}"
-                        Command="{Binding ShowViewCommand}"
-                        CommandParameter="{x:Type v:PatientsFileSettingsView}" />
+                    <Button Style="{StaticResource LeftMenuButton}"
+                            Command="{Binding ShowViewCommand}"
+                            CommandParameter="{x:Type v:PatientsFileSettingsView}">
+                        <TextBlock Text="Настройки файла прикреплен. пациентов"
+                                   TextWrapping="Wrap"
+                                   Width="170" />
+                    </Button>
 
-                <Button Content="Настройки загрузки осмотров"
-                         Style="{StaticResource LeftMenuButton}"
-                        Command="{Binding ShowViewCommand}"
-                        CommandParameter="{x:Type v:ExaminationsSettingView}" />
+                    <Button Style="{StaticResource LeftMenuButton}"
+                            Command="{Binding ShowViewCommand}"
+                            CommandParameter="{x:Type v:ExaminationsSettingView}">
+                        <TextBlock Text="Настройки загрузки осмотров"
+                                   TextWrapping="Wrap"
+                                   Width="170" />
+                    </Button>
 
-                <TextBlock Text="Прочее"  />
+                    <TextBlock Text="Прочее"
+                               Style="{StaticResource LeftMenuTextBlock}" />
 
-                <Button Content="О программе"
-                         Style="{StaticResource LeftMenuButton}"
-                        Command="{Binding ShowViewCommand}"
-                        CommandParameter="{x:Type v:AboutApplicationView}" />
+                    <Button Style="{StaticResource LeftMenuButton}"
+                            Command="{Binding ShowViewCommand}"
+                            CommandParameter="{x:Type v:AboutApplicationView}">
+                        <TextBlock Text="О программе"
+                                   TextWrapping="Wrap"
+                                   Width="180" />
+                    </Button>
 
-            </StackPanel>
+                </StackPanel>
+
             </materialDesign:ColorZone>
-
-            <Separator DockPanel.Dock="Left" Margin="10,0,10,0" Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Background="red" />
-        
 
             <DockPanel x:Name="MainRegionPanel"
                        RenderTransformOrigin="0.1,0.1">
-                
-                
 
                 <DockPanel.RenderTransform>
                     <SkewTransform x:Name="AnimatedSkewTransform" />
                 </DockPanel.RenderTransform>
 
-                <materialDesign:ColorZone DockPanel.Dock="Top"  Mode="PrimaryLight">
+                <materialDesign:ColorZone DockPanel.Dock="Top"
+                                          Mode="PrimaryLight"
+                                          Padding="15">
 
-                    <TextBlock                           
-                           
-                           
-                           Text="{Binding MainRegionService.Header, NotifyOnTargetUpdated=True}">
+                    <TextBlock Text="{Binding MainRegionService.Header, NotifyOnTargetUpdated=True}"
+                               FontSize="20" FontWeight="Regular" Foreground="White">
 
                         <TextBlock.Triggers>
                             <EventTrigger RoutedEvent="Binding.TargetUpdated">
                                 <BeginStoryboard>
                                     <Storyboard>
                                         <DoubleAnimation Storyboard.TargetName="MainRegionPanel"
-                                                     Storyboard.TargetProperty="Opacity"
-                                                     Duration="0:0:0.5"
-                                                     From="0"
-                                                     To="1" />
+                                                         Storyboard.TargetProperty="Opacity"
+                                                         Duration="0:0:0.5"
+                                                         From="0"
+                                                         To="1" />
 
                                         <DoubleAnimation Storyboard.TargetName="AnimatedSkewTransform"
-                                                     Storyboard.TargetProperty="AngleX"
-                                                     Duration="0:0:0.5"
-                                                     From="90"
-                                                     To="0" />
+                                                         Storyboard.TargetProperty="AngleX"
+                                                         Duration="0:0:0.5"
+                                                         From="90"
+                                                         To="0" />
 
                                         <DoubleAnimation Storyboard.TargetName="AnimatedSkewTransform"
-                                                     Storyboard.TargetProperty="AngleY"
-                                                     Duration="0:0:0.5"
-                                                     From="90"
-                                                     To="0" />
+                                                         Storyboard.TargetProperty="AngleY"
+                                                         Duration="0:0:0.5"
+                                                         From="90"
+                                                         To="0" />
                                     </Storyboard>
                                 </BeginStoryboard>
                             </EventTrigger>
@@ -146,7 +150,7 @@
                            TextWrapping="Wrap"
                            Text="{Binding MainRegionService.Status}" />
 
-                <ContentControl prism:RegionManager.RegionName="{x:Static i:RegionNames.MainRegion}" />
+                <ContentControl prism:RegionManager.RegionName="{x:Static i:RegionNames.MainRegion}" Margin="10" />
 
             </DockPanel>
 
