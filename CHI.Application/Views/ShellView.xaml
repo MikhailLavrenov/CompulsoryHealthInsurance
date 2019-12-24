@@ -14,7 +14,7 @@
         WindowStartupLocation="CenterScreen"
         Title="{Binding ApplicationTitle}"
         Height="600"
-        Width="800"
+        Width="850"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         Background="{DynamicResource MaterialDesignPaper}"
         TextElement.FontWeight="Medium"

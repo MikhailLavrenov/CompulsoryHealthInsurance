@@ -9,7 +9,7 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800"
+             d:DesignHeight="470" d:DesignWidth="800"
              prism:ViewModelLocator.AutoWireViewModel="True">
 
 
@@ -38,6 +38,7 @@
                    Text="Название" />
         <TextBlock Grid.Row="0"
                    Grid.Column="1"
+                   FontWeight="Medium"
                    Text="{Binding Name}" />
 
         <TextBlock Grid.Row="1"
@@ -45,13 +46,14 @@
                    Text="Версия" />
         <TextBlock Grid.Row="1"
                    Grid.Column="1"
+                   FontWeight="Medium"
                    Text="{Binding Version}" />
 
         <TextBlock Grid.Row="2"
                    Grid.Column="0"
                    Text="Copyright" />
         <TextBlock Grid.Row="2"
-                   Grid.Column="1"
+                   Grid.Column="1" FontWeight="Medium"
                    Text="{Binding Copyright}" />
 
         <TextBlock Grid.Row="3"
@@ -59,13 +61,15 @@
                    Text="Автор" />
         <TextBlock Grid.Row="3"
                    Grid.Column="1"
+                   FontWeight="Medium"
                    Text="{Binding Author}" />
 
         <TextBlock Grid.Row="4"
-                   Grid.Column="0"
+                   Grid.Column="0" 
                    Text="E-mail" />
         <TextBlock Grid.Row="4"
                    Grid.Column="1"
+                   FontWeight="Medium"
                    Text="{Binding Email}" />
 
         <TextBlock Grid.Row="5"
@@ -73,6 +77,7 @@
                    Text="Телефон" />
         <TextBlock Grid.Row="5"
                    Grid.Column="1"
+                   FontWeight="Medium"
                    Text="{Binding Phone}" />
 
         <TextBlock Grid.Row="7"
@@ -82,6 +87,7 @@
         <TextBlock Grid.Row="7"
                    Grid.Column="1"
                    TextWrapping="Wrap"
+                   FontWeight="Medium"
                    Text="{Binding License}" />
 
         <Button Grid.Row="9"                   

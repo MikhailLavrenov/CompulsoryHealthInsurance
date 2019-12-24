@@ -13,19 +13,10 @@
              d:DesignWidth="800"
              prism:ViewModelLocator.AutoWireViewModel="True">
 
-    <UserControl.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="/CHI.Application;component/Views/Resources/DefaultStyle.xaml" />
-                <ResourceDictionary Source="/CHI.Application;component/Views/Resources/Icons.xaml" />
-            </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
-    </UserControl.Resources>
-
     <Grid d:DataContext="{d:DesignInstance vm:ExaminationsSettingViewModel }">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="180" />
-            <ColumnDefinition Width="260" />
+            <ColumnDefinition Width="200" />
+            <ColumnDefinition Width="280" />
             <ColumnDefinition Width="auto" />
         </Grid.ColumnDefinitions>
 

@@ -7,25 +7,18 @@
              xmlns:i="clr-namespace:CHI.Application.Infrastructure"
              xmlns:vm="clr-namespace:CHI.Application.ViewModels"
              xmlns:prism="http://prismlibrary.com/"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d"
              d:DesignHeight="600"
              d:DesignWidth="800"
              prism:ViewModelLocator.AutoWireViewModel="True">
 
-    <UserControl.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary  Source="/CHI.Application;component/Views/Resources/DefaultStyle.xaml" />
-                <ResourceDictionary Source="/CHI.Application;component/Views/Resources/Icons.xaml" />
-            </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
-    </UserControl.Resources>
 
     <Grid d:DataContext="{d:DesignInstance vm:PatientsFileViewModel }">
-        
+
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="180" />
-            <ColumnDefinition Width="368" />
+            <ColumnDefinition Width="210" />
+            <ColumnDefinition Width="370" />
             <ColumnDefinition Width="auto" />
         </Grid.ColumnDefinitions>
 
@@ -51,7 +44,7 @@
                 </RowDefinition.Style>
             </RowDefinition>
             <RowDefinition Height="auto" />
-            
+
         </Grid.RowDefinitions>
 
         <TextBlock Grid.Row="0"
@@ -68,10 +61,9 @@
         <DockPanel Grid.Row="1"
                    Grid.Column="1">
             <Button  DockPanel.Dock="Right"
-                     Style="{StaticResource PictureButton}"
-                     Command="{Binding ShowFileDialogCommand}">
-                <ContentControl Content="{Binding Source={StaticResource FileDialog}}" />
-            </Button>
+                     Style="{StaticResource IconButton}"
+                     Command="{Binding ShowFileDialogCommand}"
+                     Content="{materialDesign:PackIcon FolderOpenOutline}" />
             <TextBox  Text="{Binding Path=Settings.PatientsFilePath, ValidatesOnDataErrors=True}"
                       Name="TextBoxFilePath" />
         </DockPanel>
@@ -112,21 +104,15 @@
                          Visibility="{Binding Path=IsChecked, ElementName=CheckBoxFormat, Converter={i:BoolToVisibleConverter}}"
                          VerticalAlignment="Center">
 
-                <Button Style="{StaticResource PictureButton}"
-                        Width="20"
-                        Height="25"
+                <Button Style="{StaticResource IconButton}"
                         Command="{Binding MoveUpCommand}"
-                        CommandParameter="{Binding SelectedItem, ElementName=DataGrid1}">
-                    <ContentControl Content="{Binding Source={StaticResource ArrowUp}}" />
-                </Button>
+                        CommandParameter="{Binding SelectedItem, ElementName=DataGrid1}"
+                        Content="{materialDesign:PackIcon ArrowUpThick}" />
 
-                <Button Style="{StaticResource PictureButton}"
-                        Width="20"
-                        Height="25"
+                <Button Style="{StaticResource IconButton}"
                         Command="{Binding MoveDownCommand}"
-                        CommandParameter="{Binding SelectedItem, ElementName=DataGrid1}">
-                    <ContentControl Content="{Binding Source={StaticResource ArrowDown}}" />
-                </Button>
+                        CommandParameter="{Binding SelectedItem, ElementName=DataGrid1}"
+                        Content="{materialDesign:PackIcon ArrowDownThick}" />
 
             </StackPanel>
 
@@ -139,15 +125,19 @@
 
                     <DataGridTextColumn     Header="Название столбца"
                                             Binding="{Binding Path=Name, ValidatesOnDataErrors=True}"
+                                            EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}"
                                             MinWidth="160" />
                     <DataGridTextColumn     Header="Понятное название"
                                             Binding="{Binding Path=AltName, ValidatesOnDataErrors=True}"
+                                            EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}"
                                             MinWidth="160" />
                     <DataGridCheckBoxColumn Header="Скрыть"
                                             Binding="{Binding Path=Hide}"
+                                            EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}"
                                             MinWidth="65" />
                     <DataGridCheckBoxColumn Header="Удалить"
                                             Binding="{Binding Path=Delete}"
+                                            EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}"
                                             MinWidth="65"
                                             Width="*" />
 

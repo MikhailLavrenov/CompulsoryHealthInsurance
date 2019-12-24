@@ -64,10 +64,11 @@
                 <ContentControl Content="{Binding Source={StaticResource FileDialog}}" />
             </Button>-->
             <Button DockPanel.Dock="Right"
-                    Style="{StaticResource MaterialDesignFlatButton}"
                     Content="{materialDesign:PackIcon FolderOpenOutline}"
-                    MinWidth="0" Padding="10,0,10,0"
-                    Command="{Binding ShowFileDialogCommand}" />
+                    Style="{StaticResource IconButton}"
+                    Command="{Binding ShowFileDialogCommand}">
+
+            </Button>
             <TextBox  Text="{Binding Settings.PatientsFilePath, ValidatesOnDataErrors=True}" />
         </DockPanel>
 

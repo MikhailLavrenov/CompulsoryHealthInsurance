@@ -7,7 +7,7 @@
              xmlns:i="clr-namespace:CHI.Application.Infrastructure"
              xmlns:vm="clr-namespace:CHI.Application.ViewModels"
              xmlns:prism="http://prismlibrary.com/"
-                         
+             
              mc:Ignorable="d"
              d:DesignHeight="600"
              d:DesignWidth="800"
@@ -15,24 +15,20 @@
 
     <prism:Dialog.WindowStyle>
         <Style TargetType="Window">
-            <Setter Property="prism:Dialog.WindowStartupLocation" Value="CenterScreen" />
-            <Setter Property="ResizeMode" Value="NoResize"/>
-            <Setter Property="ShowInTaskbar" Value="False"/>
-            <Setter Property="SizeToContent" Value="WidthAndHeight"/>
+            <Setter Property="prism:Dialog.WindowStartupLocation"
+                    Value="CenterScreen" />
+            <Setter Property="ResizeMode"
+                    Value="NoResize" />
+            <Setter Property="ShowInTaskbar"
+                    Value="False" />
+            <Setter Property="SizeToContent"
+                    Value="WidthAndHeight" />
 
         </Style>
     </prism:Dialog.WindowStyle>
 
-    <UserControl.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="/CHI.Application;component/Views/Resources/DefaultStyle.xaml" />
-                <ResourceDictionary Source="/CHI.Application;component/Views/Resources/Icons.xaml" />
-            </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
-    </UserControl.Resources>
-
-    <Grid d:DataContext="{d:DesignInstance vm:NotificationDialogViewModel}" Margin="40,10,40,10">
+    <Grid d:DataContext="{d:DesignInstance vm:NotificationDialogViewModel}"
+          Margin="40,10,40,10">
 
         <Grid.RowDefinitions>
             <RowDefinition  Height="auto" />
@@ -47,13 +43,15 @@
                    Text="{Binding Message }" />
 
         <StackPanel Grid.Row="2"
-                    Orientation="Horizontal" HorizontalAlignment="Center">
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Center">
 
             <Button Content="ОК"
                     Command="{Binding CloseDialogCommand}"
                     CommandParameter="{Binding Content, RelativeSource={RelativeSource Self}}" />
 
-            <Button Content="Отмена" IsDefault="True"
+            <Button Content="Отмена"
+                    IsDefault="True"
                     Command="{Binding CloseDialogCommand}"
                     CommandParameter="{Binding Content, RelativeSource={RelativeSource Self}}" />
 
