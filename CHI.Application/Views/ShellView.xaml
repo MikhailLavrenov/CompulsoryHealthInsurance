@@ -23,6 +23,67 @@
         prism:ViewModelLocator.AutoWireViewModel="True"
         IsEnabled="{Binding MainRegionService.IsBusy, Converter={i:InvertBoolConverter}}">
 
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/CHI.Application;component/Views/Resources/WindowDefaultStyle.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <Style x:Key="MenuCaptionText"
+           TargetType="TextBlock"
+           BasedOn="{StaticResource {x:Type TextBlock}}">
+                <Setter Property="Margin"
+                Value="0" />
+                <Setter Property="FontWeight"
+                Value="Regular" />
+                <Setter Property="Foreground"
+                Value="White" />
+            </Style>
+
+            <Style x:Key="MenuButtonText"
+           TargetType="TextBlock"
+           BasedOn="{StaticResource {x:Type TextBlock}}">
+                <Setter Property="Margin"
+                Value="0" />
+                <Setter Property="TextWrapping"
+                Value="Wrap" />
+                <Setter Property="Width"
+                Value="170" />
+            </Style>
+
+            <Style x:Key="MenuButton"
+           BasedOn="{StaticResource MaterialDesignRaisedButton}"
+           TargetType="{x:Type Button}">
+                <Setter Property="Margin"
+                Value="0" />
+                <Setter Property="HorizontalAlignment"
+                Value="Stretch" />
+                <Setter Property="FontWeight"
+                Value="Light" />
+                <Setter Property="Height"
+                Value="50" />
+                <Setter Property="materialDesign:ButtonAssist.CornerRadius"
+                Value="0" />
+                <Setter Property="materialDesign:ShadowAssist.ShadowDepth"
+                Value="Depth0" />
+                <Setter Property="Foreground"
+                Value="LightGray" />
+
+                <Style.Triggers>
+                    <Trigger Property="IsMouseOver"
+                     Value="true">
+                        <Setter Property="FontWeight"
+                        Value="Bold" />
+                        <Setter Property="FontSize"
+                        Value="14.5" />
+                    </Trigger>
+                </Style.Triggers>
+
+            </Style>
+
+        </ResourceDictionary >
+    </Window.Resources>
+
     <Grid>
 
         <ContentControl Panel.ZIndex="10"
@@ -41,61 +102,64 @@
 
                     <ContentControl Height="40" />
 
-                    <TextBlock Text="Основное"
-                               Style="{StaticResource LeftMenuTextBlock}" />
+                    <StackPanel Orientation="Horizontal" Margin="25,30,10,10">
+                        <materialDesign:PackIcon Kind="FormatListBulleted" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                        <TextBlock Text="Основное"                               
+                               Style="{StaticResource MenuCaptionText}" />
+                    </StackPanel>
 
-                    <Button Style="{StaticResource LeftMenuButton}"
+                    <Button Style="{StaticResource MenuButton}"                            
                             Command="{Binding ShowViewCommand}"
                             CommandParameter="{x:Type v:PatientsFileView}">
                         <TextBlock Text="Файл прикрепленных пациентов"
-                                   TextWrapping="Wrap"
-                                   Width="170" />
+                                   Style="{StaticResource MenuButtonText}" />
                     </Button>
 
-                    <Button Style="{StaticResource LeftMenuButton}"
+                    <Button Style="{StaticResource MenuButton}"
                             Command="{Binding ShowViewCommand}"
                             CommandParameter="{x:Type v:ExaminationsView}">
                         <TextBlock Text="Загрузка осмотров"
-                                   TextWrapping="Wrap"
-                                   Width="170" />
+                                   Style="{StaticResource MenuButtonText}" />
                     </Button>
 
-                    <TextBlock Text="Настройки"
-                               Style="{StaticResource LeftMenuTextBlock}" />
+                    <StackPanel Orientation="Horizontal" Margin="25,30,10,10">
+                        <materialDesign:PackIcon Kind="Tools" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                        <TextBlock Text="Настройки" 
+                               Style="{StaticResource MenuCaptionText}" />
+                    </StackPanel>
 
-                    <Button Style="{StaticResource LeftMenuButton}"
+                    <Button Style="{StaticResource MenuButton}"
                             Command="{Binding ShowViewCommand}"
                             CommandParameter="{x:Type v:ServicesSettingsView}">
                         <TextBlock Text="Настройки подключения к сервисам"
-                                   TextWrapping="Wrap"
-                                   Width="170" />
+                                   Style="{StaticResource MenuButtonText}" />
                     </Button>
 
-                    <Button Style="{StaticResource LeftMenuButton}"
+                    <Button Style="{StaticResource MenuButton}"
                             Command="{Binding ShowViewCommand}"
                             CommandParameter="{x:Type v:PatientsFileSettingsView}">
                         <TextBlock Text="Настройки файла прикреплен. пациентов"
-                                   TextWrapping="Wrap"
-                                   Width="170" />
+                                   Style="{StaticResource MenuButtonText}" />
                     </Button>
 
-                    <Button Style="{StaticResource LeftMenuButton}"
+                    <Button Style="{StaticResource MenuButton}"
                             Command="{Binding ShowViewCommand}"
                             CommandParameter="{x:Type v:ExaminationsSettingView}">
                         <TextBlock Text="Настройки загрузки осмотров"
-                                   TextWrapping="Wrap"
-                                   Width="170" />
+                                   Style="{StaticResource MenuButtonText}" />
                     </Button>
 
-                    <TextBlock Text="Прочее"
-                               Style="{StaticResource LeftMenuTextBlock}" />
+                    <StackPanel Orientation="Horizontal" Margin="25,30,10,10">
+                        <materialDesign:PackIcon Kind="InfoCircle" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                        <TextBlock Text="Прочее"
+                               Style="{StaticResource MenuCaptionText}" />
+                    </StackPanel>
 
-                    <Button Style="{StaticResource LeftMenuButton}"
+                    <Button Style="{StaticResource MenuButton}"
                             Command="{Binding ShowViewCommand}"
                             CommandParameter="{x:Type v:AboutApplicationView}">
                         <TextBlock Text="О программе"
-                                   TextWrapping="Wrap"
-                                   Width="180" />
+                                   Style="{StaticResource MenuButtonText}" />
                     </Button>
 
                 </StackPanel>

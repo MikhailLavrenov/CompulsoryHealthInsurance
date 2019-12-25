@@ -41,7 +41,7 @@ namespace CHI.Application.ViewModels
             MainRegionService = mainRegionService;
 
             Settings = Settings.Instance;
-            MainRegionService.Header = "Настройки прикрепленных пациентов";
+            MainRegionService.Header = "Настройки файла прикрепленных пациентов";
 
             SaveCommand = new DelegateCommand(SaveExecute);
             LoadCommand = new DelegateCommand(LoadExecute);

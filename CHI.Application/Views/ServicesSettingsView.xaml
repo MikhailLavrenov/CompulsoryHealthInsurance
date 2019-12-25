@@ -13,6 +13,14 @@
              d:DesignWidth="800"
              prism:ViewModelLocator.AutoWireViewModel="True">
 
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/CHI.Application;component/Views/Resources/WindowDefaultStyle.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary >
+    </UserControl.Resources>
+
 
     <Grid>
         <Grid.ColumnDefinitions>
@@ -93,7 +101,9 @@
 
         <TextBlock Grid.Row="6"
                    Grid.Column="0"
-                   Text="Учетные записи" />
+                   Margin="5,10,5,10"
+                   FontWeight="Medium"
+                   Text="Учетные записи СРЗ" />
 
         <!--Столбцы DataGrid не являются частью логического дерева этого View, поэтому их нельзя привязать к свойствам ViewModel-->
         <!--Использование x:Name и FrameworkElement принадлежащего логическому дереву позволяет обойти ограничение используя FrameworkElement как посредника-->
@@ -110,34 +120,30 @@
                 <!--Столбец Логин-->
                 <DataGridTextColumn Header="Логин"
                                     Binding="{Binding Login, ValidatesOnDataErrors=True}"
-                                    EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}"
-                                    MinWidth="180">
-                </DataGridTextColumn>
+                                    ElementStyle="{StaticResource DataGridText}"
+                                    EditingElementStyle="{StaticResource DataGridTextEditing}"
+                                    MinWidth="180"/>
 
                 <!--Столбец Пароль-->
                 <!--Шаблон Заголовка. В заголовок вставляем текст и кнопку для переключения видимости паролей-->
                 <DataGridTemplateColumn MinWidth="180">
                     <DataGridTemplateColumn.HeaderStyle>
                         <Style TargetType="{x:Type DataGridColumnHeader}">
-                            <Setter Property="HorizontalContentAlignment"
-                                    Value="Stretch" />
                             <Setter Property="Background"
                                     Value="Transparent" />
                         </Style>
                     </DataGridTemplateColumn.HeaderStyle>
                     <DataGridTemplateColumn.Header>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="auto" />
-                                <ColumnDefinition />
-                                <ColumnDefinition Width="auto" />
-                            </Grid.ColumnDefinitions>
+                        <StackPanel Orientation="Horizontal" Margin="0">
 
-                            <TextBlock Grid.Column="0"
+                            <TextBlock Grid.Column="0" 
+                                       FontSize="12"
+                                       FontWeight="Medium"
+                                       Foreground="{DynamicResource MaterialDesignColumnHeader}"
                                        Text="Пароль" 
-                                       Margin="0" />
+                                       Margin="5,0,0,0" VerticalAlignment="Center" />
 
-                            <Button Grid.Column="2"
+                            <Button Grid.Column="2" Margin="5,0,0,0"
                                     Style="{StaticResource IconButton}"
                                     Command="{Binding DataContext.SwitchShowPasswordCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}">
 
@@ -150,26 +156,24 @@
                                                     Visibility="{Binding DataContext.ShowProtectedPassword, Source={x:Reference proxyElement}, Converter={i:BoolToVisibleConverter}}" />
                                 </StackPanel>
                             </Button>
-                        </Grid>
+                        </StackPanel>
                     </DataGridTemplateColumn.Header>
 
                     <!--Шаблон ячейки-->
                     <DataGridTemplateColumn.CellTemplate>
                         <!--Вставляем 2 контрола. Одновременно отображается только один -->
-                        <DataTemplate>
-                            <Grid>
+                        <DataTemplate >
+                            <Grid VerticalAlignment="Stretch">
 
-                                <PasswordBox Margin="0"
+                                <PasswordBox Margin="0" 
                                              BorderThickness="0"
-                                             BorderBrush="Transparent"
                                              i:PasswordBoxHelper.BoundPassword="{Binding Password, UpdateSourceTrigger=LostFocus, ValidatesOnDataErrors=True}"
-                                             Visibility="{Binding DataContext.ShowProtectedPassword, Source={x:Reference proxyElement}, Converter={i:BoolToVisibleConverter}}">
-                                </PasswordBox>
+                                             Visibility="{Binding DataContext.ShowProtectedPassword, Source={x:Reference proxyElement}, Converter={i:BoolToVisibleConverter}}"/>
 
-                                <TextBox Margin="0" BorderThickness="0" BorderBrush="Transparent"
+                                <TextBox Margin="0"
+                                         BorderThickness="0"
                                          Text="{Binding Password, UpdateSourceTrigger=LostFocus,  ValidatesOnDataErrors=True}"
-                                         Visibility="{Binding DataContext.ShowTextPassword, Source={x:Reference proxyElement}, Converter={i:BoolToVisibleConverter}}">
-                                </TextBox>
+                                         Visibility="{Binding DataContext.ShowTextPassword, Source={x:Reference proxyElement}, Converter={i:BoolToVisibleConverter}}"/>
 
                             </Grid>
                         </DataTemplate>
@@ -181,7 +185,8 @@
                 <materialDesign:DataGridTextColumn Header="Лимит запросов"
                                                    Binding="{Binding RequestsLimit, ValidatesOnDataErrors=True}"
                                                    MinWidth="100"
-                                                   EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}"
+                                                                                       ElementStyle="{StaticResource DataGridText}"
+                                    EditingElementStyle="{StaticResource DataGridTextEditing}"
                                                    Width="*" />
 
             </DataGrid.Columns>

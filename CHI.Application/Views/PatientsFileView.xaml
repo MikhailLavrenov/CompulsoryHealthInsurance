@@ -13,6 +13,14 @@
              d:DesignWidth="800"
              prism:ViewModelLocator.AutoWireViewModel="True">
 
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/CHI.Application;component/Views/Resources/WindowDefaultStyle.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary >
+    </UserControl.Resources>
+
 
     <Grid d:DataContext="{d:DesignInstance vm:PatientsFileViewModel }">
 
@@ -50,32 +58,21 @@
 
         <TextBlock Grid.Row="2"
                    Grid.Column="0"
-                   Text="Путь к файлу: " />
+                   Text="Путь к файлу " />
         <DockPanel  Grid.Row="2"
                     Grid.Column="1">
-            <!--<Button  DockPanel.Dock="Right"
-                     MinWidth="0"
-                     Width="24"
-                     Height="16"
-                     Padding="0"
-                     BorderBrush="Transparent"
-                     Background="Transparent"                     
-                     Command="{Binding ShowFileDialogCommand}">
-                <ContentControl Content="{Binding Source={StaticResource FileDialog}}" />
-            </Button>-->
             <Button DockPanel.Dock="Right"
                     Content="{materialDesign:PackIcon FolderOpenOutline}"
                     Style="{StaticResource IconButton}"
-                    Command="{Binding ShowFileDialogCommand}">
-
-            </Button>
+                    Command="{Binding ShowFileDialogCommand}"/>
             <TextBox  Text="{Binding Settings.PatientsFilePath, ValidatesOnDataErrors=True}" />
         </DockPanel>
 
         <Button Grid.Row="3"
                 Grid.Column="0"
                 Content="ОК"
-                Command="{Binding ProcessFileCommand}" />
+                Command="{Binding ProcessFileCommand}" >
+        </Button>
 
         <FrameworkElement Grid.Row="5"
                           Grid.Column="0" Margin="15"/>

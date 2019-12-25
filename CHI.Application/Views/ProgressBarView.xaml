@@ -142,7 +142,7 @@
         </Grid.Triggers>
 
         <StackPanel Panel.ZIndex="0"
-                    Opacity="0.3"
+                    Opacity="0.35"
                     Background="LightGray" />
 
         <StackPanel HorizontalAlignment="Center"
@@ -159,8 +159,8 @@
                             <Storyboard>
                                 <DoubleAnimation Duration="00:00:01.5"
                                                  Storyboard.TargetProperty="Opacity"
-                                                 From="0.8"
-                                                 To="0.6"
+                                                 From="0.9"
+                                                 To="0.7"
                                                  RepeatBehavior="Forever"
                                                  AutoReverse="True" />
                             </Storyboard>

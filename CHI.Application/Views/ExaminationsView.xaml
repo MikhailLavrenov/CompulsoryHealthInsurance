@@ -14,10 +14,17 @@
              d:DesignWidth="800"
              prism:ViewModelLocator.AutoWireViewModel="True">
 
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/CHI.Application;component/Views/Resources/WindowDefaultStyle.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary >
+    </UserControl.Resources>
+
     <Grid d:DataContext="{d:DesignInstance vm:ExaminationsViewModel }">
 
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="130" />
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="10" />
         </Grid.ColumnDefinitions>
@@ -36,12 +43,13 @@
 
         <TextBlock Grid.Row="1"
                    Grid.Column="0"
+                   Margin="5,15,5,10"
                    Text="Результаты загрузки"
+                   FontWeight="Medium"
                    Visibility="{Binding Path=ShowErrors,  Converter={i:BoolToVisibleConverter}}" />
 
         <i:CustomDataGrid Grid.Row="2"                  
-                          Grid.Column="0"                            
-                          Grid.ColumnSpan="2"                 
+                          Grid.Column="0"                                           
                           MinHeight="200"                                                        
                           CanUserAddRows="False"                              
                           CanUserDeleteRows="False"   
@@ -56,55 +64,55 @@
 
                 <DataGridTextColumn Header="Полис"
                                     Binding="{Binding Item1.InsuranceNumber, Mode=OneWay}"
-                                    Width="120" />
+                                    Width="150" />
 
                 <DataGridTextColumn Header="Вид осмотра"
                                     Binding="{Binding Item1.Kind, Mode=OneWay, Converter={i:EnumToDescriptionConverter}}"
-                                    Width="190" />
+                                    Width="220" />
 
                 <DataGridTextColumn Header="Год"
                                     Binding="{Binding Item1.Year, Mode=OneWay}"
-                                    Width="50" />
+                                    Width="60" />
 
                 <DataGridCheckBoxColumn Header="Загружено"                                    
                                         Binding="{Binding Item2, Mode=OneWay}"                                    
-                                        Width="80" />
+                                        Width="90" />
 
                 <DataGridTextColumn Header="Сообщение об ошибке"
                                     Binding="{Binding Item3, Mode=OneWay}"
-                                    Width="200" />
+                                    Width="230" />
 
                 <DataGridTextColumn Header="1эт Начало"
                                     Binding="{Binding Item1.Stage1.BeginDate, Mode=OneWay, StringFormat='dd.MM.yyyy'}"
-                                    Width="90" />
+                                    Width="100" />
 
                 <DataGridTextColumn Header="1эт Конец"
                                     Binding="{Binding Item1.Stage1.EndDate, Mode=OneWay, StringFormat='dd.MM.yyyy'}"
-                                    Width="90" />
+                                    Width="100" />
 
                 <DataGridTextColumn Header="1эт Гр.здоровья"
                                     Binding="{Binding Item1.Stage1.HealthGroup, Mode=OneWay, Converter={i:EnumToDescriptionConverter}}"
-                                    Width="100" />
+                                    Width="110" />
 
                 <DataGridTextColumn Header="1эт Направлен"
                                     Binding="{Binding Item1.Stage1.Referral, Mode=OneWay, Converter={i:EnumToDescriptionConverter}}"
-                                    Width="200" />
+                                    Width="230" />
 
                 <DataGridTextColumn Header="2эт Начало"
                                     Binding="{Binding Item1.Stage2.BeginDate, Mode=OneWay, StringFormat='dd.MM.yyyy'}"
-                                    Width="90" />
+                                    Width="100" />
 
                 <DataGridTextColumn Header="2эт Конец"
                                     Binding="{Binding Item1.Stage2.EndDate, Mode=OneWay, StringFormat='dd.MM.yyyy'}"
-                                    Width="90" />
+                                    Width="100" />
 
                 <DataGridTextColumn Header="2эт Гр.здоровья"
                                     Binding="{Binding Item1.Stage2.HealthGroup, Mode=OneWay, Converter={i:EnumToDescriptionConverter}}"
-                                    Width="100" />
+                                    Width="110" />
 
                 <DataGridTextColumn Header="2эт Направлен"
                                     Binding="{Binding Item1.Stage2.Referral, Mode=OneWay, Converter={i:EnumToDescriptionConverter}}"
-                                    Width="200" />
+                                    Width="230" />
 
             </DataGrid.Columns>
 

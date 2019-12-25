@@ -13,6 +13,14 @@
              d:DesignWidth="800"
              prism:ViewModelLocator.AutoWireViewModel=" True ">
 
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/CHI.Application;component/Views/Resources/WindowDefaultStyle.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary >
+    </UserControl.Resources>
+
     <prism:Dialog.WindowStyle>
         <Style TargetType="Window">
             <Setter Property="prism:Dialog.WindowStartupLocation"

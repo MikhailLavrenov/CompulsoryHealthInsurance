@@ -13,6 +13,14 @@
              d:DesignWidth="800"
              prism:ViewModelLocator.AutoWireViewModel="True">
 
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/CHI.Application;component/Views/Resources/WindowDefaultStyle.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary >
+    </UserControl.Resources>
+
 
     <Grid d:DataContext="{d:DesignInstance vm:PatientsFileViewModel }">
 
@@ -124,20 +132,19 @@
                 <DataGrid.Columns>
 
                     <DataGridTextColumn     Header="Название столбца"
-                                            Binding="{Binding Path=Name, ValidatesOnDataErrors=True}"
-                                            EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}"
-                                            MinWidth="160" />
+                                            Binding="{Binding Path=Name, ValidatesOnDataErrors=True}"                                                                                 
+                                            ElementStyle="{StaticResource DataGridText}"                                    
+                                            EditingElementStyle="{StaticResource DataGridTextEditing}"
+                                            MinWidth="190" />
                     <DataGridTextColumn     Header="Понятное название"
-                                            Binding="{Binding Path=AltName, ValidatesOnDataErrors=True}"
-                                            EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}"
-                                            MinWidth="160" />
+                                            Binding="{Binding Path=AltName, ValidatesOnDataErrors=True}"                                                                                                                  
+                                            EditingElementStyle="{StaticResource DataGridTextEditing}"
+                                            MinWidth="190" />
                     <DataGridCheckBoxColumn Header="Скрыть"
-                                            Binding="{Binding Path=Hide}"
-                                            EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}"
+                                            Binding="{Binding Path=Hide}"                                                                                                                   
                                             MinWidth="65" />
                     <DataGridCheckBoxColumn Header="Удалить"
-                                            Binding="{Binding Path=Delete}"
-                                            EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}"
+                                            Binding="{Binding Path=Delete}"                                                                                                                   
                                             MinWidth="65"
                                             Width="*" />
 
