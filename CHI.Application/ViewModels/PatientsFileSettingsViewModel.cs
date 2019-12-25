@@ -134,9 +134,12 @@ namespace CHI.Application.ViewModels
             var result = dialogService.ShowDialog(title, message);
 
             if (result == ButtonResult.Cancel)
+            {
+                MainRegionService.SetCompleteStatus("Очистка базы данных отменена.");
                 return;
+            }
 
-            MainRegionService.SetBusyStatus("Очистка базы данных...");
+            MainRegionService.SetBusyStatus("Очистка базы данных.");
             var db = new Models.Database();
             if (db.Database.Exists())
                 db.Database.Delete();
