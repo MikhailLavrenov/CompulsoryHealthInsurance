@@ -68,7 +68,7 @@ namespace CHI.Application.ViewModels
             {
                 if (!Settings.SrzConnectionIsValid)
                 {
-                    MainRegionService.SetCompleteStatus("Не удалось подключиться к СРЗ, проверьте настройки и работоспособность сайта. Без подключения к СРЗ возможно только подставить ФИО из кэша в существующий файл.");
+                    MainRegionService.SetCompleteStatus("Не удалось подключиться к СРЗ, проверьте настройки и сайт. Возможно только подставить ФИО из БД в существующий файл.");
                     return;
                 }
 

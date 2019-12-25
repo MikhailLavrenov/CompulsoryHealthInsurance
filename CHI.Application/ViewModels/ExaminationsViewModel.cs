@@ -39,7 +39,7 @@ namespace CHI.Application.ViewModels
 
             ShowErrors = false;
             Settings = Settings.Instance;
-            MainRegionService.Header = "Загрузка осмотров на портал диспансеризации";
+            MainRegionService.Header = "Загрузка периодических осмотров на портал";
 
             ExportExaminationsCommand = new DelegateCommandAsync(ExportExaminationsExecute);
 

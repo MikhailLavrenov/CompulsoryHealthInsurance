@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Prism.Commands;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,9 +15,12 @@ namespace CHI.Application.Infrastructure
         string Status { get; set; }
         string Header { get; set; }
         bool IsBusy { get; set; }
+        bool ShowStatus { get; }
 
         void SetCompleteStatus(string statusMessage);
         void SetBusyStatus(string statusMessage);
         void RequestNavigate(string targetName);
+
+        DelegateCommand CloseStatusCommand { get; }
     }
 }

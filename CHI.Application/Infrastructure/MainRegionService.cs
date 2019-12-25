@@ -1,4 +1,5 @@
 ﻿using CHI.Application.Views;
+using Prism.Commands;
 using Prism.Regions;
 using System.Windows;
 
@@ -12,15 +13,29 @@ namespace CHI.Application.Infrastructure
         private string header;
         private string status;
         private bool isBusy;
+        private bool showStatus;
         private IRegionManager regionManager;
 
         public string Header { get => header; set => SetProperty(ref header, value); }
-        public string Status { get => status; set => SetProperty(ref status, value); }
+        public string Status
+        {
+            get => status;
+            set
+            {
+                SetProperty(ref status, value);
+                ShowStatus = !string.IsNullOrEmpty(value);
+            }
+        }
         public bool IsBusy { get => isBusy; set => SetProperty(ref isBusy, value, SwitchProgressBar); }
+        public bool ShowStatus { get => showStatus; private set => SetProperty(ref showStatus, value); }
+
+        public DelegateCommand CloseStatusCommand { get; }
 
         public MainRegionService(IRegionManager regionManager)
         {
             this.regionManager = regionManager;
+
+            CloseStatusCommand = new DelegateCommand(CloseStatusExecute);
         }
 
         public void SetCompleteStatus(string statusMessage)
@@ -49,6 +64,10 @@ namespace CHI.Application.Infrastructure
                 else
                     regionManager.Regions[RegionNames.ProgressBarRegion].RemoveAll();
             });
+        }
+        private void CloseStatusExecute()
+        {
+            Status = string.Empty;
         }
     }
 }

@@ -30,52 +30,48 @@
             </ResourceDictionary.MergedDictionaries>
 
             <Style x:Key="MenuCaptionText"
-           TargetType="TextBlock"
-           BasedOn="{StaticResource {x:Type TextBlock}}">
+                   TargetType="TextBlock"
+                   BasedOn="{StaticResource {x:Type TextBlock}}">
                 <Setter Property="Margin"
-                Value="0" />
+                        Value="0" />
                 <Setter Property="FontWeight"
-                Value="Regular" />
+                        Value="Regular" />
                 <Setter Property="Foreground"
-                Value="White" />
+                        Value="White" />
             </Style>
 
             <Style x:Key="MenuButtonText"
-           TargetType="TextBlock"
-           BasedOn="{StaticResource {x:Type TextBlock}}">
+                   TargetType="TextBlock"
+                   BasedOn="{StaticResource {x:Type TextBlock}}">
                 <Setter Property="Margin"
-                Value="0" />
+                        Value="0" />
                 <Setter Property="TextWrapping"
-                Value="Wrap" />
+                        Value="Wrap" />
                 <Setter Property="Width"
-                Value="170" />
+                        Value="170" />
             </Style>
 
             <Style x:Key="MenuButton"
-           BasedOn="{StaticResource MaterialDesignRaisedButton}"
-           TargetType="{x:Type Button}">
+                   BasedOn="{StaticResource MaterialDesignTabRadioButton}"
+                   TargetType="{x:Type RadioButton}">
                 <Setter Property="Margin"
-                Value="0" />
+                        Value="0,5,0,5" />
                 <Setter Property="HorizontalAlignment"
-                Value="Stretch" />
+                        Value="Stretch" />
                 <Setter Property="FontWeight"
-                Value="Light" />
+                        Value="Light" />
                 <Setter Property="Height"
-                Value="50" />
-                <Setter Property="materialDesign:ButtonAssist.CornerRadius"
-                Value="0" />
-                <Setter Property="materialDesign:ShadowAssist.ShadowDepth"
-                Value="Depth0" />
+                        Value="50" />
                 <Setter Property="Foreground"
-                Value="LightGray" />
+                        Value="LightGray" />
 
                 <Style.Triggers>
                     <Trigger Property="IsMouseOver"
-                     Value="true">
+                             Value="true">
                         <Setter Property="FontWeight"
-                        Value="Bold" />
+                                Value="Bold" />
                         <Setter Property="FontSize"
-                        Value="14.5" />
+                                Value="14.5" />
                     </Trigger>
                 </Style.Triggers>
 
@@ -94,73 +90,83 @@
                    Background="White">
 
             <materialDesign:ColorZone DockPanel.Dock="Left"
-                                      Mode="PrimaryMid" VerticalAlignment="Stretch">
+                                      Mode="PrimaryMid"
+                                      VerticalAlignment="Stretch">
 
                 <StackPanel Orientation="Vertical"
                             Width="210"
                             Margin="0,3,0,3">
 
-                    <ContentControl Height="40" />
-
-                    <StackPanel Orientation="Horizontal" Margin="25,30,10,10">
-                        <materialDesign:PackIcon Kind="FormatListBulleted" VerticalAlignment="Center" Margin="0,0,5,0"/>
-                        <TextBlock Text="Основное"                               
-                               Style="{StaticResource MenuCaptionText}" />
+                    <StackPanel Orientation="Horizontal"
+                                Margin="25,75,10,10">
+                        <materialDesign:PackIcon Kind="FormatListBulleted"
+                                                 VerticalAlignment="Center"
+                                                 Margin="0,0,5,0" />
+                        <TextBlock Text="Основное"
+                                   Style="{StaticResource MenuCaptionText}" />
                     </StackPanel>
 
-                    <Button Style="{StaticResource MenuButton}"                            
-                            Command="{Binding ShowViewCommand}"
-                            CommandParameter="{x:Type v:PatientsFileView}">
+
+                    <RadioButton Style="{StaticResource MenuButton}"
+                                 Command="{Binding ShowViewCommand}"
+                                 CommandParameter="{x:Type v:PatientsFileView}"
+                                 IsChecked="True">
                         <TextBlock Text="Файл прикрепленных пациентов"
                                    Style="{StaticResource MenuButtonText}" />
-                    </Button>
+                    </RadioButton>
 
-                    <Button Style="{StaticResource MenuButton}"
-                            Command="{Binding ShowViewCommand}"
-                            CommandParameter="{x:Type v:ExaminationsView}">
-                        <TextBlock Text="Загрузка осмотров"
+                    <RadioButton Style="{StaticResource MenuButton}"
+                                 Command="{Binding ShowViewCommand}"
+                                 CommandParameter="{x:Type v:ExaminationsView}">
+                        <TextBlock Text="Загрузка периодических осмотров"
                                    Style="{StaticResource MenuButtonText}" />
-                    </Button>
+                    </RadioButton>
 
-                    <StackPanel Orientation="Horizontal" Margin="25,30,10,10">
-                        <materialDesign:PackIcon Kind="Tools" VerticalAlignment="Center" Margin="0,0,5,0"/>
-                        <TextBlock Text="Настройки" 
-                               Style="{StaticResource MenuCaptionText}" />
+                    <StackPanel Orientation="Horizontal"
+                                Margin="25,20,10,10">
+                        <materialDesign:PackIcon Kind="Tools"
+                                                 VerticalAlignment="Center"
+                                                 Margin="0,0,5,0" />
+                        <TextBlock Text="Настройки"
+                                   Style="{StaticResource MenuCaptionText}" />
                     </StackPanel>
 
-                    <Button Style="{StaticResource MenuButton}"
-                            Command="{Binding ShowViewCommand}"
-                            CommandParameter="{x:Type v:ServicesSettingsView}">
+                    <RadioButton Style="{StaticResource MenuButton}"
+                                 Command="{Binding ShowViewCommand}"
+                                 CommandParameter="{x:Type v:ServicesSettingsView}">
                         <TextBlock Text="Настройки подключения к сервисам"
                                    Style="{StaticResource MenuButtonText}" />
-                    </Button>
+                    </RadioButton>
 
-                    <Button Style="{StaticResource MenuButton}"
-                            Command="{Binding ShowViewCommand}"
-                            CommandParameter="{x:Type v:PatientsFileSettingsView}">
+                    <RadioButton Style="{StaticResource MenuButton}"
+                                 Command="{Binding ShowViewCommand}"
+                                 CommandParameter="{x:Type v:PatientsFileSettingsView}">
                         <TextBlock Text="Настройки файла прикреплен. пациентов"
                                    Style="{StaticResource MenuButtonText}" />
-                    </Button>
+                    </RadioButton>
 
-                    <Button Style="{StaticResource MenuButton}"
-                            Command="{Binding ShowViewCommand}"
-                            CommandParameter="{x:Type v:ExaminationsSettingView}">
+                    <RadioButton Style="{StaticResource MenuButton}"
+                                 Command="{Binding ShowViewCommand}"
+                                 CommandParameter="{x:Type v:ExaminationsSettingView}">
                         <TextBlock Text="Настройки загрузки осмотров"
                                    Style="{StaticResource MenuButtonText}" />
-                    </Button>
+                    </RadioButton>
 
-                    <StackPanel Orientation="Horizontal" Margin="25,30,10,10">
-                        <materialDesign:PackIcon Kind="InfoCircle" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                    <StackPanel Orientation="Horizontal"
+                                Margin="25,20,10,0">
+                        <materialDesign:PackIcon Kind="InfoCircle"
+                                                 VerticalAlignment="Center"
+                                                 Margin="0,0,5,0" />
                         <TextBlock Text="Прочее"
-                               Style="{StaticResource MenuCaptionText}" />
+                                   Style="{StaticResource MenuCaptionText}" />
                     </StackPanel>
 
-                    <Button Style="{StaticResource MenuButton}"
-                            Command="{Binding ShowViewCommand}"
-                            CommandParameter="{x:Type v:AboutApplicationView}">
+                    <RadioButton Style="{StaticResource MenuButton}"
+                                 Command="{Binding ShowViewCommand}"
+                                 CommandParameter="{x:Type v:AboutApplicationView}">
                         <TextBlock Text="О программе"
                                    Style="{StaticResource MenuButtonText}" />
-                    </Button>
+                    </RadioButton>
 
                 </StackPanel>
 
@@ -178,7 +184,9 @@
                                           Padding="15">
 
                     <TextBlock Text="{Binding MainRegionService.Header, NotifyOnTargetUpdated=True}"
-                               FontSize="20" FontWeight="Regular" Foreground="White">
+                               FontSize="20"
+                               FontWeight="Regular"
+                               Foreground="White">
 
                         <TextBlock.Triggers>
                             <EventTrigger RoutedEvent="Binding.TargetUpdated">
@@ -210,11 +218,36 @@
 
                 </materialDesign:ColorZone>
 
-                <TextBlock DockPanel.Dock="Bottom"
-                           TextWrapping="Wrap"
-                           Text="{Binding MainRegionService.Status}" />
+                <Grid DockPanel.Dock="Bottom"
+                      MinHeight="55">
+                    <materialDesign:Snackbar Margin="15,0,15,0"
+                                             HorizontalAlignment="Stretch"
+                                             IsActive="{Binding MainRegionService.ShowStatus}">
+                        <materialDesign:SnackbarMessage  
+                                                         ActionCommand="{Binding MainRegionService.CloseStatusCommand}">
+                            
+                            <materialDesign:SnackbarMessage.ActionContent>
+                                <Viewbox  Stretch="UniformToFill"
+                                          Height="25"
+                                          Margin="0"
+                                          HorizontalAlignment="Center">
+                                    <materialDesign:PackIcon Kind="ChevronDown"
+                                                             Foreground="White" />
+                                </Viewbox>
+                            </materialDesign:SnackbarMessage.ActionContent>
 
-                <ContentControl prism:RegionManager.RegionName="{x:Static i:RegionNames.MainRegion}" Margin="10" />
+                            <materialDesign:SnackbarMessage.Content>
+                                <TextBlock Text="{Binding MainRegionService.Status}" HorizontalAlignment="Stretch" Margin="0"
+                                           FontWeight="Regular"
+                                           TextWrapping="Wrap" />
+                            </materialDesign:SnackbarMessage.Content>
+
+                        </materialDesign:SnackbarMessage>
+                    </materialDesign:Snackbar>
+                </Grid>
+
+                <ContentControl prism:RegionManager.RegionName="{x:Static i:RegionNames.MainRegion}"
+                                Margin="10" />
 
             </DockPanel>
 
