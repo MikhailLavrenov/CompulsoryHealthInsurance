@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="CHI.Application.Views.PatientsFileView"
+﻿<UserControl x:Class="CHI.Application.Views.AttachedPatientsView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -22,7 +22,7 @@
     </UserControl.Resources>
 
 
-    <Grid d:DataContext="{d:DesignInstance vm:PatientsFileViewModel }">
+    <Grid d:DataContext="{d:DesignInstance vm:AttachedPatientsViewModel }">
 
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="150" />
@@ -67,15 +67,13 @@
                     Command="{Binding ShowFileDialogCommand}"/>
             <TextBox  Text="{Binding Settings.PatientsFilePath, ValidatesOnDataErrors=True}" />
         </DockPanel>
+        
+        
 
         <Button Grid.Row="3"
                 Grid.Column="0"
                 Content="ОК"
-                Command="{Binding ProcessFileCommand}" >
-        </Button>
-
-        <FrameworkElement Grid.Row="5"
-                          Grid.Column="0" Margin="15"/>
+                Command="{Binding ProcessFileCommand}" />
 
     </Grid>
 

@@ -7,9 +7,8 @@
              xmlns:i="clr-namespace:CHI.Application.Infrastructure"
              xmlns:vm="clr-namespace:CHI.Application.ViewModels"
              xmlns:prism="http://prismlibrary.com/"
-             
              mc:Ignorable="d"
-             d:DesignHeight="600"
+             d:DesignHeight="400"
              d:DesignWidth="800"
              prism:ViewModelLocator.AutoWireViewModel=" True ">
 
@@ -31,40 +30,41 @@
                     Value="False" />
             <Setter Property="SizeToContent"
                     Value="WidthAndHeight" />
-
+            <Setter Property="WindowStyle"
+                    Value="None" />
         </Style>
     </prism:Dialog.WindowStyle>
 
-    <Grid d:DataContext="{d:DesignInstance vm:NotificationDialogViewModel}"
-          Margin="40,10,40,10">
+    <Border BorderThickness="1"
+            BorderBrush="Gray"
+            Padding="50">
 
-        <Grid.RowDefinitions>
-            <RowDefinition  Height="auto" />
-            <RowDefinition Height="20" />
-            <RowDefinition Height="auto" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
+        <DockPanel d:DataContext="{d:DesignInstance vm:NotificationDialogViewModel}">
 
-        <TextBlock Grid.Row="0"
-                   TextWrapping="Wrap"
-                   HorizontalAlignment="Center"
-                   Text="{Binding Message }" />
+            <TextBlock DockPanel.Dock="Top"
+                       TextWrapping="Wrap"
+                       HorizontalAlignment="Center"
+                       FontWeight="Medium"
+                       Text="{Binding Message }" />
 
-        <StackPanel Grid.Row="2"
-                    Orientation="Horizontal"
-                    HorizontalAlignment="Center">
+            <StackPanel DockPanel.Dock="Bottom"
+                        Margin="0,30,0,0"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Center">
 
-            <Button Content="ОК"
-                    Command="{Binding CloseDialogCommand}"
-                    CommandParameter="{Binding Content, RelativeSource={RelativeSource Self}}" />
+                <Button Content="ОК"
+                        Command="{Binding CloseDialogCommand}"
+                        CommandParameter="{Binding Content, RelativeSource={RelativeSource Self}}" />
 
-            <Button Content="Отмена"
-                    IsDefault="True"
-                    Command="{Binding CloseDialogCommand}"
-                    CommandParameter="{Binding Content, RelativeSource={RelativeSource Self}}" />
+                <Button Content="Отмена"
+                        IsDefault="True"
+                        Command="{Binding CloseDialogCommand}"
+                        CommandParameter="{Binding Content, RelativeSource={RelativeSource Self}}" />
 
-        </StackPanel>
+            </StackPanel>
 
-    </Grid>
+        </DockPanel>
+
+    </Border>
 
 </UserControl>

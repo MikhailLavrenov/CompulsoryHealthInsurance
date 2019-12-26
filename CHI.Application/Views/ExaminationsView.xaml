@@ -24,11 +24,6 @@
 
     <Grid d:DataContext="{d:DesignInstance vm:ExaminationsViewModel }">
 
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="10" />
-        </Grid.ColumnDefinitions>
-
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
@@ -37,19 +32,16 @@
         </Grid.RowDefinitions>
 
         <Button Grid.Row="0"
-                Grid.Column="0"
                 Content="Загрузить"
                 Command="{Binding ExportExaminationsCommand}" />
 
         <TextBlock Grid.Row="1"
-                   Grid.Column="0"
-                   Margin="5,15,5,10"
+                   Margin="5,5,5,15"
                    Text="Результаты загрузки"
                    FontWeight="Medium"
                    Visibility="{Binding Path=ShowErrors,  Converter={i:BoolToVisibleConverter}}" />
 
-        <i:CustomDataGrid Grid.Row="2"                  
-                          Grid.Column="0"                                           
+        <i:CustomDataGrid Grid.Row="2"                                                        
                           MinHeight="200"                                                        
                           CanUserAddRows="False"                              
                           CanUserDeleteRows="False"   

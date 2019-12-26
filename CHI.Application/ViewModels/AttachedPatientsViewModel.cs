@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace CHI.Application.ViewModels
 {
-    class PatientsFileViewModel : DomainObject, IRegionMemberLifetime
+    class AttachedPatientsViewModel : DomainObject, IRegionMemberLifetime
     {
         #region Поля
         private Settings settings;
@@ -35,7 +35,7 @@ namespace CHI.Application.ViewModels
         #endregion
 
         #region Конструкторы
-        public PatientsFileViewModel(IMainRegionService mainRegionService, IFileDialogService fileDialogService)
+        public AttachedPatientsViewModel(IMainRegionService mainRegionService, IFileDialogService fileDialogService)
         {
             this.fileDialogService = fileDialogService;
             MainRegionService = mainRegionService;

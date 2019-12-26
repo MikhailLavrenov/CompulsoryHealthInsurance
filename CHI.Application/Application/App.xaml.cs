@@ -36,7 +36,7 @@ namespace CHI.Application
             DispatcherUnhandledException += LogDispatcherUnhandledException;
 
             var viewModel = Current.MainWindow.DataContext as ShellViewModel;
-            viewModel.ShowViewCommand.Execute(typeof(PatientsFileView));
+            viewModel.ShowViewCommand.Execute(typeof(AttachedPatientsView));
         }
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
@@ -46,12 +46,12 @@ namespace CHI.Application
             containerRegistry.Register<IFileDialogService, FileDialogService>();
             containerRegistry.RegisterDialog<NotificationDialogView, NotificationDialogViewModel>();
 
-            containerRegistry.RegisterForNavigation<PatientsFileView>();
+            containerRegistry.RegisterForNavigation<AttachedPatientsView>();
             containerRegistry.RegisterForNavigation<ExaminationsView>();
             containerRegistry.RegisterForNavigation<ServicesSettingsView>();
-            containerRegistry.RegisterForNavigation<PatientsFileSettingsView>();
+            containerRegistry.RegisterForNavigation<AttachedPatientsSettingsView>();
             containerRegistry.RegisterForNavigation<ExaminationsSettingView>();
-            containerRegistry.RegisterForNavigation<AboutApplicationView>();
+            containerRegistry.RegisterForNavigation<AboutView>();
             containerRegistry.RegisterForNavigation<ProgressBarView>();
         }
         private void LogUnhandledException(object sender, UnhandledExceptionEventArgs args)

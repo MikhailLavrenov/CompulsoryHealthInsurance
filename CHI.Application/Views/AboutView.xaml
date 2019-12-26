@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="CHI.Application.Views.AboutApplicationView"
+﻿<UserControl x:Class="CHI.Application.Views.AboutView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -29,7 +29,7 @@
     </UserControl.Resources>
 
 
-    <Grid d:DataContext="{d:DesignInstance vm:AboutApplicationViewModel}">
+    <Grid d:DataContext="{d:DesignInstance vm:AboutViewModel}">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>

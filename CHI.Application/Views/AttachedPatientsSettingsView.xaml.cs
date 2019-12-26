@@ -9,9 +9,9 @@ namespace CHI.Application.Views
     /// <summary>
     /// Логика взаимодействия для AdditionalSettingsView.xaml
     /// </summary>
-    public partial class PatientsFileSettingsView : UserControl
+    public partial class AttachedPatientsSettingsView : UserControl
     {
-        public PatientsFileSettingsView()
+        public AttachedPatientsSettingsView()
         {
             InitializeComponent();
         }

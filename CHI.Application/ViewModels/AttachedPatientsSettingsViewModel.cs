@@ -10,7 +10,7 @@ using System.Linq;
 
 namespace CHI.Application.ViewModels
 {
-    public class PatientsFileSettingsViewModel : DomainObject, IRegionMemberLifetime
+    public class AttachedPatientsSettingsViewModel : DomainObject, IRegionMemberLifetime
     {
         #region Поля
         private Settings settings;
@@ -34,7 +34,7 @@ namespace CHI.Application.ViewModels
         #endregion
 
         #region Конструкторы
-        public PatientsFileSettingsViewModel(IMainRegionService mainRegionService, IFileDialogService fileDialogService, IDialogService dialogService)
+        public AttachedPatientsSettingsViewModel(IMainRegionService mainRegionService, IFileDialogService fileDialogService, IDialogService dialogService)
         {
             this.fileDialogService = fileDialogService;
             this.dialogService = dialogService;

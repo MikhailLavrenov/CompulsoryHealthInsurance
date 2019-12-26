@@ -13,7 +13,7 @@
                                              SecondaryColor="LightGreen" />-->
                 <materialDesign:CustomColorTheme BaseTheme="Light"
                                                  PrimaryColor="#01579b"
-                                                 SecondaryColor="#FF00E676" />
+                                                 SecondaryColor="White" />
                 <ResourceDictionary  Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
                 <ResourceDictionary Source="/CHI.Application;component/Views/Resources/Icons.xaml" />
                 <ResourceDictionary Source="/CHI.Application;component/Views/Resources/AppDefaultStyle.xaml" />

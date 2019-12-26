@@ -170,7 +170,7 @@
 
                     <RadioButton Style="{StaticResource MenuButton}"
                                  Command="{Binding ShowViewCommand}"
-                                 CommandParameter="{x:Type v:PatientsFileView}"
+                                 CommandParameter="{x:Type v:AttachedPatientsView}"
                                  IsChecked="True">
                         <TextBlock Text="Файл прикрепленных пациентов"
                                    Style="{StaticResource MenuButtonText}" />
@@ -201,7 +201,7 @@
 
                     <RadioButton Style="{StaticResource MenuButton}"
                                  Command="{Binding ShowViewCommand}"
-                                 CommandParameter="{x:Type v:PatientsFileSettingsView}">
+                                 CommandParameter="{x:Type v:AttachedPatientsSettingsView}">
                         <TextBlock Text="Настройки файла прикреплен. пациентов"
                                    Style="{StaticResource MenuButtonText}" />
                     </RadioButton>
@@ -224,7 +224,7 @@
 
                     <RadioButton Style="{StaticResource MenuButton}"
                                  Command="{Binding ShowViewCommand}"
-                                 CommandParameter="{x:Type v:AboutApplicationView}">
+                                 CommandParameter="{x:Type v:AboutView}">
                         <TextBlock Text="О программе"
                                    Style="{StaticResource MenuButtonText}" />
                     </RadioButton>
@@ -290,7 +290,7 @@
                         <TextBlock DockPanel.Dock="Left"
                                    Text="{Binding MainRegionService.Header, NotifyOnTargetUpdated=True}"
                                    FontSize="20"
-                                   Margin="15,35,15,15"
+                                   Margin="20,35,15,15"
                                    FontWeight="Regular"
                                    Foreground="White">
 
@@ -356,7 +356,7 @@
                 </Grid>
 
                 <ContentControl prism:RegionManager.RegionName="{x:Static i:RegionNames.MainRegion}"
-                                Margin="10" />
+                                Margin="15" />
 
             </DockPanel>
 

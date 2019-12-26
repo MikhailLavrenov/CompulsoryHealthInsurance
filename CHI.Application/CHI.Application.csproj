@@ -171,16 +171,16 @@
     <Compile Include="Models\License.cs" />
     <Compile Include="Models\LicenseManager.cs" />
     <Compile Include="Models\Settings.cs" />
-    <Compile Include="ViewModels\AboutApplicationViewModel.cs" />
+    <Compile Include="ViewModels\AboutViewModel.cs" />
     <Compile Include="ViewModels\ExaminationsSettingViewModel.cs" />
     <Compile Include="ViewModels\ExaminationsViewModel.cs" />
     <Compile Include="ViewModels\NotificationDialogViewModel.cs" />
     <Compile Include="ViewModels\ShellViewModel.cs" />
-    <Compile Include="ViewModels\PatientsFileSettingsViewModel.cs" />
-    <Compile Include="ViewModels\PatientsFileViewModel.cs" />
+    <Compile Include="ViewModels\AttachedPatientsSettingsViewModel.cs" />
+    <Compile Include="ViewModels\AttachedPatientsViewModel.cs" />
     <Compile Include="ViewModels\ServicesSettingsViewModel.cs" />
-    <Compile Include="Views\AboutApplicationView.xaml.cs">
-      <DependentUpon>AboutApplicationView.xaml</DependentUpon>
+    <Compile Include="Views\AboutView.xaml.cs">
+      <DependentUpon>AboutView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ExaminationsSettingView.xaml.cs">
       <DependentUpon>ExaminationsSettingView.xaml</DependentUpon>
@@ -191,8 +191,8 @@
     <Compile Include="Views\NotificationDialogView.xaml.cs">
       <DependentUpon>NotificationDialogView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\PatientsFileSettingsView.xaml.cs">
-      <DependentUpon>PatientsFileSettingsView.xaml</DependentUpon>
+    <Compile Include="Views\AttachedPatientsSettingsView.xaml.cs">
+      <DependentUpon>AttachedPatientsSettingsView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ProgressBarView.xaml.cs">
       <DependentUpon>ProgressBarView.xaml</DependentUpon>
@@ -200,7 +200,7 @@
     <Compile Include="Views\ServicesSettingsView.xaml.cs">
       <DependentUpon>ServicesSettingsView.xaml</DependentUpon>
     </Compile>
-    <Page Include="Views\AboutApplicationView.xaml">
+    <Page Include="Views\AboutView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -216,11 +216,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\PatientsFileSettingsView.xaml">
+    <Page Include="Views\AttachedPatientsSettingsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\PatientsFileView.xaml">
+    <Page Include="Views\AttachedPatientsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -244,8 +244,8 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Views\PatientsFileView.xaml.cs">
-      <DependentUpon>PatientsFileView.xaml</DependentUpon>
+    <Compile Include="Views\AttachedPatientsView.xaml.cs">
+      <DependentUpon>AttachedPatientsView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ShellView.xaml.cs">
       <DependentUpon>ShellView.xaml</DependentUpon>

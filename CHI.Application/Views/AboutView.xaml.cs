@@ -18,9 +18,9 @@ namespace CHI.Application.Views
     /// <summary>
     /// Логика взаимодействия для AboutApplicationView.xaml
     /// </summary>
-    public partial class AboutApplicationView : UserControl
+    public partial class AboutView : UserControl
     {
-        public AboutApplicationView()
+        public AboutView()
         {
             InitializeComponent();
         }

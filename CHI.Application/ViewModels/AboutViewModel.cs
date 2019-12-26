@@ -8,7 +8,7 @@ using System.Reflection;
 
 namespace CHI.Application.ViewModels
 {
-    class AboutApplicationViewModel : DomainObject, IRegionMemberLifetime, INavigationAware
+    class AboutViewModel : DomainObject, IRegionMemberLifetime, INavigationAware
     {
         #region Поля
         private readonly string manualPath;
@@ -28,7 +28,7 @@ namespace CHI.Application.ViewModels
         #endregion
 
         #region Конструкторы
-        public AboutApplicationViewModel(IMainRegionService mainRegionService, ILicenseManager licenseManager)
+        public AboutViewModel(IMainRegionService mainRegionService, ILicenseManager licenseManager)
         {
             MainRegionService = mainRegionService;
             var assembly = Assembly.GetExecutingAssembly();

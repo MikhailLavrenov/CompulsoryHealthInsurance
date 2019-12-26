@@ -37,6 +37,8 @@ namespace CHI.Application.ViewModels
             MainRegionService = mainRegionService;
             LicenseManager = licenseManager;
 
+            Result = new List<Tuple<PatientExaminations, bool, string>>();
+
             ShowErrors = false;
             Settings = Settings.Instance;
             MainRegionService.Header = "Загрузка периодических осмотров на портал";
