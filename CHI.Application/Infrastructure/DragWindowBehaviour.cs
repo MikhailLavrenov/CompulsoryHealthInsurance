@@ -22,17 +22,17 @@ namespace CHI.Application.Infrastructure
             if (window == null) 
                 return;
 
-            AssociatedObject.PreviewMouseLeftButtonDown += _associatedObject_MouseLeftButtonDown;
+            AssociatedObject.MouseLeftButtonDown += MouseLeftButtonDownHandler;
         }
 
-        private void _associatedObject_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void MouseLeftButtonDownHandler(object sender, MouseButtonEventArgs e)
         {
             window.DragMove();
         }
 
         protected override void OnDetaching()
         {
-            AssociatedObject.PreviewMouseLeftButtonDown -= _associatedObject_MouseLeftButtonDown;
+            AssociatedObject.MouseLeftButtonDown -= MouseLeftButtonDownHandler;
             window = null;
         }
     }

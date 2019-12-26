@@ -12,13 +12,10 @@
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
         mc:Ignorable="d"
-        
-        WindowStyle="None"
         WindowStartupLocation="CenterScreen"
         Title="{Binding ApplicationTitle}"
         Height="600"
         Width="850"
-
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         Background="{DynamicResource MaterialDesignPaper}"
         TextElement.FontWeight="Medium"
@@ -26,6 +23,32 @@
         FontFamily="{materialDesign:MaterialDesignFont}"
         prism:ViewModelLocator.AutoWireViewModel="True"
         IsEnabled="{Binding MainRegionService.IsBusy, Converter={i:InvertBoolConverter}}">
+
+    <Window.Style>
+      
+        <!--Убирает стандартную рамку и заголовок окна -->
+    <Style >
+        <Setter Property="WindowChrome.WindowChrome">
+            <Setter.Value>
+                <WindowChrome ResizeBorderThickness="3"
+                              CaptionHeight="0"
+                              CornerRadius="0"
+                              NonClientFrameEdges="None"
+                              GlassFrameThickness="1" />
+            </Setter.Value>
+        </Setter>
+        <!-- Устраняет растягивание окна на панель задач и выход окна за пределы экрана-->
+        <Style.Triggers>
+            <Trigger Property="Window.WindowState"
+                     Value="Maximized">
+                <Setter Property="Window.BorderThickness"
+                        Value="8" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    </Window.Style>
+
 
     <Window.Resources>
         <ResourceDictionary>
@@ -81,22 +104,31 @@
 
             </Style>
 
-            <Style x:Key="WindowButton"                   
-                   TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialDesignRaisedButton}">
-                <Setter Property="BorderThickness" Value="0"/>
+            <Style x:Key="WindowButton"
+                   TargetType="{x:Type Button}"
+                   BasedOn="{StaticResource MaterialDesignRaisedButton}">
+                <Setter Property="BorderThickness"
+                        Value="0" />
                 <Setter Property="Margin"
                         Value="0" />
-                <Setter Property="Width" 
+                <Setter Property="Width"
                         Value="40" />
-                <Setter Property="Height" Value="30"/>
-                <Setter Property="Padding" Value="0"/>
-                <Setter Property="materialDesign:ButtonAssist.CornerRadius" Value="0"/>
-                <Setter Property="materialDesign:ShadowAssist.ShadowDepth" Value="Depth0"/>
-                <Setter Property="Foreground" Value="White"/>
-                
+                <Setter Property="Height"
+                        Value="30" />
+                <Setter Property="Padding"
+                        Value="0" />
+                <Setter Property="materialDesign:ButtonAssist.CornerRadius"
+                        Value="0" />
+                <Setter Property="materialDesign:ShadowAssist.ShadowDepth"
+                        Value="Depth0" />
+                <Setter Property="Foreground"
+                        Value="White" />
+
                 <Style.Triggers>
-                    <Trigger Property="IsMouseOver" Value="False">
-                        <Setter Property="Background" Value="Transparent"/>
+                    <Trigger Property="IsMouseOver"
+                             Value="False">
+                        <Setter Property="Background"
+                                Value="Transparent" />
                     </Trigger>
                 </Style.Triggers>
 
@@ -106,7 +138,7 @@
     </Window.Resources>
 
     <b:Interaction.Behaviors>
-        <i:DragWindowBehaviour/>
+        <i:DragWindowBehaviour />
     </b:Interaction.Behaviors>
 
     <Grid>
@@ -127,7 +159,7 @@
                             Margin="0,3,0,3">
 
                     <StackPanel Orientation="Horizontal"
-                                Margin="25,75,10,10">
+                                Margin="25,85,10,10">
                         <materialDesign:PackIcon Kind="FormatListBulleted"
                                                  VerticalAlignment="Center"
                                                  Margin="0,0,5,0" />
@@ -214,28 +246,38 @@
 
                     <DockPanel>
 
-                        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Top">
+                        <StackPanel DockPanel.Dock="Right"
+                                    Orientation="Horizontal"
+                                    VerticalAlignment="Top">
 
-                            <Button Style="{StaticResource WindowButton}" Command="{Binding MinimizeWindowCommand}">
-                                <materialDesign:PackIcon Kind="WindowMinimize"  />
+                            <Button Style="{StaticResource WindowButton}"
+                                    Command="{Binding MinimizeWindowCommand}">
+                                <materialDesign:PackIcon Kind="WindowMinimize" />
                             </Button>
 
-                            <Button Style="{StaticResource WindowButton}" Command="{Binding MaximizeWindowCommand}" Visibility="{Binding IsMaximizedWidow, Converter={i:InvertedBoolToVisibleConverter}}">
-                                <materialDesign:PackIcon Kind="WindowMaximize"  />
+                            <Button Style="{StaticResource WindowButton}"
+                                    Command="{Binding MaximizeWindowCommand}"
+                                    Visibility="{Binding IsMaximizedWidow, Converter={i:InvertedBoolToVisibleConverter}}">
+                                <materialDesign:PackIcon Kind="WindowMaximize" />
                             </Button>
 
-                            <Button Style="{StaticResource WindowButton}" Command="{Binding RestoreWindowCommand}" Visibility="{Binding IsMaximizedWidow, Converter={i:BoolToVisibleConverter}}">
-                                <materialDesign:PackIcon Kind="WindowRestore"  />
+                            <Button Style="{StaticResource WindowButton}"
+                                    Command="{Binding RestoreWindowCommand}"
+                                    Visibility="{Binding IsMaximizedWidow, Converter={i:BoolToVisibleConverter}}">
+                                <materialDesign:PackIcon Kind="WindowRestore" />
                             </Button>
 
-                            <Button   Command="{Binding CloseWindowCommand}" >
-                                <materialDesign:PackIcon Kind="WindowClose"/>
+                            <Button   Command="{Binding CloseWindowCommand}">
+                                <materialDesign:PackIcon Kind="WindowClose" />
 
                                 <Button.Style>
-                                    <Style TargetType="Button" BasedOn="{StaticResource WindowButton}">
+                                    <Style TargetType="Button"
+                                           BasedOn="{StaticResource WindowButton}">
                                         <Style.Triggers>
-                                            <Trigger Property="IsMouseOver" Value="True">
-                                                <Setter Property="Background" Value="Red" />
+                                            <Trigger Property="IsMouseOver"
+                                                     Value="True">
+                                                <Setter Property="Background"
+                                                        Value="Red" />
                                             </Trigger>
                                         </Style.Triggers>
                                     </Style>
@@ -243,36 +285,36 @@
 
                             </Button>
 
-
                         </StackPanel>
 
-                        <TextBlock DockPanel.Dock="Left" Text="{Binding MainRegionService.Header, NotifyOnTargetUpdated=True}"
-                               FontSize="20"
-                               Margin="15"
-                               FontWeight="Regular"
-                               Foreground="White">
+                        <TextBlock DockPanel.Dock="Left"
+                                   Text="{Binding MainRegionService.Header, NotifyOnTargetUpdated=True}"
+                                   FontSize="20"
+                                   Margin="15,35,15,15"
+                                   FontWeight="Regular"
+                                   Foreground="White">
 
                             <TextBlock.Triggers>
                                 <EventTrigger RoutedEvent="Binding.TargetUpdated">
                                     <BeginStoryboard>
                                         <Storyboard>
                                             <DoubleAnimation Storyboard.TargetName="MainRegionPanel"
-                                                         Storyboard.TargetProperty="Opacity"
-                                                         Duration="0:0:0.5"
-                                                         From="0"
-                                                         To="1" />
+                                                             Storyboard.TargetProperty="Opacity"
+                                                             Duration="0:0:0.5"
+                                                             From="0"
+                                                             To="1" />
 
                                             <DoubleAnimation Storyboard.TargetName="AnimatedSkewTransform"
-                                                         Storyboard.TargetProperty="AngleX"
-                                                         Duration="0:0:0.5"
-                                                         From="90"
-                                                         To="0" />
+                                                             Storyboard.TargetProperty="AngleX"
+                                                             Duration="0:0:0.5"
+                                                             From="90"
+                                                             To="0" />
 
                                             <DoubleAnimation Storyboard.TargetName="AnimatedSkewTransform"
-                                                         Storyboard.TargetProperty="AngleY"
-                                                         Duration="0:0:0.5"
-                                                         From="90"
-                                                         To="0" />
+                                                             Storyboard.TargetProperty="AngleY"
+                                                             Duration="0:0:0.5"
+                                                             From="90"
+                                                             To="0" />
                                         </Storyboard>
                                     </BeginStoryboard>
                                 </EventTrigger>
@@ -289,8 +331,7 @@
                     <materialDesign:Snackbar Margin="15,0,15,0"
                                              HorizontalAlignment="Stretch"
                                              IsActive="{Binding MainRegionService.ShowStatus}">
-                        <materialDesign:SnackbarMessage  
-                                                         ActionCommand="{Binding MainRegionService.CloseStatusCommand}">
+                        <materialDesign:SnackbarMessage ActionCommand="{Binding MainRegionService.CloseStatusCommand}">
 
                             <materialDesign:SnackbarMessage.ActionContent>
                                 <Viewbox  Stretch="UniformToFill"
@@ -303,7 +344,9 @@
                             </materialDesign:SnackbarMessage.ActionContent>
 
                             <materialDesign:SnackbarMessage.Content>
-                                <TextBlock Text="{Binding MainRegionService.Status}" HorizontalAlignment="Stretch" Margin="0"
+                                <TextBlock Text="{Binding MainRegionService.Status}"
+                                           HorizontalAlignment="Stretch"
+                                           Margin="0"
                                            FontWeight="Regular"
                                            TextWrapping="Wrap" />
                             </materialDesign:SnackbarMessage.Content>

@@ -30,8 +30,6 @@ namespace CHI.Application.ViewModels
         #region Конструкторы
         public ShellViewModel(IMainRegionService mainRegionService, ILicenseManager licenseManager)
         {
-            System.Windows.Application.Current.MainWindow.MaxHeight = SystemParameters.MaximizedPrimaryScreenHeight;
-
             IsMaximizedWidow = System.Windows.Application.Current.MainWindow.WindowState == WindowState.Maximized ? true : false;
             MainRegionService = mainRegionService;
             ApplicationTitle = ((AssemblyTitleAttribute)Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(AssemblyTitleAttribute), false).First()).Title;
