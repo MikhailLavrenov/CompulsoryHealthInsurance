@@ -25,30 +25,29 @@
         IsEnabled="{Binding MainRegionService.IsBusy, Converter={i:InvertBoolConverter}}">
 
     <Window.Style>
-      
+
         <!--Убирает стандартную рамку и заголовок окна -->
-    <Style >
-        <Setter Property="WindowChrome.WindowChrome">
-            <Setter.Value>
-                <WindowChrome ResizeBorderThickness="3"
-                              CaptionHeight="0"
-                              CornerRadius="0"
-                              NonClientFrameEdges="None"
-                              GlassFrameThickness="1" />
-            </Setter.Value>
-        </Setter>
-        <!-- Устраняет растягивание окна на панель задач и выход окна за пределы экрана-->
-        <Style.Triggers>
-            <Trigger Property="Window.WindowState"
-                     Value="Maximized">
-                <Setter Property="Window.BorderThickness"
-                        Value="8" />
-            </Trigger>
-        </Style.Triggers>
-    </Style>
+        <Style>
+            <Setter Property="WindowChrome.WindowChrome">
+                <Setter.Value>
+                    <WindowChrome ResizeBorderThickness="3"
+                                  CaptionHeight="0"
+                                  CornerRadius="0"
+                                  NonClientFrameEdges="None"
+                                  GlassFrameThickness="1" />
+                </Setter.Value>
+            </Setter>
+            <!-- Устраняет растягивание окна на панель задач и выход окна за пределы экрана-->
+            <Style.Triggers>
+                <Trigger Property="Window.WindowState"
+                         Value="Maximized">
+                    <Setter Property="Window.BorderThickness"
+                            Value="8" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
 
     </Window.Style>
-
 
     <Window.Resources>
         <ResourceDictionary>
@@ -106,7 +105,7 @@
 
             <Style x:Key="WindowButton"
                    TargetType="{x:Type Button}"
-                   BasedOn="{StaticResource MaterialDesignRaisedButton}">
+                   BasedOn="{StaticResource MaterialDesignRaisedLightButton}">
                 <Setter Property="BorderThickness"
                         Value="0" />
                 <Setter Property="Margin"
@@ -141,158 +140,164 @@
         <i:DragWindowBehaviour />
     </b:Interaction.Behaviors>
 
-    <Grid>
+    <DockPanel >
 
-        <ContentControl Panel.ZIndex="10"
-                        prism:RegionManager.RegionName="{x:Static i:RegionNames.ProgressBarRegion}" />
+        <materialDesign:ColorZone DockPanel.Dock="Top"
+                                  Mode="PrimaryMid"
+                                  Padding="0">
 
-        <DockPanel d:DataContext="{d:DesignInstance vm:ShellViewModel}"
-                   Panel.ZIndex="0"
-                   Background="White">
+            <StackPanel HorizontalAlignment="Right"
+                        Orientation="Horizontal"
+                        VerticalAlignment="Top">
 
-            <materialDesign:ColorZone DockPanel.Dock="Left"
-                                      Mode="PrimaryMid"
-                                      VerticalAlignment="Stretch">
+                <Button Style="{StaticResource WindowButton}"
+                        Command="{Binding MinimizeWindowCommand}">
+                    <materialDesign:PackIcon Kind="WindowMinimize" />
+                </Button>
 
-                <StackPanel Orientation="Vertical"
-                            Width="210"
-                            Margin="0,3,0,3">
+                <Button Style="{StaticResource WindowButton}"
+                        Command="{Binding MaximizeWindowCommand}"
+                        Visibility="{Binding IsMaximizedWidow, Converter={i:InvertedBoolToVisibleConverter}}">
+                    <materialDesign:PackIcon Kind="WindowMaximize" />
+                </Button>
 
-                    <StackPanel Orientation="Horizontal"
-                                Margin="25,85,10,10">
-                        <materialDesign:PackIcon Kind="FormatListBulleted"
-                                                 VerticalAlignment="Center"
-                                                 Margin="0,0,5,0" />
-                        <TextBlock Text="Основное"
-                                   Style="{StaticResource MenuCaptionText}" />
-                    </StackPanel>
+                <Button Style="{StaticResource WindowButton}"
+                        Command="{Binding RestoreWindowCommand}"
+                        Visibility="{Binding IsMaximizedWidow, Converter={i:BoolToVisibleConverter}}">
+                    <materialDesign:PackIcon Kind="WindowRestore" />
+                </Button>
 
+                <Button   Command="{Binding CloseWindowCommand}">
+                    <materialDesign:PackIcon Kind="WindowClose" />
 
-                    <RadioButton Style="{StaticResource MenuButton}"
-                                 Command="{Binding ShowViewCommand}"
-                                 CommandParameter="{x:Type v:AttachedPatientsView}"
-                                 IsChecked="True">
-                        <TextBlock Text="Файл прикрепленных пациентов"
-                                   Style="{StaticResource MenuButtonText}" />
-                    </RadioButton>
+                    <Button.Style>
+                        <Style TargetType="Button"
+                               BasedOn="{StaticResource WindowButton}">
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver"
+                                         Value="True">
+                                    <Setter Property="Background"
+                                            Value="Red" />
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
 
-                    <RadioButton Style="{StaticResource MenuButton}"
-                                 Command="{Binding ShowViewCommand}"
-                                 CommandParameter="{x:Type v:ExaminationsView}">
-                        <TextBlock Text="Загрузка периодических осмотров"
-                                   Style="{StaticResource MenuButtonText}" />
-                    </RadioButton>
+                </Button>
 
-                    <StackPanel Orientation="Horizontal"
-                                Margin="25,20,10,10">
-                        <materialDesign:PackIcon Kind="Tools"
-                                                 VerticalAlignment="Center"
-                                                 Margin="0,0,5,0" />
-                        <TextBlock Text="Настройки"
-                                   Style="{StaticResource MenuCaptionText}" />
-                    </StackPanel>
+            </StackPanel>
 
-                    <RadioButton Style="{StaticResource MenuButton}"
-                                 Command="{Binding ShowViewCommand}"
-                                 CommandParameter="{x:Type v:ServicesSettingsView}">
-                        <TextBlock Text="Настройки подключения к сервисам"
-                                   Style="{StaticResource MenuButtonText}" />
-                    </RadioButton>
+        </materialDesign:ColorZone>
+        
+        <Grid>
 
-                    <RadioButton Style="{StaticResource MenuButton}"
-                                 Command="{Binding ShowViewCommand}"
-                                 CommandParameter="{x:Type v:AttachedPatientsSettingsView}">
-                        <TextBlock Text="Настройки файла прикреплен. пациентов"
-                                   Style="{StaticResource MenuButtonText}" />
-                    </RadioButton>
+            <ContentControl Panel.ZIndex="10"
+                            prism:RegionManager.RegionName="{x:Static i:RegionNames.ProgressBarRegion}" />
 
-                    <RadioButton Style="{StaticResource MenuButton}"
-                                 Command="{Binding ShowViewCommand}"
-                                 CommandParameter="{x:Type v:ExaminationsSettingView}">
-                        <TextBlock Text="Настройки загрузки осмотров"
-                                   Style="{StaticResource MenuButtonText}" />
-                    </RadioButton>
+            <DockPanel d:DataContext="{d:DesignInstance vm:ShellViewModel}"
+                       Panel.ZIndex="0"
+                       Background="White">
 
-                    <StackPanel Orientation="Horizontal"
-                                Margin="25,20,10,0">
-                        <materialDesign:PackIcon Kind="InfoCircle"
-                                                 VerticalAlignment="Center"
-                                                 Margin="0,0,5,0" />
-                        <TextBlock Text="Прочее"
-                                   Style="{StaticResource MenuCaptionText}" />
-                    </StackPanel>
+                <materialDesign:ColorZone DockPanel.Dock="Left"
+                                          Mode="PrimaryMid"
+                                          VerticalAlignment="Stretch">
 
-                    <RadioButton Style="{StaticResource MenuButton}"
-                                 Command="{Binding ShowViewCommand}"
-                                 CommandParameter="{x:Type v:AboutView}">
-                        <TextBlock Text="О программе"
-                                   Style="{StaticResource MenuButtonText}" />
-                    </RadioButton>
+                    <StackPanel Orientation="Vertical"
+                                Width="210">
 
-                </StackPanel>
-
-            </materialDesign:ColorZone>
-
-            <DockPanel x:Name="MainRegionPanel"
-                       RenderTransformOrigin="0.1,0.1">
-
-                <DockPanel.RenderTransform>
-                    <SkewTransform x:Name="AnimatedSkewTransform" />
-                </DockPanel.RenderTransform>
-
-                <materialDesign:ColorZone DockPanel.Dock="Top"
-                                          Mode="PrimaryLight"
-                                          Padding="0">
-
-                    <DockPanel>
-
-                        <StackPanel DockPanel.Dock="Right"
-                                    Orientation="Horizontal"
-                                    VerticalAlignment="Top">
-
-                            <Button Style="{StaticResource WindowButton}"
-                                    Command="{Binding MinimizeWindowCommand}">
-                                <materialDesign:PackIcon Kind="WindowMinimize" />
-                            </Button>
-
-                            <Button Style="{StaticResource WindowButton}"
-                                    Command="{Binding MaximizeWindowCommand}"
-                                    Visibility="{Binding IsMaximizedWidow, Converter={i:InvertedBoolToVisibleConverter}}">
-                                <materialDesign:PackIcon Kind="WindowMaximize" />
-                            </Button>
-
-                            <Button Style="{StaticResource WindowButton}"
-                                    Command="{Binding RestoreWindowCommand}"
-                                    Visibility="{Binding IsMaximizedWidow, Converter={i:BoolToVisibleConverter}}">
-                                <materialDesign:PackIcon Kind="WindowRestore" />
-                            </Button>
-
-                            <Button   Command="{Binding CloseWindowCommand}">
-                                <materialDesign:PackIcon Kind="WindowClose" />
-
-                                <Button.Style>
-                                    <Style TargetType="Button"
-                                           BasedOn="{StaticResource WindowButton}">
-                                        <Style.Triggers>
-                                            <Trigger Property="IsMouseOver"
-                                                     Value="True">
-                                                <Setter Property="Background"
-                                                        Value="Red" />
-                                            </Trigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Button.Style>
-
-                            </Button>
-
+                        <StackPanel Orientation="Horizontal"
+                                    Margin="25,20,10,10">
+                            <materialDesign:PackIcon Kind="FormatListBulleted"
+                                                     VerticalAlignment="Center"
+                                                     Margin="0,0,5,0" />
+                            <TextBlock Text="Основное"
+                                       Style="{StaticResource MenuCaptionText}" />
                         </StackPanel>
 
-                        <TextBlock DockPanel.Dock="Left"
+
+                        <RadioButton Style="{StaticResource MenuButton}"
+                                     Command="{Binding ShowViewCommand}"
+                                     CommandParameter="{x:Type v:AttachedPatientsView}"
+                                     IsChecked="True">
+                            <TextBlock Text="Файл прикрепленных пациентов"
+                                       Style="{StaticResource MenuButtonText}" />
+                        </RadioButton>
+
+                        <RadioButton Style="{StaticResource MenuButton}"
+                                     Command="{Binding ShowViewCommand}"
+                                     CommandParameter="{x:Type v:ExaminationsView}">
+                            <TextBlock Text="Загрузка периодических осмотров"
+                                       Style="{StaticResource MenuButtonText}" />
+                        </RadioButton>
+
+                        <StackPanel Orientation="Horizontal"
+                                    Margin="25,20,10,10">
+                            <materialDesign:PackIcon Kind="Tools"
+                                                     VerticalAlignment="Center"
+                                                     Margin="0,0,5,0" />
+                            <TextBlock Text="Настройки"
+                                       Style="{StaticResource MenuCaptionText}" />
+                        </StackPanel>
+
+                        <RadioButton Style="{StaticResource MenuButton}"
+                                     Command="{Binding ShowViewCommand}"
+                                     CommandParameter="{x:Type v:ServicesSettingsView}">
+                            <TextBlock Text="Настройки подключения к сервисам"
+                                       Style="{StaticResource MenuButtonText}" />
+                        </RadioButton>
+
+                        <RadioButton Style="{StaticResource MenuButton}"
+                                     Command="{Binding ShowViewCommand}"
+                                     CommandParameter="{x:Type v:AttachedPatientsSettingsView}">
+                            <TextBlock Text="Настройки файла прикреплен. пациентов"
+                                       Style="{StaticResource MenuButtonText}" />
+                        </RadioButton>
+
+                        <RadioButton Style="{StaticResource MenuButton}"
+                                     Command="{Binding ShowViewCommand}"
+                                     CommandParameter="{x:Type v:ExaminationsSettingView}">
+                            <TextBlock Text="Настройки загрузки осмотров"
+                                       Style="{StaticResource MenuButtonText}" />
+                        </RadioButton>
+
+                        <StackPanel Orientation="Horizontal"
+                                    Margin="25,20,10,0">
+                            <materialDesign:PackIcon Kind="InfoCircle"
+                                                     VerticalAlignment="Center"
+                                                     Margin="0,0,5,0" />
+                            <TextBlock Text="Прочее"
+                                       Style="{StaticResource MenuCaptionText}" />
+                        </StackPanel>
+
+                        <RadioButton Style="{StaticResource MenuButton}"
+                                     Command="{Binding ShowViewCommand}"
+                                     CommandParameter="{x:Type v:AboutView}">
+                            <TextBlock Text="О программе"
+                                       Style="{StaticResource MenuButtonText}" />
+                        </RadioButton>
+
+                    </StackPanel>
+
+                </materialDesign:ColorZone>
+
+                <DockPanel x:Name="MainRegionPanel"
+                           RenderTransformOrigin="0.1,0.1">
+
+                    <DockPanel.RenderTransform>
+                        <SkewTransform x:Name="AnimatedSkewTransform" />
+                    </DockPanel.RenderTransform>
+
+                    <materialDesign:ColorZone DockPanel.Dock="Top"
+                                              Mode="Light"
+                                              Padding="0">
+
+                        <TextBlock DockPanel.Dock="Top"
+                                   HorizontalAlignment="Left"
                                    Text="{Binding MainRegionService.Header, NotifyOnTargetUpdated=True}"
                                    FontSize="20"
-                                   Margin="20,35,15,15"
-                                   FontWeight="Regular"
-                                   Foreground="White">
+                                   Margin="20,15,20,15"
+                                   FontWeight="Medium"
+                                   Foreground="#FF01579B">
 
                             <TextBlock.Triggers>
                                 <EventTrigger RoutedEvent="Binding.TargetUpdated">
@@ -322,59 +327,59 @@
 
                         </TextBlock>
 
-                    </DockPanel>
+                    </materialDesign:ColorZone>
 
-                </materialDesign:ColorZone>
+                    <Grid DockPanel.Dock="Bottom"
+                          MinHeight="55">
+                        <materialDesign:Snackbar Margin="15,0,15,0"
+                                                 HorizontalAlignment="Stretch"
+                                                 IsActive="{Binding MainRegionService.ShowStatus}">
+                            <materialDesign:SnackbarMessage ActionCommand="{Binding MainRegionService.CloseStatusCommand}">
 
-                <Grid DockPanel.Dock="Bottom"
-                      MinHeight="55">
-                    <materialDesign:Snackbar Margin="15,0,15,0"
-                                             HorizontalAlignment="Stretch"
-                                             IsActive="{Binding MainRegionService.ShowStatus}">
-                        <materialDesign:SnackbarMessage ActionCommand="{Binding MainRegionService.CloseStatusCommand}">
+                                <materialDesign:SnackbarMessage.ActionContent>
+                                    <Viewbox  Stretch="UniformToFill"
+                                              Height="25"
+                                              Margin="0"
+                                              HorizontalAlignment="Center">
+                                        <materialDesign:PackIcon Kind="ChevronDown"
+                                                                 Foreground="White" />
+                                    </Viewbox>
+                                </materialDesign:SnackbarMessage.ActionContent>
 
-                            <materialDesign:SnackbarMessage.ActionContent>
-                                <Viewbox  Stretch="UniformToFill"
-                                          Height="25"
-                                          Margin="0"
-                                          HorizontalAlignment="Center">
-                                    <materialDesign:PackIcon Kind="ChevronDown"
-                                                             Foreground="White" />
-                                </Viewbox>
-                            </materialDesign:SnackbarMessage.ActionContent>
+                                <materialDesign:SnackbarMessage.Content>
+                                    <TextBlock Text="{Binding MainRegionService.Status}"
+                                               HorizontalAlignment="Stretch"
+                                               Margin="0"
+                                               FontWeight="Regular"
+                                               TextWrapping="Wrap" />
+                                </materialDesign:SnackbarMessage.Content>
 
-                            <materialDesign:SnackbarMessage.Content>
-                                <TextBlock Text="{Binding MainRegionService.Status}"
-                                           HorizontalAlignment="Stretch"
-                                           Margin="0"
-                                           FontWeight="Regular"
-                                           TextWrapping="Wrap" />
-                            </materialDesign:SnackbarMessage.Content>
+                            </materialDesign:SnackbarMessage>
+                        </materialDesign:Snackbar>
+                    </Grid>
 
-                        </materialDesign:SnackbarMessage>
-                    </materialDesign:Snackbar>
-                </Grid>
+                    <ContentControl prism:RegionManager.RegionName="{x:Static i:RegionNames.MainRegion}"
+                                    Margin="15" />
 
-                <ContentControl prism:RegionManager.RegionName="{x:Static i:RegionNames.MainRegion}"
-                                Margin="15" />
+                </DockPanel>
+
+                <DockPanel.Triggers>
+                    <EventTrigger RoutedEvent="Loaded">
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                 Duration="0:0:0.5"
+                                                 From="0"
+                                                 To="1" />
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </EventTrigger>
+                </DockPanel.Triggers>
 
             </DockPanel>
 
-            <DockPanel.Triggers>
-                <EventTrigger RoutedEvent="Loaded">
-                    <BeginStoryboard>
-                        <Storyboard>
-                            <DoubleAnimation Storyboard.TargetProperty="Opacity"
-                                             Duration="0:0:0.5"
-                                             From="0"
-                                             To="1" />
-                        </Storyboard>
-                    </BeginStoryboard>
-                </EventTrigger>
-            </DockPanel.Triggers>
+        </Grid>
 
-        </DockPanel>
-
-    </Grid>
+    </DockPanel>
 
 </Window>
