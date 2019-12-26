@@ -24,12 +24,10 @@
     <Grid d:DataContext="{d:DesignInstance vm:ExaminationsSettingViewModel }">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="200" />
-            <ColumnDefinition Width="280" />
-            <ColumnDefinition Width="auto" />
+            <ColumnDefinition Width="300" />
         </Grid.ColumnDefinitions>
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />

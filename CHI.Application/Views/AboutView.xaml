@@ -46,7 +46,7 @@
 
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="80"/>
-            <ColumnDefinition />
+            <ColumnDefinition Width="*" MaxWidth="1000"/>
         </Grid.ColumnDefinitions>
 
         <TextBlock Grid.Row="0"

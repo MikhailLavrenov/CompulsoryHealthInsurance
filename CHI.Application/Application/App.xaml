@@ -12,7 +12,7 @@
                                              PrimaryColor="DeepPurple"
                                              SecondaryColor="LightGreen" />-->
                 <materialDesign:CustomColorTheme BaseTheme="Light"
-                                                 PrimaryColor="#01579b"
+                                                 PrimaryColor="#FF0067B8"
                                                  SecondaryColor="White" />
                 <ResourceDictionary  Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
                 <ResourceDictionary Source="/CHI.Application;component/Views/Resources/Icons.xaml" />
