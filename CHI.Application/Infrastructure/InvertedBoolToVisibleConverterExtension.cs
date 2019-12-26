@@ -7,18 +7,20 @@ using System.Windows.Markup;
 namespace CHI.Application.Infrastructure
 {
     /// <summary>
-    /// Расширение разметки xaml, конвертирует bool в !bool
+    /// Расширение разметки xaml, конвертирует !bool в Visibility
     /// </summary>
     [ValueConversion(typeof(bool), typeof(Visibility))]
-    public class InvertBoolConverterExtension : MarkupExtension, IValueConverter
+    public class InvertedBoolToVisibleConverterExtension : MarkupExtension, IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return !(bool)value;
+            var visible = !(bool)value;
+            return visible ? Visibility.Visible : Visibility.Collapsed;
         }
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return !(bool)value;
+            var visible = (Visibility)value;
+            return visible == Visibility.Visible ? false : true;
         }
         public override object ProvideValue(IServiceProvider serviceProvider)
         {

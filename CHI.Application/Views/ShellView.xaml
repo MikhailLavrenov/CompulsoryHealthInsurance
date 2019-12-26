@@ -10,11 +10,15 @@
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         xmlns:prism="http://prismlibrary.com/"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
         mc:Ignorable="d"
+        
+        WindowStyle="None"
         WindowStartupLocation="CenterScreen"
         Title="{Binding ApplicationTitle}"
         Height="600"
         Width="850"
+
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         Background="{DynamicResource MaterialDesignPaper}"
         TextElement.FontWeight="Medium"
@@ -77,8 +81,33 @@
 
             </Style>
 
+            <Style x:Key="WindowButton"                   
+                   TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialDesignRaisedButton}">
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="Margin"
+                        Value="0" />
+                <Setter Property="Width" 
+                        Value="40" />
+                <Setter Property="Height" Value="30"/>
+                <Setter Property="Padding" Value="0"/>
+                <Setter Property="materialDesign:ButtonAssist.CornerRadius" Value="0"/>
+                <Setter Property="materialDesign:ShadowAssist.ShadowDepth" Value="Depth0"/>
+                <Setter Property="Foreground" Value="White"/>
+                
+                <Style.Triggers>
+                    <Trigger Property="IsMouseOver" Value="False">
+                        <Setter Property="Background" Value="Transparent"/>
+                    </Trigger>
+                </Style.Triggers>
+
+            </Style>
+
         </ResourceDictionary >
     </Window.Resources>
+
+    <b:Interaction.Behaviors>
+        <i:DragWindowBehaviour/>
+    </b:Interaction.Behaviors>
 
     <Grid>
 
@@ -181,40 +210,77 @@
 
                 <materialDesign:ColorZone DockPanel.Dock="Top"
                                           Mode="PrimaryLight"
-                                          Padding="15">
+                                          Padding="0">
 
-                    <TextBlock Text="{Binding MainRegionService.Header, NotifyOnTargetUpdated=True}"
+                    <DockPanel>
+
+                        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Top">
+
+                            <Button Style="{StaticResource WindowButton}" Command="{Binding MinimizeWindowCommand}">
+                                <materialDesign:PackIcon Kind="WindowMinimize"  />
+                            </Button>
+
+                            <Button Style="{StaticResource WindowButton}" Command="{Binding MaximizeWindowCommand}" Visibility="{Binding IsMaximizedWidow, Converter={i:InvertedBoolToVisibleConverter}}">
+                                <materialDesign:PackIcon Kind="WindowMaximize"  />
+                            </Button>
+
+                            <Button Style="{StaticResource WindowButton}" Command="{Binding RestoreWindowCommand}" Visibility="{Binding IsMaximizedWidow, Converter={i:BoolToVisibleConverter}}">
+                                <materialDesign:PackIcon Kind="WindowRestore"  />
+                            </Button>
+
+                            <Button   Command="{Binding CloseWindowCommand}" >
+                                <materialDesign:PackIcon Kind="WindowClose"/>
+
+                                <Button.Style>
+                                    <Style TargetType="Button" BasedOn="{StaticResource WindowButton}">
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Background" Value="Red" />
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+
+                            </Button>
+
+
+                        </StackPanel>
+
+                        <TextBlock DockPanel.Dock="Left" Text="{Binding MainRegionService.Header, NotifyOnTargetUpdated=True}"
                                FontSize="20"
+                               Margin="15"
                                FontWeight="Regular"
                                Foreground="White">
 
-                        <TextBlock.Triggers>
-                            <EventTrigger RoutedEvent="Binding.TargetUpdated">
-                                <BeginStoryboard>
-                                    <Storyboard>
-                                        <DoubleAnimation Storyboard.TargetName="MainRegionPanel"
+                            <TextBlock.Triggers>
+                                <EventTrigger RoutedEvent="Binding.TargetUpdated">
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="MainRegionPanel"
                                                          Storyboard.TargetProperty="Opacity"
                                                          Duration="0:0:0.5"
                                                          From="0"
                                                          To="1" />
 
-                                        <DoubleAnimation Storyboard.TargetName="AnimatedSkewTransform"
+                                            <DoubleAnimation Storyboard.TargetName="AnimatedSkewTransform"
                                                          Storyboard.TargetProperty="AngleX"
                                                          Duration="0:0:0.5"
                                                          From="90"
                                                          To="0" />
 
-                                        <DoubleAnimation Storyboard.TargetName="AnimatedSkewTransform"
+                                            <DoubleAnimation Storyboard.TargetName="AnimatedSkewTransform"
                                                          Storyboard.TargetProperty="AngleY"
                                                          Duration="0:0:0.5"
                                                          From="90"
                                                          To="0" />
-                                    </Storyboard>
-                                </BeginStoryboard>
-                            </EventTrigger>
-                        </TextBlock.Triggers>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                            </TextBlock.Triggers>
 
-                    </TextBlock>
+                        </TextBlock>
+
+                    </DockPanel>
 
                 </materialDesign:ColorZone>
 
@@ -225,7 +291,7 @@
                                              IsActive="{Binding MainRegionService.ShowStatus}">
                         <materialDesign:SnackbarMessage  
                                                          ActionCommand="{Binding MainRegionService.CloseStatusCommand}">
-                            
+
                             <materialDesign:SnackbarMessage.ActionContent>
                                 <Viewbox  Stretch="UniformToFill"
                                           Height="25"
