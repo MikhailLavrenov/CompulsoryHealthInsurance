@@ -21,8 +21,7 @@
         TextElement.FontWeight="Medium"
         TextElement.FontSize="14"
         FontFamily="{materialDesign:MaterialDesignFont}"
-        prism:ViewModelLocator.AutoWireViewModel="True"
-        IsEnabled="{Binding MainRegionService.IsBusy, Converter={i:InvertBoolConverter}}">
+        prism:ViewModelLocator.AutoWireViewModel="True">
 
     <Window.Style>
 
@@ -194,7 +193,7 @@
         </StackPanel>
 
 
-        <Grid Background="Transparent">
+        <Grid Background="Transparent" IsEnabled="{Binding MainRegionService.IsBusy, Converter={i:InvertBoolConverter}}">
 
             <ContentControl Panel.ZIndex="10"
                             prism:RegionManager.RegionName="{x:Static i:RegionNames.ProgressBarRegion}" />
@@ -203,7 +202,18 @@
                        Panel.ZIndex="0"
                        Background="Transparent">
 
-
+                <DockPanel.Triggers>
+                    <EventTrigger RoutedEvent="Loaded">
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                 Duration="0:0:0.5"
+                                                 From="0"
+                                                 To="1" />
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </EventTrigger>
+                </DockPanel.Triggers>
 
                 <StackPanel Orientation="Vertical"
                             Width="210"
@@ -340,7 +350,7 @@
 
                     <Grid DockPanel.Dock="Bottom"
                           MinHeight="55">
-                        <materialDesign:Snackbar Margin="15,0,15,0"
+                        <materialDesign:Snackbar Margin="15,0,15,0"  Opacity="0.85"
                                                  HorizontalAlignment="Stretch"
                                                  IsActive="{Binding MainRegionService.ShowStatus}">
                             <materialDesign:SnackbarMessage ActionCommand="{Binding MainRegionService.CloseStatusCommand}">
@@ -372,18 +382,7 @@
 
                 </DockPanel>
 
-                <DockPanel.Triggers>
-                    <EventTrigger RoutedEvent="Loaded">
-                        <BeginStoryboard>
-                            <Storyboard>
-                                <DoubleAnimation Storyboard.TargetProperty="Opacity"
-                                                 Duration="0:0:0.5"
-                                                 From="0"
-                                                 To="1" />
-                            </Storyboard>
-                        </BeginStoryboard>
-                    </EventTrigger>
-                </DockPanel.Triggers>
+
 
             </DockPanel>
 

@@ -7,6 +7,8 @@
              xmlns:i="clr-namespace:CHI.Application.Infrastructure"
              xmlns:vm="clr-namespace:CHI.Application.ViewModels"
              xmlns:prism="http://prismlibrary.com/"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             
              mc:Ignorable="d"
              d:DesignHeight="400"
              d:DesignWidth="800"
@@ -32,19 +34,20 @@
                     Value="WidthAndHeight" />
             <Setter Property="WindowStyle"
                     Value="None" />
+
         </Style>
     </prism:Dialog.WindowStyle>
 
     <Border BorderThickness="1"
-            BorderBrush="Gray"
-            Padding="50">
+            BorderBrush="{DynamicResource PrimaryHueMidBrush}"
+            Padding="50,65,50,50">
 
-        <DockPanel d:DataContext="{d:DesignInstance vm:NotificationDialogViewModel}">
+        <StackPanel d:DataContext="{d:DesignInstance vm:NotificationDialogViewModel}">
 
-            <TextBlock DockPanel.Dock="Top"
-                       TextWrapping="Wrap"
+            <TextBlock  TextWrapping="Wrap"
                        HorizontalAlignment="Center"
-                       FontWeight="Medium"
+                       VerticalAlignment="Center"                
+                       Style="{StaticResource MaterialDesignSubtitle2TextBlock}"
                        Text="{Binding Message }" />
 
             <StackPanel DockPanel.Dock="Bottom"
@@ -63,7 +66,7 @@
 
             </StackPanel>
 
-        </DockPanel>
+        </StackPanel>
 
     </Border>
 
