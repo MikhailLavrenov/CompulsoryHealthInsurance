@@ -50,7 +50,7 @@ namespace CHI.Application
             containerRegistry.RegisterForNavigation<ExaminationsView>();
             containerRegistry.RegisterForNavigation<ServicesSettingsView>();
             containerRegistry.RegisterForNavigation<AttachedPatientsSettingsView>();
-            containerRegistry.RegisterForNavigation<ExaminationsSettingView>();
+            containerRegistry.RegisterForNavigation<OtherSettingsView>();
             containerRegistry.RegisterForNavigation<AboutView>();
             containerRegistry.RegisterForNavigation<ProgressBarView>();
         }

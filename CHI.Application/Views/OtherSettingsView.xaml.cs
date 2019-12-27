@@ -18,9 +18,9 @@ namespace CHI.Application.Views
     /// <summary>
     /// Логика взаимодействия для MedicalExaminationsSettingView.xaml
     /// </summary>
-    public partial class ExaminationsSettingView : UserControl
+    public partial class OtherSettingsView : UserControl
     {
-        public ExaminationsSettingView()
+        public OtherSettingsView()
         {
             InitializeComponent();
         }

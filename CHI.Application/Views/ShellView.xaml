@@ -272,8 +272,8 @@
 
                     <RadioButton Style="{StaticResource MenuButton}"
                                  Command="{Binding ShowViewCommand}"
-                                 CommandParameter="{x:Type v:ExaminationsSettingView}">
-                        <TextBlock Text="Настройки загрузки осмотров"
+                                 CommandParameter="{x:Type v:OtherSettingsView}">
+                        <TextBlock Text="Прочие настройки"
                                    Style="{StaticResource MenuButtonText}" />
                     </RadioButton>
 

@@ -172,7 +172,7 @@
     <Compile Include="Models\LicenseManager.cs" />
     <Compile Include="Models\Settings.cs" />
     <Compile Include="ViewModels\AboutViewModel.cs" />
-    <Compile Include="ViewModels\ExaminationsSettingViewModel.cs" />
+    <Compile Include="ViewModels\OtherSettingsViewModel.cs" />
     <Compile Include="ViewModels\ExaminationsViewModel.cs" />
     <Compile Include="ViewModels\NotificationDialogViewModel.cs" />
     <Compile Include="ViewModels\ShellViewModel.cs" />
@@ -182,8 +182,8 @@
     <Compile Include="Views\AboutView.xaml.cs">
       <DependentUpon>AboutView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\ExaminationsSettingView.xaml.cs">
-      <DependentUpon>ExaminationsSettingView.xaml</DependentUpon>
+    <Compile Include="Views\OtherSettingsView.xaml.cs">
+      <DependentUpon>OtherSettingsView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ExaminationsView.xaml.cs">
       <DependentUpon>ExaminationsView.xaml</DependentUpon>
@@ -204,7 +204,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\ExaminationsSettingView.xaml">
+    <Page Include="Views\OtherSettingsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

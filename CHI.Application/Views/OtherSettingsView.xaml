@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="CHI.Application.Views.ExaminationsSettingView"
+﻿<UserControl x:Class="CHI.Application.Views.OtherSettingsView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -21,7 +21,7 @@
         </ResourceDictionary >
     </UserControl.Resources>
 
-    <Grid d:DataContext="{d:DesignInstance vm:ExaminationsSettingViewModel }">
+    <Grid d:DataContext="{d:DesignInstance vm:OtherSettingsViewModel }">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="200" />
             <ColumnDefinition Width="300" />
@@ -31,16 +31,21 @@
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0" Grid.Column="0" Text="Имена файлов пациентов"/>
-        <TextBox  Grid.Row="0" Grid.Column="1" Text="{Binding Settings.PatientFileNames}" />
+        <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Text="Загрузка осмотров на портал Диспансеризации"/>
+        
+        <TextBlock Grid.Row="1" Grid.Column="0" Text="Имена файлов пациентов"/>
+        <TextBox  Grid.Row="1" Grid.Column="1" Text="{Binding Settings.PatientFileNames}" />
 
-        <TextBlock Grid.Row="1" Grid.Column="0" Text="Имена файлов услуг"/>
-        <TextBox  Grid.Row="1" Grid.Column="1" Text="{Binding Settings.ExaminationFileNames}" />
+        <TextBlock Grid.Row="2" Grid.Column="0" Text="Имена файлов услуг"/>
+        <TextBox  Grid.Row="2" Grid.Column="1" Text="{Binding Settings.ExaminationFileNames}" />
 
-        <StackPanel Grid.Row="2"
+        <StackPanel Grid.Row="3"
                     Grid.Column="0"
                     Grid.ColumnSpan="2"
                     Orientation="Horizontal"
@@ -53,6 +58,22 @@
             <Button Content="По умолчанию"
                     Command="{Binding SetDefaultCommand}" />
         </StackPanel>
+
+        <TextBlock Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Text="Локальная база прикрепленных пациентов"/>
+        
+        <StackPanel VerticalAlignment="Top"
+                    Grid.Row="5"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2"
+                    Orientation="Horizontal">
+            <Button Content="Импорт"
+                    Command="{Binding ImportPatientsCommand}" />
+            <Button Content="Скачать пример"
+                    Command="{Binding SaveExampleCommand}" />
+            <Button Content="Очистить"
+                    Command="{Binding ClearDatabaseCommand}" />
+        </StackPanel>
+        
 
     </Grid>
 </UserControl>

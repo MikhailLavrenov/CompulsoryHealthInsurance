@@ -35,7 +35,6 @@
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
-            <RowDefinition Height="auto" />
             <RowDefinition>
                 <RowDefinition.Style>
                     <Style TargetType="{x:Type RowDefinition}">
@@ -78,24 +77,8 @@
 
         <TextBlock Grid.Row="2"
                    Grid.Column="0"
-                   Text="Локальная БД пациентов" />
-        <StackPanel VerticalAlignment="Top"
-                    Grid.Row="2"
-                    Grid.Column="1"
-                    Grid.ColumnSpan="2"
-                    Orientation="Horizontal">
-            <Button Content="Импорт"
-                    Command="{Binding ImportPatientsCommand}" />
-            <Button Content="Скачать пример"
-                    Command="{Binding SaveExampleCommand}" />
-            <Button Content="Очистить"
-                    Command="{Binding ClearDatabaseCommand}" />
-        </StackPanel>
-
-        <TextBlock Grid.Row="3"
-                   Grid.Column="0"
                    Text="Применить форматирование" />
-        <CheckBox  Grid.Row="3"
+        <CheckBox  Grid.Row="2"
                    Grid.Column="1"
                    Name="CheckBoxFormat"
                    IsChecked="{Binding Path=Settings.FormatPatientsFile}" />
@@ -103,7 +86,7 @@
 
 
 
-        <DockPanel Grid.Row="4"
+        <DockPanel Grid.Row="3"
                    Grid.Column="0"
                    Grid.ColumnSpan="2">
 
@@ -156,7 +139,7 @@
 
 
 
-        <StackPanel Grid.Row="5"
+        <StackPanel Grid.Row="4"
                     Grid.Column="0"
                     Grid.ColumnSpan="2"
                     Orientation="Horizontal"
