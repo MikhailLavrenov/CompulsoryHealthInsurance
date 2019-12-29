@@ -37,7 +37,7 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Text="Загрузка осмотров на портал Диспансеризации"/>
+        <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Style="{StaticResource SubTitleText}" Margin="5,5,5,15" Text="Загрузка осмотров на портал Диспансеризации"/>
         
         <TextBlock Grid.Row="1" Grid.Column="0" Text="Имена файлов пациентов"/>
         <TextBox  Grid.Row="1" Grid.Column="1" Text="{Binding Settings.PatientFileNames}" />
@@ -59,7 +59,7 @@
                     Command="{Binding SetDefaultCommand}" />
         </StackPanel>
 
-        <TextBlock Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Text="Локальная база прикрепленных пациентов"/>
+        <TextBlock Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Style="{StaticResource SubTitleText}" Margin="5,20,5,5" Text="Локальная база прикрепленных пациентов"/>
         
         <StackPanel VerticalAlignment="Top"
                     Grid.Row="5"

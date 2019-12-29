@@ -5,6 +5,19 @@
                     xmlns:v="clr-namespace:CHI.Application.Views">
 
 
+    <!-- TextBlock-->
+
+    <Style x:Key="SubTitleText" BasedOn="{StaticResource {x:Type TextBlock}}"
+           TargetType="{x:Type TextBlock}">
+        <Setter Property="FontSize"
+                Value="16" />
+        <Setter Property="FontWeight"
+                Value="Medium" />
+        <Setter Property="Margin"
+                Value="5,15,5,15" />
+
+    </Style>
+
     <!--Buttons-->
 
     <Style BasedOn="{StaticResource {x:Type Button}}"
