@@ -101,36 +101,51 @@
                                 </Grid.ColumnDefinitions>
                                 <Border Background="{TemplateBinding Background}">
 
-                                    <wpf:Ripple Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" Focusable="False"
-                                        HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                        VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
-                                        Padding="{TemplateBinding Padding}"
-                                        x:Name="MyContentPresenter"
-                                        Opacity=".82"
-                                        SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                    <wpf:Ripple Content="{TemplateBinding Content}"
+                                                ContentTemplate="{TemplateBinding ContentTemplate}"
+                                                Focusable="False"
+                                                HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                Padding="{TemplateBinding Padding}"
+                                                x:Name="ContentPresenter"
+                                                Opacity="0.82"
+                                                SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
                                 </Border>
-                                <Border x:Name="SelectionHighlightBorder" HorizontalAlignment="Left" Width="6" Background="{TemplateBinding BorderBrush}"                               
-                                Visibility="Hidden"/>
-                                <Border x:Name="SelectionHighlightBackground" HorizontalAlignment="Stretch" Opacity="0.15" Background="{TemplateBinding BorderBrush}"                               
-                                Visibility="Hidden"/>
+                                <Border x:Name="SelectionHighlightBorder"
+                                        HorizontalAlignment="Left"
+                                        Width="2"
+                                        Background="{TemplateBinding BorderBrush}"
+                                        Visibility="Hidden" />
+                                <Border x:Name="SelectionHighlightBackground"
+                                        HorizontalAlignment="Stretch"
+                                        Opacity="0.15"
+                                        Background="{TemplateBinding BorderBrush}"
+                                        Visibility="Hidden" />
                             </Grid>
 
                             <ControlTemplate.Triggers>
-                                
-                                <Trigger Property="IsChecked" Value="True">
-                                    <Setter TargetName="MyContentPresenter" Property="Opacity" Value="1"/>
-                                    <Setter TargetName="SelectionHighlightBorder" Property="Visibility" Value="Visible" />
-                                    <Setter TargetName="SelectionHighlightBackground" Property="Visibility" Value="Visible" />
+
+                                <Trigger Property="IsChecked"
+                                         Value="True">
+                                    <Setter TargetName="ContentPresenter"
+                                            Property="Opacity"
+                                            Value="1" />
+                                    <Setter TargetName="SelectionHighlightBorder"
+                                            Property="Visibility"
+                                            Value="Visible" />
+                                    <Setter TargetName="SelectionHighlightBackground"
+                                            Property="Visibility"
+                                            Value="Visible" />
                                 </Trigger>
 
                                 <Trigger Property="IsMouseOver"
-                             Value="true">
+                                         Value="true">
                                     <Setter Property="FontWeight"
-                                Value="Bold" />
+                                            Value="Bold" />
                                     <Setter Property="FontSize"
-                                Value="14.5" />
-                                    <Setter Property="Cursor"                        
-                                Value="Hand" />
+                                            Value="14.5" />
+                                    <Setter Property="Cursor"
+                                            Value="Hand" />
                                 </Trigger>
 
                             </ControlTemplate.Triggers>
@@ -141,8 +156,65 @@
             </Style>
 
             <Style x:Key="WindowButton"
+                   TargetType="{x:Type ButtonBase}"
+                   BasedOn="{StaticResource MaterialDesignFlatButton}">
+                <Setter Property="Margin"
+                        Value="0" />
+                <Setter Property="Width"
+                        Value="40" />
+                <Setter Property="Height"
+                        Value="30" />
+                <Setter Property="Padding"
+                        Value="0" />
+                <Setter Property="materialDesign:ShadowAssist.ShadowDepth"
+                        Value="Depth0" />
+                <Setter Property="Foreground"
+                        Value="White" />
+                <Setter Property="Background"
+                        Value="Transparent" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type ButtonBase}">
+                            <Grid Background="{TemplateBinding Background}">
+
+                                <wpf:Ripple Content="{TemplateBinding Content}"
+                                            ContentTemplate="{TemplateBinding ContentTemplate}"
+                                            Focusable="False"
+                                            HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                            VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                            Padding="{TemplateBinding Padding}"
+                                            SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}">
+                                </wpf:Ripple>
+                                <Border Background="White"
+                                        Opacity="0"
+                                        x:Name="SelectionHue"
+                                        BorderThickness="0">
+                                </Border>
+                            </Grid>
+                            <ControlTemplate.Triggers>
+
+                                <Trigger Property="IsEnabled"
+                                         Value="false">
+                                    <Setter Property="Opacity"
+                                            Value="0.23" />
+                                </Trigger>
+
+                                <Trigger Property="IsMouseOver"
+                                         Value="true">
+                                    <Setter TargetName="SelectionHue"
+                                            Property="Opacity"
+                                            Value="0.15" />
+                                </Trigger>
+
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!--<Style x:Key="WindowButton"
                    TargetType="{x:Type Button}"
-                   BasedOn="{StaticResource MaterialDesignRaisedLightButton}">
+                   BasedOn="{StaticResource MaterialDesignRaisedButton}">
                 <Setter Property="BorderThickness"
                         Value="0" />
                 <Setter Property="Margin"
@@ -159,16 +231,18 @@
                         Value="Depth0" />
                 <Setter Property="Foreground"
                         Value="White" />
+                <Setter Property="Background"
+                        Value="Transparent" />
 
                 <Style.Triggers>
                     <Trigger Property="IsMouseOver"
-                             Value="False">
+                             Value="true">
                         <Setter Property="Background"
-                                Value="Transparent" />
+                                Value="#FF2773AE" />
                     </Trigger>
                 </Style.Triggers>
 
-            </Style>
+            </Style>-->
 
         </ResourceDictionary >
     </Window.Resources>
@@ -181,8 +255,10 @@
         <DockPanel.Background>
             <LinearGradientBrush EndPoint="0,0.5"
                                  StartPoint="0.5,0.5">
-                <GradientStop Color="#FF01579B" Offset="0.475" />
-                <GradientStop Color="#FF0082EA" Offset="1" />
+                <GradientStop Color="#FF01579B"
+                              Offset="0.475" />
+                <GradientStop Color="#FF0082EA"
+                              Offset="1" />
             </LinearGradientBrush>
         </DockPanel.Background>
 
@@ -229,7 +305,8 @@
         </StackPanel>
 
 
-        <Grid Background="Transparent" IsEnabled="{Binding MainRegionService.IsBusy, Converter={i:InvertBoolConverter}}">
+        <Grid Background="Transparent"
+              IsEnabled="{Binding MainRegionService.IsBusy, Converter={i:InvertBoolConverter}}">
 
             <ContentControl Panel.ZIndex="10"
                             prism:RegionManager.RegionName="{x:Static i:RegionNames.ProgressBarRegion}" />
@@ -343,7 +420,7 @@
 
                     <materialDesign:ColorZone DockPanel.Dock="Top"
                                               Mode="Light"
-                                              Padding="0" 
+                                              Padding="0"
                                               materialDesign:ShadowAssist.ShadowDepth="Depth1">
 
                         <TextBlock DockPanel.Dock="Top"
@@ -386,7 +463,8 @@
 
                     <Grid DockPanel.Dock="Bottom"
                           MinHeight="55">
-                        <materialDesign:Snackbar Margin="15,0,15,0"  Opacity="0.85"
+                        <materialDesign:Snackbar Margin="15,0,15,0"
+                                                 Opacity="0.85"
                                                  HorizontalAlignment="Stretch"
                                                  IsActive="{Binding MainRegionService.ShowStatus}">
                             <materialDesign:SnackbarMessage ActionCommand="{Binding MainRegionService.CloseStatusCommand}">
