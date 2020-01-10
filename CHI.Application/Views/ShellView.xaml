@@ -158,6 +158,8 @@
             <Style x:Key="WindowButton"
                    TargetType="{x:Type ButtonBase}"
                    BasedOn="{StaticResource MaterialDesignFlatButton}">
+                <Setter Property="IsTabStop"
+                        Value="False" />
                 <Setter Property="Margin"
                         Value="0" />
                 <Setter Property="Width"
@@ -212,39 +214,7 @@
                 </Setter>
             </Style>
 
-            <!--<Style x:Key="WindowButton"
-                   TargetType="{x:Type Button}"
-                   BasedOn="{StaticResource MaterialDesignRaisedButton}">
-                <Setter Property="BorderThickness"
-                        Value="0" />
-                <Setter Property="Margin"
-                        Value="0" />
-                <Setter Property="Width"
-                        Value="40" />
-                <Setter Property="Height"
-                        Value="30" />
-                <Setter Property="Padding"
-                        Value="0" />
-                <Setter Property="materialDesign:ButtonAssist.CornerRadius"
-                        Value="0" />
-                <Setter Property="materialDesign:ShadowAssist.ShadowDepth"
-                        Value="Depth0" />
-                <Setter Property="Foreground"
-                        Value="White" />
-                <Setter Property="Background"
-                        Value="Transparent" />
-
-                <Style.Triggers>
-                    <Trigger Property="IsMouseOver"
-                             Value="true">
-                        <Setter Property="Background"
-                                Value="#FF2773AE" />
-                    </Trigger>
-                </Style.Triggers>
-
-            </Style>-->
-
-        </ResourceDictionary >
+         </ResourceDictionary >
     </Window.Resources>
 
     <b:Interaction.Behaviors>
@@ -304,15 +274,23 @@
 
         </StackPanel>
 
+        <Grid IsEnabled="{Binding MainRegionService.IsBusy, Converter={i:InvertBoolConverter}}">
 
-        <Grid Background="Transparent"
-              IsEnabled="{Binding MainRegionService.IsBusy, Converter={i:InvertBoolConverter}}">
-
-            <ContentControl Panel.ZIndex="10"
-                            prism:RegionManager.RegionName="{x:Static i:RegionNames.ProgressBarRegion}" />
+            <ContentControl prism:RegionManager.RegionName="{x:Static i:RegionNames.ProgressBarRegion}">
+                <ContentControl.Style>
+                    <Style>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding  MainRegionService.IsBusy}"
+                                         Value="True">
+                                <Setter Property="Panel.ZIndex"
+                                        Value="1" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ContentControl.Style>
+            </ContentControl>
 
             <DockPanel d:DataContext="{d:DesignInstance vm:ShellViewModel}"
-                       Panel.ZIndex="0"
                        Background="Transparent">
 
                 <DockPanel.Triggers>
@@ -408,8 +386,6 @@
 
                 </StackPanel>
 
-
-
                 <DockPanel x:Name="MainRegionPanel"
                            RenderTransformOrigin="0.1,0.1"
                            Background="White">
@@ -495,8 +471,6 @@
                                     Margin="15" />
 
                 </DockPanel>
-
-
 
             </DockPanel>
 
