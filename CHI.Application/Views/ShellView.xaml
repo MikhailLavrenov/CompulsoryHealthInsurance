@@ -214,7 +214,7 @@
                 </Setter>
             </Style>
 
-         </ResourceDictionary >
+        </ResourceDictionary >
     </Window.Resources>
 
     <b:Interaction.Behaviors>
@@ -290,8 +290,7 @@
                 </ContentControl.Style>
             </ContentControl>
 
-            <DockPanel d:DataContext="{d:DesignInstance vm:ShellViewModel}"
-                       Background="Transparent">
+            <DockPanel d:DataContext="{d:DesignInstance vm:ShellViewModel}">
 
                 <DockPanel.Triggers>
                     <EventTrigger RoutedEvent="Loaded">
@@ -309,7 +308,6 @@
                 <StackPanel Orientation="Vertical"
                             Width="210"
                             Background="Transparent">
-
 
                     <StackPanel Orientation="Horizontal"
                                 Margin="25,23,10,10">
@@ -386,91 +384,69 @@
 
                 </StackPanel>
 
-                <DockPanel x:Name="MainRegionPanel"
-                           RenderTransformOrigin="0.1,0.1"
-                           Background="White">
+                <Border Background="White" >
 
-                    <DockPanel.RenderTransform>
-                        <SkewTransform x:Name="AnimatedSkewTransform" />
-                    </DockPanel.RenderTransform>
+                    <DockPanel x:Name="MainRegionPanel">
 
-                    <materialDesign:ColorZone DockPanel.Dock="Top"
-                                              Mode="Light"
-                                              Padding="0"
-                                              materialDesign:ShadowAssist.ShadowDepth="Depth1">
+                        <materialDesign:ColorZone DockPanel.Dock="Top"
+                                                  Mode="Light"
+                                                  Padding="0"
+                                                  materialDesign:ShadowAssist.ShadowDepth="Depth1">
 
-                        <TextBlock DockPanel.Dock="Top"
-                                   HorizontalAlignment="Left"
-                                   Text="{Binding MainRegionService.Header, NotifyOnTargetUpdated=True}"
-                                   FontSize="20"
-                                   Margin="20,15,20,15"
-                                   FontWeight="Medium"
-                                   Foreground="#FF01579B">
+                            <TextBlock DockPanel.Dock="Top"
+                                       HorizontalAlignment="Left"
+                                       Text="{Binding MainRegionService.Header, NotifyOnTargetUpdated=True}"
+                                       FontSize="20"
+                                       Margin="20,15,20,15"
+                                       FontWeight="Medium"
+                                       Foreground="#FF01579B">
+                                                            
+                                <b:Interaction.Behaviors>        
+                                    <i:MainRegionChangeBehaviour />    
+                                </b:Interaction.Behaviors>
 
-                            <TextBlock.Triggers>
-                                <EventTrigger RoutedEvent="Binding.TargetUpdated">
-                                    <BeginStoryboard>
-                                        <Storyboard>
-                                            <DoubleAnimation Storyboard.TargetName="MainRegionPanel"
-                                                             Storyboard.TargetProperty="Opacity"
-                                                             Duration="0:0:0.5"
-                                                             From="0"
-                                                             To="1" />
+                            </TextBlock>
 
-                                            <DoubleAnimation Storyboard.TargetName="AnimatedSkewTransform"
-                                                             Storyboard.TargetProperty="AngleX"
-                                                             Duration="0:0:0.5"
-                                                             From="90"
-                                                             To="0" />
+                        </materialDesign:ColorZone>
 
-                                            <DoubleAnimation Storyboard.TargetName="AnimatedSkewTransform"
-                                                             Storyboard.TargetProperty="AngleY"
-                                                             Duration="0:0:0.5"
-                                                             From="90"
-                                                             To="0" />
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                </EventTrigger>
-                            </TextBlock.Triggers>
+                        <Grid DockPanel.Dock="Bottom"
+                              MinHeight="55">
+                            
+                            <materialDesign:Snackbar Margin="15,0,15,0"
+                                                     Opacity="0.85"
+                                                     HorizontalAlignment="Stretch"
+                                                     IsActive="{Binding MainRegionService.ShowStatus}">
+                                <materialDesign:SnackbarMessage ActionCommand="{Binding MainRegionService.CloseStatusCommand}">
 
-                        </TextBlock>
+                                    <materialDesign:SnackbarMessage.ActionContent>
+                                        <Viewbox  Stretch="UniformToFill"
+                                                  Height="25"
+                                                  Margin="0"
+                                                  HorizontalAlignment="Center">
+                                            <materialDesign:PackIcon Kind="ChevronDown"
+                                                                     Foreground="White" />
+                                        </Viewbox>
+                                    </materialDesign:SnackbarMessage.ActionContent>
 
-                    </materialDesign:ColorZone>
+                                    <materialDesign:SnackbarMessage.Content>
+                                        <TextBlock Text="{Binding MainRegionService.Status}"
+                                                   HorizontalAlignment="Stretch"
+                                                   Margin="0"
+                                                   FontWeight="Regular"
+                                                   TextWrapping="Wrap" />
+                                    </materialDesign:SnackbarMessage.Content>
 
-                    <Grid DockPanel.Dock="Bottom"
-                          MinHeight="55">
-                        <materialDesign:Snackbar Margin="15,0,15,0"
-                                                 Opacity="0.85"
-                                                 HorizontalAlignment="Stretch"
-                                                 IsActive="{Binding MainRegionService.ShowStatus}">
-                            <materialDesign:SnackbarMessage ActionCommand="{Binding MainRegionService.CloseStatusCommand}">
+                                </materialDesign:SnackbarMessage>
+                            </materialDesign:Snackbar>
+                            
+                        </Grid>
 
-                                <materialDesign:SnackbarMessage.ActionContent>
-                                    <Viewbox  Stretch="UniformToFill"
-                                              Height="25"
-                                              Margin="0"
-                                              HorizontalAlignment="Center">
-                                        <materialDesign:PackIcon Kind="ChevronDown"
-                                                                 Foreground="White" />
-                                    </Viewbox>
-                                </materialDesign:SnackbarMessage.ActionContent>
+                        <ContentControl prism:RegionManager.RegionName="{x:Static i:RegionNames.MainRegion}"
+                                        Margin="15" />
 
-                                <materialDesign:SnackbarMessage.Content>
-                                    <TextBlock Text="{Binding MainRegionService.Status}"
-                                               HorizontalAlignment="Stretch"
-                                               Margin="0"
-                                               FontWeight="Regular"
-                                               TextWrapping="Wrap" />
-                                </materialDesign:SnackbarMessage.Content>
+                    </DockPanel>
 
-                            </materialDesign:SnackbarMessage>
-                        </materialDesign:Snackbar>
-                    </Grid>
-
-                    <ContentControl prism:RegionManager.RegionName="{x:Static i:RegionNames.MainRegion}"
-                                    Margin="15" />
-
-                </DockPanel>
+                </Border>
 
             </DockPanel>
 

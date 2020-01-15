@@ -144,6 +144,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Infrastructure\MainRegionChangeBehaviour.cs" />
     <Compile Include="Infrastructure\DragWindowBehaviour.cs" />
     <Compile Include="Infrastructure\InvertedBoolToVisibleConverterExtension.cs" />
     <Compile Include="Infrastructure\CustomDataGrid.cs" />

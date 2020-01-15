@@ -18,7 +18,7 @@ namespace CHI.Application.Infrastructure
             // Если редактируется ячейка DataGridTemplateColumn
             if (e.Column.GetType() == typeof(DataGridTemplateColumn))
             {
-                var control = FindVisualVisibleChild<Control>(e.EditingElement);
+                var control = e.EditingElement.FindVisualVisibleChild<Control>();
 
                 // Установливает фокус на элемент управления, чтобы исключить лишний клик
                 if (control?.IsFocused == false)
@@ -40,7 +40,7 @@ namespace CHI.Application.Infrastructure
 
             var mbe = e as MouseButtonEventArgs;
             var clickedElement = mbe.OriginalSource as UIElement;
-            var cell = FindVisualParent<DataGridCell>(clickedElement);
+            var cell = clickedElement.FindVisualParent<DataGridCell>();
 
             if (cell == null || cell.IsEditing || cell.IsReadOnly)
                 return;
@@ -51,7 +51,7 @@ namespace CHI.Application.Infrastructure
             // Условие обязательно, тупо выделять ячейку нельзя, может возникнуть исключение
             if (SelectionUnit == DataGridSelectionUnit.FullRow)
             {
-                var row = FindVisualParent<DataGridRow>(cell);
+                var row = cell.FindVisualParent<DataGridRow>();
 
                 if (row?.IsSelected == false)
                     row.IsSelected = true;
@@ -65,43 +65,6 @@ namespace CHI.Application.Infrastructure
 
             if (currentItemName == "NamedObject")
                 BeginEdit();
-        }
-        // Находит родительский элемент соответствующий типу T 
-        private static T FindVisualParent<T>(UIElement element) where T : UIElement
-        {
-            while (element != null)
-            {
-                if (element is T correctlyTyped)
-                    return correctlyTyped;
-
-                element = VisualTreeHelper.GetParent(element) as UIElement;
-            }
-
-            return null;
-        }
-        // Рекурсивно находит дочерний видимый элемент соответствующий типу T 
-        public static T FindVisualVisibleChild<T>(UIElement element) where T : UIElement
-        {
-            if (element == null)
-                return null;
-
-            int childrenCount = VisualTreeHelper.GetChildrenCount(element);
-
-            for (int i = 0; i < childrenCount; i++)
-            {
-                var child = VisualTreeHelper.GetChild(element, i) as UIElement;
-
-                if (child is T correctlyTyped)
-                    if (correctlyTyped.IsVisible)
-                        return correctlyTyped;
-
-                var result = FindVisualVisibleChild<T>(child);
-
-                if (result != null)
-                    return result;
-            }
-
-            return null;
         }
     }
 }
