@@ -22,7 +22,7 @@
            TargetType="TextBlock"
            BasedOn="{StaticResource {x:Type TextBlock}}">
                 <Setter Property="FontWeight"
-                Value="Regular" />
+                Value="Medium" />
             </Style>
             
         </ResourceDictionary >

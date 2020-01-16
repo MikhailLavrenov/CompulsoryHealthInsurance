@@ -293,19 +293,6 @@
 
             <DockPanel d:DataContext="{d:DesignInstance vm:ShellViewModel}">
 
-                <DockPanel.Triggers>
-                    <EventTrigger RoutedEvent="Loaded">
-                        <BeginStoryboard>
-                            <Storyboard>
-                                <DoubleAnimation Storyboard.TargetProperty="Opacity"
-                                                 Duration="0:0:0.5"
-                                                 From="0"
-                                                 To="1" />
-                            </Storyboard>
-                        </BeginStoryboard>
-                    </EventTrigger>
-                </DockPanel.Triggers>
-
                 <StackPanel Orientation="Vertical"
                             Width="210"
                             Background="Transparent">
@@ -423,6 +410,7 @@
                                      Opacity="0.9"
                                      HorizontalAlignment="Stretch"
                                      IsActive="{Binding MainRegionService.ShowStatus}">
+                
                 <materialDesign:SnackbarMessage ActionCommand="{Binding MainRegionService.CloseStatusCommand}">
 
                     <materialDesign:SnackbarMessage.ActionContent>
@@ -444,6 +432,7 @@
                     </materialDesign:SnackbarMessage.Content>
 
                 </materialDesign:SnackbarMessage>
+                
             </materialDesign:Snackbar>
 
         </Grid>
