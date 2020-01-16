@@ -222,6 +222,7 @@
     </b:Interaction.Behaviors>
 
     <DockPanel>
+        
         <DockPanel.Background>
             <LinearGradientBrush EndPoint="0,0.5"
                                  StartPoint="0.5,0.5">
@@ -409,46 +410,41 @@
 
                         </materialDesign:ColorZone>
 
-                        <Grid DockPanel.Dock="Bottom"
-                              MinHeight="55">
-                            
-                            <materialDesign:Snackbar Margin="15,0,15,0"
-                                                     Opacity="0.85"
-                                                     HorizontalAlignment="Stretch"
-                                                     IsActive="{Binding MainRegionService.ShowStatus}">
-                                <materialDesign:SnackbarMessage ActionCommand="{Binding MainRegionService.CloseStatusCommand}">
-
-                                    <materialDesign:SnackbarMessage.ActionContent>
-                                        <Viewbox  Stretch="UniformToFill"
-                                                  Height="25"
-                                                  Margin="0"
-                                                  HorizontalAlignment="Center">
-                                            <materialDesign:PackIcon Kind="ChevronDown"
-                                                                     Foreground="White" />
-                                        </Viewbox>
-                                    </materialDesign:SnackbarMessage.ActionContent>
-
-                                    <materialDesign:SnackbarMessage.Content>
-                                        <TextBlock Text="{Binding MainRegionService.Status}"
-                                                   HorizontalAlignment="Stretch"
-                                                   Margin="0"
-                                                   FontWeight="Regular"
-                                                   TextWrapping="Wrap" />
-                                    </materialDesign:SnackbarMessage.Content>
-
-                                </materialDesign:SnackbarMessage>
-                            </materialDesign:Snackbar>
-                            
-                        </Grid>
-
                         <ContentControl prism:RegionManager.RegionName="{x:Static i:RegionNames.MainRegion}"
-                                        Margin="15" />
+                                        Margin="15,15,15,40" />
 
                     </DockPanel>
 
                 </Border>
 
             </DockPanel>
+
+            <materialDesign:Snackbar Margin="0"
+                                     Opacity="0.9"
+                                     HorizontalAlignment="Stretch"
+                                     IsActive="{Binding MainRegionService.ShowStatus}">
+                <materialDesign:SnackbarMessage ActionCommand="{Binding MainRegionService.CloseStatusCommand}">
+
+                    <materialDesign:SnackbarMessage.ActionContent>
+                        <Viewbox  Stretch="UniformToFill"
+                                  Height="25"
+                                  Margin="0"
+                                  HorizontalAlignment="Center">
+                            <materialDesign:PackIcon Kind="ChevronDown"
+                                                     Foreground="White" />
+                        </Viewbox>
+                    </materialDesign:SnackbarMessage.ActionContent>
+
+                    <materialDesign:SnackbarMessage.Content>
+                        <TextBlock Text="{Binding MainRegionService.Status}"
+                                   HorizontalAlignment="Stretch"
+                                   Margin="0"
+                                   FontWeight="Regular"
+                                   TextWrapping="Wrap" />
+                    </materialDesign:SnackbarMessage.Content>
+
+                </materialDesign:SnackbarMessage>
+            </materialDesign:Snackbar>
 
         </Grid>
 

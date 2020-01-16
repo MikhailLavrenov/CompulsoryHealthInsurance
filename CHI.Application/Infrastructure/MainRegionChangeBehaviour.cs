@@ -37,22 +37,24 @@ namespace CHI.Application.Infrastructure
 
             var duration = TimeSpan.FromMilliseconds(500);
 
-            var ease = new ExponentialEase();
-            ease.EasingMode = EasingMode.EaseIn;
-            ease.Exponent = 1.5;
+            var ease = new ExponentialEase {
+                EasingMode = EasingMode.EaseIn,
+                Exponent = 1.5
+            };
 
             var animationOpacity = new DoubleAnimation(0, 1, duration);
             animationOpacity.EasingFunction = ease;
+            panel.BeginAnimation(UIElement.OpacityProperty, animationOpacity);
+
             var animationX = new DoubleAnimation(0, radius, duration);
             animationX.EasingFunction = ease;
-            var animationY = new DoubleAnimation(0, radius, duration);
-            animationY.Completed += (sndr, args) => { panel.Clip = null; };
-            animationY.EasingFunction = ease;
-
-
-            panel.BeginAnimation(UIElement.OpacityProperty, animationOpacity);
             elipseGeometry.BeginAnimation(EllipseGeometry.RadiusXProperty, animationX);
+
+            var animationY = new DoubleAnimation(0, radius, duration);            
+            animationY.EasingFunction = ease;
+            animationY.Completed += (sndr, args) => panel.Clip = null;
             elipseGeometry.BeginAnimation(EllipseGeometry.RadiusYProperty, animationY);
+            
         }
 
         protected override void OnDetaching()

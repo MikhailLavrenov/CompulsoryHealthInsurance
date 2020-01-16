@@ -97,12 +97,6 @@
                   DisplayMemberPath="Value"
                   SelectedValue="{Binding Path=Settings.CredentialsScope}" />
 
-        <TextBlock Grid.Row="6"
-                   Grid.Column="0"
-                   Margin="5,10,5,10"
-                   FontWeight="Medium"
-                   Text="Учетные записи СРЗ" />
-
         <!--Столбцы DataGrid не являются частью логического дерева этого View, поэтому их нельзя привязать к свойствам ViewModel-->
         <!--Использование x:Name и FrameworkElement принадлежащего логическому дереву позволяет обойти ограничение используя FrameworkElement как посредника-->
         <FrameworkElement x:Name="proxyElement" />
@@ -110,6 +104,7 @@
         <i:CustomDataGrid Grid.Row="7"
                           Grid.Column="0"
                           Grid.ColumnSpan="2"
+                          Margin="0,20,0,10"
                           MinHeight="100"
                           ItemsSource="{Binding Settings.Credentials}">
 

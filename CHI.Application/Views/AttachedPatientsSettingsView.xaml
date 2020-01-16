@@ -83,9 +83,6 @@
                    Name="CheckBoxFormat"
                    IsChecked="{Binding Path=Settings.FormatPatientsFile}" />
 
-
-
-
         <DockPanel Grid.Row="3"
                    Grid.Column="0"
                    Grid.ColumnSpan="2">
@@ -108,6 +105,7 @@
             </StackPanel>
 
             <i:CustomDataGrid x:Name="DataGrid1"
+                              Margin="0,20,0,10"
                               MinHeight="200"
                               Visibility="{Binding Path=IsChecked, ElementName=CheckBoxFormat, Converter={i:BoolToVisibleConverter}}"
                               ItemsSource="{Binding Settings.ColumnProperties}">
