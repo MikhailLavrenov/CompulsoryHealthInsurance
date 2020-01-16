@@ -6,152 +6,27 @@
              xmlns:local="clr-namespace:CHI.Application.Views"
              xmlns:i="clr-namespace:CHI.Application.Infrastructure"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              mc:Ignorable="d"
              d:DesignHeight="450"
              d:DesignWidth="850">
 
-    <UserControl.Resources>
-        <Style TargetType="Ellipse"
-               x:Key="ProgressBarEllipse">
-            <Setter Property="Width"
-                    Value="10" />
-            <Setter Property="Height"
-                    Value="10" />
-            <Setter Property="HorizontalAlignment"
-                    Value="Center" />
-            <Setter Property="VerticalAlignment"
-                    Value="Center" />
-            <Setter Property="RenderTransformOrigin"
-                    Value="0.5,0.5" />
-            <Setter Property="Fill"
-                    Value="#FF54ACE0" />
-            
-        </Style>
-    </UserControl.Resources>
-
     <Grid>
 
-        <Grid.Triggers>
-            <EventTrigger RoutedEvent="Loaded">
-                <BeginStoryboard>
-                    <Storyboard>
+        <Border Opacity="0.35"
+                Background="LightGray" />
 
-                        <DoubleAnimationUsingKeyFrames  Storyboard.TargetName="Ellipse1"                                          
-                                                        Storyboard.TargetProperty="RenderTransform.X"
-                                                        BeginTime="00:00:00"                                             
-                                                        Duration="00:00:04"                                                                                                    
-                                                        RepeatBehavior="Forever">
-                            <SplineDoubleKeyFrame Value="450" KeyTime="50%" KeySpline="0.0,0.9 0.9,0.0" />
-                            <SplineDoubleKeyFrame Value="450"/>
-                        </DoubleAnimationUsingKeyFrames>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
 
-                        <DoubleAnimationUsingKeyFrames  Storyboard.TargetName="Ellipse1"                                          
-                                                        Storyboard.TargetProperty="Opacity"
-                                                        BeginTime="00:00:00"                                             
-                                                        Duration="00:00:04"                                                            
-                                                        RepeatBehavior="Forever">
-                            <DiscreteDoubleKeyFrame KeyTime="50%"  Value="0"  />
-                        </DoubleAnimationUsingKeyFrames>
-
-                        <DoubleAnimationUsingKeyFrames  Storyboard.TargetName="Ellipse2"                                          
-                                                        Storyboard.TargetProperty="RenderTransform.X"
-                                                        BeginTime="00:00:00.15"                                                                                                  
-                                                        Duration="00:00:04"                                                                                                          
-                                                        RepeatBehavior="Forever">
-                            <SplineDoubleKeyFrame Value="450" KeyTime="50%" KeySpline="0.0,0.9 0.9,0.0" />
-                            <SplineDoubleKeyFrame Value="450"/>
-                        </DoubleAnimationUsingKeyFrames>
-
-                        <DoubleAnimationUsingKeyFrames  Storyboard.TargetName="Ellipse2"                                          
-                                                        Storyboard.TargetProperty="Opacity"
-                                                        BeginTime="00:00:00.15"                                                                                                  
-                                                        Duration="00:00:04"                                                                                                         
-                                                        RepeatBehavior="Forever">
-                            <DiscreteDoubleKeyFrame KeyTime="50%"  Value="0"  />
-                        </DoubleAnimationUsingKeyFrames>
-
-                        <DoubleAnimationUsingKeyFrames  Storyboard.TargetName="Ellipse3"                                         
-                                                        Storyboard.TargetProperty="RenderTransform.X"
-                                                        BeginTime="00:00:00.3"                                                                                                  
-                                                        Duration="00:00:04"                                                                                                         
-                                                        RepeatBehavior="Forever">
-                            <SplineDoubleKeyFrame Value="450" KeyTime="50%" KeySpline="0.0,0.9 0.9,0.0" />
-                            <SplineDoubleKeyFrame Value="450"/>
-                        </DoubleAnimationUsingKeyFrames>
-
-                        <DoubleAnimationUsingKeyFrames  Storyboard.TargetName="Ellipse3"                                          
-                                                        Storyboard.TargetProperty="Opacity"
-                                                        BeginTime="00:00:00.3"                                                                                                  
-                                                        Duration="00:00:04"                                                                                                       
-                                                        RepeatBehavior="Forever">
-                            <DiscreteDoubleKeyFrame KeyTime="50%"  Value="0"  />
-                        </DoubleAnimationUsingKeyFrames>
-
-                        <DoubleAnimationUsingKeyFrames  Storyboard.TargetName="Ellipse4"                                          
-                                                        Storyboard.TargetProperty="RenderTransform.X"
-                                                        BeginTime="00:00:00.45"                                                                                                 
-                                                        Duration="00:00:04"                                                                                                          
-                                                        RepeatBehavior="Forever">
-                            <SplineDoubleKeyFrame Value="450" KeyTime="50%" KeySpline="0.0,0.9 0.9,0.0" />
-                            <SplineDoubleKeyFrame Value="450"/>
-                        </DoubleAnimationUsingKeyFrames>
-
-                        <DoubleAnimationUsingKeyFrames  Storyboard.TargetName="Ellipse4"                                          
-                                                        Storyboard.TargetProperty="Opacity"
-                                                        BeginTime="00:00:00.45"                                                                                                   
-                                                        Duration="00:00:04"                                                                                                       
-                                                        RepeatBehavior="Forever">
-                            <DiscreteDoubleKeyFrame KeyTime="50%"  Value="0"  />
-                        </DoubleAnimationUsingKeyFrames>
-
-                        <DoubleAnimationUsingKeyFrames  Storyboard.TargetName="Ellipse5"                                          
-                                                        Storyboard.TargetProperty="RenderTransform.X"
-                                                        BeginTime="00:00:00.6"                                                                                                  
-                                                        Duration="00:00:04"                                                                                                          
-                                                        RepeatBehavior="Forever">
-                            <SplineDoubleKeyFrame Value="450" KeyTime="50%" KeySpline="0.0,0.9 0.9,0.0" />
-                            <SplineDoubleKeyFrame Value="450"/>
-                        </DoubleAnimationUsingKeyFrames>
-
-                        <DoubleAnimationUsingKeyFrames  Storyboard.TargetName="Ellipse5"                                          
-                                                        Storyboard.TargetProperty="Opacity"
-                                                        BeginTime="00:00:00.6"                                                                                               
-                                                        Duration="00:00:04"                                                                                                       
-                                                        RepeatBehavior="Forever">
-                            <DiscreteDoubleKeyFrame KeyTime="50%"  Value="0"  />
-                        </DoubleAnimationUsingKeyFrames>
-
-                        <DoubleAnimationUsingKeyFrames  Storyboard.TargetName="Ellipse6"                                          
-                                                        Storyboard.TargetProperty="RenderTransform.X"
-                                                        BeginTime="00:00:00.75"                                                                                                  
-                                                        Duration="00:00:04"                                                                                                          
-                                                        RepeatBehavior="Forever">
-                            <SplineDoubleKeyFrame Value="450" KeyTime="50%" KeySpline="0.0,0.9 0.9,0.0" />
-                            <SplineDoubleKeyFrame Value="450" />
-                        </DoubleAnimationUsingKeyFrames>
-
-                        <DoubleAnimationUsingKeyFrames  Storyboard.TargetName="Ellipse6"                                          
-                                                        Storyboard.TargetProperty="Opacity"
-                                                        BeginTime="00:00:00.75"                                                                                                   
-                                                        Duration="00:00:04"                                                                                                       
-                                                        RepeatBehavior="Forever">
-                            <DiscreteDoubleKeyFrame KeyTime="50%"  Value="0"  />
-                        </DoubleAnimationUsingKeyFrames>
-
-                    </Storyboard>
-                </BeginStoryboard>
-            </EventTrigger>
-        </Grid.Triggers>
-
-        <StackPanel Panel.ZIndex="0"
-                    Opacity="0.35"
-                    Background="LightGray" />
-
-        <StackPanel HorizontalAlignment="Center"
-                    VerticalAlignment="Center"
-                    Panel.ZIndex="1">
-
-            <TextBlock Text="Ожидайте..."
+            <TextBlock Grid.Row="0"
+                       Text="Ожидайте..."
+                       VerticalAlignment="Bottom"
+                       HorizontalAlignment="Center"
+                       Margin="10"
                        FontSize="24"
                        FontWeight="SemiBold">
 
@@ -172,52 +47,16 @@
 
             </TextBlock>
 
-            <Canvas  HorizontalAlignment="Center"
-                     VerticalAlignment="Center"
-                     Margin="10"
-                     Panel.ZIndex="1">
+            <Canvas Grid.Row="1"
+                    VerticalAlignment="Top">
 
-                <Ellipse Style="{StaticResource ProgressBarEllipse}" x:Name="Ellipse1">
-                    <Ellipse.RenderTransform>
-                        <TranslateTransform X="-450" />
-                    </Ellipse.RenderTransform>
-                </Ellipse>
-
-                <!--FFEBBA16-->
-                <Ellipse Style="{StaticResource ProgressBarEllipse}" x:Name="Ellipse2">
-                    <Ellipse.RenderTransform>
-                        <TranslateTransform   X="-450" />
-                    </Ellipse.RenderTransform>
-                </Ellipse>
-
-                <Ellipse Style="{StaticResource ProgressBarEllipse}" x:Name="Ellipse3">
-                    <Ellipse.RenderTransform>
-                        <TranslateTransform  X="-450" />
-                    </Ellipse.RenderTransform>
-                </Ellipse>
-
-                <Ellipse Style="{StaticResource ProgressBarEllipse}" x:Name="Ellipse4">
-                    <Ellipse.RenderTransform>
-                        <TranslateTransform  X="-450" />
-                    </Ellipse.RenderTransform>
-                </Ellipse>
-
-                <Ellipse Style="{StaticResource ProgressBarEllipse}" x:Name="Ellipse5">
-                    <Ellipse.RenderTransform>
-                        <TranslateTransform  X="-450" />
-                    </Ellipse.RenderTransform>
-                </Ellipse>
-
-                <Ellipse Style="{StaticResource ProgressBarEllipse}" x:Name="Ellipse6">
-                    <Ellipse.RenderTransform>
-                        <TranslateTransform  X="-450" />
-                    </Ellipse.RenderTransform>
-                </Ellipse>
-
+                <b:Interaction.Behaviors>
+                    <i:ProgressBarBehaviour />
+                </b:Interaction.Behaviors>
 
             </Canvas>
 
-        </StackPanel>
+        </Grid>
 
     </Grid>
 
