@@ -76,7 +76,7 @@ namespace CHI.Application.ViewModels
 
                 var service = new SRZService(Settings.SRZAddress, Settings.UseProxy, Settings.ProxyAddress, Settings.ProxyPort);
 
-                var credential = Settings.Credentials.First(x => x.RequestsLimit > 0);
+                var credential = Settings.SRZCredentials.First(x => x.RequestsLimit > 0);
                 service.Authorize(credential);
                 service.GetPatientsFile(Settings.PatientsFilePath, FileDate);
             }
@@ -94,7 +94,7 @@ namespace CHI.Application.ViewModels
             if (Settings.SrzConnectionIsValid)
             {
                 MainRegionService.SetBusyStatus("Поиск пациентов без ФИО в файле.");
-                var limitCount = Settings.Credentials.Sum(x => x.RequestsLimit);
+                var limitCount = Settings.SRZCredentials.Sum(x => x.RequestsLimit);
                 var unknownInsuaranceNumbers = file.GetUnknownInsuaranceNumbers(limitCount);
 
                 MainRegionService.SetBusyStatus("Поиск ФИО в СРЗ.");
@@ -144,12 +144,12 @@ namespace CHI.Application.ViewModels
         //запускает многопоточно запросы к сайту для поиска пациентов
         private Patient[] GetPatients(List<string> insuranceNumbers)
         {
-            int threadsLimit = Settings.ThreadsLimit;
+            int threadsLimit = Settings.SRZThreadsLimit;
             if (insuranceNumbers.Count < threadsLimit)
                 threadsLimit = insuranceNumbers.Count;
 
             var dictionary = new Dictionary<Credential, uint>();
-            foreach (var credential in Settings.Credentials)
+            foreach (var credential in Settings.SRZCredentials)
                 dictionary.Add(credential, credential.RequestsLimit);
 
             var circularRestrictedList = new CircularListWithCounter<Credential>(dictionary);

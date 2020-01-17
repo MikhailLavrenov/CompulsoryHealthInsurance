@@ -7,7 +7,7 @@ using System.Text;
 
 namespace CHI.Application.ViewModels
 {
-    class ServicesSettingsViewModel : DomainObject, IRegionMemberLifetime
+    class ExaminationsSettingsViewModel : DomainObject, IRegionMemberLifetime
     {
         #region Поля
         private Settings settings;
@@ -29,12 +29,12 @@ namespace CHI.Application.ViewModels
         #endregion
 
         #region Конструкторы
-        public ServicesSettingsViewModel(IMainRegionService mainRegionService)
+        public ExaminationsSettingsViewModel(IMainRegionService mainRegionService)
         {
             MainRegionService = mainRegionService;
             Settings = Settings.Instance;
 
-            MainRegionService.Header = "Настройки подключения к сервисам ФОМС";
+            MainRegionService.Header = "Настройки загрузки периодических осмотров";
             ShowTextPassword = false;
             ShowProtectedPassword = !ShowTextPassword;
 
@@ -59,20 +59,20 @@ namespace CHI.Application.ViewModels
         }
         private void SetDefaultExecute()
         {
-            Settings.SetDefaultAttachedPatients();
+            Settings.SetDefaultExaminations();
             MainRegionService.SetCompleteStatus("Настройки установлены по умолчанию.");
         }
         private void TestExecute()
         {
             MainRegionService.SetBusyStatus("Проверка настроек.");
-            Settings.TestConnectionSRZ();
+            Settings.TestConnectionExaminations();
 
-            if (Settings.SrzConnectionIsValid)
+            if (Settings.ExaminationsConnectionIsValid)
                 MainRegionService.SetCompleteStatus("Настройки корректны.");
             else if (Settings.ContainsErrorMessage(nameof(Settings.ProxyAddress),ErrorMessages.Connection))
                 MainRegionService.SetCompleteStatus("Прокси сервер не доступен.");
-            else if (Settings.ContainsErrorMessage(nameof(Settings.SRZAddress), ErrorMessages.Connection))
-                MainRegionService.SetCompleteStatus("Web-сайт СРЗ не доступен.");
+            else if (Settings.ContainsErrorMessage(nameof(Settings.ExaminationsAddress), ErrorMessages.Connection))
+                MainRegionService.SetCompleteStatus("Портал диспансеризации не доступен.");
             else
                 MainRegionService.SetCompleteStatus($"Не удалось авторизоваться под некоторыми учетными записями.");
         }

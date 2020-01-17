@@ -17,6 +17,8 @@
         Title="{Binding ApplicationTitle}"
         Height="600"
         Width="850"
+        MinHeight="600"
+        MinWidth="850"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         Background="{DynamicResource MaterialDesignPaper}"
         TextElement.FontWeight="Medium"
@@ -335,7 +337,14 @@
                     <RadioButton Style="{StaticResource MenuButton}"
                                  Command="{Binding ShowViewCommand}"
                                  CommandParameter="{x:Type v:ServicesSettingsView}">
-                        <TextBlock Text="Настройки подключения к сервисам"
+                        <TextBlock Text="Файла прикрепленных пациентов"
+                                   Style="{StaticResource MenuButtonText}" />
+                    </RadioButton>
+
+                    <RadioButton Style="{StaticResource MenuButton}"
+                                 Command="{Binding ShowViewCommand}"
+                                 CommandParameter="{x:Type v:ExaminationsSettingsView}">
+                        <TextBlock Text="Загрузки периодических осмотров"
                                    Style="{StaticResource MenuButtonText}" />
                     </RadioButton>
 

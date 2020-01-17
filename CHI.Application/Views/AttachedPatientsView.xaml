@@ -55,7 +55,7 @@
                     Visibility="{Binding IsChecked, ElementName=CheckBoxDowloadNewFile, Converter={i:BoolToVisibleConverter}, ValidatesOnDataErrors=True}"
                     SelectedDate="{Binding FileDate}" />
 
-        <TextBlock Grid.Row="2"
+        <!--<TextBlock Grid.Row="2"
                    Grid.Column="0"
                    Text="Путь к файлу " />
         <DockPanel  Grid.Row="2"
@@ -65,11 +65,9 @@
                     Style="{StaticResource IconButton}"
                     Command="{Binding ShowFileDialogCommand}"/>
             <TextBox  Text="{Binding Settings.PatientsFilePath, ValidatesOnDataErrors=True}" />
-        </DockPanel>
-        
-        
+        </DockPanel>-->               
 
-        <Button Grid.Row="3"
+        <Button Grid.Row="2"
                 Grid.Column="0"
                 Content="ОК"
                 Command="{Binding ProcessFileCommand}" />

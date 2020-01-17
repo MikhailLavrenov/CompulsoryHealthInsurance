@@ -15,40 +15,160 @@ namespace CHI.Application.Models
 {
     public class Settings : DomainObject
     {
-        #region Поля
-        //SRZ
-        private readonly int timeoutConnection = 3000;
-        private string srzAddress;
-        private string medicalExaminationsAddress;
+        #region Общие
+        private static readonly int timeoutConnection = 3000;
+        private static readonly string settingsFileName = "Settings.xml";
+
+        public static Settings Instance { get; private set; }
+
+        static Settings()
+        {
+            Instance = Load();
+        }
+        public Settings()
+        {
+            SRZCredentials = new ObservableCollection<Credential>();
+            ExaminationsCredentials = new ObservableCollection<Credential>();
+            ColumnProperties = new ObservableCollection<ColumnProperty>();
+            Instance = this;
+        }
+
+        //сохраняет настройки в xml
+        public void Save()
+        {
+            SrzConnectionIsValid = false;
+            ExaminationsConnectionIsValid = false;
+
+            // Т.к. при создании экзмпляра класса если свойства не инициализируются - не срабатывает валидация. Поэтому принудительно проверяем все. 
+            // Свойства не инициализируются сразу т.к. иначе сразу после создания на них будут отображаться ошибки, и во View тоже, это плохо.
+            foreach (var item in SRZCredentials)
+                item.Validate();
+
+            foreach (var item in ExaminationsCredentials)
+                item.Validate();
+
+            foreach (var item in ColumnProperties)
+                item.Validate();
+
+            using (var stream = new FileStream(settingsFileName, FileMode.Create))
+            {
+                var formatter = new XmlSerializer(GetType());
+                formatter.Serialize(stream, this);
+            }
+        }
+        //загружает настройки из xml
+        public static Settings Load()
+        {
+            if (File.Exists(settingsFileName))
+                using (var stream = new FileStream(settingsFileName, FileMode.Open))
+                {
+                    var formatter = new XmlSerializer(typeof(Settings));
+                    return formatter.Deserialize(stream) as Settings;
+                }
+            else
+                return new Settings();
+        }
+        //исправляет url
+        private static string FixUrl(string url)
+        {
+            url = url.Trim().ToLower();
+
+            if (!string.IsNullOrEmpty(url))
+            {
+                if (!url.StartsWith(@"http://") && !url.StartsWith(@"https://"))
+                    url = $@"http://{url}";
+
+                if (url.EndsWith(@"/") == false)
+                    url = $@"{url}/";
+            }
+
+            return url;
+        }
+        //Валидация свойств
+        public override void Validate(string propertyName)
+        {
+            switch (propertyName)
+            {
+                case nameof(SRZAddress):
+                    if (string.IsNullOrEmpty(SRZAddress) || Uri.TryCreate(SRZAddress, UriKind.Absolute, out _) == false)
+                        AddError(ErrorMessages.UriFormat, propertyName);
+                    else
+                        RemoveError(ErrorMessages.UriFormat, propertyName);
+                    break;
+
+                case nameof(ExaminationsAddress):
+                    if (string.IsNullOrEmpty(ExaminationsAddress) || Uri.TryCreate(ExaminationsAddress, UriKind.Absolute, out _) == false)
+                        AddError(ErrorMessages.UriFormat, propertyName);
+                    else
+                        RemoveError(ErrorMessages.UriFormat, propertyName);
+                    break;
+
+                case nameof(UseProxy):
+                    if (UseProxy == false)
+                    {
+                        RemoveErrors(nameof(ProxyAddress));
+                        RemoveErrors(nameof(ProxyPort));
+                    }
+                    break;
+
+                case nameof(ProxyAddress):
+                    if (UseProxy)
+                        ValidateIsNullOrEmptyString(nameof(ProxyAddress), ProxyAddress);
+                    break;
+
+                case nameof(PatientsFilePath):
+                    ValidateIsNullOrEmptyString(nameof(PatientsFilePath), PatientsFilePath);
+                    break;
+
+                case nameof(SRZThreadsLimit):
+                    if (SRZThreadsLimit < 1)
+                        AddError(ErrorMessages.LessOne, propertyName);
+                    else
+                        RemoveError(ErrorMessages.LessOne, propertyName);
+                    break;
+
+                case nameof(ExaminationsThreadsLimit):
+                    if (ExaminationsThreadsLimit < 1)
+                        AddError(ErrorMessages.LessOne, propertyName);
+                    else
+                        RemoveError(ErrorMessages.LessOne, propertyName);
+                    break;
+            }
+        }
+        //проверяет доступность сайта, в случае успеха - true
+        private bool TryConnectSite(string url, string nameOfAddress)
+        {
+            try
+            {
+                var webRequest = (HttpWebRequest)WebRequest.Create(url);
+
+                webRequest.Timeout = timeoutConnection;
+
+                if (UseProxy)
+                    webRequest.Proxy = new WebProxy(ProxyAddress + ":" + ProxyPort);
+
+                webRequest.GetResponse();
+                webRequest.Abort();
+
+                RemoveError(ErrorMessages.Connection, nameOfAddress);
+                return true;
+            }
+            catch (Exception)
+            {
+                AddError(ErrorMessages.Connection, nameOfAddress);
+                return false;
+            }
+
+        }
+        #endregion
+
+        #region Прочие
         private bool useProxy;
         private string proxyAddress;
         private ushort proxyPort;
-        private byte threadsLimit;
+        private bool proxyConnectionIsValid;
         private CredentialScope credentialsScope;
-        private ObservableCollection<Credential> credentials;
-        private bool srzConnectionIsValid;
 
-        //PatientsFile
-        private bool downloadNewPatientsFile;
-        private string patientsFilePath;
-        private bool formatPatientsFile;
-        private ObservableCollection<ColumnProperty> columnProperties;
-
-        //MedicalExaminations
-        private string examinationFileNames;
-        private string patientFileNames;
-        private bool examinationsConnectionIsValid;
-        #endregion
-
-        #region Свойства       
-        public static string SettingsFileName { get; }
-        public static Settings Instance { get; private set; }
-
-        //SRZ
-        public string SRZAddress { get => srzAddress; set => SetProperty(ref srzAddress, FixUrl(value)); }
-        [XmlIgnore] public bool SrzConnectionIsValid { get => srzConnectionIsValid; set => SetProperty(ref srzConnectionIsValid, value); }
-
-        //Services 
         public bool UseProxy
         {
             get => useProxy;
@@ -77,114 +197,145 @@ namespace CHI.Application.Models
             get => proxyPort;
             set => SetProperty(ref proxyPort, value);
         }
-        public byte ThreadsLimit { get => threadsLimit; set => SetProperty(ref threadsLimit, value); }
+        [XmlIgnore] public bool ProxyConnectionIsValid { get => proxyConnectionIsValid; set => SetProperty(ref proxyConnectionIsValid, value); }
         public CredentialScope CredentialsScope { get => credentialsScope; set { Credential.Scope = value; SetProperty(ref credentialsScope, value); } }
-        public ObservableCollection<Credential> Credentials { get => credentials; set => SetProperty(ref credentials, value); }
 
-        //PatientsFile
+        //проверяет настройки прокси-сервера, true-соединение установлено или прокси-сервер не используется, false-иначе
+        public void TestConnectionProxy()
+        {
+            var connected = false;
+
+            if (UseProxy)
+                using (var client = new TcpClient())
+                {
+                    try
+                    {
+                        client.ConnectAsync(ProxyAddress, ProxyPort).Wait(timeoutConnection);
+                        connected = client.Connected;
+                    }
+                    catch (Exception)
+                    { }
+                }
+
+            if (UseProxy && !connected)
+            {
+                AddError(ErrorMessages.Connection, nameof(ProxyAddress));
+                AddError(ErrorMessages.Connection, nameof(ProxyPort));
+                SrzConnectionIsValid = false;
+                ExaminationsConnectionIsValid = false;
+
+                ProxyConnectionIsValid = false;
+            }
+            else
+            {
+                RemoveError(ErrorMessages.Connection, nameof(ProxyAddress));
+                RemoveError(ErrorMessages.Connection, nameof(ProxyPort));
+
+                ProxyConnectionIsValid = true;
+            }
+        }
+        //устанавливает по-умолчанию настройки для прочих настроек
+        public void SetDefaultOther()
+        {
+            UseProxy = false;
+            ProxyAddress = "";
+            ProxyPort = 0;
+            CredentialsScope = CredentialScope.ТекущийПользователь;
+        }
+        #endregion
+
+        #region Файл прикрепленных пациентоа
+        private string srzAddress;
+        private byte srzThreadsLimit;
+        private ObservableCollection<Credential> srzCredentials;
+        private bool srzConnectionIsValid;
+        private bool downloadNewPatientsFile;
+        private string patientsFilePath;
+        private bool formatPatientsFile;
+        private ObservableCollection<ColumnProperty> columnProperties;
+
+        public string SRZAddress { get => srzAddress; set => SetProperty(ref srzAddress, FixUrl(value)); }
+        public byte SRZThreadsLimit { get => srzThreadsLimit; set => SetProperty(ref srzThreadsLimit, value); }
+        public ObservableCollection<Credential> SRZCredentials { get => srzCredentials; set => SetProperty(ref srzCredentials, value); }
+        [XmlIgnore] public bool SrzConnectionIsValid { get => srzConnectionIsValid; set => SetProperty(ref srzConnectionIsValid, value); }
         public bool DownloadNewPatientsFile { get => downloadNewPatientsFile; set => SetProperty(ref downloadNewPatientsFile, value); }
         public string PatientsFilePath { get => patientsFilePath; set => SetProperty(ref patientsFilePath, value); }
         public bool FormatPatientsFile { get => formatPatientsFile; set => SetProperty(ref formatPatientsFile, value); }
         public ObservableCollection<ColumnProperty> ColumnProperties { get => columnProperties; set => SetProperty(ref columnProperties, value); }
 
-        //MedicalExaminations
-        public string MedicalExaminationsAddress { get => medicalExaminationsAddress; set => SetProperty(ref medicalExaminationsAddress, FixUrl(value)); }
-        public string ExaminationFileNames { get => examinationFileNames; set => SetProperty(ref examinationFileNames, value); }
-        public string PatientFileNames { get => patientFileNames; set => SetProperty(ref patientFileNames, value); }
-        [XmlIgnore] public bool ExaminationsConnectionIsValid { get => examinationsConnectionIsValid; set => SetProperty(ref examinationsConnectionIsValid, value); }
-        [XmlIgnore] public string FomsCodeMO { get; private set; }
-        #endregion
-
-        #region Конструкторы
-        static Settings()
+        //проверяет учетные данные СРЗ, в случае успеха - true
+        private bool TryAuthorizeSrzCredentials()
         {
-            SettingsFileName = "Settings.xml";
-            Instance = Load();
-        }
-        public Settings()
-        {
-            Credentials = new ObservableCollection<Credential>();
-            ColumnProperties = new ObservableCollection<ColumnProperty>();
-            Instance = this;
-        }
-        #endregion
+            Parallel.ForEach(SRZCredentials, new ParallelOptions { MaxDegreeOfParallelism = SRZThreadsLimit }, credential =>
+            {
+                using (var service = new SRZService(SRZAddress, UseProxy, ProxyAddress, ProxyPort))
+                {
+                    if (service.Authorize(credential))
+                    {
+                        service.Logout();
 
-        #region Методы
-        //проверить настройки
+                        credential.RemoveErrors(nameof(credential.Login));
+                        credential.RemoveErrors(nameof(credential.Password));
+                    }
+                    else
+                    {
+                        credential.AddError(ErrorMessages.Connection, nameof(credential.Login));
+                        credential.AddError(ErrorMessages.Connection, nameof(credential.Password));
+                    }
+                }
+            });
+
+            return !SRZCredentials.Any(x => x.HasErrors);
+        }
+        //сдвигает вверх элемент коллекции ColumnProperties
+        public void MoveUpColumnProperty(ColumnProperty item)
+        {
+            var itemIndex = ColumnProperties.IndexOf(item);
+            if (itemIndex > 0)
+                ColumnProperties.Move(itemIndex, itemIndex - 1);
+        }
+        //сдвигает вниз элемент коллекции ColumnProperties
+        public void MoveDownColumnProperty(ColumnProperty item)
+        {
+            var itemIndex = ColumnProperties.IndexOf(item);
+            if (itemIndex >= 0 && itemIndex < ColumnProperties.Count - 1)
+                ColumnProperties.Move(itemIndex, itemIndex + 1);
+        }
+        //проверить настройки подключения к СРЗ
         public void TestConnectionSRZ()
         {
             SrzConnectionIsValid = false;
 
             RemoveError(ErrorMessages.Connection, nameof(SRZAddress));
-            Credentials.ToList().ForEach(x => x.RemoveErrorsMessage(ErrorMessages.Connection));
+            SRZCredentials.ToList().ForEach(x => x.RemoveErrorsMessage(ErrorMessages.Connection));
 
-            if (!TryConnectProxy())
+            TestConnectionProxy();
+
+            if (!ProxyConnectionIsValid)
                 return;
 
             if (!TryConnectSite(SRZAddress, nameof(SRZAddress)))
                 return;
 
-            if (!TryAuthorizeCredentialsInSrzService())
+            if (!TryAuthorizeSrzCredentials())
                 return;
 
             SrzConnectionIsValid = true;
         }
-        public void TestConnectionExaminations()
+        //устанавливает по-умолчанию настройки для сервиса загрузки прикрепленных пациентов
+        public void SetDefaultAttachedPatients()
         {
-            ExaminationsConnectionIsValid = false;
-
-            RemoveError(ErrorMessages.Connection, nameof(MedicalExaminationsAddress));
-            Credentials.ToList().ForEach(x => x.RemoveErrorsMessage(ErrorMessages.Connection));
-
-            if (!TryConnectProxy())
-                return;
-
-            if (!TryConnectSite(MedicalExaminationsAddress, nameof(MedicalExaminationsAddress)))
-                return;
-
-            if (!TryAuthorizeCredentialsInExaminationsService())
-                return;
-
-            ExaminationsConnectionIsValid = true;
-        }
-        //сохраняет настройки в xml
-        public void Save()
-        {
-            SrzConnectionIsValid = false;
-            ExaminationsConnectionIsValid = false;
-
-            // Т.к. при создании экзмпляра класса если свойства не инициализируются - не срабатывает валидация. Поэтому принудительно проверяем все. 
-            // Свойства не инициализируются сразу т.к. иначе сразу после создания на них будут отображаться ошибки, и во View тоже, это плохо.
-            foreach (var item in Credentials)
-                item.Validate();
-
-            foreach (var item in ColumnProperties)
-                item.Validate();
-
-            using (var stream = new FileStream(SettingsFileName, FileMode.Create))
-            {
-                var formatter = new XmlSerializer(GetType());
-                formatter.Serialize(stream, this);
-            }
-        }
-        //загружает настройки из xml
-        public static Settings Load()
-        {
-            if (File.Exists(SettingsFileName))
-                using (var stream = new FileStream(SettingsFileName, FileMode.Open))
-                {
-                    var formatter = new XmlSerializer(typeof(Settings));
-                    return formatter.Deserialize(stream) as Settings;
-                }
-            else
-                return new Settings();
-        }
-        //устанавливает по-умолчанию настройки для файла пациентов
-        public void SetDefaultPatiensFile()
-        {
+            SRZAddress = @"http://11.0.0.1/";
+            SRZThreadsLimit = 10;
             DownloadNewPatientsFile = true;
             PatientsFilePath = "Прикрепленные пациенты выгрузка.xlsx";
             FormatPatientsFile = true;
+            SRZCredentials = new ObservableCollection<Credential>()
+             {
+                    new Credential{Login="МойЛогин1", Password="МойПароль1", RequestsLimit=400},
+                    new Credential{Login="МойЛогин2", Password="МойПароль2", RequestsLimit=300},
+                    new Credential{Login="МойЛогин3", Password="МойПароль3", RequestsLimit=500}
+             };
             ColumnProperties = new ObservableCollection<ColumnProperty>()
              {
                     new ColumnProperty{Name="ENP",         AltName="Полис",                 Hide=false,  Delete=false},
@@ -226,155 +377,37 @@ namespace CHI.Application.Models
                     new ColumnProperty{Name="PRV_TYPE",    AltName="PRV_TYPE",              Hide=false,  Delete=true},
              };
         }
-        //устанавливает по-умолчанию настройки для СРЗ-сайта
-        public void SetDefaultFomsServices()
+        #endregion
+
+        #region Загрузка осмотров
+        private string examinationsAddress;
+        private byte examinationsThreadsLimit;
+        private string examinationsFileNames;
+        private string patientsFileNames;
+        private ObservableCollection<Credential> examinationsCredentials;
+        private bool examinationsConnectionIsValid;
+
+        public string ExaminationsAddress { get => examinationsAddress; set => SetProperty(ref examinationsAddress, FixUrl(value)); }
+        public byte ExaminationsThreadsLimit { get => examinationsThreadsLimit; set => SetProperty(ref examinationsThreadsLimit, value); }
+        public string ExaminationFileNames { get => examinationsFileNames; set => SetProperty(ref examinationsFileNames, value); }
+        public string PatientFileNames { get => patientsFileNames; set => SetProperty(ref patientsFileNames, value); }
+        public ObservableCollection<Credential> ExaminationsCredentials { get => examinationsCredentials; set => SetProperty(ref examinationsCredentials, value); }
+        [XmlIgnore] public string FomsCodeMO { get; private set; }
+        [XmlIgnore] public bool ExaminationsConnectionIsValid { get => examinationsConnectionIsValid; set => SetProperty(ref examinationsConnectionIsValid, value); }
+
+        //проверяет учетные данные портала диспансеризации, в случае успеха - true
+        private bool TryAuthorizeExaminationsCredentials()
         {
-            SRZAddress = @"http://11.0.0.1/";
-            MedicalExaminationsAddress = @"http://11.0.0.2/";
-            UseProxy = false;
-            ProxyAddress = "";
-            ProxyPort = 0;
-            ThreadsLimit = 5;
-            CredentialsScope = CredentialScope.ТекущийПользователь;
-            Credentials = new ObservableCollection<Credential>()
-             {
-                    new Credential{Login="МойЛогин1", Password="МойПароль1", RequestsLimit=400},
-                    new Credential{Login="МойЛогин2", Password="МойПароль2", RequestsLimit=300},
-                    new Credential{Login="МойЛогин3", Password="МойПароль3", RequestsLimit=500}
-             };
-        }
-        //Устанавливает значения по умолчанию для портала диспансеризации
-        public void SetDefaultMedicalExaminations()
-        {
-            PatientFileNames = @"LPM, LVM, LOM";
-            ExaminationFileNames = @"DPM, DVM, DOM";
-        }
-        //сдвигает вверх элемент коллекции ColumnProperties
-        public void MoveUpColumnProperty(ColumnProperty item)
-        {
-            var itemIndex = ColumnProperties.IndexOf(item);
-            if (itemIndex > 0)
-                ColumnProperties.Move(itemIndex, itemIndex - 1);
-        }
-        //сдвигает вниз элемент коллекции ColumnProperties
-        public void MoveDownColumnProperty(ColumnProperty item)
-        {
-            var itemIndex = ColumnProperties.IndexOf(item);
-            if (itemIndex >= 0 && itemIndex < ColumnProperties.Count - 1)
-                ColumnProperties.Move(itemIndex, itemIndex + 1);
-        }
-        //Валидация свойств
-        public override void Validate(string propertyName)
-        {
-            switch (propertyName)
+            var codesMO = new ConcurrentBag<string>();
+
+            Parallel.ForEach(ExaminationsCredentials, new ParallelOptions { MaxDegreeOfParallelism = ExaminationsThreadsLimit }, credential =>
             {
-                case nameof(SRZAddress):
-                    if (string.IsNullOrEmpty(SRZAddress) || Uri.TryCreate(SRZAddress, UriKind.Absolute, out _) == false)
-                        AddError(ErrorMessages.UriFormat, propertyName);
-                    else
-                        RemoveError(ErrorMessages.UriFormat, propertyName);
-                    break;
-
-                case nameof(MedicalExaminationsAddress):
-                    if (string.IsNullOrEmpty(MedicalExaminationsAddress) || Uri.TryCreate(MedicalExaminationsAddress, UriKind.Absolute, out _) == false)
-                        AddError(ErrorMessages.UriFormat, propertyName);
-                    else
-                        RemoveError(ErrorMessages.UriFormat, propertyName);
-                    break;
-
-                case nameof(UseProxy):
-                    if (UseProxy == false)
-                    {
-                        RemoveErrors(nameof(ProxyAddress));
-                        RemoveErrors(nameof(ProxyPort));
-                    }
-                    break;
-
-                case nameof(ProxyAddress):
-                    if (UseProxy)
-                        ValidateIsNullOrEmptyString(nameof(ProxyAddress), ProxyAddress);
-                    break;
-
-                case nameof(PatientsFilePath):
-                    ValidateIsNullOrEmptyString(nameof(PatientsFilePath), PatientsFilePath);
-                    break;
-
-                case nameof(ThreadsLimit):
-                    if (ThreadsLimit < 1)
-                        AddError(ErrorMessages.LessOne, propertyName);
-                    else
-                        RemoveError(ErrorMessages.LessOne, propertyName);
-                    break;
-            }
-        }
-        //проверяет настройки прокси-сервера, true-соединение установлено или прокси-сервер не используется, false-иначе
-        private bool TryConnectProxy()
-        {
-            var connected = false;
-
-            if (UseProxy)
-                using (var client = new TcpClient())
-                {
-                    try
-                    {
-                        client.ConnectAsync(ProxyAddress, ProxyPort).Wait(timeoutConnection);
-                        connected = client.Connected;
-                    }
-                    catch (Exception)
-                    { }
-                }
-
-            if (UseProxy && !connected)
-            {
-                AddError(ErrorMessages.Connection, nameof(ProxyAddress));
-                AddError(ErrorMessages.Connection, nameof(ProxyPort));
-                SrzConnectionIsValid = false;
-                ExaminationsConnectionIsValid = false;
-
-                return false;
-            }
-            else
-            {
-                RemoveError(ErrorMessages.Connection, nameof(ProxyAddress));
-                RemoveError(ErrorMessages.Connection, nameof(ProxyPort));
-
-                return true;
-            }
-        }
-        //проверяет доступность сайта, в случае успеха - true
-        private bool TryConnectSite(string url, string nameOfAddress)
-        {
-            try
-            {
-                var webRequest = (HttpWebRequest)WebRequest.Create(url);
-
-                webRequest.Timeout = timeoutConnection;
-
-                if (UseProxy)
-                    webRequest.Proxy = new WebProxy(ProxyAddress + ":" + ProxyPort);
-
-                webRequest.GetResponse();
-                webRequest.Abort();
-
-                RemoveError(ErrorMessages.Connection, nameOfAddress);
-                return true;
-            }
-            catch (Exception)
-            {
-                AddError(ErrorMessages.Connection, nameOfAddress);
-                return false;
-            }
-
-        }
-        //проверяет учетные данные, в случае успеха - true
-        private bool TryAuthorizeCredentialsInSrzService()
-        {
-            Parallel.ForEach(Credentials, new ParallelOptions { MaxDegreeOfParallelism = ThreadsLimit }, credential =>
-            {
-                using (var service = new SRZService(SRZAddress, UseProxy, ProxyAddress, ProxyPort))
+                using (var service = new ExaminationService(ExaminationsAddress, UseProxy, ProxyAddress, ProxyPort))
                 {
                     if (service.Authorize(credential))
                     {
+                        codesMO.Add(service.FomsCodeMO);
+
                         service.Logout();
 
                         credential.RemoveErrors(nameof(credential.Login));
@@ -388,33 +421,6 @@ namespace CHI.Application.Models
                 }
             });
 
-            return !Credentials.Any(x => x.HasErrors);
-        }
-        private bool TryAuthorizeCredentialsInExaminationsService()
-        {
-            var codesMO = new ConcurrentBag<string>();
-
-            Parallel.ForEach(Credentials, new ParallelOptions { MaxDegreeOfParallelism = ThreadsLimit }, credential =>
-               {
-                   using (var service = new ExaminationService(MedicalExaminationsAddress, UseProxy, ProxyAddress, ProxyPort))
-                   {
-                       if (service.Authorize(credential))
-                       {
-                           codesMO.Add(service.FomsCodeMO);
-
-                           service.Logout();
-
-                           credential.RemoveErrors(nameof(credential.Login));
-                           credential.RemoveErrors(nameof(credential.Password));
-                       }
-                       else
-                       {
-                           credential.AddError(ErrorMessages.Connection, nameof(credential.Login));
-                           credential.AddError(ErrorMessages.Connection, nameof(credential.Password));
-                       }
-                   }
-               });
-
             var uniqCodes = codesMO.ToList().Distinct(StringComparer.OrdinalIgnoreCase).ToList();
 
             if (uniqCodes.Count != 1)
@@ -422,22 +428,43 @@ namespace CHI.Application.Models
 
             FomsCodeMO = uniqCodes.First();
 
-            return !Credentials.Any(x => x.HasErrors);
+            return !ExaminationsCredentials.Any(x => x.HasErrors);
         }
-        private static string FixUrl(string url)
+        //Устанавливает значения по умолчанию для портала диспансеризации
+        public void SetDefaultExaminations()
         {
-            url = url.Trim().ToLower();
+            ExaminationsAddress = @"http://11.0.0.2/";
+            ExaminationsThreadsLimit = 5;
+            PatientFileNames = @"LPM, LVM, LOM";
+            ExaminationFileNames = @"DPM, DVM, DOM";
 
-            if (!string.IsNullOrEmpty(url))
-            {
-                if (!url.StartsWith(@"http://") && !url.StartsWith(@"https://"))
-                    url = $@"http://{url}";
+            ExaminationsCredentials = new ObservableCollection<Credential>()
+             {
+                    new Credential{Login="МойЛогин1", Password="МойПароль1", RequestsLimit=0},
+                    new Credential{Login="МойЛогин2", Password="МойПароль2", RequestsLimit=0},
+                    new Credential{Login="МойЛогин3", Password="МойПароль3", RequestsLimit=0}
+             };
+        }
+        //проверить настройеки подключения к порталу диспансризации
+        public void TestConnectionExaminations()
+        {
+            ExaminationsConnectionIsValid = false;
 
-                if (url.EndsWith(@"/") == false)
-                    url = $@"{url}/";
-            }
+            RemoveError(ErrorMessages.Connection, nameof(ExaminationsAddress));
+            ExaminationsCredentials.ToList().ForEach(x => x.RemoveErrorsMessage(ErrorMessages.Connection));
 
-            return url;
+            TestConnectionProxy();
+
+            if (!ProxyConnectionIsValid)
+                return;
+
+            if (!TryConnectSite(ExaminationsAddress, nameof(ExaminationsAddress)))
+                return;
+
+            if (!TryAuthorizeExaminationsCredentials())
+                return;
+
+            ExaminationsConnectionIsValid = true;
         }
         #endregion
     }

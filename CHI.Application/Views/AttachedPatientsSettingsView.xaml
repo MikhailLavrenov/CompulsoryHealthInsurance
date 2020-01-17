@@ -33,8 +33,6 @@
         <Grid.RowDefinitions>
 
             <RowDefinition Height="auto" />
-            <RowDefinition Height="auto" />
-            <RowDefinition Height="auto" />
             <RowDefinition>
                 <RowDefinition.Style>
                     <Style TargetType="{x:Type RowDefinition}">
@@ -56,34 +54,13 @@
 
         <TextBlock Grid.Row="0"
                    Grid.Column="0"
-                   Text="Скачать новый файл" />
-        <CheckBox  Grid.Row="0"
-                   Grid.Column="1"
-                   Name="CheckBoxDowloadNewFile"
-                   IsChecked="{Binding Path=Settings.DownloadNewPatientsFile}" />
-
-        <TextBlock Grid.Row="1"
-                   Grid.Column="0"
-                   Text="Путь к файлу" />
-        <DockPanel Grid.Row="1"
-                   Grid.Column="1">
-            <Button  DockPanel.Dock="Right"
-                     Style="{StaticResource IconButton}"
-                     Command="{Binding ShowFileDialogCommand}"
-                     Content="{materialDesign:PackIcon FolderOpenOutline}" />
-            <TextBox  Text="{Binding Path=Settings.PatientsFilePath, ValidatesOnDataErrors=True}"
-                      Name="TextBoxFilePath" />
-        </DockPanel>
-
-        <TextBlock Grid.Row="2"
-                   Grid.Column="0"
                    Text="Применить форматирование" />
-        <CheckBox  Grid.Row="2"
+        <CheckBox  Grid.Row="0"
                    Grid.Column="1"
                    Name="CheckBoxFormat"
                    IsChecked="{Binding Path=Settings.FormatPatientsFile}" />
 
-        <DockPanel Grid.Row="3"
+        <DockPanel Grid.Row="1"
                    Grid.Column="0"
                    Grid.ColumnSpan="2">
 
@@ -137,7 +114,7 @@
 
 
 
-        <StackPanel Grid.Row="4"
+        <StackPanel Grid.Row="2"
                     Grid.Column="0"
                     Grid.ColumnSpan="2"
                     Orientation="Horizontal"

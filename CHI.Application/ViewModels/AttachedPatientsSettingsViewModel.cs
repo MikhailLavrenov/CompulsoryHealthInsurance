@@ -70,7 +70,7 @@ namespace CHI.Application.ViewModels
         }
         private void SetDefaultExecute()
         {
-            Settings.SetDefaultPatiensFile();
+            Settings.SetDefaultAttachedPatients();
             MainRegionService.SetCompleteStatus("Настройки установлены по умолчанию.");
         }
         #endregion

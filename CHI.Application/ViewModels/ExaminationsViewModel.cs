@@ -136,7 +136,7 @@ namespace CHI.Application.ViewModels
 
             MainRegionService.SetBusyStatus($"Загрузка осмотров. Всего пациентов: {patientsExaminations.Count}.");
 
-            var examinationService = new ExaminationServiceParallel(Settings.MedicalExaminationsAddress, Settings.UseProxy, Settings.ProxyAddress, Settings.ProxyPort, Settings.ThreadsLimit, Settings.Credentials);
+            var examinationService = new ExaminationServiceParallel(Settings.ExaminationsAddress, Settings.UseProxy, Settings.ProxyAddress, Settings.ProxyPort, Settings.ExaminationsThreadsLimit, Settings.ExaminationsCredentials);
 
             examinationService.AddCounterChangeEvent += UpdateProgress;
 

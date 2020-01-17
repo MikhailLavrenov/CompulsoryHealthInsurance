@@ -177,6 +177,7 @@
     <Compile Include="ViewModels\OtherSettingsViewModel.cs" />
     <Compile Include="ViewModels\ExaminationsViewModel.cs" />
     <Compile Include="ViewModels\NotificationDialogViewModel.cs" />
+    <Compile Include="ViewModels\ExaminationsSettingsViewModel.cs" />
     <Compile Include="ViewModels\ShellViewModel.cs" />
     <Compile Include="ViewModels\AttachedPatientsSettingsViewModel.cs" />
     <Compile Include="ViewModels\AttachedPatientsViewModel.cs" />
@@ -198,6 +199,9 @@
     </Compile>
     <Compile Include="Views\ProgressBarView.xaml.cs">
       <DependentUpon>ProgressBarView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ExaminationsSettingsView.xaml.cs">
+      <DependentUpon>ExaminationsSettingsView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ServicesSettingsView.xaml.cs">
       <DependentUpon>ServicesSettingsView.xaml</DependentUpon>
@@ -237,6 +241,10 @@
     <Page Include="Views\Resources\WindowDefaultStyle.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\ExaminationsSettingsView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\ShellView.xaml">
       <Generator>MSBuild:Compile</Generator>
