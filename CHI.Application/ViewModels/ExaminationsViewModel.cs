@@ -6,6 +6,7 @@ using CHI.Services.MedicalExaminations;
 using Prism.Regions;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace CHI.Application.ViewModels
@@ -97,7 +98,7 @@ namespace CHI.Application.ViewModels
             MainRegionService.SetBusyStatus("Выбор файлов.");
 
             fileDialogService.DialogType = FileDialogType.Open;
-            fileDialogService.FileName = Settings.PatientsFilePath;
+            fileDialogService.FileName = Settings.ExaminationsFileDirectory;
             fileDialogService.MiltiSelect = true;
             fileDialogService.Filter = "Zip files (*.zip)|*.zip|Xml files (*.xml)|*.xml";
 
@@ -107,11 +108,11 @@ namespace CHI.Application.ViewModels
                 return;
             }
 
-            var files = fileDialogService.FileNames;
+            Settings.ExaminationsFileDirectory =Path.GetDirectoryName(fileDialogService.FileNames.FirstOrDefault());
 
             MainRegionService.SetBusyStatus("Чтение файлов.");
 
-            var registers = new BillsRegisterService(files);
+            var registers = new BillsRegisterService(fileDialogService.FileNames);
             var patientsFileNames = Settings.PatientFileNames.Split(',');
             var examinationFileNames = Settings.ExaminationFileNames.Split(',');
 

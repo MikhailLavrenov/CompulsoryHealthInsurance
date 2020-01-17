@@ -52,26 +52,37 @@ namespace CHI.Application.ViewModels
         #region Методы
         private void ShowFileDialogExecute()
         {
-            fileDialogService.DialogType = settings.DownloadNewPatientsFile ? FileDialogType.Save : FileDialogType.Open;
-            fileDialogService.FileName = settings.PatientsFilePath;
-            fileDialogService.Filter = "Excel files (*.xslx)|*.xlsx";
-
-            if (fileDialogService.ShowDialog() == true)
-                settings.PatientsFilePath = fileDialogService.FileName;
         }
         private void ProcessFileExecute()
         {
             MainRegionService.SetBusyStatus("Проверка подключения к СРЗ.");
-            Settings.TestConnectionSRZ();
+
+            if (!Settings.SrzConnectionIsValid)
+                Settings.TestConnectionSRZ();
+
+            if (!Settings.SrzConnectionIsValid && Settings.DownloadNewPatientsFile)
+            {
+                MainRegionService.SetCompleteStatus("Не удалось подключиться к СРЗ, проверьте настройки и сайт. Возможно только подставить ФИО из БД в существующий файл.");
+                return;
+            }
+
+            MainRegionService.SetBusyStatus("Выбор пути к файлу.");
+
+            fileDialogService.DialogType = settings.DownloadNewPatientsFile ? FileDialogType.Save : FileDialogType.Open;
+            fileDialogService.FileName = settings.PatientsFilePath;
+            fileDialogService.Filter = "Excel files (*.xslx)|*.xlsx";
+
+            if (fileDialogService.ShowDialog() != true)
+            {
+                MainRegionService.SetCompleteStatus("Отменено.");
+                return;
+            }
+
+            settings.PatientsFilePath = fileDialogService.FileName;
+
 
             if (Settings.DownloadNewPatientsFile)
             {
-                if (!Settings.SrzConnectionIsValid)
-                {
-                    MainRegionService.SetCompleteStatus("Не удалось подключиться к СРЗ, проверьте настройки и сайт. Возможно только подставить ФИО из БД в существующий файл.");
-                    return;
-                }
-
                 MainRegionService.SetBusyStatus("Загрузка файла из СРЗ.");
 
                 var service = new SRZService(Settings.SRZAddress, Settings.UseProxy, Settings.ProxyAddress, Settings.ProxyPort);

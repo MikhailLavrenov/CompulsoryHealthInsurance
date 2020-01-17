@@ -36,6 +36,7 @@ namespace CHI.Application.Models
         //сохраняет настройки в xml
         public void Save()
         {
+            ProxyConnectionIsValid = false;
             SrzConnectionIsValid = false;
             ExaminationsConnectionIsValid = false;
 
@@ -244,7 +245,7 @@ namespace CHI.Application.Models
         }
         #endregion
 
-        #region Файл прикрепленных пациентоа
+        #region Файл прикрепленных пациентов
         private string srzAddress;
         private byte srzThreadsLimit;
         private ObservableCollection<Credential> srzCredentials;
@@ -385,6 +386,7 @@ namespace CHI.Application.Models
         private string examinationsFileNames;
         private string patientsFileNames;
         private ObservableCollection<Credential> examinationsCredentials;
+        private string examinationsFileDirectory;
         private bool examinationsConnectionIsValid;
 
         public string ExaminationsAddress { get => examinationsAddress; set => SetProperty(ref examinationsAddress, FixUrl(value)); }
@@ -392,6 +394,7 @@ namespace CHI.Application.Models
         public string ExaminationFileNames { get => examinationsFileNames; set => SetProperty(ref examinationsFileNames, value); }
         public string PatientFileNames { get => patientsFileNames; set => SetProperty(ref patientsFileNames, value); }
         public ObservableCollection<Credential> ExaminationsCredentials { get => examinationsCredentials; set => SetProperty(ref examinationsCredentials, value); }
+        public string ExaminationsFileDirectory { get => examinationsFileDirectory; set => SetProperty(ref examinationsFileDirectory, value); }
         [XmlIgnore] public string FomsCodeMO { get; private set; }
         [XmlIgnore] public bool ExaminationsConnectionIsValid { get => examinationsConnectionIsValid; set => SetProperty(ref examinationsConnectionIsValid, value); }
 
