@@ -174,16 +174,21 @@
     <Compile Include="Models\LicenseManager.cs" />
     <Compile Include="Models\Settings.cs" />
     <Compile Include="ViewModels\AboutViewModel.cs" />
+    <Compile Include="ViewModels\AttachedPatientsStorageSettingsViewModel.cs" />
     <Compile Include="ViewModels\OtherSettingsViewModel.cs" />
     <Compile Include="ViewModels\ExaminationsViewModel.cs" />
     <Compile Include="ViewModels\NotificationDialogViewModel.cs" />
     <Compile Include="ViewModels\ExaminationsSettingsViewModel.cs" />
     <Compile Include="ViewModels\ShellViewModel.cs" />
-    <Compile Include="ViewModels\AttachedPatientsSettingsViewModel.cs" />
+    <Compile Include="ViewModels\AttachedPatientsFileSettingsViewModel.cs" />
     <Compile Include="ViewModels\AttachedPatientsViewModel.cs" />
-    <Compile Include="ViewModels\ServicesSettingsViewModel.cs" />
+    <Compile Include="ViewModels\AttachedPatientsSettingsViewModel.cs" />
+    <Compile Include="ViewModels\SrzSettingsViewModel.cs" />
     <Compile Include="Views\AboutView.xaml.cs">
       <DependentUpon>AboutView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\AttachedPatientsStorageSettingsView.xaml.cs">
+      <DependentUpon>AttachedPatientsStorageSettingsView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\OtherSettingsView.xaml.cs">
       <DependentUpon>OtherSettingsView.xaml</DependentUpon>
@@ -194,8 +199,8 @@
     <Compile Include="Views\NotificationDialogView.xaml.cs">
       <DependentUpon>NotificationDialogView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\AttachedPatientsSettingsView.xaml.cs">
-      <DependentUpon>AttachedPatientsSettingsView.xaml</DependentUpon>
+    <Compile Include="Views\AttachedPatientsFileSettingsView.xaml.cs">
+      <DependentUpon>AttachedPatientsFileSettingsView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ProgressBarView.xaml.cs">
       <DependentUpon>ProgressBarView.xaml</DependentUpon>
@@ -203,12 +208,19 @@
     <Compile Include="Views\ExaminationsSettingsView.xaml.cs">
       <DependentUpon>ExaminationsSettingsView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\ServicesSettingsView.xaml.cs">
-      <DependentUpon>ServicesSettingsView.xaml</DependentUpon>
+    <Compile Include="Views\AttachedPatientsSettingsView.xaml.cs">
+      <DependentUpon>AttachedPatientsSettingsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\SrzSettingsView.xaml.cs">
+      <DependentUpon>SrzSettingsView.xaml</DependentUpon>
     </Compile>
     <Page Include="Views\AboutView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\AttachedPatientsStorageSettingsView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\OtherSettingsView.xaml">
       <SubType>Designer</SubType>
@@ -222,7 +234,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\AttachedPatientsSettingsView.xaml">
+    <Page Include="Views\AttachedPatientsFileSettingsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -265,7 +277,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\ServicesSettingsView.xaml">
+    <Page Include="Views\AttachedPatientsSettingsView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\SrzSettingsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

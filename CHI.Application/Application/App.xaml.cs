@@ -21,7 +21,7 @@ namespace CHI.Application
 
         protected override Window CreateShell()
         {
-            var window= Container.Resolve<ShellView>();
+            var window = Container.Resolve<ShellView>();
             //устанавливает язык для DatePicker MaterialDesign
             window.Language = XmlLanguage.GetLanguage(CultureInfo.CurrentCulture.IetfLanguageTag);
             return window;
@@ -47,10 +47,13 @@ namespace CHI.Application
             containerRegistry.RegisterDialog<NotificationDialogView, NotificationDialogViewModel>();
 
             containerRegistry.RegisterForNavigation<AttachedPatientsView>();
-            containerRegistry.RegisterForNavigation<ExaminationsView>();
-            containerRegistry.RegisterForNavigation<ServicesSettingsView>();
-            containerRegistry.RegisterForNavigation<ExaminationsSettingsView>();
             containerRegistry.RegisterForNavigation<AttachedPatientsSettingsView>();
+            containerRegistry.RegisterForNavigation<SrzSettingsView>();
+            containerRegistry.RegisterForNavigation<AttachedPatientsStorageSettingsView>();
+            containerRegistry.RegisterForNavigation<AttachedPatientsFileSettingsView>();            
+            containerRegistry.RegisterForNavigation<ExaminationsView>();
+            containerRegistry.RegisterForNavigation<ExaminationsSettingsView>();
+            containerRegistry.RegisterForNavigation<SrzSettingsView>();
             containerRegistry.RegisterForNavigation<OtherSettingsView>();
             containerRegistry.RegisterForNavigation<AboutView>();
             containerRegistry.RegisterForNavigation<ProgressBarView>();

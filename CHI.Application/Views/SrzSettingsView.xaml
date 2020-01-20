@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="CHI.Application.Views.ServicesSettingsView"
+﻿<UserControl x:Class="CHI.Application.Views.SrzSettingsView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -31,11 +31,6 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
-            <RowDefinition Height="auto" />
-            <RowDefinition Height="auto" />
-            <RowDefinition Height="auto" />
-            <RowDefinition Height="auto" />
-            <RowDefinition Height="auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
@@ -59,7 +54,7 @@
         <!--Использование x:Name и FrameworkElement принадлежащего логическому дереву позволяет обойти ограничение используя FrameworkElement как посредника-->
         <FrameworkElement x:Name="proxyElement" />
 
-        <i:CustomDataGrid Grid.Row="7"
+        <i:CustomDataGrid Grid.Row="2"
                           Grid.Column="0"
                           Grid.ColumnSpan="2"
                           Margin="0,20,0,10"
@@ -143,7 +138,7 @@
             </DataGrid.Columns>
         </i:CustomDataGrid>
 
-        <StackPanel Grid.Row="8"
+        <StackPanel Grid.Row="3"
                     Grid.Column="0"
                     Grid.ColumnSpan="2"
                     Orientation="Horizontal">

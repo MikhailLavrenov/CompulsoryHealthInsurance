@@ -313,7 +313,7 @@
                                  Command="{Binding ShowViewCommand}"
                                  CommandParameter="{x:Type v:AttachedPatientsView}"
                                  IsChecked="True">
-                        <TextBlock Text="Файл прикрепленных пациентов"
+                        <TextBlock Text="Загрузка прикрепленных пациентов"
                                    Style="{StaticResource MenuButtonText}" />
                     </RadioButton>
 
@@ -336,8 +336,8 @@
 
                     <RadioButton Style="{StaticResource MenuButton}"
                                  Command="{Binding ShowViewCommand}"
-                                 CommandParameter="{x:Type v:ServicesSettingsView}">
-                        <TextBlock Text="Файла прикрепленных пациентов"
+                                 CommandParameter="{x:Type v:AttachedPatientsSettingsView}">
+                        <TextBlock Text="Загрузки прикрепленых пациентов"
                                    Style="{StaticResource MenuButtonText}" />
                     </RadioButton>
 
@@ -345,13 +345,6 @@
                                  Command="{Binding ShowViewCommand}"
                                  CommandParameter="{x:Type v:ExaminationsSettingsView}">
                         <TextBlock Text="Загрузки периодических осмотров"
-                                   Style="{StaticResource MenuButtonText}" />
-                    </RadioButton>
-
-                    <RadioButton Style="{StaticResource MenuButton}"
-                                 Command="{Binding ShowViewCommand}"
-                                 CommandParameter="{x:Type v:AttachedPatientsSettingsView}">
-                        <TextBlock Text="Настройки файла прикреплен. пациентов"
                                    Style="{StaticResource MenuButtonText}" />
                     </RadioButton>
 

@@ -7,7 +7,7 @@ using System.Text;
 
 namespace CHI.Application.ViewModels
 {
-    class ServicesSettingsViewModel : DomainObject, IRegionMemberLifetime
+    class SrzSettingsViewModel : DomainObject, IRegionMemberLifetime
     {
         #region Поля
         private Settings settings;
@@ -29,12 +29,12 @@ namespace CHI.Application.ViewModels
         #endregion
 
         #region Конструкторы
-        public ServicesSettingsViewModel(IMainRegionService mainRegionService)
+        public SrzSettingsViewModel(IMainRegionService mainRegionService)
         {
             MainRegionService = mainRegionService;
             Settings = Settings.Instance;
 
-            MainRegionService.Header = "Настройки подключения к сервисам ФОМС";
+            //MainRegionService.Header = "Настройки подключения к СРЗ";
             ShowTextPassword = false;
             ShowProtectedPassword = !ShowTextPassword;
 

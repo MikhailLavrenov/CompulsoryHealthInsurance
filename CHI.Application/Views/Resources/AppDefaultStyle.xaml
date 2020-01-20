@@ -105,6 +105,23 @@
         </Setter>
     </Style>
 
+    <!--RadioButton-->
+
+    <Style x:Key="TabRadioButton"
+        TargetType="{x:Type RadioButton}"
+           BasedOn="{StaticResource  MaterialDesignTabRadioButton}">
+        <Setter Property="Margin"
+                Value="5,5,15,5" />
+        <Setter Property="Padding"
+                Value="5,5,5,5" />
+        <Setter Property="VerticalAlignment"
+                Value="Center" />
+        <Setter Property="BorderBrush"
+                Value="{DynamicResource PrimaryHueMidBrush}">
+
+        </Setter>
+    </Style>
+
     <!--DataPicker-->
 
     <Style TargetType="{x:Type DatePicker}"

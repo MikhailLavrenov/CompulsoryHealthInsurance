@@ -1,78 +1,42 @@
 ﻿using CHI.Application.Infrastructure;
 using CHI.Application.Models;
-using CHI.Services.AttachedPatients;
 using Prism.Commands;
 using Prism.Regions;
-using Prism.Services.Dialogs;
-using System.Collections.Generic;
-using System.Data.Entity;
+using System;
 using System.Linq;
+using System.Text;
 
 namespace CHI.Application.ViewModels
 {
-    public class AttachedPatientsSettingsViewModel : DomainObject, IRegionMemberLifetime
+    class AttachedPatientsSettingsViewModel : DomainObject, IRegionMemberLifetime
     {
         #region Поля
-        private Settings settings;
-        private readonly IFileDialogService fileDialogService;
+        private IRegionManager regionManager;
         #endregion
 
         #region Свойства
         public IMainRegionService MainRegionService { get; set; }
         public bool KeepAlive { get => false; }
-        public Settings Settings { get => settings; set => SetProperty(ref settings, value); }
-        public DelegateCommand SaveCommand { get; }
-        public DelegateCommand LoadCommand { get; }
-        public DelegateCommand SetDefaultCommand { get; }
-        public DelegateCommand<ColumnProperty> MoveUpCommand { get; }
-        public DelegateCommand<ColumnProperty> MoveDownCommand { get; }
-        public DelegateCommand ShowFileDialogCommand { get; }
-
+        public DelegateCommand<Type> ShowViewCommand { get; }
         #endregion
 
         #region Конструкторы
-        public AttachedPatientsSettingsViewModel(IMainRegionService mainRegionService, IFileDialogService fileDialogService)
+        public AttachedPatientsSettingsViewModel(IMainRegionService mainRegionService, IRegionManager regionManager)
         {
-            this.fileDialogService = fileDialogService;
+            this.regionManager = regionManager;
             MainRegionService = mainRegionService;
-
-            Settings = Settings.Instance;
-            MainRegionService.Header = "Настройки файла прикрепленных пациентов";
-
-            SaveCommand = new DelegateCommand(SaveExecute);
-            LoadCommand = new DelegateCommand(LoadExecute);
-            SetDefaultCommand = new DelegateCommand(SetDefaultExecute);
-            MoveUpCommand = new DelegateCommand<ColumnProperty>(x => Settings.MoveUpColumnProperty(x as ColumnProperty));
-            MoveDownCommand = new DelegateCommand<ColumnProperty>(x => Settings.MoveDownColumnProperty(x as ColumnProperty));
-            ShowFileDialogCommand = new DelegateCommand(ShowFileDialogExecute);
+            MainRegionService.Header = "Настройки загрузки прикрепленных пациентов";
+            ShowViewCommand = new DelegateCommand<Type>(ShowViewExecute);
         }
         #endregion
 
-        #region Методы
-        private void ShowFileDialogExecute()
+        #region Методы     
+        private void ShowViewExecute(Type view)
         {
-            fileDialogService.DialogType = settings.DownloadNewPatientsFile ? FileDialogType.Save : FileDialogType.Open;
-            fileDialogService.FileName = settings.PatientsFilePath;
-            fileDialogService.Filter = "Excel files (*.xslx)|*.xlsx";
-
-            if (fileDialogService.ShowDialog() == true)
-                settings.PatientsFilePath = fileDialogService.FileName;
-        }
-        private void SaveExecute()
-        {
-            Settings.Save();
-            MainRegionService.SetCompleteStatus("Настройки сохранены.");
-        }
-        private void LoadExecute()
-        {
-            Settings = Settings.Load();
-            MainRegionService.SetCompleteStatus("Изменения настроек отменены.");
-        }
-        private void SetDefaultExecute()
-        {
-            Settings.SetDefaultAttachedPatients();
-            MainRegionService.SetCompleteStatus("Настройки установлены по умолчанию.");
+            regionManager.RequestNavigate(RegionNames.AttachedPatientsSettingsRegion, view.Name);
+            MainRegionService.SetCompleteStatus(string.Empty);
         }
         #endregion
     }
 }
+;
