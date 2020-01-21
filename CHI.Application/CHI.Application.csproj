@@ -144,6 +144,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Infrastructure\ContentControlExtensions.cs" />
+    <Compile Include="Infrastructure\CustomContentControl.cs" />
+    <Compile Include="Infrastructure\TabRadioButtonBehaviour.cs" />
     <Compile Include="Infrastructure\ProgressBarBehaviour.cs" />
     <Compile Include="Infrastructure\MainRegionChangeBehaviour.cs" />
     <Compile Include="Infrastructure\DragWindowBehaviour.cs" />

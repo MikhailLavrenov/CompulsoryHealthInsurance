@@ -117,9 +117,13 @@
         <Setter Property="VerticalAlignment"
                 Value="Center" />
         <Setter Property="BorderBrush"
-                Value="{DynamicResource PrimaryHueMidBrush}">
-
-        </Setter>
+                Value="{DynamicResource PrimaryHueMidBrush}"/>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver"
+                     Value="true">
+                <Setter Property="Cursor" Value="Hand"/>
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
     <!--DataPicker-->

@@ -51,7 +51,15 @@
 
         </StackPanel>
 
-        <ContentControl prism:RegionManager.RegionName="{x:Static i:RegionNames.AttachedPatientsSettingsRegion}" />
+        <i:CustomContentControl prism:RegionManager.RegionName="{x:Static i:RegionNames.AttachedPatientsSettingsRegion}" ContentChanged="CustomContentControl_ContentChanged">
+
+            <!--<i:ContentControlExtensions.ContentAnimation>
+                <Storyboard>
+                    <ThicknessAnimation To="0" From="30,0,-30,0" Duration="0:0:0.3" Storyboard.TargetProperty="Margin"/>
+                </Storyboard>
+            </i:ContentControlExtensions.ContentAnimation>-->
+            
+        </i:CustomContentControl>
 
     </DockPanel>
 
