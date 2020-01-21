@@ -389,18 +389,18 @@
                                        FontSize="20"
                                        Margin="20,15,20,15"
                                        FontWeight="Medium"
-                                       Foreground="#FF01579B">
-                                                            
-                                <b:Interaction.Behaviors>        
-                                    <i:MainRegionChangeBehaviour />    
-                                </b:Interaction.Behaviors>
-
-                            </TextBlock>
+                                       Foreground="#FF01579B" />
 
                         </materialDesign:ColorZone>
 
-                        <ContentControl prism:RegionManager.RegionName="{x:Static i:RegionNames.MainRegion}"
-                                        Margin="15,15,15,40" />
+                        <i:CustomContentControl prism:RegionManager.RegionName="{x:Static i:RegionNames.MainRegion}"
+                                        Margin="15,15,15,40">
+                            
+                            <b:Interaction.Behaviors>
+                                <i:MainRegionChangeBehaviour />
+                            </b:Interaction.Behaviors>
+
+                        </i:CustomContentControl>
 
                     </DockPanel>
 

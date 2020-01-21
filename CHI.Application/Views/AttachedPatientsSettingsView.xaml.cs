@@ -11,10 +11,5 @@ namespace CHI.Application.Views
         {
             InitializeComponent();
         }
-
-        private void CustomContentControl_ContentChanged(object sender, System.Windows.DependencyPropertyChangedEventArgs e)
-        {
-
-        }
     }
 }

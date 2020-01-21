@@ -13,6 +13,6 @@ namespace CHI.Application.Infrastructure
     {
         public static string MainRegion { get; } = "MainRegion";
         public static string ProgressBarRegion { get; } = "ProgressBarRegion";
-        public static string AttachedPatientsSettingsRegion { get; } = "AttachedPAtientsSettingsRegion";
+        public static string AttachedPatientsSettingsRegion { get; } = "AttachedPatientsSettingsRegion";
     }
 }
