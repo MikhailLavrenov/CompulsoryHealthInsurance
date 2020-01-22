@@ -59,7 +59,7 @@ namespace CHI.Application.ViewModels
         }
         private void SetDefaultExecute()
         {
-            Settings.SetDefaultAttachedPatients();
+            Settings.SetDefaultSRZ();
             MainRegionService.SetCompleteStatus("Настройки установлены по умолчанию.");
         }
         private void TestExecute()

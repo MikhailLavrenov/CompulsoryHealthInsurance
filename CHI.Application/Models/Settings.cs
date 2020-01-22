@@ -323,8 +323,8 @@ namespace CHI.Application.Models
 
             SrzConnectionIsValid = true;
         }
-        //устанавливает по-умолчанию настройки для сервиса загрузки прикрепленных пациентов
-        public void SetDefaultAttachedPatients()
+        //устанавливает по-умолчанию настройки подключения к СРЗ
+        public void SetDefaultSRZ()
         {
             SRZAddress = @"http://11.0.0.1/";
             SRZThreadsLimit = 10;
@@ -337,6 +337,10 @@ namespace CHI.Application.Models
                     new Credential{Login="МойЛогин2", Password="МойПароль2", RequestsLimit=300},
                     new Credential{Login="МойЛогин3", Password="МойПароль3", RequestsLimit=500}
              };
+        }
+        //устанавливает по-умолчанию настройки файла прикрепленных пациентов
+        public void SetDefaultAttachedPatientsFile()
+        {
             ColumnProperties = new ObservableCollection<ColumnProperty>()
              {
                     new ColumnProperty{Name="ENP",         AltName="Полис",                 Hide=false,  Delete=false},
