@@ -47,33 +47,33 @@ namespace CHI.Application.ViewModels
             ExportExaminationsCommand = new DelegateCommandAsync(ExportExaminationsExecute);
 
 
-            var examination1Stage = new Examination
-            {
-                BeginDate = new DateTime(2019, 10, 10),
-                EndDate = new DateTime(2019, 10, 15),
-                HealthGroup = HealthGroup.ThirdA,
-                Referral = Referral.LocalClinic
-            };
-            var examination2Stage = new Examination
-            {
-                BeginDate = new DateTime(2019, 10, 20),
-                EndDate = new DateTime(2019, 10, 25),
-                HealthGroup = HealthGroup.ThirdB,
-                Referral = Referral.AnotherClinic
-            };
+            //var examination1Stage = new Examination
+            //{
+            //    BeginDate = new DateTime(2019, 10, 10),
+            //    EndDate = new DateTime(2019, 10, 15),
+            //    HealthGroup = HealthGroup.ThirdA,
+            //    Referral = Referral.LocalClinic
+            //};
+            //var examination2Stage = new Examination
+            //{
+            //    BeginDate = new DateTime(2019, 10, 20),
+            //    EndDate = new DateTime(2019, 10, 25),
+            //    HealthGroup = HealthGroup.ThirdB,
+            //    Referral = Referral.AnotherClinic
+            //};
 
-            ShowErrors = true;
-            var pe = new PatientExaminations("2751530822000157", 2019, ExaminationKind.Dispanserizacia1)
-            {
-                Stage1 = examination1Stage,
-                Stage2 = examination2Stage
-            };
-            Result = new List<Tuple<PatientExaminations, bool, string>> {
-                new Tuple<PatientExaminations, bool,string>(pe, true, ""),
-                new Tuple<PatientExaminations,bool, string>(pe, true, ""),
-                new Tuple<PatientExaminations,bool, string>(pe, false, "Какая то надпись"),
-                new Tuple<PatientExaminations, bool,string>(pe, false, "Еще одна надпись"),
-            };
+            //ShowErrors = true;
+            //var pe = new PatientExaminations("2751530822000157", 2019, ExaminationKind.Dispanserizacia1)
+            //{
+            //    Stage1 = examination1Stage,
+            //    Stage2 = examination2Stage
+            //};
+            //Result = new List<Tuple<PatientExaminations, bool, string>> {
+            //    new Tuple<PatientExaminations, bool,string>(pe, true, ""),
+            //    new Tuple<PatientExaminations,bool, string>(pe, true, ""),
+            //    new Tuple<PatientExaminations,bool, string>(pe, false, "Какая то надпись"),
+            //    new Tuple<PatientExaminations, bool,string>(pe, false, "Еще одна надпись"),
+            //};
         }
         #endregion
 

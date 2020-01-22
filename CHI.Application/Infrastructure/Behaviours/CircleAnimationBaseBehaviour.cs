@@ -9,36 +9,50 @@ using System.Windows.Media.Animation;
 
 namespace CHI.Application.Infrastructure
 {
-
     /// <summary>
     /// Базовый класс поведения с круговой анимацией. Используется при смене view в RegionManager
     /// </summary>
-    public abstract class CircleAnimationBaseBehaviour : Behavior<FrameworkElement>
+    public class CircleAnimationBaseBehaviour : Behavior<FrameworkElement>
     {
-        protected CustomContentControl customContentControl;
-        protected FrameworkElement animatedElement;
-        protected FrameworkElement parentContainer;
+        protected FrameworkElement AnimatedElement { get; set; }
+        //элемент относительно которого расчитываются параметры (размеры) анимации
+        protected FrameworkElement AnimationParametersTargetElement { get; set; }
+        /// <summary>
+        /// Имя элемента относительно которого расчитываются параметры (размеры) анимации
+        /// </summary>
+        public string AnimationParametersTarget { get; set; }
         //пропускает показ 1ой анимации, может использоваться при одновременном проигрывании анимации в 2х регионах, когда 1й включает в себя 2й
-        protected bool skipFirstAnimation = false;
+        public bool SkipFirstAnimation { get; set; } = false;
 
+        protected override void OnAttached()
+        {
+            AnimatedElement = (FrameworkElement)AssociatedObject.Parent;
+            AnimationParametersTargetElement = AssociatedObject.FindParent(AnimationParametersTarget);
+
+            ((CustomContentControl)AssociatedObject).ContentChanged += EventHandler;
+        }
+        protected override void OnDetaching()
+        {
+            ((CustomContentControl)AssociatedObject).ContentChanged -= EventHandler;
+        }
         protected void EventHandler(object sender, DependencyPropertyChangedEventArgs e)
         {
             //RegionManager при навигации сначала устанавливает содержимое в null, затем новое значение, поэтому событие может возникать 2 раза подряд
             if (e.NewValue == null)
                 return;
 
-            if (skipFirstAnimation)
+            if (SkipFirstAnimation)
             { 
-                skipFirstAnimation = false;
+                SkipFirstAnimation = false;
                 return;
             }
 
-            var elipseGeometry = new EllipseGeometry(Mouse.GetPosition(animatedElement), 0, 0);
-            var point = Mouse.GetPosition(parentContainer);
-            var x = Math.Max(point.X, parentContainer.ActualWidth - point.X);
-            var y = Math.Max(point.Y, parentContainer.ActualHeight - point.Y);
+            var elipseGeometry = new EllipseGeometry(Mouse.GetPosition(AnimatedElement), 0, 0);
+            var point = Mouse.GetPosition(AnimationParametersTargetElement);
+            var x = Math.Max(point.X, AnimationParametersTargetElement.ActualWidth - point.X);
+            var y = Math.Max(point.Y, AnimationParametersTargetElement.ActualHeight - point.Y);
             var radius = Math.Sqrt(Math.Pow(x, 2) + Math.Pow(y, 2));
-            animatedElement.Clip = elipseGeometry;
+            AnimatedElement.Clip = elipseGeometry;
 
             var duration = TimeSpan.FromMilliseconds(500);
 
@@ -49,7 +63,7 @@ namespace CHI.Application.Infrastructure
 
             var animationOpacity = new DoubleAnimation(0, 1, duration);
             animationOpacity.EasingFunction = ease;
-            animatedElement.BeginAnimation(UIElement.OpacityProperty, animationOpacity);
+            AnimatedElement.BeginAnimation(UIElement.OpacityProperty, animationOpacity);
 
             var animationX = new DoubleAnimation(0, radius, duration);
             animationX.EasingFunction = ease;
@@ -57,9 +71,8 @@ namespace CHI.Application.Infrastructure
 
             var animationY = new DoubleAnimation(0, radius, duration);            
             animationY.EasingFunction = ease;
-            animationY.Completed += (sndr, args) => animatedElement.Clip = null;
-            elipseGeometry.BeginAnimation(EllipseGeometry.RadiusYProperty, animationY);
-            
+            animationY.Completed += (sndr, args) => AnimatedElement.Clip = null;
+            elipseGeometry.BeginAnimation(EllipseGeometry.RadiusYProperty, animationY);            
         }
     }
 }

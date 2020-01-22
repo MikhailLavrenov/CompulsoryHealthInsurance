@@ -1,7 +1,11 @@
 ﻿using CHI.Application.Views;
 using Prism.Services.Dialogs;
 using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Media;
 
@@ -12,6 +16,45 @@ namespace CHI.Application.Infrastructure
     /// </summary>
     public static class ExtensionMethods
     {
+        /// <summary>
+        /// Возвращает описание (Description) перечисления (enum)
+        /// </summary>
+        /// <param name="value">Перечисление (enum)</param>
+        /// <returns>Описание</returns>
+        public static string GetDescription(this Enum value)
+        {
+            Type type = value.GetType();
+            FieldInfo fieldInfo = type.GetField(value.ToString());
+            Attribute attribute = Attribute.GetCustomAttribute(fieldInfo, typeof(DescriptionAttribute), false);
+            DescriptionAttribute descriptionAttribute = attribute as DescriptionAttribute;
+
+            return descriptionAttribute.Description;
+        }
+        /// <summary>
+        /// Возвращает список всех значений enum и их описаний 
+        /// </summary>
+        /// <typeparam name="T">Перечисление (enum)</typeparam>
+        /// <returns>Перечисление значений и описаний</returns>
+        public static IEnumerable<KeyValuePair<Enum, string>> GetAllValuesAndDescriptions(this Enum en)
+        {
+            return Enum.GetValues(en.GetType())
+                .Cast<Enum>()
+                .Select(x => new KeyValuePair<Enum, string>(x, x.GetDescription()))
+                .ToList();
+        }
+        // Находит в логическом дереве родительский элемент с заданным Именем
+        public static FrameworkElement FindParent(this FrameworkElement element, string foundName)
+        {
+            while (element != null)
+            {
+                if (element.Name==foundName)
+                    return element;
+
+                element = element.Parent as FrameworkElement;
+            }
+
+            return null;
+        }
         // Находит в логическом дереве родительский элемент соответствующий типу T
         public static T FindLogicalParent<T>(this UIElement element) where T : UIElement
         {
@@ -25,7 +68,7 @@ namespace CHI.Application.Infrastructure
 
             return null;
         }
-        // Находит в визульном дереве родительский элемент соответствующий типу T 
+        // Находит в визульном дереве родительский элемент соответствующий типу T
         public static T FindVisualParent<T>(this UIElement element) where T : UIElement
         {
             while (element != null)
@@ -38,7 +81,7 @@ namespace CHI.Application.Infrastructure
 
             return null;
         }
-        // Рекурсивно находит дочерний видимый элемент соответствующий типу T 
+        // Рекурсивно находит дочерний видимый элемент соответствующий типу T
         public static T FindVisualVisibleChild<T>(this UIElement element) where T : UIElement
         {
             if (element == null)

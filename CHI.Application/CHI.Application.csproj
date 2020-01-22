@@ -145,18 +145,14 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Infrastructure\Behaviours\CircleAnimationBaseBehaviour.cs" />
-    <Compile Include="Infrastructure\ContentControlExtensions.cs" />
-    <Compile Include="Infrastructure\CustomContentControl.cs" />
-    <Compile Include="Infrastructure\Behaviours\AttachedPatientsSettingsRegionChangeBehaviour.cs" />
+    <Compile Include="Infrastructure\Controls\CustomContentControl.cs" />
     <Compile Include="Infrastructure\Behaviours\ProgressBarBehaviour.cs" />
-    <Compile Include="Infrastructure\Behaviours\MainRegionChangeBehaviour.cs" />
     <Compile Include="Infrastructure\Behaviours\DragWindowBehaviour.cs" />
     <Compile Include="Infrastructure\Converters\InvertedBoolToVisibleConverterExtension.cs" />
-    <Compile Include="Infrastructure\CustomDataGrid.cs" />
+    <Compile Include="Infrastructure\Controls\CustomDataGrid.cs" />
     <Compile Include="Infrastructure\Converters\BoolToVisibleConverterExtension.cs" />
     <Compile Include="Infrastructure\Converters\EnumToDescriptionConverterExtension.cs" />
     <Compile Include="Infrastructure\MVVM\FileDialogType.cs" />
-    <Compile Include="Infrastructure\EnumHelper.cs" />
     <Compile Include="Infrastructure\Converters\EnumToCollectionConverterExtension.cs" />
     <Compile Include="Infrastructure\ExtensionMethods.cs" />
     <Compile Include="Infrastructure\MVVM\FileDialogService.cs" />
