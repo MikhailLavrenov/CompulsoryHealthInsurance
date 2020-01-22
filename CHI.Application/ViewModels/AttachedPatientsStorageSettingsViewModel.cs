@@ -22,10 +22,6 @@ namespace CHI.Application.ViewModels
         public IMainRegionService MainRegionService { get; set; }
         public bool KeepAlive { get => false; }
         public Settings Settings { get => settings; set => SetProperty(ref settings, value); }
-        public DelegateCommandAsync TestCommand { get; }
-        public DelegateCommand SaveCommand { get; }
-        public DelegateCommand LoadCommand { get; }
-        public DelegateCommand SetDefaultCommand { get; }
         public DelegateCommand ShowFileDialogCommand { get; }
         public DelegateCommandAsync ImportPatientsCommand { get; }
         public DelegateCommandAsync SaveExampleCommand { get; }
@@ -40,12 +36,7 @@ namespace CHI.Application.ViewModels
             MainRegionService = mainRegionService;
 
             Settings = Settings.Instance;
-            //MainRegionService.Header = "Настройки локальной БД пациентов";
 
-            TestCommand = new DelegateCommandAsync(TestExecute);
-            SaveCommand = new DelegateCommand(SaveExecute);
-            LoadCommand = new DelegateCommand(LoadExecute);
-            SetDefaultCommand = new DelegateCommand(SetDefaultExecute);
             ShowFileDialogCommand = new DelegateCommand(ShowFileDialogExecute);
             ImportPatientsCommand = new DelegateCommandAsync(ImportPatientsExecute);
             SaveExampleCommand = new DelegateCommandAsync(SaveExampleExecute);
@@ -54,16 +45,6 @@ namespace CHI.Application.ViewModels
         #endregion
 
         #region Методы
-        private void TestExecute()
-        {
-            MainRegionService.SetBusyStatus("Проверка настроек.");
-            Settings.TestConnectionProxy();
-
-            if (Settings.ProxyConnectionIsValid)
-                MainRegionService.SetCompleteStatus("Настройки корректны.");
-            else
-                MainRegionService.SetCompleteStatus("Прокси сервер не доступен.");
-        }
         private void ShowFileDialogExecute()
         {
             fileDialogService.DialogType = FileDialogType.Open;
@@ -72,21 +53,6 @@ namespace CHI.Application.ViewModels
 
             if (fileDialogService.ShowDialog() == true)
                 settings.PatientsFilePath = fileDialogService.FileName;
-        }
-        private void SaveExecute()
-        {
-            Settings.Save();
-            MainRegionService.SetCompleteStatus("Настройки сохранены.");
-        }
-        private void LoadExecute()
-        {
-            Settings = Settings.Load();
-            MainRegionService.SetCompleteStatus("Изменения настроек отменены.");
-        }
-        private void SetDefaultExecute()
-        {
-            Settings.SetDefaultOther();
-            MainRegionService.SetCompleteStatus("Настройки установлены по умолчанию.");
         }
         private void ImportPatientsExecute()
         {

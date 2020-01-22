@@ -11,19 +11,27 @@ namespace CHI.Application.Infrastructure
 {
 
     /// <summary>
-    /// Базовый класс поведения с круговой анимацией
+    /// Базовый класс поведения с круговой анимацией. Используется при смене view в RegionManager
     /// </summary>
     public abstract class CircleAnimationBaseBehaviour : Behavior<FrameworkElement>
     {
         protected CustomContentControl customContentControl;
         protected FrameworkElement animatedElement;
         protected FrameworkElement parentContainer;
+        //пропускает показ 1ой анимации, может использоваться при одновременном проигрывании анимации в 2х регионах, когда 1й включает в себя 2й
+        protected bool skipFirstAnimation = false;
 
         protected void EventHandler(object sender, DependencyPropertyChangedEventArgs e)
         {
             //RegionManager при навигации сначала устанавливает содержимое в null, затем новое значение, поэтому событие может возникать 2 раза подряд
             if (e.NewValue == null)
                 return;
+
+            if (skipFirstAnimation)
+            { 
+                skipFirstAnimation = false;
+                return;
+            }
 
             var elipseGeometry = new EllipseGeometry(Mouse.GetPosition(animatedElement), 0, 0);
             var point = Mouse.GetPosition(parentContainer);

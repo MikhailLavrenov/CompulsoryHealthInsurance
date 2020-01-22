@@ -426,10 +426,10 @@ namespace CHI.Application.Models
 
             var uniqCodes = codesMO.ToList().Distinct(StringComparer.OrdinalIgnoreCase).ToList();
 
-            if (uniqCodes.Count != 1)
+            if (uniqCodes.Count > 1)
                 throw new InvalidOperationException("Ошибка: учетные записи не должны принадлежать разным ЛПУ");
 
-            FomsCodeMO = uniqCodes.First();
+            FomsCodeMO = uniqCodes.FirstOrDefault();
 
             return !ExaminationsCredentials.Any(x => x.HasErrors);
         }

@@ -76,12 +76,16 @@
                     Grid.ColumnSpan="2"
                     Margin="0,10,0,10"
                     Orientation="Horizontal">
-            <Button Content="Импорт"
-                    Command="{Binding ImportPatientsCommand}" />
-            <Button Content="Скачать пример"
-                    Command="{Binding SaveExampleCommand}" />
-            <Button Content="Очистить"
-                    Command="{Binding ClearDatabaseCommand}" />
+
+            <Button Content="Проверить"
+                    Command="{Binding TestCommand}" />
+            <Button Content="Сохранить"
+                    Command="{Binding SaveCommand}" />
+            <Button Content="Отмена"
+                    Command="{Binding LoadCommand}" />
+            <Button Content="По умолчанию"
+                    Command="{Binding SetDefaultCommand}" />
+
         </StackPanel>
 
 

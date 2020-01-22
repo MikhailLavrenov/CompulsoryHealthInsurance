@@ -8,14 +8,15 @@ using System.Windows.Media.Animation;
 
 namespace CHI.Application.Infrastructure
 {
-
     /// <summary>
     /// Анимация смены представления в AttachedPatientsSettingsRegion
     /// </summary>
     public class AttachedPatientsSettingsRegionChangeBehaviour : CircleAnimationBaseBehaviour
-    {
+    {      
         protected override void OnAttached()
         {
+            skipFirstAnimation = true;
+
             customContentControl = AssociatedObject.FindLogicalParent<CustomContentControl>();
             customContentControl.ContentChanged += EventHandler;
 

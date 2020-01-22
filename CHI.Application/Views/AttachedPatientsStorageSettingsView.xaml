@@ -28,12 +28,14 @@
                     Grid.Column="0"
                     Grid.ColumnSpan="2"
                     Orientation="Horizontal">
+            
             <Button Content="Импорт"
                     Command="{Binding ImportPatientsCommand}" />
             <Button Content="Скачать пример"
                     Command="{Binding SaveExampleCommand}" />
             <Button Content="Очистить"
                     Command="{Binding ClearDatabaseCommand}" />
+            
         </StackPanel>
     
 </UserControl>
