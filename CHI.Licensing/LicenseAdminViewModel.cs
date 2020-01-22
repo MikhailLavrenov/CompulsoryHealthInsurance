@@ -17,6 +17,7 @@ namespace CHI.Licensing
         private bool showLicense;
         private bool showSave;
         private string status;
+        private string licenseFileName;
         #endregion
 
         #region Свойства
@@ -28,6 +29,8 @@ namespace CHI.Licensing
         public bool ShowLicense { get => showLicense; set => SetProperty(ref showLicense, value); }
         public bool ShowSave { get => showSave; set { showSave = value; SaveLicenseCommand.RaiseCanExecuteChanged(); } }
         public string Status { get => status; set => SetProperty(ref status, value); }
+        public string LicenseFileName { get => licenseFileName; set => SetProperty(ref licenseFileName, value); }
+        
         #endregion
 
         #region Конструкторы
@@ -77,8 +80,8 @@ namespace CHI.Licensing
             ShowLicense = true;
             ShowSave = false;
 
-
-            Status=$"Лицензия открыта: {Path.GetFileName(fileDialogService.FileName)}";
+            LicenseFileName = Path.GetFileName(fileDialogService.FileName);
+            Status =$"Лицензия открыта: {LicenseFileName}";
         }
         private void NewLicenseExecute()
         {
@@ -86,7 +89,9 @@ namespace CHI.Licensing
             ShowSave = true;
 
             CurrentLicense = new License();
-            Status="Новая лицензия.";
+
+            LicenseFileName = "Новая";
+            Status ="Новая лицензия.";
         }
         private void SaveLicenseExecute()
         {

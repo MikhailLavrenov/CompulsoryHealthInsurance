@@ -6,23 +6,32 @@
         xmlns:local="clr-namespace:CHI.Licensing"
         xmlns:i="clr-namespace:CHI.Application.Infrastructure;assembly=CHI.Application"
         xmlns:prism="http://prismlibrary.com/"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        
+
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
         Title="Лицензирование"
         Height="600"
-        Width="750"
+        Width="850"
+        MinHeight="600"
+        MinWidth="850"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        Background="{DynamicResource MaterialDesignPaper}"
+        TextElement.FontWeight="Medium"
+        TextElement.FontSize="14"
+        FontFamily="{materialDesign:MaterialDesignFont}"
         prism:ViewModelLocator.AutoWireViewModel="True">
 
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary  Source="/CHI.Application;component/Views/Resources/DefaultStyle.xaml" />
-                <ResourceDictionary Source="/CHI.Application;component/Views/Resources/Icons.xaml" />
+                <ResourceDictionary Source="/CHI.Application;component/Views/Resources/WindowDefaultStyle.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
 
-    <DockPanel >
+    <DockPanel Margin="10">
 
         <StackPanel DockPanel.Dock="Top"
                     Orientation="Horizontal">
@@ -47,7 +56,7 @@
 
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="180" />
-                <ColumnDefinition Width="350" />
+                <ColumnDefinition Width="400" />
                 <ColumnDefinition Width="auto" />
             </Grid.ColumnDefinitions>
 

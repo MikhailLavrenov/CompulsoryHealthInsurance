@@ -1,7 +1,21 @@
-﻿<prism:PrismApplication x:Class="CHI.Licensing.App" 
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"             
-             xmlns:prism="http://prismlibrary.com/"    
-                        xmlns:local="clr-namespace:CHI.Licensing">
+﻿<prism:PrismApplication x:Class="CHI.Licensing.App"
+                        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                        xmlns:prism="http://prismlibrary.com/"
+                        xmlns:local="clr-namespace:CHI.Licensing"
+                        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
+
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <materialDesign:CustomColorTheme BaseTheme="Light"
+                                                 PrimaryColor="#FF0067B8"
+                                                 SecondaryColor="White" />
+                <ResourceDictionary  Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
+                <ResourceDictionary Source="/CHI.Application;component/Views/Resources/Icons.xaml" />
+                <ResourceDictionary Source="/CHI.Application;component/Views/Resources/AppDefaultStyle.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary >
+    </Application.Resources>
 
 </prism:PrismApplication>

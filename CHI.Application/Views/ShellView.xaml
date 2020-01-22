@@ -11,7 +11,6 @@
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         xmlns:prism="http://prismlibrary.com/"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-        xmlns:wpf="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
@@ -104,7 +103,7 @@
                                 </Grid.ColumnDefinitions>
                                 <Border Background="{TemplateBinding Background}">
 
-                                    <wpf:Ripple Content="{TemplateBinding Content}"
+                                    <materialDesign:Ripple Content="{TemplateBinding Content}"
                                                 ContentTemplate="{TemplateBinding ContentTemplate}"
                                                 Focusable="False"
                                                 HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
@@ -182,14 +181,14 @@
                         <ControlTemplate TargetType="{x:Type ButtonBase}">
                             <Grid Background="{TemplateBinding Background}">
 
-                                <wpf:Ripple Content="{TemplateBinding Content}"
+                                <materialDesign:Ripple Content="{TemplateBinding Content}"
                                             ContentTemplate="{TemplateBinding ContentTemplate}"
                                             Focusable="False"
                                             HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
                                             VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
                                             Padding="{TemplateBinding Padding}"
                                             SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}">
-                                </wpf:Ripple>
+                                </materialDesign:Ripple>
                                 <Border Background="White"
                                         Opacity="0"
                                         x:Name="SelectionHue"
