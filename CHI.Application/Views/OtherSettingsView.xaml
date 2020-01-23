@@ -23,8 +23,8 @@
 
     <Grid d:DataContext="{d:DesignInstance vm:OtherSettingsViewModel }">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="200" />
-            <ColumnDefinition Width="320" />
+            <ColumnDefinition Width="220" />
+            <ColumnDefinition Width="300" />
         </Grid.ColumnDefinitions>
 
         <Grid.RowDefinitions>
@@ -79,10 +79,6 @@
 
             <Button Content="Проверить"
                     Command="{Binding TestCommand}" />
-            <Button Content="Сохранить"
-                    Command="{Binding SaveCommand}" />
-            <Button Content="Отмена"
-                    Command="{Binding LoadCommand}" />
             <Button Content="По умолчанию"
                     Command="{Binding SetDefaultCommand}" />
 

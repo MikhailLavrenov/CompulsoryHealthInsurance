@@ -34,9 +34,6 @@ namespace CHI.Application
 
             AppDomain.CurrentDomain.UnhandledException += LogUnhandledException;
             DispatcherUnhandledException += LogDispatcherUnhandledException;
-
-            var viewModel = Current.MainWindow.DataContext as ShellViewModel;
-            viewModel.ShowViewCommand.Execute(typeof(AttachedPatientsView));
         }
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {

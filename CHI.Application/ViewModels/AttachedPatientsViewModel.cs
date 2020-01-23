@@ -30,8 +30,6 @@ namespace CHI.Application.ViewModels
         public Settings Settings { get => settings; set => SetProperty(ref settings, value); }
         public DateTime FileDate { get => fileDate; set => SetProperty(ref fileDate, value); }
         public DelegateCommandAsync ProcessFileCommand { get; }
-        public DelegateCommand ShowFileDialogCommand { get; }
-
         #endregion
 
         #region Конструкторы
@@ -45,14 +43,10 @@ namespace CHI.Application.ViewModels
             FileDate = DateTime.Today;
 
             ProcessFileCommand = new DelegateCommandAsync(ProcessFileExecute, ProcessFileCanExecute);
-            ShowFileDialogCommand = new DelegateCommand(ShowFileDialogExecute);
         }
         #endregion
 
         #region Методы
-        private void ShowFileDialogExecute()
-        {
-        }
         private void ProcessFileExecute()
         {
             MainRegionService.SetBusyStatus("Проверка подключения к СРЗ.");

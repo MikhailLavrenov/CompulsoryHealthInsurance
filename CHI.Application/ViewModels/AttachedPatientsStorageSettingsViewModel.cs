@@ -22,7 +22,6 @@ namespace CHI.Application.ViewModels
         public IMainRegionService MainRegionService { get; set; }
         public bool KeepAlive { get => false; }
         public Settings Settings { get => settings; set => SetProperty(ref settings, value); }
-        public DelegateCommand ShowFileDialogCommand { get; }
         public DelegateCommandAsync ImportPatientsCommand { get; }
         public DelegateCommandAsync SaveExampleCommand { get; }
         public DelegateCommandAsync ClearDatabaseCommand { get; }
@@ -37,7 +36,6 @@ namespace CHI.Application.ViewModels
 
             Settings = Settings.Instance;
 
-            ShowFileDialogCommand = new DelegateCommand(ShowFileDialogExecute);
             ImportPatientsCommand = new DelegateCommandAsync(ImportPatientsExecute);
             SaveExampleCommand = new DelegateCommandAsync(SaveExampleExecute);
             ClearDatabaseCommand = new DelegateCommandAsync(ClearDatabaseExecute);
@@ -45,15 +43,6 @@ namespace CHI.Application.ViewModels
         #endregion
 
         #region Методы
-        private void ShowFileDialogExecute()
-        {
-            fileDialogService.DialogType = FileDialogType.Open;
-            fileDialogService.FileName = settings.PatientsFilePath;
-            fileDialogService.Filter = "Excel files (*.xslx)|*.xlsx";
-
-            if (fileDialogService.ShowDialog() == true)
-                settings.PatientsFilePath = fileDialogService.FileName;
-        }
         private void ImportPatientsExecute()
         {
             fileDialogService.DialogType = FileDialogType.Open;

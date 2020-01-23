@@ -7,7 +7,8 @@
 
     <!-- TextBlock-->
 
-    <Style x:Key="SubTitleText" BasedOn="{StaticResource {x:Type TextBlock}}"
+    <Style x:Key="SubTitleText"
+           BasedOn="{StaticResource {x:Type TextBlock}}"
            TargetType="{x:Type TextBlock}">
         <Setter Property="FontSize"
                 Value="16" />
@@ -108,7 +109,7 @@
     <!--RadioButton-->
 
     <Style x:Key="TabRadioButton"
-        TargetType="{x:Type RadioButton}"
+           TargetType="{x:Type RadioButton}"
            BasedOn="{StaticResource  MaterialDesignTabRadioButton}">
         <Setter Property="Margin"
                 Value="5,5,15,5" />
@@ -117,11 +118,12 @@
         <Setter Property="VerticalAlignment"
                 Value="Center" />
         <Setter Property="BorderBrush"
-                Value="{DynamicResource PrimaryHueMidBrush}"/>
+                Value="{DynamicResource PrimaryHueMidBrush}" />
         <Style.Triggers>
             <Trigger Property="IsMouseOver"
                      Value="true">
-                <Setter Property="Cursor" Value="Hand"/>
+                <Setter Property="Cursor"
+                        Value="Hand" />
             </Trigger>
         </Style.Triggers>
     </Style>
@@ -189,5 +191,13 @@
         <Setter Property="VerticalAlignment"
                 Value="Center" />
     </Style>
+
+    <DataTemplate x:Key="DataGridDragColumn">
+        <Viewbox Stretch="UniformToFill"
+                 HorizontalAlignment="Right">
+            <ContentControl Content="{materialDesign:PackIcon EllipsisVertical}"
+                            Foreground="LightGray" />
+        </Viewbox>
+    </DataTemplate>
 
 </ResourceDictionary>

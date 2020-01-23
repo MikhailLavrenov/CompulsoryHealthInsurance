@@ -21,8 +21,6 @@ namespace CHI.Application.ViewModels
         public Settings Settings { get => settings; set => SetProperty(ref settings, value); }
         public bool ShowTextPassword { get => showTextPassword; set => SetProperty(ref showTextPassword, value); }
         public bool ShowProtectedPassword { get => showProtectedPassword; set => SetProperty(ref showProtectedPassword, value); }
-        public DelegateCommand SaveCommand { get; }
-        public DelegateCommand LoadCommand { get; }
         public DelegateCommand SetDefaultCommand { get; }
         public DelegateCommandAsync TestCommand { get; }
         public DelegateCommand SwitchShowPasswordCommand { get; }
@@ -38,8 +36,6 @@ namespace CHI.Application.ViewModels
             ShowTextPassword = false;
             ShowProtectedPassword = !ShowTextPassword;
 
-            SaveCommand = new DelegateCommand(SaveExecute);
-            LoadCommand = new DelegateCommand(LoadExecute);
             SetDefaultCommand = new DelegateCommand(SetDefaultExecute);
             TestCommand = new DelegateCommandAsync(TestExecute);
             SwitchShowPasswordCommand = new DelegateCommand(SwitchShowPasswordExecute);
@@ -47,16 +43,6 @@ namespace CHI.Application.ViewModels
         #endregion
 
         #region Методы        
-        private void SaveExecute()
-        {
-            Settings.Save();
-            MainRegionService.SetCompleteStatus("Настройки сохранены.");
-        }
-        private void LoadExecute()
-        {
-            Settings = Settings.Load();
-            MainRegionService.SetCompleteStatus("Изменения настроек отменены.");
-        }
         private void SetDefaultExecute()
         {
             Settings.SetDefaultExaminations();

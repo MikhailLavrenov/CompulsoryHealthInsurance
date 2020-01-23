@@ -223,6 +223,17 @@
         <i:DragWindowBehaviour />
     </b:Interaction.Behaviors>
 
+    <b:Interaction.Triggers>
+        <b:EventTrigger EventName="Loaded">
+            <b:InvokeCommandAction Command="{Binding ShowViewCommand}"
+                                   CommandParameter="{x:Type v:AttachedPatientsView}" />
+        </b:EventTrigger>
+
+        <b:EventTrigger EventName="Closing">
+            <b:InvokeCommandAction Command="{Binding SaveSettingsCommand}" />
+        </b:EventTrigger>
+    </b:Interaction.Triggers>
+
     <DockPanel>
         
         <DockPanel.Background>

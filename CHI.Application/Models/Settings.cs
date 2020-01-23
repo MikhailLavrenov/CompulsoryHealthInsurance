@@ -67,7 +67,15 @@ namespace CHI.Application.Models
                     return formatter.Deserialize(stream) as Settings;
                 }
             else
-                return new Settings();
+            {
+                var settings= new Settings();
+                settings.SetDefaultSRZ();
+                settings.SetDefaultAttachedPatientsFile();
+                settings.SetDefaultExaminations();
+                settings.SetDefaultOther();
+
+                return settings;
+            }
         }
         //исправляет url
         private static string FixUrl(string url)
@@ -328,8 +336,6 @@ namespace CHI.Application.Models
         {
             SRZAddress = @"http://11.0.0.1/";
             SRZThreadsLimit = 10;
-            DownloadNewPatientsFile = true;
-            PatientsFilePath = "Прикрепленные пациенты выгрузка.xlsx";
             FormatPatientsFile = true;
             SRZCredentials = new ObservableCollection<Credential>()
              {
@@ -341,6 +347,9 @@ namespace CHI.Application.Models
         //устанавливает по-умолчанию настройки файла прикрепленных пациентов
         public void SetDefaultAttachedPatientsFile()
         {
+            DownloadNewPatientsFile = true;
+            PatientsFilePath = "Прикрепленные пациенты выгрузка.xlsx";
+
             ColumnProperties = new ObservableCollection<ColumnProperty>()
              {
                     new ColumnProperty{Name="ENP",         AltName="Полис",                 Hide=false,  Delete=false},

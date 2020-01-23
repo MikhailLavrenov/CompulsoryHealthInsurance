@@ -21,8 +21,6 @@ namespace CHI.Application.ViewModels
         public IMainRegionService MainRegionService { get; set; }
         public bool KeepAlive { get => false; }
         public Settings Settings { get => settings; set => SetProperty(ref settings, value); }
-        public DelegateCommand SaveCommand { get; }
-        public DelegateCommand LoadCommand { get; }
         public DelegateCommand SetDefaultCommand { get; }
         public DelegateCommand<ColumnProperty> MoveUpCommand { get; }
         public DelegateCommand<ColumnProperty> MoveDownCommand { get; }
@@ -39,8 +37,6 @@ namespace CHI.Application.ViewModels
             Settings = Settings.Instance;
             //MainRegionService.Header = "Настройки столбцов файла прикрепленных пациентов";
 
-            SaveCommand = new DelegateCommand(SaveExecute);
-            LoadCommand = new DelegateCommand(LoadExecute);
             SetDefaultCommand = new DelegateCommand(SetDefaultExecute);
             MoveUpCommand = new DelegateCommand<ColumnProperty>(x => Settings.MoveUpColumnProperty(x as ColumnProperty));
             MoveDownCommand = new DelegateCommand<ColumnProperty>(x => Settings.MoveDownColumnProperty(x as ColumnProperty));
@@ -57,16 +53,6 @@ namespace CHI.Application.ViewModels
 
             if (fileDialogService.ShowDialog() == true)
                 settings.PatientsFilePath = fileDialogService.FileName;
-        }
-        private void SaveExecute()
-        {
-            Settings.Save();
-            MainRegionService.SetCompleteStatus("Настройки сохранены.");
-        }
-        private void LoadExecute()
-        {
-            Settings = Settings.Load();
-            MainRegionService.SetCompleteStatus("Изменения настроек отменены.");
         }
         private void SetDefaultExecute()
         {

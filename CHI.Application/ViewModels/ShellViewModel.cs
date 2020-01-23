@@ -1,4 +1,5 @@
 ﻿using CHI.Application.Infrastructure;
+using CHI.Application.Models;
 using Prism.Commands;
 using System;
 using System.Linq;
@@ -19,7 +20,7 @@ namespace CHI.Application.ViewModels
         public bool ShowLicenseManager { get; }
         public bool IsMaximizedWidow { get => isMaximizedWindow; set => SetProperty(ref isMaximizedWindow, value); }
 
-
+        public DelegateCommand SaveSettingsCommand { get; }
         public DelegateCommand CloseWindowCommand { get; }
         public DelegateCommand RestoreWindowCommand { get; }
         public DelegateCommand MaximizeWindowCommand { get; }
@@ -34,6 +35,7 @@ namespace CHI.Application.ViewModels
             MainRegionService = mainRegionService;
             ApplicationTitle = ((AssemblyTitleAttribute)Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(AssemblyTitleAttribute), false).First()).Title;
 
+            SaveSettingsCommand = new DelegateCommand(() => Settings.Instance.Save());
             ShowViewCommand = new DelegateCommand<Type>(x => MainRegionService.RequestNavigate(x.Name));
             CloseWindowCommand = new DelegateCommand(() => System.Windows.Application.Current.Shutdown());
             RestoreWindowCommand = new DelegateCommand(RestoreWindowExecute);

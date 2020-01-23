@@ -89,15 +89,18 @@
 
                 <DataGrid.Columns>
 
+                    <DataGridTemplateColumn CellTemplate="{StaticResource DataGridDragColumn}"
+                                            IsReadOnly="True" />
+
                     <DataGridTextColumn     Header="Название столбца"
                                             Binding="{Binding Path=Name, ValidatesOnDataErrors=True}"                                                                                 
                                             ElementStyle="{StaticResource DataGridText}"                                    
                                             EditingElementStyle="{StaticResource DataGridTextEditing}"
-                                            MinWidth="190" />
+                                            MinWidth="170" />
                     <DataGridTextColumn     Header="Понятное название"
                                             Binding="{Binding Path=AltName, ValidatesOnDataErrors=True}"                                                                                                                  
                                             EditingElementStyle="{StaticResource DataGridTextEditing}"
-                                            MinWidth="190" />
+                                            MinWidth="170" />
                     <DataGridCheckBoxColumn Header="Скрыть"
                                             Binding="{Binding Path=Hide}"                                                                                                                   
                                             MinWidth="65" />
@@ -120,10 +123,6 @@
                     Orientation="Horizontal"
                     VerticalAlignment="Top">
 
-            <Button Content="Сохранить"
-                    Command="{Binding SaveCommand}" />
-            <Button Content="Отмена"
-                    Command="{Binding LoadCommand}" />
             <Button Content="По умолчанию"
                     Command="{Binding SetDefaultCommand}" />
         </StackPanel>

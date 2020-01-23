@@ -25,7 +25,7 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="200" />
-            <ColumnDefinition Width="320" />
+            <ColumnDefinition Width="300" />
         </Grid.ColumnDefinitions>
 
         <Grid.RowDefinitions>
@@ -63,16 +63,19 @@
 
             <DataGrid.Columns>
 
+                <DataGridTemplateColumn CellTemplate="{StaticResource DataGridDragColumn}"
+                                        IsReadOnly="True" />
+
                 <!--Столбец Логин-->
                 <DataGridTextColumn Header="Логин"
                                     Binding="{Binding Login, ValidatesOnDataErrors=True}"
                                     ElementStyle="{StaticResource DataGridText}"
                                     EditingElementStyle="{StaticResource DataGridTextEditing}"
-                                    MinWidth="180"/>
+                                    MinWidth="160"/>
 
                 <!--Столбец Пароль-->
                 <!--Шаблон Заголовка. В заголовок вставляем текст и кнопку для переключения видимости паролей-->
-                <DataGridTemplateColumn MinWidth="180">
+                <DataGridTemplateColumn MinWidth="160">
                     <DataGridTemplateColumn.HeaderStyle>
                         <Style TargetType="{x:Type DataGridColumnHeader}">
                             <Setter Property="Background"
@@ -130,7 +133,7 @@
                 <!--Столбец Лимит запросов-->
                 <materialDesign:DataGridTextColumn Header="Лимит запросов"
                                                    Binding="{Binding RequestsLimit, ValidatesOnDataErrors=True}"
-                                                   MinWidth="100"
+                                                   MinWidth="90"
                                                                                        ElementStyle="{StaticResource DataGridText}"
                                     EditingElementStyle="{StaticResource DataGridTextEditing}"
                                                    Width="*" />
@@ -144,10 +147,6 @@
                     Orientation="Horizontal">
             <Button Content="Проверить"
                     Command="{Binding TestCommand}" />
-            <Button Content="Сохранить"
-                    Command="{Binding SaveCommand}" />
-            <Button Content="Отмена"
-                    Command="{Binding LoadCommand}" />
             <Button Content="По умолчанию"
                     Command="{Binding SetDefaultCommand}" />
         </StackPanel>
