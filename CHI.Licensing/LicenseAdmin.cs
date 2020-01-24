@@ -1,4 +1,5 @@
 ﻿using CHI.Application;
+using CHI.Application.Models;
 using System;
 using System.IO;
 using System.Security.Cryptography;
@@ -18,17 +19,20 @@ namespace CHI.Licensing
         /// <summary>
         /// Полный путь к ключевой паре подписи лицензий.
         /// </summary>
-        internal static string SecretKeyPath { get; } = $"{DefaultDirectory}{secretKeyName}";
+        internal string SecretKeyPath { get; }
         /// <summary>
         /// Полный путь к открытому ключу проверки подписи лицензий.
         /// </summary>
-        internal static string PublicKeyPath { get; } = $"{DefaultDirectory}{publicKeyName}";
+        internal string PublicKeyPath { get; }
 
         /// <summary>
         /// Конструктор. Вызывает инициализацию класса.
         /// </summary>
         internal LicenseAdmin()
         {
+            PublicKeyPath= $"{DefaultDirectory}{publicKeyName}";
+            SecretKeyPath = $"{DefaultDirectory}{secretKeyName}";
+
             Initialize();
         }
 
@@ -47,7 +51,7 @@ namespace CHI.Licensing
         /// <summary>
         /// Генерирует и сохраняет в файлы новую ключевую пару для подписи лицензий.
         /// </summary>
-        internal static void NewSignKeyPair()
+        internal void NewSignKeyPair()
         {
             new FileInfo(DefaultDirectory).Directory.Create();
 
@@ -69,22 +73,22 @@ namespace CHI.Licensing
         internal void SingAndSaveLicense(License license, string licensePath)
         {
             if (!SecretKeyLoaded)
-                throw new InvalidOperationException("Ошибка генерации лицензии: отсутствует закрытый ключ.");
+                throw new InvalidOperationException("Ошибка генерации лицензии: отсутствует закрытый ключ.");          
 
-            var signPath = Path.ChangeExtension(licensePath, SignExtension);
-
-            using (var licenseStream = new FileStream(licensePath, FileMode.CreateNew))
-            using (var signStream = new FileStream(signPath, FileMode.CreateNew))
+            using (var stream = new FileStream(licensePath, FileMode.CreateNew))
             {
+                var signedLicense = new SignedLicense();
+                signedLicense.License = license;
+
+                var mstream = new MemoryStream();
                 var formatter = new XmlSerializer(license.GetType());
+                formatter.Serialize(mstream, license);
+                mstream.Position = 0;
 
-                formatter.Serialize(licenseStream, license);
+                signedLicense.Sign = cryptoProvider.SignData(mstream, new SHA512CryptoServiceProvider());
 
-                licenseStream.Position = 0;
-
-                var licenseSign = cryptoProvider.SignData(licenseStream, new SHA512CryptoServiceProvider());
-
-                signStream.Write(licenseSign, 0, licenseSign.Length);
+                formatter = new XmlSerializer(signedLicense.GetType());
+                formatter.Serialize(stream, signedLicense);
             }
         }
     }

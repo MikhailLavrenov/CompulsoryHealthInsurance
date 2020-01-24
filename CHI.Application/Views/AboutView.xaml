@@ -24,7 +24,7 @@
                 <Setter Property="FontWeight"
                 Value="Medium" />
             </Style>
-            
+
         </ResourceDictionary >
     </UserControl.Resources>
 
@@ -37,15 +37,14 @@
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
-            <RowDefinition Height="20"/>
             <RowDefinition Height="auto"/>
-            <RowDefinition Height="20"/>
-            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="80"/>
+            <ColumnDefinition Width="90"/>
             <ColumnDefinition Width="*" MaxWidth="1000"/>
         </Grid.ColumnDefinitions>
 
@@ -97,6 +96,8 @@
                    Style="{StaticResource TextBlockRight}"
                    Text="{Binding Phone}" />
 
+        <FrameworkElement Grid.Row="6"  Height="20"/>
+
         <TextBlock Grid.Row="7"
                    Grid.Column="0"
                    Text="Лицензия" 
@@ -107,13 +108,16 @@
                    Style="{StaticResource TextBlockRight}"
                    Text="{Binding License}" />
 
-        <Button Grid.Row="9"                   
-                Grid.Column="0"
-                Grid.ColumnSpan="2"
-                Style="{StaticResource MaterialDesignFlatButton}" FontWeight="Regular" Padding="5,0,5,0"
-                HorizontalAlignment="Left"
-                Content="Открыть инструкцию"              
+        <StackPanel Grid.Row="8"  Grid.Column="0"
+                Grid.ColumnSpan="2" Orientation="Horizontal">
+
+            <Button Content="Установить лицензию" Width="170"            
+                Command="{Binding ImportLicenseCommand}" />
+
+            <Button Content="Открыть инструкцию"  Width="170"                
                 Command="{Binding OpenManualCommand}" />
+
+        </StackPanel>
 
     </Grid>
 </UserControl>

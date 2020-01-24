@@ -52,14 +52,14 @@ namespace CHI.Licensing
         #region Методы
         private void NewSignKeysExecute()
         {
-            LicenseAdmin.NewSignKeyPair();
+            licenseAdmin.NewSignKeyPair();
             licenseAdmin.Initialize();
             NewSignKeysCommand.RaiseCanExecuteChanged();
             Status = "Создана новая пара ключей для подписания лицензий.";
         }
         private bool NewSignKeysCanExecute()
         {
-            if (File.Exists(LicenseAdmin.SecretKeyPath) || File.Exists(LicenseAdmin.PublicKeyPath))
+            if (File.Exists(licenseAdmin.SecretKeyPath) || File.Exists(licenseAdmin.PublicKeyPath))
                 return false;
 
             return true;

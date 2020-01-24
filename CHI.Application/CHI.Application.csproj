@@ -173,6 +173,7 @@
     <Compile Include="Models\License.cs" />
     <Compile Include="Models\LicenseManager.cs" />
     <Compile Include="Models\Settings.cs" />
+    <Compile Include="Models\SignedLicense.cs" />
     <Compile Include="ViewModels\AboutViewModel.cs" />
     <Compile Include="ViewModels\AttachedPatientsStorageSettingsViewModel.cs" />
     <Compile Include="ViewModels\OtherSettingsViewModel.cs" />

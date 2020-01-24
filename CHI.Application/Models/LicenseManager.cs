@@ -1,4 +1,5 @@
 ﻿using CHI.Application.Infrastructure;
+using CHI.Application.Models;
 using System;
 using System.IO;
 using System.Linq;
@@ -20,15 +21,11 @@ namespace CHI.Application
         /// <summary>
         /// Стандартная директория для подсистемы лицензирования
         /// </summary>
-        public static string DefaultDirectory { get; } = $@"{Directory.GetCurrentDirectory()}\Licensing\";
-        /// <summary>
-        /// Расширение файла проверки лицензии
-        /// </summary>
-        public static string SignExtension { get; } = ".sig";
+        public string DefaultDirectory { get; } = $@"{Directory.GetCurrentDirectory()}\Licensing\";
         /// <summary>
         /// Расширение файла лицензии
         /// </summary>
-        public static string LicenseExtension { get; } = ".lic";
+        public string LicenseExtension { get; } = ".lic";
         /// <summary>
         /// Текущая пользовательская лицензия
         /// </summary>
@@ -73,28 +70,23 @@ namespace CHI.Application
         /// <exception cref="InvalidOperationException">Возникает когда подпись не соответствует файлу лицензии</exception>
         public License LoadLicense(string licensePath)
         {
-            License license = null;
+            SignedLicense signedLicense = null;
 
-            var signPath = Path.ChangeExtension(licensePath, SignExtension);
-
-            using (var licenseStream = new FileStream(licensePath, FileMode.Open, FileAccess.Read))
-            using (var signStream = new FileStream(signPath, FileMode.Open, FileAccess.Read))
+            using (var stream = new FileStream(licensePath, FileMode.Open, FileAccess.Read))
             {
-                var licenseBytes = licenseStream.GetBytes();
-                var signBytes = signStream.GetBytes();
+                var formatter = new XmlSerializer(typeof(SignedLicense));
+                signedLicense = (SignedLicense)formatter.Deserialize(stream);
 
-                if (cryptoProvider.VerifyData(licenseBytes, new SHA512CryptoServiceProvider(), signBytes))
-                {
-                    var formatter = new XmlSerializer(typeof(License));
+                var mstream = new MemoryStream();
+                formatter = new XmlSerializer(signedLicense.License.GetType());
+                formatter.Serialize(mstream, signedLicense.License);
+                var licenseBytes = mstream.ToArray();
 
-                    licenseStream.Position = 0;
-                    license = (License)formatter.Deserialize(licenseStream);
-                }
-                else
+                if (!cryptoProvider.VerifyData(licenseBytes, new SHA512CryptoServiceProvider(), signedLicense.Sign))
                     throw new InvalidOperationException("Ошибка проверки лицензии: подпись не соответствует лицензии.");
             }
 
-            return license;
+            return signedLicense.License;
         }
         /// <summary>
         /// Возвращает описание текущей лицензии в виде строк (включая предоставленные права)
