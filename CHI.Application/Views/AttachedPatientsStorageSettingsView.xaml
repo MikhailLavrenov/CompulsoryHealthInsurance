@@ -21,21 +21,36 @@
         </ResourceDictionary >
     </UserControl.Resources>
 
+    <Grid d:DataContext="{d:DesignInstance vm:OtherSettingsViewModel}">
 
-        <StackPanel d:DataContext="{d:DesignInstance vm:OtherSettingsViewModel}"
-            VerticalAlignment="Top"
-                    Grid.Row="5"
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="300"/>
+        </Grid.ColumnDefinitions>
+
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="Кол-во пациентов в БД"/>
+        <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding PatientsCount}" FontWeight="Medium"/>
+
+        <StackPanel Grid.Row="1"
                     Grid.Column="0"
-                    Grid.ColumnSpan="2"
+                    Grid.ColumnSpan="2"                    
                     Orientation="Horizontal">
-            
+
             <Button Content="Импорт"
                     Command="{Binding ImportPatientsCommand}" />
             <Button Content="Скачать пример"
                     Command="{Binding SaveExampleCommand}" />
             <Button Content="Очистить"
                     Command="{Binding ClearDatabaseCommand}" />
-            
+
         </StackPanel>
-    
+
+    </Grid>
+
 </UserControl>

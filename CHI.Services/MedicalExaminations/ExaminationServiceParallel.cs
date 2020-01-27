@@ -80,11 +80,7 @@ namespace CHI.Services.MedicalExaminations
         /// <returns>Список кортежей состоящий из PatientExaminations, флага успешной загрузки (true-успешно, false-иначе), строки с сообщением об ошибке.</returns>
         public List<Tuple<PatientExaminations, bool, string>> AddPatientsExaminations(List<PatientExaminations> patientsExaminations)
         {
-            var threadsLimit = ThreadsLimit;
-
-            if (patientsExaminations.Count < threadsLimit)
-                threadsLimit = patientsExaminations.Count;
-
+            var threadsLimit = patientsExaminations.Count > ThreadsLimit ? ThreadsLimit : patientsExaminations.Count;
             var circularList = new CircularList<ICredential>(Credentials);
             var result = new ConcurrentBag<Tuple<PatientExaminations, bool, string>>();
             var tasks = new Task<ExaminationService>[threadsLimit];

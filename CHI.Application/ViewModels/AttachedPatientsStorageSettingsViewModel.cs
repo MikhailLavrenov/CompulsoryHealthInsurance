@@ -1,12 +1,12 @@
 ﻿using CHI.Application.Infrastructure;
 using CHI.Application.Models;
 using CHI.Services.AttachedPatients;
-using Prism.Commands;
 using Prism.Regions;
 using Prism.Services.Dialogs;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace CHI.Application.ViewModels
 {
@@ -16,9 +16,11 @@ namespace CHI.Application.ViewModels
         private Settings settings;
         private IDialogService dialogService;
         private readonly IFileDialogService fileDialogService;
+        private string patientsCount = "Вычисляется...";
         #endregion
 
         #region Свойства
+        public string PatientsCount { get => patientsCount; set => SetProperty(ref patientsCount, value); }
         public IMainRegionService MainRegionService { get; set; }
         public bool KeepAlive { get => false; }
         public Settings Settings { get => settings; set => SetProperty(ref settings, value); }
@@ -35,6 +37,8 @@ namespace CHI.Application.ViewModels
             MainRegionService = mainRegionService;
 
             Settings = Settings.Instance;
+
+            Task.Run(() => PatientsCount=new Models.Database().Patients.Count().ToString());
 
             ImportPatientsCommand = new DelegateCommandAsync(ImportPatientsExecute);
             SaveExampleCommand = new DelegateCommandAsync(SaveExampleExecute);
@@ -72,8 +76,9 @@ namespace CHI.Application.ViewModels
             db.Patients.AddRange(newUniqPatients);
             db.SaveChanges();
 
-            int total = existenInsuaranceNumbers.Count + newUniqPatients.Count;
-            MainRegionService.SetCompleteStatus($"В файле найдено {newPatients.Count} человек(а). В БД добавлено {newUniqPatients.Count} новых. Итого в БД {total}.");
+            PatientsCount = db.Patients.Count().ToString();
+
+            MainRegionService.SetCompleteStatus($"В файле найдено {newPatients.Count} человек(а). В БД добавлено {newUniqPatients.Count} новых человек(а).");
         }
         private void SaveExampleExecute()
         {
@@ -107,6 +112,7 @@ namespace CHI.Application.ViewModels
             if (db.Database.Exists())
                 db.Database.Delete();
             db.Database.Create();
+            PatientsCount = db.Patients.Count().ToString();            
             MainRegionService.SetCompleteStatus("База данных очищена.");
         }
         #endregion
