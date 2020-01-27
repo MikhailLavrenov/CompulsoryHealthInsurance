@@ -72,7 +72,7 @@ namespace CHI.Application.ViewModels
             .Select(x => x.First())
             .ToList();
 
-            MainRegionService.SetBusyStatus("Сохранение в кэш.");
+            MainRegionService.SetBusyStatus("Сохранение в локальную базу данных.");
             db.Patients.AddRange(newUniqPatients);
             db.SaveChanges();
 

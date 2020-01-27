@@ -74,6 +74,13 @@ namespace CHI.Application.ViewModels
 
             settings.PatientsFilePath = fileDialogService.FileName;
 
+            Models.Database db=null;
+            db = new Models.Database();
+            db.Patients.Load();
+
+            var dbLoading = Task.Run(()=> {
+
+            });
 
             if (Settings.DownloadNewPatientsFile)
             {
@@ -86,43 +93,41 @@ namespace CHI.Application.ViewModels
                 service.GetPatientsFile(Settings.PatientsFilePath, FileDate);
             }
 
-            MainRegionService.SetBusyStatus("Подстановка в файл ФИО из локальной базы данных.");
-            var db = new Models.Database();
-            var file = new PatientsFileService();
+            MainRegionService.SetBusyStatus("Подстановка ФИО в файл.");
 
-            db.Patients.Load();
+            dbLoading.ConfigureAwait(false).GetAwaiter();
+
+            var file = new PatientsFileService();
             file.Open(Settings.PatientsFilePath, Settings.ColumnProperties);
-            file.SetFullNames(db.Patients.ToList());
+            file.AddFullNames(db.Patients.ToList());
 
             string resultReport;
             var limitCount = Settings.SRZCredentials.Sum(x => x.RequestsLimit);
 
             if (Settings.SrzConnectionIsValid)
-            {
-                MainRegionService.SetBusyStatus("Поиск пациентов без ФИО в файле.");                
+            {              
                 var unknownInsuaranceNumbers = file.GetUnknownInsuaranceNumbers(limitCount);
 
                 MainRegionService.SetBusyStatus("Поиск ФИО в СРЗ.");
-                var verifiedPatients = GetPatients(unknownInsuaranceNumbers);
-                resultReport = $"Запрошено ФИО в СРЗ: {verifiedPatients.Count()}.";
+                var foundPatients = GetPatients(unknownInsuaranceNumbers);
 
-                MainRegionService.SetBusyStatus("Сохранение ФИО из СРЗ в локальной базе данных.");
-                var duplicateInsuranceNumber = new HashSet<string>(verifiedPatients.Select(x => x.InsuranceNumber));
-                var duplicatePatients = db.Patients.Where(x => duplicateInsuranceNumber.Contains(x.InsuranceNumber)).ToArray();
+                resultReport = $"Запрошено ФИО в СРЗ: {foundPatients.Count()}.";
+                MainRegionService.SetBusyStatus("Подстановка ФИО в файл.");
+                file.AddFullNames(foundPatients);
+
+                MainRegionService.SetBusyStatus("Добавление ФИО в локальную базу данных.");
+                var duplicateInsuranceNumbers = new HashSet<string>(foundPatients.Select(x => x.InsuranceNumber).ToList());
+                var duplicatePatients = db.Patients.Where(x => duplicateInsuranceNumbers.Contains(x.InsuranceNumber)).ToArray();
                 
                 db.Patients.RemoveRange(duplicatePatients);
                 db.SaveChanges();
 
-                db.Patients.AddRange(verifiedPatients);
+                db.Patients.AddRange(foundPatients);
                 db.SaveChanges();
-
-                MainRegionService.SetBusyStatus("Подстановка в файл ФИО полученных из СРЗ.");
-                file.SetFullNames(db.Patients.ToList());
             }
             else
-                resultReport = $"ФИО подставлены только из кэша. Не удалось подключиться к СРЗ, проверьте настройки и доступность сайта.";
+                resultReport = $"ФИО подставлены только из локальной БД. Не удалось подключиться к СРЗ, проверьте настройки и доступность сайта.";
               
-            MainRegionService.SetBusyStatus("Поиск пациентов без ФИО в файле.");
             var unknownPatients = file.GetUnknownInsuaranceNumbers(int.MaxValue);
 
             if (unknownPatients.Count == 0)
@@ -136,8 +141,10 @@ namespace CHI.Application.ViewModels
 
             if (unknownPatients.Count == 0)
                 MainRegionService.SetCompleteStatus($"{resultReport} Файл готов, все ФИО найдены.");
-            else
+            else if(Settings.SrzConnectionIsValid)
                 MainRegionService.SetCompleteStatus($"{resultReport} Файл не готов, осталось найти {unknownPatients.Count} ФИО, достигнут лимит {limitCount} запроса(ов) в день.");
+            else 
+                MainRegionService.SetCompleteStatus($"{resultReport} Файл не готов, осталось найти {unknownPatients.Count} ФИО.");
         }
         //запускает многопоточно запросы к сайту для поиска пациентов
         private Patient[] GetPatients(List<string> insuranceNumbers)

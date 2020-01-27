@@ -12,7 +12,6 @@ namespace CHI.Services.AttachedPatients
     public class PatientsFileService : IDisposable
     {
         #region Поля
-        private static readonly object locker = new object();
         private ExcelPackage excel;
         private ExcelWorksheet sheet;
         private List<IColumnProperties> columnProperties;
@@ -24,8 +23,8 @@ namespace CHI.Services.AttachedPatients
         private int surnameColumn;
         private int nameColumn;
         private int patronymicColumn;
-        private Patient[] excelPatients;
-        private bool NeedWriteExcelPatients=false;
+        private Patient[] patients;
+        private bool patientsChanged = false;
         #endregion
 
         #region Методы
@@ -48,16 +47,93 @@ namespace CHI.Services.AttachedPatients
             patronymicColumn = GetColumnIndex("Отчество");
 
             CheckOrFixStructure();
+            GetPatients();
+        }
+        /// <summary>
+        /// Проверяет структуру файла, при необходимости добавляет столбцы Фамилия, Имя, Отчество.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">Возникает в случае если невозможно исправить структуру файла.</exception>
+        private void CheckOrFixStructure()
+        {
+            if (insuranceColumn == -1)
+                throw new InvalidOperationException("Не найден столбец с номером полиса");
 
-            LoadExcelPatients();
+            if (initialsColumn == -1)
+                throw new InvalidOperationException("Не найден столбец с инициалами ФИО");
+
+            if (surnameColumn == -1)
+            {
+                surnameColumn = initialsColumn + 1;
+                sheet.InsertColumn(surnameColumn, 1);
+                sheet.Cells[headerIndex, surnameColumn].Value = "Фамилия";
+                maxCol++;
+            }
+
+            if (nameColumn == -1)
+            {
+                nameColumn = surnameColumn + 1;
+                sheet.InsertColumn(nameColumn, 1);
+                sheet.Cells[headerIndex, nameColumn].Value = "Имя";
+                maxCol++;
+            }
+
+            if (patronymicColumn == -1)
+            {
+                patronymicColumn = nameColumn + 1;
+                sheet.InsertColumn(patronymicColumn, 1);
+                sheet.Cells[headerIndex, patronymicColumn].Value = "Отчество";
+                maxCol++;
+            }
+        }
+        /// <summary>
+        /// Создает масив типа Patient соответствующий файлу прикрепленных пациентов
+        /// </summary>
+        private void GetPatients()
+        {
+            patients = new Patient[maxRow - headerIndex];
+
+            for (int i = 0; i < patients.Length; i++)
+            {
+                var sheetRow = i + headerIndex + 1;
+
+                var patient = new Patient
+                {
+                    InsuranceNumber = sheet.Cells[sheetRow, insuranceColumn].Value.ToString(),
+                    Initials = sheet.Cells[sheetRow, initialsColumn].Value.ToString()
+                };
+
+                if (sheet.Cells[sheetRow, surnameColumn].Value != null)
+                {
+                    patient.Surname = sheet.Cells[sheetRow, surnameColumn].Value.ToString();
+                    patient.Name = sheet.Cells[sheetRow, nameColumn].Value.ToString();
+                    patient.Patronymic = sheet.Cells[sheetRow, patronymicColumn].Value.ToString();
+                    patient.FullNameExist = true;
+                }
+
+                patients[i] = patient;
+            }
         }
         /// <summary>
         /// Cохраняет изменения в файле
         /// </summary>
         public void Save()
         {
-            if (NeedWriteExcelPatients)
-                WriteExcelPatients();
+            if (patientsChanged)
+            {
+                for (int i = 0; i < patients.Length; i++)
+                {
+                    var sheetRow = i + headerIndex + 1;
+
+                    if (sheet.Cells[sheetRow, surnameColumn].Value == null && patients[i].FullNameExist)
+                    {
+                        sheet.Cells[sheetRow, surnameColumn].Value = patients[i].Surname;
+                        sheet.Cells[sheetRow, nameColumn].Value = patients[i].Name;
+                        sheet.Cells[sheetRow, patronymicColumn].Value = patients[i].Patronymic;
+                    }
+                }
+
+                patientsChanged = false;
+            }
 
             excel.Save();
         }
@@ -68,31 +144,31 @@ namespace CHI.Services.AttachedPatients
         /// <returns>Список серии и/или номера полиса пациентов без полных ФИО</returns>
         public List<string> GetUnknownInsuaranceNumbers(long limitCount)
         {
-            return excelPatients.Where(x => !x.FullNameExist).Take((int)limitCount).Select(x => x.InsuranceNumber).ToList();
+            return patients.Where(x => !x.FullNameExist).Take((int)limitCount).Select(x => x.InsuranceNumber).ToList();
         }
         /// <summary>
         /// Вставляет полные ФИО в файл.
         /// </summary>
-        /// <param name="cachedPatients">Коллекиця сведений о пациентах.</param>
-        public void SetFullNames(IEnumerable<Patient> cachedPatients)
-        {
-            var dict = new Dictionary<string, Patient>();
-            cachedPatients.ToList().ForEach(x => dict.Add(x.InsuranceNumber, x));
+        /// <param name="patientsWithFullName">Коллекиця сведений о пациентах.</param>
+        public void AddFullNames(IEnumerable<Patient> patientsWithFullName)
+        {            
+            var fullNamePatients = new Dictionary<string, Patient>();
 
-            foreach (var excelPatient in excelPatients.Where(x => !x.FullNameExist))
+            foreach (var item in patientsWithFullName)
+                fullNamePatients.Add(item.InsuranceNumber, item);
+
+            for (int i = 0; i < patients.Length; i++)
             {
-                dict.TryGetValue(excelPatient.InsuranceNumber, out var cachedPatient);
-
-                if (cachedPatient == null || excelPatient.Initials!= cachedPatient.Initials)
+                if (patients[i].FullNameExist)
                     continue;
 
-                excelPatient.Surname = cachedPatient.Surname;
-                excelPatient.Name = cachedPatient.Name;
-                excelPatient.Patronymic = cachedPatient.Patronymic;
-                excelPatient.FullNameExist = true;
+                fullNamePatients.TryGetValue(patients[i].InsuranceNumber, out var fullNamePatient);
+
+                if (fullNamePatient != null && patients[i].Initials == fullNamePatient.Initials)
+                    patients[i] = fullNamePatient;
             }
 
-            NeedWriteExcelPatients = true;
+            patientsChanged = true;
         }
         /// <summary>
         /// Применяет форматирования к файлу в соотвествии с настройками свойств столбцов
@@ -140,13 +216,19 @@ namespace CHI.Services.AttachedPatients
                     var name = sheet.Cells[row, nameColumn].Value;
                     var patronymic = sheet.Cells[row, patronymicColumn].Value ?? string.Empty;
 
-                    if (insurance != null && surname != null && name != null)
-                    {
-                        var patient = new Patient(insurance.ToString(), surname.ToString(), name.ToString(), patronymic.ToString());
-                        patient.Normalize();
+                    if (insurance == null || surname == null || name == null)
+                        continue;
 
-                        patients.Add(patient);
-                    }
+                    var patient = new Patient
+                    {
+                        InsuranceNumber = insurance.ToString().Replace(" ", "").ToUpper(),
+                        Surname = surname.ToString().Replace("  ", " ").Trim().ToUpper(),
+                        Name = name.ToString().Replace("  ", " ").Trim().ToUpper(),
+                        Patronymic = patronymic.ToString().Replace("  ", " ").Trim().ToUpper(),
+                        FullNameExist = true
+                    };
+                    patient.DefineInitilas();
+                    patients.Add(patient);
                 }
             }
 
@@ -258,7 +340,11 @@ namespace CHI.Services.AttachedPatients
 
             return -1;
         }
-        //возвращает атрибуты столбца по имени, если такого нет - null
+        /// <summary>
+        /// возвращает атрибуты столбца по имени, если такого нет - null
+        /// </summary>
+        /// <param name="name">Имя столбца</param>
+        /// <returns>Атрибуты столбца</returns>
         private IColumnProperties GetColumnProperty(string name)
         {
             foreach (var attribute in columnProperties)
@@ -266,81 +352,6 @@ namespace CHI.Services.AttachedPatients
                     return attribute;
 
             return null;
-        }
-        /// <summary>
-        /// Проверяет структуру файла, при необходимости добавляет столбцы Фамилия, Имя, Отчество.
-        /// </summary>
-        /// <exception cref="InvalidOperationException">Возникает в случае если невозможно исправить структуру файла.</exception>
-        private void CheckOrFixStructure()
-        {
-            if (insuranceColumn == -1)
-                throw new InvalidOperationException("Не найден столбец с номером полиса");
-
-            if (initialsColumn == -1)
-                throw new InvalidOperationException("Не найден столбец с инициалами ФИО");
-
-            if (surnameColumn == -1)
-            {
-                surnameColumn = initialsColumn + 1;
-                sheet.InsertColumn(surnameColumn, 1);
-                sheet.Cells[headerIndex, surnameColumn].Value = "Фамилия";
-                maxCol++;
-            }
-
-            if (nameColumn == -1)
-            {
-                nameColumn = surnameColumn + 1;
-                sheet.InsertColumn(nameColumn, 1);
-                sheet.Cells[headerIndex, nameColumn].Value = "Имя";
-                maxCol++;
-            }
-
-            if (patronymicColumn == -1)
-            {
-                patronymicColumn = nameColumn + 1;
-                sheet.InsertColumn(patronymicColumn, 1);
-                sheet.Cells[headerIndex, patronymicColumn].Value = "Отчество";
-                maxCol++;
-            }
-        }
-        private void LoadExcelPatients()
-        {
-            excelPatients = new Patient[maxRow - headerIndex];
-
-            for (int i = 0; i < excelPatients.Length; i++)
-            {
-                var exRow = i + headerIndex + 1;
-
-                var patient = new Patient
-                {
-                    InsuranceNumber = sheet.Cells[exRow, insuranceColumn].Value.ToString(),
-                    Initials = sheet.Cells[exRow, initialsColumn].Value.ToString()
-                };
-
-                if (sheet.Cells[exRow, surnameColumn].Value != null)
-                {
-                    patient.Surname = sheet.Cells[exRow, surnameColumn].Value.ToString();
-                    patient.Name = sheet.Cells[exRow, nameColumn].Value.ToString();
-                    patient.Patronymic = sheet.Cells[exRow, patronymicColumn].Value.ToString();
-                    patient.FullNameExist = true;
-                }
-
-                excelPatients[i] = patient;
-            }
-        }
-        private void WriteExcelPatients()
-        {
-            for (int i = 0; i < excelPatients.Length; i++)
-            {
-                var exRow = i + headerIndex + 1;
-
-                if (sheet.Cells[exRow, surnameColumn].Value == null && excelPatients[i].FullNameExist)
-                {
-                    sheet.Cells[exRow, surnameColumn].Value = excelPatients[i].Surname;
-                    sheet.Cells[exRow, nameColumn].Value = excelPatients[i].Name;
-                    sheet.Cells[exRow, patronymicColumn].Value = excelPatients[i].Patronymic;
-                }
-            }
         }
         /// <summary>
         /// Изменяет порядок столбоцов в соотвествии с порядком следования свойств настроек столбцов.

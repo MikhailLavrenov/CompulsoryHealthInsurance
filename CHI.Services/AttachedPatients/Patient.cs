@@ -9,16 +9,21 @@ namespace CHI.Services.AttachedPatients
     /// </summary>
     public class Patient
     {
+        #region Поля
+        public string insuranceNumber;
+        public string initials;
+        #endregion
+
         #region Свойства
         /// <summary>
         /// Серия и/или номер полиса
         /// </summary>
         [Key]
-        public string InsuranceNumber { get; set; }
+        public string InsuranceNumber { get=> insuranceNumber; set=> insuranceNumber=value.ToUpper(); }
         /// <summary>
         /// Инициалы ФИО
         /// </summary>
-        public string Initials { get; set; }
+        public string Initials { get => initials; set => initials = value.ToUpper(); }
         /// <summary>
         /// Фамилия
         /// </summary>
@@ -51,7 +56,7 @@ namespace CHI.Services.AttachedPatients
             Surname = surname;
             Name = name;
             Patronymic = patronymic;
-            SetInitialsFromFullName();
+            DefineInitilas();
             FullNameExist = true;
         }
         /// <summary>
@@ -68,14 +73,15 @@ namespace CHI.Services.AttachedPatients
         /// <summary>
         /// Конструктор по умолчанию.
         /// </summary>
-        public Patient() { }
+        public Patient()
+        { }
         #endregion
 
         #region Методы
         /// <summary>
         /// определяет инициалы по полному ФИО/
         /// </summary>
-        private void SetInitialsFromFullName()
+        public void DefineInitilas()
         {
             var str = new StringBuilder();
 
@@ -86,35 +92,8 @@ namespace CHI.Services.AttachedPatients
             if (Patronymic != null && Patronymic.Length > 0)
                 str.Append(Patronymic[0]);
 
-            Initials = str.ToString().ToUpper();
+            Initials = str.ToString();
         }
-        /// <summary>
-        /// Сравнивает экземпляры класса по значениям свойств
-        /// </summary>
-        /// <param name="patient">Ссылка на экземпляр с которым сравнивается/</param>
-        /// <returns>True-совпадают, False-не совпадают.</returns>
-        public bool Equals(Patient patient)
-        {
-            if (InsuranceNumber.Equals(patient.InsuranceNumber, StringComparison.OrdinalIgnoreCase)
-                && Surname.Equals(patient.Surname, StringComparison.OrdinalIgnoreCase)
-                && Name.Equals(patient.Name, StringComparison.OrdinalIgnoreCase)
-                && Patronymic.Equals(patient.Patronymic, StringComparison.OrdinalIgnoreCase))
-                return true;
-            else
-                return false;
-
-        }
-        /// <summary>
-        /// убирает лишние пробелы, приводит буквы к верхнему регистру, переопределяет инициалы/
-        /// </summary>
-        public void Normalize()
-        {
-            InsuranceNumber = InsuranceNumber.Replace(" ", "").ToUpper();
-            Surname = Surname.Replace("  ", " ").Trim().ToUpper();
-            Name = Name.Replace("  ", " ").Trim().ToUpper();
-            Patronymic = Patronymic.Replace("  ", " ").Trim().ToUpper();
-            SetInitialsFromFullName();
-        }
-        #endregion
+         #endregion
     }
 }
