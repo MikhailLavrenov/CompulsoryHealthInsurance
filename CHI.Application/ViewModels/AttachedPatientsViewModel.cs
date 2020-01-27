@@ -42,7 +42,7 @@ namespace CHI.Application.ViewModels
             MainRegionService.Header = "Загрузка прикрепленных пациентов из СРЗ";
             FileDate = DateTime.Today;
 
-            ProcessFileCommand = new DelegateCommandAsync(ProcessFileExecute, ProcessFileCanExecute);
+            ProcessFileCommand = new DelegateCommandAsync(ProcessFileExecute);
         }
         #endregion
 
@@ -99,15 +99,12 @@ namespace CHI.Application.ViewModels
 
             if (Settings.SrzConnectionIsValid)
             {
-                MainRegionService.SetBusyStatus("Поиск в файле пациентов без ФИО.");                
+                MainRegionService.SetBusyStatus("Поиск пациентов без ФИО в файле.");                
                 var unknownInsuaranceNumbers = file.GetUnknownInsuaranceNumbers(limitCount);
 
                 MainRegionService.SetBusyStatus("Поиск ФИО в СРЗ.");
                 var verifiedPatients = GetPatients(unknownInsuaranceNumbers);
                 resultReport = $"Запрошено ФИО в СРЗ: {verifiedPatients.Count()}.";
-
-                MainRegionService.SetBusyStatus("Подстановка в файл ФИО полученных из СРЗ.");
-                file.SetFullNames(verifiedPatients);
 
                 MainRegionService.SetBusyStatus("Сохранение ФИО из СРЗ в локальной базе данных.");
                 var duplicateInsuranceNumber = new HashSet<string>(verifiedPatients.Select(x => x.InsuranceNumber));
@@ -117,12 +114,15 @@ namespace CHI.Application.ViewModels
                 db.SaveChanges();
 
                 db.Patients.AddRange(verifiedPatients);
-                db.SaveChanges();                
+                db.SaveChanges();
+
+                MainRegionService.SetBusyStatus("Подстановка в файл ФИО полученных из СРЗ.");
+                file.SetFullNames(db.Patients.ToList());
             }
             else
                 resultReport = $"ФИО подставлены только из кэша. Не удалось подключиться к СРЗ, проверьте настройки и доступность сайта.";
-
-            MainRegionService.SetBusyStatus("Подсчет человек без ФИО.");
+              
+            MainRegionService.SetBusyStatus("Поиск пациентов без ФИО в файле.");
             var unknownPatients = file.GetUnknownInsuaranceNumbers(int.MaxValue);
 
             if (unknownPatients.Count == 0)
@@ -138,13 +138,6 @@ namespace CHI.Application.ViewModels
                 MainRegionService.SetCompleteStatus($"{resultReport} Файл готов, все ФИО найдены.");
             else
                 MainRegionService.SetCompleteStatus($"{resultReport} Файл не готов, осталось найти {unknownPatients.Count} ФИО, достигнут лимит {limitCount} запроса(ов) в день.");
-        }
-        private bool ProcessFileCanExecute()
-        {
-            if (Settings.DownloadNewPatientsFile == false && File.Exists(Settings.PatientsFilePath) == false)
-                return false;
-            else
-                return true;
         }
         //запускает многопоточно запросы к сайту для поиска пациентов
         private Patient[] GetPatients(List<string> insuranceNumbers)

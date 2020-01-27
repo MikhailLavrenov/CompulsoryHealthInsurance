@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace CHI.Services.AttachedPatients
 {
@@ -25,6 +24,8 @@ namespace CHI.Services.AttachedPatients
         private int surnameColumn;
         private int nameColumn;
         private int patronymicColumn;
+        private Patient[] excelPatients;
+        private bool NeedWriteExcelPatients=false;
         #endregion
 
         #region Методы
@@ -47,12 +48,17 @@ namespace CHI.Services.AttachedPatients
             patronymicColumn = GetColumnIndex("Отчество");
 
             CheckOrFixStructure();
+
+            LoadExcelPatients();
         }
         /// <summary>
         /// Cохраняет изменения в файле
         /// </summary>
         public void Save()
         {
+            if (NeedWriteExcelPatients)
+                WriteExcelPatients();
+
             excel.Save();
         }
         /// <summary>
@@ -62,24 +68,7 @@ namespace CHI.Services.AttachedPatients
         /// <returns>Список серии и/или номера полиса пациентов без полных ФИО</returns>
         public List<string> GetUnknownInsuaranceNumbers(long limitCount)
         {
-            var patients = new List<string>();
-
-            for (int row = headerIndex + 1; row <= maxRow; row++)
-            {
-                var insuranceValue = sheet.Cells[row, insuranceColumn].Value;
-                var initialsValue = sheet.Cells[row, initialsColumn].Value;
-                var surnameValue = sheet.Cells[row, surnameColumn].Value;
-
-                if (insuranceValue == null || initialsValue == null || surnameValue != null)
-                    continue;
-
-                if (patients.Count < limitCount)
-                    patients.Add(insuranceValue.ToString());
-                else
-                    break;
-            }
-
-            return patients;
+            return excelPatients.Where(x => !x.FullNameExist).Take((int)limitCount).Select(x => x.InsuranceNumber).ToList();
         }
         /// <summary>
         /// Вставляет полные ФИО в файл.
@@ -87,34 +76,23 @@ namespace CHI.Services.AttachedPatients
         /// <param name="cachedPatients">Коллекиця сведений о пациентах.</param>
         public void SetFullNames(IEnumerable<Patient> cachedPatients)
         {
-            Parallel.For(headerIndex + 1, maxRow + 1, (row, state) =>
+            var dict = new Dictionary<string, Patient>();
+            cachedPatients.ToList().ForEach(x => dict.Add(x.InsuranceNumber, x));
+
+            foreach (var excelPatient in excelPatients.Where(x => !x.FullNameExist))
             {
-                object insuranceValue;
-                object initialsValue;
-                object surnameValue;
+                dict.TryGetValue(excelPatient.InsuranceNumber, out var cachedPatient);
 
-                lock (locker)
-                {
-                    insuranceValue = sheet.Cells[row, insuranceColumn].Value;
-                    initialsValue = sheet.Cells[row, initialsColumn].Value;
-                    surnameValue = sheet.Cells[row, surnameColumn].Value;
-                }
+                if (cachedPatient == null || excelPatient.Initials!= cachedPatient.Initials)
+                    continue;
 
-                if (insuranceValue == null || initialsValue == null || surnameValue != null)
-                    return;
+                excelPatient.Surname = cachedPatient.Surname;
+                excelPatient.Name = cachedPatient.Name;
+                excelPatient.Patronymic = cachedPatient.Patronymic;
+                excelPatient.FullNameExist = true;
+            }
 
-                var patient = cachedPatients.Where(x => x.InsuranceNumber == insuranceValue.ToString() && x.Initials == initialsValue.ToString()).FirstOrDefault();
-
-                if (patient == null)
-                    return;
-
-                lock (locker)
-                {
-                    sheet.Cells[row, surnameColumn].Value = patient.Surname;
-                    sheet.Cells[row, nameColumn].Value = patient.Name;
-                    sheet.Cells[row, patronymicColumn].Value = patient.Patronymic;
-                }
-            });
+            NeedWriteExcelPatients = true;
         }
         /// <summary>
         /// Применяет форматирования к файлу в соотвествии с настройками свойств столбцов
@@ -323,6 +301,45 @@ namespace CHI.Services.AttachedPatients
                 sheet.InsertColumn(patronymicColumn, 1);
                 sheet.Cells[headerIndex, patronymicColumn].Value = "Отчество";
                 maxCol++;
+            }
+        }
+        private void LoadExcelPatients()
+        {
+            excelPatients = new Patient[maxRow - headerIndex];
+
+            for (int i = 0; i < excelPatients.Length; i++)
+            {
+                var exRow = i + headerIndex + 1;
+
+                var patient = new Patient
+                {
+                    InsuranceNumber = sheet.Cells[exRow, insuranceColumn].Value.ToString(),
+                    Initials = sheet.Cells[exRow, initialsColumn].Value.ToString()
+                };
+
+                if (sheet.Cells[exRow, surnameColumn].Value != null)
+                {
+                    patient.Surname = sheet.Cells[exRow, surnameColumn].Value.ToString();
+                    patient.Name = sheet.Cells[exRow, nameColumn].Value.ToString();
+                    patient.Patronymic = sheet.Cells[exRow, patronymicColumn].Value.ToString();
+                    patient.FullNameExist = true;
+                }
+
+                excelPatients[i] = patient;
+            }
+        }
+        private void WriteExcelPatients()
+        {
+            for (int i = 0; i < excelPatients.Length; i++)
+            {
+                var exRow = i + headerIndex + 1;
+
+                if (sheet.Cells[exRow, surnameColumn].Value == null && excelPatients[i].FullNameExist)
+                {
+                    sheet.Cells[exRow, surnameColumn].Value = excelPatients[i].Surname;
+                    sheet.Cells[exRow, nameColumn].Value = excelPatients[i].Name;
+                    sheet.Cells[exRow, patronymicColumn].Value = excelPatients[i].Patronymic;
+                }
             }
         }
         /// <summary>
