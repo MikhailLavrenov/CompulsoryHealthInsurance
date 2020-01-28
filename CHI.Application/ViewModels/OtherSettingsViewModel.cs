@@ -23,8 +23,6 @@ namespace CHI.Application.ViewModels
         public bool KeepAlive { get => false; }
         public Settings Settings { get => settings; set => SetProperty(ref settings, value); }
         public DelegateCommandAsync TestCommand { get; }
-        public DelegateCommand SaveCommand { get; }
-        public DelegateCommand LoadCommand { get; }
         public DelegateCommand SetDefaultCommand { get; }
         #endregion
 
@@ -39,8 +37,6 @@ namespace CHI.Application.ViewModels
             MainRegionService.Header = "Прочие настройки";
 
             TestCommand = new DelegateCommandAsync(TestExecute);
-            SaveCommand = new DelegateCommand(SaveExecute);
-            LoadCommand = new DelegateCommand(LoadExecute);
             SetDefaultCommand = new DelegateCommand(SetDefaultExecute);
         }
         #endregion
@@ -55,16 +51,6 @@ namespace CHI.Application.ViewModels
                 MainRegionService.SetCompleteStatus("Настройки корректны.");
             else
                 MainRegionService.SetCompleteStatus("Прокси сервер не доступен.");
-        }
-        private void SaveExecute()
-        {
-            Settings.Save();
-            MainRegionService.SetCompleteStatus("Настройки сохранены.");
-        }
-        private void LoadExecute()
-        {
-            Settings = Settings.Load();
-            MainRegionService.SetCompleteStatus("Изменения настроек отменены.");
         }
         private void SetDefaultExecute()
         {

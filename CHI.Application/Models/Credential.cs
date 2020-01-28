@@ -1,5 +1,5 @@
-﻿using CHI.Services;
-using CHI.Application.Infrastructure;
+﻿using CHI.Application.Infrastructure;
+using CHI.Services;
 using System;
 using System.Security.Cryptography;
 using System.Text;
@@ -12,14 +12,15 @@ namespace CHI.Application.Models
         #region Поля
         private string login;
         private string password;
+        private string protectedLogin;
+        private string protectedPassword;
         #endregion
 
         #region Свойства
-        public static CredentialScope Scope { get; set; }
         [XmlIgnore] public string Login { get => login; set => SetProperty(ref login, value); }
-        public string ProtectedLogin { get => Encrypt(Login); set => Login = Decrypt(value); }
+        public string ProtectedLogin { get => protectedLogin; set => protectedLogin = value; }
         [XmlIgnore] public string Password { get => password; set => SetProperty(ref password, value); }
-        public string ProtectedPassword { get => Encrypt(Password); set => Password = Decrypt(value); }
+        public string ProtectedPassword { get => protectedPassword; set => protectedPassword = value; }
         #endregion
 
         #region Конструкторы
@@ -40,51 +41,48 @@ namespace CHI.Application.Models
             if (propertyName == nameof(Password) || propertyName == null)
                 ValidateIsNullOrEmptyString(nameof(Password), Password);
         }
-        //шифрует текст в соответствии с видимостью
-        private static string Encrypt(string text)
+        //шифрует учетные данные в соответствии с видимостью
+        public void Encrypt(CredentialScope scope)
         {
-            if (text == null)
-                text = "";
-
-            if (Scope == CredentialScope.Все)
-                return text;
-
-            DataProtectionScope scope;
-            if (Scope == CredentialScope.ТекущийПользователь)
-                scope = DataProtectionScope.CurrentUser;
-            else
-                scope = DataProtectionScope.LocalMachine;
-
-            byte[] byteText = Encoding.Default.GetBytes(text);
-            var protectedText = ProtectedData.Protect(byteText, null, scope);
-
-            return Convert.ToBase64String(protectedText);
+            ProtectedLogin = InternalEncrypt(Login, scope);
+            ProtectedPassword = InternalEncrypt(Password, scope);
         }
         //расшифровывает текст в соответствии с видимостью
-        private static string Decrypt(string text)
+        public void Decrypt(CredentialScope scope)
+        {
+            Login = InternalDecrypt(ProtectedLogin, scope);
+            Password = InternalDecrypt(ProtectedPassword, scope);
+        }
+        //шифрует учетные данные в соответствии с видимостью
+        private static string InternalEncrypt(string text, CredentialScope scope)
         {
             if (text == null)
                 text = string.Empty;
 
-            if (Scope == CredentialScope.Все)
+            if (scope == CredentialScope.Все)
                 return text;
 
-            DataProtectionScope scope;
-            if (Scope == CredentialScope.ТекущийПользователь)
-                scope = DataProtectionScope.CurrentUser;
-            else
-                scope = DataProtectionScope.LocalMachine;
+            var protectionScope = scope == CredentialScope.ТекущийПользователь ? DataProtectionScope.CurrentUser : DataProtectionScope.LocalMachine;
 
-            try
-            {
-                var byteText = Convert.FromBase64String(text);
-                var unprotectedText = ProtectedData.Unprotect(byteText, null, scope);
-                return Encoding.Default.GetString(unprotectedText);
-            }
-            catch (Exception)
-            {
-                return string.Empty;
-            }
+            byte[] byteText = Encoding.Default.GetBytes(text);
+            var protectedText = ProtectedData.Protect(byteText, null, protectionScope);
+
+            return Convert.ToBase64String(protectedText);
+        }
+        //расшифровывает текст в соответствии с видимостью
+        private static string InternalDecrypt(string text, CredentialScope scope)
+        {
+            if (text == null)
+                text = string.Empty;
+
+            if (scope == CredentialScope.Все)
+                return text;
+
+            var protectionScope = scope == CredentialScope.ТекущийПользователь ? DataProtectionScope.CurrentUser : DataProtectionScope.LocalMachine;
+
+            var byteText = Convert.FromBase64String(text);
+            var unprotectedText = ProtectedData.Unprotect(byteText, null, protectionScope);
+            return Encoding.Default.GetString(unprotectedText);
         }
         #endregion
     }

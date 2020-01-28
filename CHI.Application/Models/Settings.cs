@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 
@@ -20,6 +21,7 @@ namespace CHI.Application.Models
         private static readonly string settingsFileName = "Settings.xml";
 
         public static Settings Instance { get; private set; }
+        public bool SuccessfulDecrypted { get; set; } = true;
 
         static Settings()
         {
@@ -43,10 +45,16 @@ namespace CHI.Application.Models
             // Т.к. при создании экзмпляра класса если свойства не инициализируются - не срабатывает валидация. Поэтому принудительно проверяем все. 
             // Свойства не инициализируются сразу т.к. иначе сразу после создания на них будут отображаться ошибки, и во View тоже, это плохо.
             foreach (var item in SrzCredentials)
+            {
                 item.Validate();
+                item.Encrypt(CredentialsScope);
+            }
 
             foreach (var item in ExaminationsCredentials)
+            {
                 item.Validate();
+                item.Encrypt(CredentialsScope);
+            }
 
             foreach (var item in ColumnProperties)
                 item.Validate();
@@ -64,11 +72,28 @@ namespace CHI.Application.Models
                 using (var stream = new FileStream(settingsFileName, FileMode.Open))
                 {
                     var formatter = new XmlSerializer(typeof(Settings));
-                    return formatter.Deserialize(stream) as Settings;
+                    var settings = formatter.Deserialize(stream) as Settings;
+
+                    try
+                    {
+                        foreach (var item in settings.SrzCredentials)
+                            item.Decrypt(settings.CredentialsScope);
+
+                        foreach (var item in settings.ExaminationsCredentials)
+                            item.Decrypt(settings.CredentialsScope);
+
+                        settings.SuccessfulDecrypted = true;
+                    }
+                    catch (CryptographicException)
+                    {
+                        settings.SuccessfulDecrypted = false;
+                    }
+
+                    return settings;
                 }
             else
             {
-                var settings= new Settings();
+                var settings = new Settings();
                 settings.SetDefaultSRZ();
                 settings.SetDefaultAttachedPatientsFile();
                 settings.SetDefaultExaminations();
@@ -207,7 +232,7 @@ namespace CHI.Application.Models
             set => SetProperty(ref proxyPort, value);
         }
         [XmlIgnore] public bool ProxyConnectionIsValid { get => proxyConnectionIsValid; set => SetProperty(ref proxyConnectionIsValid, value); }
-        public CredentialScope CredentialsScope { get => credentialsScope; set { Credential.Scope = value; SetProperty(ref credentialsScope, value); } }
+        public CredentialScope CredentialsScope { get => credentialsScope; set => SetProperty(ref credentialsScope, value); }
 
         //проверяет настройки прокси-сервера, true-соединение установлено или прокси-сервер не используется, false-иначе
         public void TestConnectionProxy()
@@ -274,7 +299,7 @@ namespace CHI.Application.Models
         public bool FormatPatientsFile { get => formatPatientsFile; set => SetProperty(ref formatPatientsFile, value); }
         public ObservableCollection<ColumnProperty> ColumnProperties { get => columnProperties; set => SetProperty(ref columnProperties, value); }
 
-                //проверяет учетные данные СРЗ, в случае успеха - true
+        //проверяет учетные данные СРЗ, в случае успеха - true
         private bool TryAuthorizeSrzCredentials()
         {
             Parallel.ForEach(SrzCredentials, new ParallelOptions { MaxDegreeOfParallelism = SrzThreadsLimit }, credential =>

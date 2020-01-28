@@ -1,6 +1,7 @@
 ﻿using CHI.Application.Infrastructure;
 using CHI.Application.Models;
 using Prism.Commands;
+using Prism.Services.Dialogs;
 using System;
 using System.Linq;
 using System.Reflection;
@@ -29,8 +30,19 @@ namespace CHI.Application.ViewModels
         #endregion
 
         #region Конструкторы
-        public ShellViewModel(IMainRegionService mainRegionService, ILicenseManager licenseManager)
+        public ShellViewModel(IMainRegionService mainRegionService, ILicenseManager licenseManager, IDialogService dialogService)
         {
+            if (!Settings.Instance.SuccessfulDecrypted)
+            {
+                var title = "Предупреждение";
+                var message = $"У вас нет прав на расшифрование сохраненных логинов и паролей.{Environment.NewLine} Если продолжить сохраненные учетные записи будут утеряны. {Environment.NewLine}Продолжить?";
+                var result = dialogService.ShowDialog(title, message);
+
+                if (result == ButtonResult.OK)
+                    System.Windows.Application.Current.Shutdown();
+            }
+
+
             IsMaximizedWidow = System.Windows.Application.Current.MainWindow.WindowState == WindowState.Maximized ? true : false;
             MainRegionService = mainRegionService;
             ApplicationTitle = ((AssemblyTitleAttribute)Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(AssemblyTitleAttribute), false).First()).Title;
