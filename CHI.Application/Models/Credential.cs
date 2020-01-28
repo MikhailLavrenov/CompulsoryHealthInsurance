@@ -12,26 +12,19 @@ namespace CHI.Application.Models
         #region Поля
         private string login;
         private string password;
-        private string protectedLogin;
-        private string protectedPassword;
         #endregion
 
         #region Свойства
-        [XmlIgnore] public string Login { get => login; set => SetProperty(ref login, value); }
-        public string ProtectedLogin { get => protectedLogin; set => protectedLogin = value; }
+        [XmlIgnore] public string Login { get => login; set => SetProperty(ref login, value); }        
         [XmlIgnore] public string Password { get => password; set => SetProperty(ref password, value); }
-        public string ProtectedPassword { get => protectedPassword; set => protectedPassword = value; }
+        public string ProtectedLogin { get; set; }
+        public string ProtectedPassword { get; set; }
         #endregion
 
         #region Конструкторы
         #endregion
 
         #region Методы
-        //создает копию экземпляра класса
-        public Credential Copy()
-        {
-            return MemberwiseClone() as Credential;
-        }
         //валидация свойств
         public override void Validate(string propertyName = null)
         {

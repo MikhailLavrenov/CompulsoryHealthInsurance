@@ -227,6 +227,8 @@
         <b:EventTrigger EventName="Loaded">
             <b:InvokeCommandAction Command="{Binding ShowViewCommand}"
                                    CommandParameter="{x:Type v:AttachedPatientsView}" />
+
+            <b:InvokeCommandAction Command="{Binding CheckSettingsCommand}" />
         </b:EventTrigger>
 
         <b:EventTrigger EventName="Closing">

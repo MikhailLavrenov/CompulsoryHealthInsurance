@@ -5,6 +5,7 @@ using Prism.Services.Dialogs;
 using System;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Windows;
 
 namespace CHI.Application.ViewModels
@@ -12,7 +13,8 @@ namespace CHI.Application.ViewModels
     public class ShellViewModel : DomainObject
     {
         #region Поля
-        public bool isMaximizedWindow;
+        private bool isMaximizedWindow;
+        private IMainRegionService mainRegionService;
         #endregion
 
         #region Свойства 
@@ -22,6 +24,7 @@ namespace CHI.Application.ViewModels
         public bool IsMaximizedWidow { get => isMaximizedWindow; set => SetProperty(ref isMaximizedWindow, value); }
 
         public DelegateCommand SaveSettingsCommand { get; }
+        public DelegateCommand CheckSettingsCommand { get; }
         public DelegateCommand CloseWindowCommand { get; }
         public DelegateCommand RestoreWindowCommand { get; }
         public DelegateCommand MaximizeWindowCommand { get; }
@@ -30,24 +33,16 @@ namespace CHI.Application.ViewModels
         #endregion
 
         #region Конструкторы
-        public ShellViewModel(IMainRegionService mainRegionService, ILicenseManager licenseManager, IDialogService dialogService)
+        public ShellViewModel(IMainRegionService mainRegionService)
         {
-            if (!Settings.Instance.SuccessfulDecrypted)
-            {
-                var title = "Предупреждение";
-                var message = $"У вас нет прав на расшифрование сохраненных логинов и паролей.{Environment.NewLine} Если продолжить сохраненные учетные записи будут утеряны. {Environment.NewLine}Продолжить?";
-                var result = dialogService.ShowDialog(title, message);
-
-                if (result == ButtonResult.OK)
-                    System.Windows.Application.Current.Shutdown();
-            }
-
+            this.mainRegionService = mainRegionService;
 
             IsMaximizedWidow = System.Windows.Application.Current.MainWindow.WindowState == WindowState.Maximized ? true : false;
             MainRegionService = mainRegionService;
             ApplicationTitle = ((AssemblyTitleAttribute)Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(AssemblyTitleAttribute), false).First()).Title;
 
             SaveSettingsCommand = new DelegateCommand(() => Settings.Instance.Save());
+            CheckSettingsCommand = new DelegateCommand(CheckSettingsExecute);
             ShowViewCommand = new DelegateCommand<Type>(x => MainRegionService.RequestNavigate(x.Name));
             CloseWindowCommand = new DelegateCommand(() => System.Windows.Application.Current.Shutdown());
             RestoreWindowCommand = new DelegateCommand(RestoreWindowExecute);
@@ -66,6 +61,14 @@ namespace CHI.Application.ViewModels
         {
             System.Windows.Application.Current.MainWindow.WindowState = WindowState.Maximized;
             IsMaximizedWidow = true;
+        }
+        private void CheckSettingsExecute()
+        {
+            if (Settings.Instance.FailedToDecrypt)
+            {
+                var message = $"Нет прав на доступ к учетным записям. Создана резервная копия настроек: {Settings.Instance.BackupSettingsFile}. Заново задайте учетные данные.";
+                mainRegionService.SetCompleteStatus(message);
+            }
         }
         #endregion
     }

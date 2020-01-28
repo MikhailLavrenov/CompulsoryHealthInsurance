@@ -21,7 +21,8 @@ namespace CHI.Application.Models
         private static readonly string settingsFileName = "Settings.xml";
 
         public static Settings Instance { get; private set; }
-        public bool SuccessfulDecrypted { get; set; } = true;
+        [XmlIgnore] public bool FailedToDecrypt { get; set; }
+        [XmlIgnore] public string BackupSettingsFile { get; set; }
 
         static Settings()
         {
@@ -68,39 +69,49 @@ namespace CHI.Application.Models
         //загружает настройки из xml
         public static Settings Load()
         {
+            Settings settings;
+
             if (File.Exists(settingsFileName))
+            {
                 using (var stream = new FileStream(settingsFileName, FileMode.Open))
                 {
                     var formatter = new XmlSerializer(typeof(Settings));
-                    var settings = formatter.Deserialize(stream) as Settings;
+                    settings = formatter.Deserialize(stream) as Settings;
+                }
 
-                    try
-                    {
-                        foreach (var item in settings.SrzCredentials)
-                            item.Decrypt(settings.CredentialsScope);
+                try
+                {
+                    foreach (var item in settings.SrzCredentials)
+                        item.Decrypt(settings.CredentialsScope);
 
-                        foreach (var item in settings.ExaminationsCredentials)
-                            item.Decrypt(settings.CredentialsScope);
+                    foreach (var item in settings.ExaminationsCredentials)
+                        item.Decrypt(settings.CredentialsScope);
 
-                        settings.SuccessfulDecrypted = true;
-                    }
-                    catch (CryptographicException)
-                    {
-                        settings.SuccessfulDecrypted = false;
-                    }
+
+                }
+                catch (CryptographicException)
+                {
+                    settings.SrzCredentials = new ObservableCollection<Credential>();
+                    settings.ExaminationsCredentials = new ObservableCollection<Credential>();
+                    settings.BackupSettingsFile = $@"Settings backup {DateTime.Now.ToString("dd_MM_yyyy_HH_mm_ss_FFF")}.xml";
+                    settings.FailedToDecrypt = true;
+
+                    File.Copy(settingsFileName, settings.BackupSettingsFile);
 
                     return settings;
                 }
+            }
+
             else
             {
-                var settings = new Settings();
+                settings = new Settings();
                 settings.SetDefaultSRZ();
                 settings.SetDefaultAttachedPatientsFile();
                 settings.SetDefaultExaminations();
                 settings.SetDefaultOther();
-
-                return settings;
             }
+
+            return settings;
         }
         //исправляет url
         private static string FixUrl(string url)
