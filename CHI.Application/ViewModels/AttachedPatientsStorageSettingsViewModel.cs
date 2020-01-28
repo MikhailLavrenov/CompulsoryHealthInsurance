@@ -97,6 +97,8 @@ namespace CHI.Application.ViewModels
         }
         private void ClearDatabaseExecute()
         {
+            MainRegionService.SetBusyStatus("Очистка базы данных.");
+
             var title = "Предупреждение";
             var message = "Информация о пациентах будет удалена из базы данных. Продолжить ?";
             var result = dialogService.ShowDialog(title, message);
@@ -106,8 +108,7 @@ namespace CHI.Application.ViewModels
                 MainRegionService.SetCompleteStatus("Очистка базы данных отменена.");
                 return;
             }
-
-            MainRegionService.SetBusyStatus("Очистка базы данных.");
+            
             var db = new Models.Database();
             if (db.Database.Exists())
                 db.Database.Delete();

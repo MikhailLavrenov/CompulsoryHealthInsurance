@@ -27,7 +27,7 @@ namespace CHI.Application.Models
         }
         public Settings()
         {
-            SRZCredentials = new ObservableCollection<Credential>();
+            SrzCredentials = new ObservableCollection<Credential>();
             ExaminationsCredentials = new ObservableCollection<Credential>();
             ColumnProperties = new ObservableCollection<ColumnProperty>();
             Instance = this;
@@ -42,7 +42,7 @@ namespace CHI.Application.Models
 
             // Т.к. при создании экзмпляра класса если свойства не инициализируются - не срабатывает валидация. Поэтому принудительно проверяем все. 
             // Свойства не инициализируются сразу т.к. иначе сразу после создания на них будут отображаться ошибки, и во View тоже, это плохо.
-            foreach (var item in SRZCredentials)
+            foreach (var item in SrzCredentials)
                 item.Validate();
 
             foreach (var item in ExaminationsCredentials)
@@ -98,8 +98,8 @@ namespace CHI.Application.Models
         {
             switch (propertyName)
             {
-                case nameof(SRZAddress):
-                    if (string.IsNullOrEmpty(SRZAddress) || Uri.TryCreate(SRZAddress, UriKind.Absolute, out _) == false)
+                case nameof(SrzAddress):
+                    if (string.IsNullOrEmpty(SrzAddress) || Uri.TryCreate(SrzAddress, UriKind.Absolute, out _) == false)
                         AddError(ErrorMessages.UriFormat, propertyName);
                     else
                         RemoveError(ErrorMessages.UriFormat, propertyName);
@@ -129,8 +129,8 @@ namespace CHI.Application.Models
                     ValidateIsNullOrEmptyString(nameof(PatientsFilePath), PatientsFilePath);
                     break;
 
-                case nameof(SRZThreadsLimit):
-                    if (SRZThreadsLimit < 1)
+                case nameof(SrzThreadsLimit):
+                    if (SrzThreadsLimit < 1)
                         AddError(ErrorMessages.LessOne, propertyName);
                     else
                         RemoveError(ErrorMessages.LessOne, propertyName);
@@ -256,6 +256,7 @@ namespace CHI.Application.Models
         #region Файл прикрепленных пациентов
         private string srzAddress;
         private byte srzThreadsLimit;
+        private uint srzRequestsLimit;
         private ObservableCollection<Credential> srzCredentials;
         private bool srzConnectionIsValid;
         private bool downloadNewPatientsFile;
@@ -263,21 +264,22 @@ namespace CHI.Application.Models
         private bool formatPatientsFile;
         private ObservableCollection<ColumnProperty> columnProperties;
 
-        public string SRZAddress { get => srzAddress; set => SetProperty(ref srzAddress, FixUrl(value)); }
-        public byte SRZThreadsLimit { get => srzThreadsLimit; set => SetProperty(ref srzThreadsLimit, value); }
-        public ObservableCollection<Credential> SRZCredentials { get => srzCredentials; set => SetProperty(ref srzCredentials, value); }
+        public string SrzAddress { get => srzAddress; set => SetProperty(ref srzAddress, FixUrl(value)); }
+        public byte SrzThreadsLimit { get => srzThreadsLimit; set => SetProperty(ref srzThreadsLimit, value); }
+        public uint SrzRequestsLimit { get => srzRequestsLimit; set => SetProperty(ref srzRequestsLimit, value); }
+        public ObservableCollection<Credential> SrzCredentials { get => srzCredentials; set => SetProperty(ref srzCredentials, value); }
         [XmlIgnore] public bool SrzConnectionIsValid { get => srzConnectionIsValid; set => SetProperty(ref srzConnectionIsValid, value); }
         public bool DownloadNewPatientsFile { get => downloadNewPatientsFile; set => SetProperty(ref downloadNewPatientsFile, value); }
         public string PatientsFilePath { get => patientsFilePath; set => SetProperty(ref patientsFilePath, value); }
         public bool FormatPatientsFile { get => formatPatientsFile; set => SetProperty(ref formatPatientsFile, value); }
         public ObservableCollection<ColumnProperty> ColumnProperties { get => columnProperties; set => SetProperty(ref columnProperties, value); }
 
-        //проверяет учетные данные СРЗ, в случае успеха - true
+                //проверяет учетные данные СРЗ, в случае успеха - true
         private bool TryAuthorizeSrzCredentials()
         {
-            Parallel.ForEach(SRZCredentials, new ParallelOptions { MaxDegreeOfParallelism = SRZThreadsLimit }, credential =>
+            Parallel.ForEach(SrzCredentials, new ParallelOptions { MaxDegreeOfParallelism = SrzThreadsLimit }, credential =>
             {
-                using (var service = new SRZService(SRZAddress, UseProxy, ProxyAddress, ProxyPort))
+                using (var service = new SRZService(SrzAddress, UseProxy, ProxyAddress, ProxyPort))
                 {
                     if (service.Authorize(credential))
                     {
@@ -294,7 +296,7 @@ namespace CHI.Application.Models
                 }
             });
 
-            return !SRZCredentials.Any(x => x.HasErrors);
+            return !SrzCredentials.Any(x => x.HasErrors);
         }
         //сдвигает вверх элемент коллекции ColumnProperties
         public void MoveUpColumnProperty(ColumnProperty item)
@@ -315,15 +317,15 @@ namespace CHI.Application.Models
         {
             SrzConnectionIsValid = false;
 
-            RemoveError(ErrorMessages.Connection, nameof(SRZAddress));
-            SRZCredentials.ToList().ForEach(x => x.RemoveErrorsMessage(ErrorMessages.Connection));
+            RemoveError(ErrorMessages.Connection, nameof(SrzAddress));
+            SrzCredentials.ToList().ForEach(x => x.RemoveErrorsMessage(ErrorMessages.Connection));
 
             TestConnectionProxy();
 
             if (!ProxyConnectionIsValid)
                 return;
 
-            if (!TryConnectSite(SRZAddress, nameof(SRZAddress)))
+            if (!TryConnectSite(SrzAddress, nameof(SrzAddress)))
                 return;
 
             if (!TryAuthorizeSrzCredentials())
@@ -334,14 +336,15 @@ namespace CHI.Application.Models
         //устанавливает по-умолчанию настройки подключения к СРЗ
         public void SetDefaultSRZ()
         {
-            SRZAddress = @"http://11.0.0.1/";
-            SRZThreadsLimit = 10;
+            SrzAddress = @"http://10.0.0.201/";
+            SrzThreadsLimit = 10;
+            srzRequestsLimit = 1000;
             FormatPatientsFile = true;
-            SRZCredentials = new ObservableCollection<Credential>()
+            SrzCredentials = new ObservableCollection<Credential>()
              {
-                    new Credential{Login="МойЛогин1", Password="МойПароль1", RequestsLimit=400},
-                    new Credential{Login="МойЛогин2", Password="МойПароль2", RequestsLimit=300},
-                    new Credential{Login="МойЛогин3", Password="МойПароль3", RequestsLimit=500}
+                    new Credential{Login="МойЛогин1", Password="МойПароль1"},
+                    new Credential{Login="МойЛогин2", Password="МойПароль2"},
+                    new Credential{Login="МойЛогин3", Password="МойПароль3"}
              };
         }
         //устанавливает по-умолчанию настройки файла прикрепленных пациентов
@@ -449,16 +452,16 @@ namespace CHI.Application.Models
         //Устанавливает значения по умолчанию для портала диспансеризации
         public void SetDefaultExaminations()
         {
-            ExaminationsAddress = @"http://11.0.0.2/";
+            ExaminationsAddress = @"http://10.0.0.203/";
             ExaminationsThreadsLimit = 5;
             PatientFileNames = @"LPM, LVM, LOM";
             ExaminationFileNames = @"DPM, DVM, DOM";
 
             ExaminationsCredentials = new ObservableCollection<Credential>()
              {
-                    new Credential{Login="МойЛогин1", Password="МойПароль1", RequestsLimit=0},
-                    new Credential{Login="МойЛогин2", Password="МойПароль2", RequestsLimit=0},
-                    new Credential{Login="МойЛогин3", Password="МойПароль3", RequestsLimit=0}
+                    new Credential{Login="МойЛогин1", Password="МойПароль1"},
+                    new Credential{Login="МойЛогин2", Password="МойПароль2"},
+                    new Credential{Login="МойЛогин3", Password="МойПароль3"}
              };
         }
         //проверить настройеки подключения к порталу диспансризации

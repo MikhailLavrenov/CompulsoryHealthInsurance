@@ -234,7 +234,7 @@
         </b:EventTrigger>
     </b:Interaction.Triggers>
 
-    <DockPanel>
+    <DockPanel d:DataContext="{d:DesignInstance vm:ShellViewModel}">
         
         <DockPanel.Background>
             <LinearGradientBrush EndPoint="0,0.5"
@@ -304,7 +304,7 @@
                 </ContentControl.Style>
             </ContentControl>
 
-            <DockPanel d:DataContext="{d:DesignInstance vm:ShellViewModel}">
+            <DockPanel>
 
                 <StackPanel Orientation="Vertical"
                             Width="210"

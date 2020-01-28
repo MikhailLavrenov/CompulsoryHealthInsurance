@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:CHI.Application.Views"
              xmlns:i="clr-namespace:CHI.Application.Infrastructure"
+             xmlns:vm="clr-namespace:CHI.Application.ViewModels"
              xmlns:prism="http://prismlibrary.com/"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d"
@@ -21,10 +22,10 @@
     </UserControl.Resources>
 
 
-    <Grid>
+    <Grid d:DataContext="{d:DesignInstance vm:ExaminationsSettingsViewModel}">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="210" />
-            <ColumnDefinition Width="240" />
+            <ColumnDefinition Width="260" />
         </Grid.ColumnDefinitions>
 
         <Grid.RowDefinitions>
@@ -85,11 +86,11 @@
                                     Binding="{Binding Login, ValidatesOnDataErrors=True}"
                                     ElementStyle="{StaticResource DataGridText}"
                                     EditingElementStyle="{StaticResource DataGridTextEditing}"
-                                    MinWidth="180" />
+                                    MinWidth="190" />
 
                 <!--Столбец Пароль-->
                 <!--Шаблон Заголовка. В заголовок вставляем текст и кнопку для переключения видимости паролей-->
-                <DataGridTemplateColumn MinWidth="180">
+                <DataGridTemplateColumn MinWidth="190">
                     <DataGridTemplateColumn.HeaderStyle>
                         <Style TargetType="{x:Type DataGridColumnHeader}">
                             <Setter Property="Background"

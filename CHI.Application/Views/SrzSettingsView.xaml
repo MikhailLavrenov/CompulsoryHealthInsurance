@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:CHI.Application.Views"
              xmlns:i="clr-namespace:CHI.Application.Infrastructure"
+             xmlns:vm="clr-namespace:CHI.Application.ViewModels"
              xmlns:prism="http://prismlibrary.com/"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              
@@ -22,13 +23,14 @@
     </UserControl.Resources>
 
 
-    <Grid>
+    <Grid d:DataContext="{d:DesignInstance vm:SrzSettingsViewModel}">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="200" />
-            <ColumnDefinition Width="300" />
+            <ColumnDefinition Width="210" />
+            <ColumnDefinition Width="260" />
         </Grid.ColumnDefinitions>
 
         <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
             <RowDefinition Height="*" />
@@ -40,26 +42,33 @@
                    Text="Адрес сайта" />
         <TextBox Grid.Row="0"
                  Grid.Column="1"
-                 Text="{Binding Settings.SRZAddress, ValidatesOnDataErrors=True}" />
+                 Text="{Binding Settings.SrzAddress, ValidatesOnDataErrors=True}" />
 
         <TextBlock Grid.Row="1"
                    Grid.Column="0"
                    Text="Количество потоков" />
         <TextBox Grid.Row="1"
                  Grid.Column="1"
-                 Text="{Binding Settings.SRZThreadsLimit, ValidatesOnDataErrors=True}" />
+                 Text="{Binding Settings.SrzThreadsLimit, ValidatesOnDataErrors=True}" />
+
+        <TextBlock Grid.Row="2"
+                   Grid.Column="0"
+                   Text="Лимит запросов" />
+        <TextBox Grid.Row="2"
+                 Grid.Column="1"
+                 Text="{Binding Settings.SrzRequestsLimit, ValidatesOnDataErrors=True}" />
 
 
         <!--Столбцы DataGrid не являются частью логического дерева этого View, поэтому их нельзя привязать к свойствам ViewModel-->
         <!--Использование x:Name и FrameworkElement принадлежащего логическому дереву позволяет обойти ограничение используя FrameworkElement как посредника-->
         <FrameworkElement x:Name="proxyElement" />
 
-        <i:CustomDataGrid Grid.Row="2"
+        <i:CustomDataGrid Grid.Row="3"
                           Grid.Column="0"
                           Grid.ColumnSpan="2"
                           Margin="0,20,0,10"
                           MinHeight="100"
-                          ItemsSource="{Binding Settings.SRZCredentials}">
+                          ItemsSource="{Binding Settings.SrzCredentials}">
 
             <DataGrid.Columns>
 
@@ -71,11 +80,11 @@
                                     Binding="{Binding Login, ValidatesOnDataErrors=True}"
                                     ElementStyle="{StaticResource DataGridText}"
                                     EditingElementStyle="{StaticResource DataGridTextEditing}"
-                                    MinWidth="160"/>
+                                    MinWidth="190"/>
 
                 <!--Столбец Пароль-->
                 <!--Шаблон Заголовка. В заголовок вставляем текст и кнопку для переключения видимости паролей-->
-                <DataGridTemplateColumn MinWidth="160">
+                <DataGridTemplateColumn MinWidth="160" Width="*">
                     <DataGridTemplateColumn.HeaderStyle>
                         <Style TargetType="{x:Type DataGridColumnHeader}">
                             <Setter Property="Background"
@@ -130,18 +139,10 @@
 
                 </DataGridTemplateColumn>
 
-                <!--Столбец Лимит запросов-->
-                <materialDesign:DataGridTextColumn Header="Лимит запросов"
-                                                   Binding="{Binding RequestsLimit, ValidatesOnDataErrors=True}"
-                                                   MinWidth="90"
-                                                                                       ElementStyle="{StaticResource DataGridText}"
-                                    EditingElementStyle="{StaticResource DataGridTextEditing}"
-                                                   Width="*" />
-
             </DataGrid.Columns>
         </i:CustomDataGrid>
 
-        <StackPanel Grid.Row="3"
+        <StackPanel Grid.Row="4"
                     Grid.Column="0"
                     Grid.ColumnSpan="2"
                     Orientation="Horizontal">

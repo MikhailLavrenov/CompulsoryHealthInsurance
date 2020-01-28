@@ -8,7 +8,6 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data.Entity;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -74,11 +73,12 @@ namespace CHI.Application.ViewModels
 
             settings.PatientsFilePath = fileDialogService.FileName;
 
-            Models.Database db=null;
+            Models.Database db = null;
             db = new Models.Database();
             db.Patients.Load();
 
-            var dbLoading = Task.Run(()=> {
+            var dbLoading = Task.Run(() =>
+            {
 
             });
 
@@ -86,9 +86,9 @@ namespace CHI.Application.ViewModels
             {
                 MainRegionService.SetBusyStatus("Скачивание файла.");
 
-                var service = new SRZService(Settings.SRZAddress, Settings.UseProxy, Settings.ProxyAddress, Settings.ProxyPort);
+                var service = new SRZService(Settings.SrzAddress, Settings.UseProxy, Settings.ProxyAddress, Settings.ProxyPort);
 
-                var credential = Settings.SRZCredentials.First(x => x.RequestsLimit > 0);
+                var credential = Settings.SrzCredentials.First();
                 service.Authorize(credential);
                 service.GetPatientsFile(Settings.PatientsFilePath, FileDate);
             }
@@ -102,23 +102,22 @@ namespace CHI.Application.ViewModels
             file.AddFullNames(db.Patients.ToList());
 
             string resultReport;
-            var limitCount = Settings.SRZCredentials.Sum(x => x.RequestsLimit);
 
             if (Settings.SrzConnectionIsValid)
-            {              
-                var unknownInsuaranceNumbers = file.GetUnknownInsuaranceNumbers(limitCount);
+            {
+                var unknownInsuaranceNumbers = file.GetUnknownInsuaranceNumbers(Settings.SrzRequestsLimit);
 
                 MainRegionService.SetBusyStatus("Поиск ФИО в СРЗ.");
                 var foundPatients = GetPatients(unknownInsuaranceNumbers);
 
-                resultReport = $"Запрошено ФИО в СРЗ: {foundPatients.Count()}.";
+                resultReport = $"Запрошено пациентов в СРЗ: {foundPatients.Count()}, лимит {Settings.SrzRequestsLimit}.";
                 MainRegionService.SetBusyStatus("Подстановка ФИО в файл.");
                 file.AddFullNames(foundPatients);
 
                 MainRegionService.SetBusyStatus("Добавление ФИО в локальную базу данных.");
                 var duplicateInsuranceNumbers = new HashSet<string>(foundPatients.Select(x => x.InsuranceNumber).ToList());
                 var duplicatePatients = db.Patients.Where(x => duplicateInsuranceNumbers.Contains(x.InsuranceNumber)).ToArray();
-                
+
                 db.Patients.RemoveRange(duplicatePatients);
                 db.SaveChanges();
 
@@ -127,7 +126,7 @@ namespace CHI.Application.ViewModels
             }
             else
                 resultReport = $"ФИО подставлены только из локальной БД. Не удалось подключиться к СРЗ, проверьте настройки и доступность сайта.";
-              
+
             var unknownPatients = file.GetUnknownInsuaranceNumbers(int.MaxValue);
 
             if (unknownPatients.Count == 0)
@@ -141,28 +140,23 @@ namespace CHI.Application.ViewModels
 
             if (unknownPatients.Count == 0)
                 MainRegionService.SetCompleteStatus($"{resultReport} Файл готов, все ФИО найдены.");
-            else if(Settings.SrzConnectionIsValid)
-                MainRegionService.SetCompleteStatus($"{resultReport} Файл не готов, осталось найти {unknownPatients.Count} ФИО, достигнут лимит {limitCount} запроса(ов) в день.");
-            else 
+            else
                 MainRegionService.SetCompleteStatus($"{resultReport} Файл не готов, осталось найти {unknownPatients.Count} ФИО.");
         }
         //запускает многопоточно запросы к сайту для поиска пациентов
         private Patient[] GetPatients(List<string> insuranceNumbers)
         {
             int counter = 0;
-            int threadsLimit = insuranceNumbers.Count > Settings.SRZThreadsLimit ? Settings.SRZThreadsLimit : insuranceNumbers.Count;
+            int threadsLimit = insuranceNumbers.Count > Settings.SrzThreadsLimit ? Settings.SrzThreadsLimit : insuranceNumbers.Count;
+            var requestsLimit = insuranceNumbers.Count > Settings.SrzRequestsLimit ? Settings.SrzRequestsLimit : (uint)insuranceNumbers.Count;
 
-            var dictionary = new Dictionary<Credential, uint>();
-            foreach (var credential in Settings.SRZCredentials)
-                dictionary.Add(credential, credential.RequestsLimit);
-
-            var circularListWithCounter = new CircularListWithCounter<Credential>(dictionary);
+            var circularList = new CircularList<Credential>(Settings.SrzCredentials);
             var verifiedPatients = new ConcurrentBag<Patient>();
             var tasks = new Task<SRZService>[threadsLimit];
             for (int i = 0; i < threadsLimit; i++)
                 tasks[i] = Task.Run(() => (SRZService)null);
 
-            for (int i = 0; i < insuranceNumbers.Count; i++)
+            for (int i = 0; i < requestsLimit; i++)
             {
                 var insuranceNumber = insuranceNumbers[i];
                 var index = Task.WaitAny(tasks);
@@ -171,23 +165,11 @@ namespace CHI.Application.ViewModels
                     var service = task.ConfigureAwait(false).GetAwaiter().GetResult();
                     var credential = (Credential)service?.Credential;
 
-                    if (credential == null || !circularListWithCounter.TryReserve(credential))
+                    if (credential == null)
                     {
-                        service?.Logout();
+                        service = new SRZService(Settings.SrzAddress, Settings.UseProxy, Settings.ProxyAddress, Settings.ProxyPort);
 
-                        while (true)
-                        {
-                            if (!circularListWithCounter.TryGetNext(out credential))
-                                return null;
-
-                            if (circularListWithCounter.TryReserve(credential))
-                            {
-                                service = new SRZService(Settings.SRZAddress, Settings.UseProxy, Settings.ProxyAddress, Settings.ProxyPort);
-
-                                if (service.Authorize(credential))
-                                    break;
-                            }
-                        }
+                        service.Authorize(circularList.GetNext());
                     }
 
                     var patient = service.GetPatient(insuranceNumber);
@@ -203,6 +185,18 @@ namespace CHI.Application.ViewModels
                 });
             }
             Task.WaitAll(tasks);
+
+            for (int i = 0; i < tasks.Length; i++)
+            {
+                var index = Task.WaitAny(tasks);
+
+                tasks[index] = tasks[index].ContinueWith((task) =>
+                {
+                    var service = task.ConfigureAwait(false).GetAwaiter().GetResult();
+                    service?.Logout();
+                    return service;
+                });
+            }
 
             return verifiedPatients.ToArray();
         }

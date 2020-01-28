@@ -59,7 +59,7 @@ namespace CHI.Application.ViewModels
                 MainRegionService.SetCompleteStatus("Настройки корректны.");
             else if (Settings.ContainsErrorMessage(nameof(Settings.ProxyAddress),ErrorMessages.Connection))
                 MainRegionService.SetCompleteStatus("Прокси сервер не доступен.");
-            else if (Settings.ContainsErrorMessage(nameof(Settings.SRZAddress), ErrorMessages.Connection))
+            else if (Settings.ContainsErrorMessage(nameof(Settings.SrzAddress), ErrorMessages.Connection))
                 MainRegionService.SetCompleteStatus("Web-сайт СРЗ не доступен.");
             else
                 MainRegionService.SetCompleteStatus($"Не удалось авторизоваться под некоторыми учетными записями.");

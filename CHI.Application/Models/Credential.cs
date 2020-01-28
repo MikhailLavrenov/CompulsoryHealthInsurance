@@ -10,10 +10,8 @@ namespace CHI.Application.Models
     public class Credential : DomainObject, ICredential
     {
         #region Поля
-        private readonly object locker = new object();
         private string login;
         private string password;
-        private uint requestsLimit;
         #endregion
 
         #region Свойства
@@ -22,7 +20,6 @@ namespace CHI.Application.Models
         public string ProtectedLogin { get => Encrypt(Login); set => Login = Decrypt(value); }
         [XmlIgnore] public string Password { get => password; set => SetProperty(ref password, value); }
         public string ProtectedPassword { get => Encrypt(Password); set => Password = Decrypt(value); }
-        public uint RequestsLimit { get => requestsLimit; set => SetProperty(ref requestsLimit, value); }
         #endregion
 
         #region Конструкторы
