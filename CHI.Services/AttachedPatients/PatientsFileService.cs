@@ -40,21 +40,22 @@ namespace CHI.Services.AttachedPatients
             this.columnProperties = columnProperties.ToList();
             maxRow = sheet.Dimension.Rows;
             maxCol = sheet.Dimension.Columns;
+
+            SetColumnsIndexes();
+            SetPatients();
+        }
+        /// <summary>
+        /// Находит столбцы в файле и устанавливает их индексы. При необходимости может добавлять отсутствующие столбцы.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">Возникает в случае если невозможно исправить структуру файла.</exception>
+        private void SetColumnsIndexes()
+        {
             insuranceColumn = GetColumnIndex("ENP");
             initialsColumn = GetColumnIndex("FIO");
             surnameColumn = GetColumnIndex("Фамилия");
             nameColumn = GetColumnIndex("Имя");
             patronymicColumn = GetColumnIndex("Отчество");
 
-            CheckOrFixStructure();
-            GetPatients();
-        }
-        /// <summary>
-        /// Проверяет структуру файла, при необходимости добавляет столбцы Фамилия, Имя, Отчество.
-        /// </summary>
-        /// <exception cref="InvalidOperationException">Возникает в случае если невозможно исправить структуру файла.</exception>
-        private void CheckOrFixStructure()
-        {
             if (insuranceColumn == -1)
                 throw new InvalidOperationException("Не найден столбец с номером полиса");
 
@@ -88,7 +89,7 @@ namespace CHI.Services.AttachedPatients
         /// <summary>
         /// Создает масив типа Patient соответствующий файлу прикрепленных пациентов
         /// </summary>
-        private void GetPatients()
+        private void SetPatients()
         {
             patients = new Patient[maxRow - headerIndex];
 
@@ -379,6 +380,8 @@ namespace CHI.Services.AttachedPatients
                     correctIndex++;
                 }
             }
+
+            SetColumnsIndexes();
         }
         /// <summary>
         /// Заменяет цифры с полом в понятные названия

@@ -9,6 +9,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -73,13 +74,10 @@ namespace CHI.Application.ViewModels
 
             settings.PatientsFilePath = fileDialogService.FileName;
 
-            Models.Database db = null;
-            db = new Models.Database();
-            db.Patients.Load();
-
-            var dbLoading = Task.Run(() =>
-            {
-
+            var dbLoadingTask = Task.Run(() => {
+                var dbContext = new Models.Database();
+                dbContext.Patients.Load();
+                return dbContext;
             });
 
             if (Settings.DownloadNewPatientsFile)
@@ -95,13 +93,13 @@ namespace CHI.Application.ViewModels
 
             MainRegionService.SetBusyStatus("Подстановка ФИО в файл.");
 
-            dbLoading.ConfigureAwait(false).GetAwaiter();
+            var db=dbLoadingTask.ConfigureAwait(false).GetAwaiter().GetResult();
 
             var file = new PatientsFileService();
             file.Open(Settings.PatientsFilePath, Settings.ColumnProperties);
             file.AddFullNames(db.Patients.ToList());
 
-            string resultReport;
+            var resultReport = new StringBuilder();
 
             if (Settings.SrzConnectionIsValid)
             {
@@ -110,7 +108,7 @@ namespace CHI.Application.ViewModels
                 MainRegionService.SetBusyStatus("Поиск ФИО в СРЗ.");
                 var foundPatients = GetPatients(unknownInsuaranceNumbers);
 
-                resultReport = $"Запрошено пациентов в СРЗ: {foundPatients.Count()}, лимит {Settings.SrzRequestsLimit}.";
+                resultReport.Append( $"Запрошено пациентов в СРЗ: {foundPatients.Count()}, лимит {Settings.SrzRequestsLimit}. ");
                 MainRegionService.SetBusyStatus("Подстановка ФИО в файл.");
                 file.AddFullNames(foundPatients);
 
@@ -125,11 +123,11 @@ namespace CHI.Application.ViewModels
                 db.SaveChanges();
             }
             else
-                resultReport = $"ФИО подставлены только из локальной БД. Не удалось подключиться к СРЗ, проверьте настройки и доступность сайта.";
+                resultReport.Append( "ФИО подставлены только из локальной БД. ");
 
             var unknownPatients = file.GetUnknownInsuaranceNumbers(int.MaxValue);
 
-            if (unknownPatients.Count == 0)
+            if (Settings.FormatPatientsFile && unknownPatients.Count == 0)
             {
                 MainRegionService.SetBusyStatus("Форматирование файла.");
                 file.Format();
@@ -138,10 +136,15 @@ namespace CHI.Application.ViewModels
             MainRegionService.SetBusyStatus("Сохранение файла.");
             file.Save();
 
+            if (!Settings.SrzConnectionIsValid && unknownPatients.Count != 0)
+                resultReport.Append("Не удалось подключиться к СРЗ, проверьте настройки и доступность сайта. ");
+
             if (unknownPatients.Count == 0)
-                MainRegionService.SetCompleteStatus($"{resultReport} Файл готов, все ФИО найдены.");
+                resultReport.Append($"Файл готов, все ФИО найдены.");
             else
-                MainRegionService.SetCompleteStatus($"{resultReport} Файл не готов, осталось найти {unknownPatients.Count} ФИО.");
+                resultReport.Append($"Файл не готов, осталось найти {unknownPatients.Count} ФИО.");
+
+            MainRegionService.SetCompleteStatus(resultReport.ToString());
         }
         //запускает многопоточно запросы к сайту для поиска пациентов
         private Patient[] GetPatients(List<string> insuranceNumbers)
