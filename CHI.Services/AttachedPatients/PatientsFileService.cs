@@ -1,4 +1,5 @@
 ﻿using OfficeOpenXml;
+using OfficeOpenXml.Style;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -122,7 +123,32 @@ namespace CHI.Services.AttachedPatients
         {
             WritePatientsToFile();
 
+            //Задаем всему листу прозрачную заливку, т.к. EpPlus в некоторых случаях устанавливает серую заливку.
+            sheet.Cells.Style.Fill.PatternType = ExcelFillStyle.None;
+
             excel.Save();
+        }
+        /// <summary>
+        /// Записывает ФИО кэшированных пациентов в файл если были изменения с момента последней записи
+        /// </summary>
+        private void WritePatientsToFile()
+        {
+            if (patientsChanged)
+            {
+                for (int i = 0; i < patients.Length; i++)
+                {
+                    var sheetRow = i + headerIndex + 1;
+
+                    if (sheet.Cells[sheetRow, surnameColumn].Value == null && patients[i].FullNameExist)
+                    {
+                        sheet.Cells[sheetRow, surnameColumn].Value = patients[i].Surname;
+                        sheet.Cells[sheetRow, nameColumn].Value = patients[i].Name;
+                        sheet.Cells[sheetRow, patronymicColumn].Value = patients[i].Patronymic;
+                    }
+                }
+
+                patientsChanged = false;
+            }
         }
         /// <summary>
         /// Получает список серии и/или номера полиса пациентов без полных ФИО
@@ -138,7 +164,7 @@ namespace CHI.Services.AttachedPatients
         /// </summary>
         /// <param name="patientsWithFullName">Коллекиця сведений о пациентах.</param>
         public void AddFullNames(IEnumerable<Patient> patientsWithFullName)
-        {            
+        {
             var fullNamePatients = new Dictionary<string, Patient>();
 
             foreach (var item in patientsWithFullName)
@@ -162,11 +188,164 @@ namespace CHI.Services.AttachedPatients
         /// </summary>
         public void Format()
         {
+            WritePatientsToFile();
+
             ApplyColumnProperty();
             SetColumnsOrder();
             RenameSex();
             sheet.Cells.AutoFitColumns();
             sheet.Cells[sheet.Dimension.Address].AutoFilter = true;
+
+            SetColumnsIndexes();
+        }
+        /// <summary>
+        /// Ищет номер столбца в файле по названию заголовка.
+        /// </summary>
+        /// <param name="columnName">Название столбца</param>
+        /// <returns>Индекс искомого столбца, если столбец не найден возвращает -1.</returns>
+        private int GetColumnIndex(string columnName)
+        {
+            var columnProperty = columnProperties
+                .Where(x => string.Equals(x.Name, columnName, StringComparison.OrdinalIgnoreCase) || string.Equals(x.AltName, columnName, StringComparison.OrdinalIgnoreCase))
+                .FirstOrDefault();
+
+            if (columnProperty == null)
+                return GetColumnIndex(columnName, columnName);
+
+            return GetColumnIndex(columnProperty.Name, columnProperty.AltName);
+        }
+        /// <summary>
+        /// Ищет номер столбца в файле по названию заголовка или его алтернативному названию.
+        /// </summary>
+        /// <param name="name">Название столбца.</param>
+        /// <param name="altName">Альтернативное название столбца.</param>
+        /// <returns>Индекс искомого столбца, если столбец не найден возвращает -1.</returns>
+        private int GetColumnIndex(string name, string altName)
+        {
+            for (int col = 1; col <= maxCol; col++)
+            {
+                var cellValue = sheet.Cells[headerIndex, col].Value;
+
+                if (cellValue == null)
+                    continue;
+
+                var cellText = cellValue.ToString();
+                if ((cellText == name) || (cellText == altName))
+                    return col;
+            }
+            return -1;
+        }
+        /// <summary>
+        /// Ищет номер столбца в файле по названию заголовка
+        /// </summary>
+        /// <param name="columnName">Название столбца.</param>
+        /// <param name="sheet">Ссылка на лист excel файла</param>
+        /// <param name="headerIndex">Номер строки с заголовками.</param>
+        /// <returns>Индекс искомого столбца, если столбец не найден возвращает -1.</returns>
+        private static int GetColumnIndex(string columnName, ExcelWorksheet sheet, int headerIndex)
+        {
+            for (int col = 1; col <= sheet.Dimension.Columns; col++)
+            {
+                var cellValue = sheet.Cells[headerIndex, col].Value;
+
+                if (cellValue == null)
+                    continue;
+
+                string cellText = cellValue.ToString();
+
+                if (cellText == columnName)
+                    return col;
+            }
+
+            return -1;
+        }
+        /// <summary>
+        /// возвращает атрибуты столбца по имени, если такого нет - null
+        /// </summary>
+        /// <param name="name">Имя столбца</param>
+        /// <returns>Атрибуты столбца</returns>
+        private IColumnProperties GetColumnProperty(string name)
+        {
+            foreach (var attribute in columnProperties)
+                if (string.Equals(attribute.Name, name, StringComparison.OrdinalIgnoreCase) || string.Equals(attribute.AltName, name, StringComparison.OrdinalIgnoreCase))
+                    return attribute;
+
+            return null;
+        }
+        /// <summary>
+        /// Изменяет порядок столбоцов в соотвествии с порядком следования свойств настроек столбцов.
+        /// </summary>
+        private void SetColumnsOrder()
+        {
+            int correctIndex = 1;
+
+            foreach (var columnProperty in columnProperties)
+            {
+                var currentIndex = GetColumnIndex(columnProperty.Name, columnProperty.AltName);
+
+                //если столбец на своем месте 
+                if (currentIndex == correctIndex)
+                    correctIndex++;
+                //если столбец не на своем месте и столбец найден в таблице
+                else if (currentIndex != -1)
+                {
+                    sheet.InsertColumn(correctIndex, 1);
+                    currentIndex++;
+                    var currentRange = sheet.Cells[headerIndex, currentIndex, maxRow, currentIndex];
+                    var correctRange = sheet.Cells[headerIndex, correctIndex, maxRow, correctIndex];
+                    currentRange.Copy(correctRange);
+                    sheet.DeleteColumn(currentIndex);
+                    correctIndex++;
+                }
+            }
+        }
+        /// <summary>
+        /// Заменяет цифры с полом в понятные названия
+        /// </summary>
+        private void RenameSex()
+        {
+            int sexColumn = GetColumnIndex("SEX");
+
+            if (sexColumn == -1)
+                return;
+
+            var cells = sheet.Cells[headerIndex + 1, sexColumn, maxRow, sexColumn]
+                .Where(x => x.Value != null);
+
+            foreach (var cell in cells)
+                cell.Value = cell.Value.ToString()
+                    .Replace("1", "Мужской")
+                    .Replace("2", "Женский");
+        }
+        /// <summary>
+        /// Применяет свойства столбцов к таблице в соотвествии с настройками свойств столбцов:
+        /// заменяет названия столбцов на настроенные, скрывает и удаляет столбцы.
+        /// </summary>
+        private void ApplyColumnProperty()
+        {
+            for (int i = 1; i <= maxCol; i++)
+            {
+                var cellValue = sheet.Cells[headerIndex, i].Value;
+
+                if (cellValue == null)
+                    continue;
+
+                var name = cellValue.ToString();
+                var columnProperty = GetColumnProperty(name);
+
+                if (columnProperty?.AltName != string.Empty)
+                    sheet.Cells[headerIndex, i].Value = columnProperty.AltName;
+
+                if (columnProperty.Hide)
+                    sheet.Column(i).Hidden = true;
+
+                if (columnProperty.Delete)
+                {
+                    sheet.DeleteColumn(i);
+                    maxCol--;
+                    i--;
+                }
+            }
         }
         /// <summary>
         /// Читает файл для загрузки пациентов в локальную БД и возвращает список сведений о них
@@ -265,181 +444,6 @@ namespace CHI.Services.AttachedPatients
         {
             sheet?.Dispose();
             excel?.Dispose();
-        }
-        /// <summary>
-        /// Ищет номер столбца в файле по названию заголовка.
-        /// </summary>
-        /// <param name="columnName">Название столбца</param>
-        /// <returns>Индекс искомого столбца, если столбец не найден возвращает -1.</returns>
-        private int GetColumnIndex(string columnName)
-        {
-            var columnProperty = columnProperties
-                .Where(x => string.Equals(x.Name, columnName, StringComparison.OrdinalIgnoreCase) || string.Equals(x.AltName, columnName, StringComparison.OrdinalIgnoreCase))
-                .FirstOrDefault();
-
-            if (columnProperty == null)
-                return GetColumnIndex(columnName, columnName);
-
-            return GetColumnIndex(columnProperty.Name, columnProperty.AltName);
-        }
-        /// <summary>
-        /// Ищет номер столбца в файле по названию заголовка или его алтернативному названию.
-        /// </summary>
-        /// <param name="name">Название столбца.</param>
-        /// <param name="altName">Альтернативное название столбца.</param>
-        /// <returns>Индекс искомого столбца, если столбец не найден возвращает -1.</returns>
-        private int GetColumnIndex(string name, string altName)
-        {
-            for (int col = 1; col <= maxCol; col++)
-            {
-                var cellValue = sheet.Cells[headerIndex, col].Value;
-
-                if (cellValue == null)
-                    continue;
-
-                var cellText = cellValue.ToString();
-                if ((cellText == name) || (cellText == altName))
-                    return col;
-            }
-            return -1;
-        }
-        /// <summary>
-        /// Ищет номер столбца в файле по названию заголовка
-        /// </summary>
-        /// <param name="columnName">Название столбца.</param>
-        /// <param name="sheet">Ссылка на лист excel файла</param>
-        /// <param name="headerIndex">Номер строки с заголовками.</param>
-        /// <returns>Индекс искомого столбца, если столбец не найден возвращает -1.</returns>
-        private static int GetColumnIndex(string columnName, ExcelWorksheet sheet, int headerIndex)
-        {
-            for (int col = 1; col <= sheet.Dimension.Columns; col++)
-            {
-                var cellValue = sheet.Cells[headerIndex, col].Value;
-
-                if (cellValue == null)
-                    continue;
-
-                string cellText = cellValue.ToString();
-
-                if (cellText == columnName)
-                    return col;
-            }
-
-            return -1;
-        }
-        /// <summary>
-        /// возвращает атрибуты столбца по имени, если такого нет - null
-        /// </summary>
-        /// <param name="name">Имя столбца</param>
-        /// <returns>Атрибуты столбца</returns>
-        private IColumnProperties GetColumnProperty(string name)
-        {
-            foreach (var attribute in columnProperties)
-                if (string.Equals(attribute.Name, name, StringComparison.OrdinalIgnoreCase) || string.Equals(attribute.AltName, name, StringComparison.OrdinalIgnoreCase))
-                    return attribute;
-
-            return null;
-        }
-        /// <summary>
-        /// Изменяет порядок столбоцов в соотвествии с порядком следования свойств настроек столбцов.
-        /// </summary>
-        private void SetColumnsOrder()
-        {
-            WritePatientsToFile();
-
-            int correctIndex = 1;
-
-            foreach (var columnProperty in columnProperties)
-            {
-                var currentIndex = GetColumnIndex(columnProperty.Name, columnProperty.AltName);
-
-                //если столбец на своем месте 
-                if (currentIndex == correctIndex)
-                    correctIndex++;
-                //если столбец не на своем месте и столбец найден в таблице
-                else if (currentIndex != -1)
-                {
-                    sheet.InsertColumn(correctIndex, 1);
-                    currentIndex++;
-                    var currentRange = sheet.Cells[headerIndex, currentIndex, maxRow, currentIndex];
-                    var correctRange = sheet.Cells[headerIndex, correctIndex, maxRow, correctIndex];
-                    currentRange.Copy(correctRange);
-                    sheet.DeleteColumn(currentIndex);
-                    correctIndex++;
-                }
-            }
-
-            SetColumnsIndexes();
-        }
-        /// <summary>
-        /// Записывает ФИО кэшированных пациентов в файл если были изменения с момента последней записи
-        /// </summary>
-        private void WritePatientsToFile()
-        {
-            if (patientsChanged)
-            {
-                for (int i = 0; i < patients.Length; i++)
-                {
-                    var sheetRow = i + headerIndex + 1;
-
-                    if (sheet.Cells[sheetRow, surnameColumn].Value == null && patients[i].FullNameExist)
-                    {
-                        sheet.Cells[sheetRow, surnameColumn].Value = patients[i].Surname;
-                        sheet.Cells[sheetRow, nameColumn].Value = patients[i].Name;
-                        sheet.Cells[sheetRow, patronymicColumn].Value = patients[i].Patronymic;
-                    }
-                }
-
-                patientsChanged = false;
-            }
-        }
-        /// <summary>
-        /// Заменяет цифры с полом в понятные названия
-        /// </summary>
-        private void RenameSex()
-        {
-            int sexColumn = GetColumnIndex("SEX");
-
-            if (sexColumn == -1)
-                return;
-
-            var cells = sheet.Cells[headerIndex + 1, sexColumn, maxRow, sexColumn]
-                .Where(x => x.Value != null);
-
-            foreach (var cell in cells)
-                cell.Value = cell.Value.ToString()
-                    .Replace("1", "Мужской")
-                    .Replace("2", "Женский");
-        }
-        /// <summary>
-        /// Применяет свойства столбцов к таблице в соотвествии с настройками свойств столбцов:
-        /// заменяет названия столбцов на настроенные, скрывает и удаляет столбцы.
-        /// </summary>
-        private void ApplyColumnProperty()
-        {
-            for (int i = 1; i <= maxCol; i++)
-            {
-                var cellValue = sheet.Cells[headerIndex, i].Value;
-
-                if (cellValue == null)
-                    continue;
-
-                var name = cellValue.ToString();
-                var columnProperty = GetColumnProperty(name);
-
-                if (columnProperty?.AltName != string.Empty)
-                    sheet.Cells[headerIndex, i].Value = columnProperty.AltName;
-
-                if (columnProperty.Hide)
-                    sheet.Column(i).Hidden = true;
-
-                if (columnProperty.Delete)
-                {
-                    sheet.DeleteColumn(i);
-                    maxCol--;
-                    i--;
-                }
-            }
         }
         #endregion
     }
