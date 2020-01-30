@@ -84,7 +84,7 @@
                 <!--Столбец Логин-->
                 <DataGridTextColumn Header="Логин"
                                     Binding="{Binding Login, ValidatesOnDataErrors=True}"
-                                    ElementStyle="{StaticResource DataGridText}"
+                                    ElementStyle="{StaticResource DataGridTextBlock}"
                                     EditingElementStyle="{StaticResource DataGridTextEditing}"
                                     MinWidth="190" />
 

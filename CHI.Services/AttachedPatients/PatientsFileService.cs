@@ -23,6 +23,7 @@ namespace CHI.Services.AttachedPatients
         private int surnameColumn;
         private int nameColumn;
         private int patronymicColumn;
+        //Кэширует данные пациентов из файла для увеличения производительности
         private Patient[] patients;
         private bool patientsChanged = false;
         #endregion
@@ -119,22 +120,7 @@ namespace CHI.Services.AttachedPatients
         /// </summary>
         public void Save()
         {
-            if (patientsChanged)
-            {
-                for (int i = 0; i < patients.Length; i++)
-                {
-                    var sheetRow = i + headerIndex + 1;
-
-                    if (sheet.Cells[sheetRow, surnameColumn].Value == null && patients[i].FullNameExist)
-                    {
-                        sheet.Cells[sheetRow, surnameColumn].Value = patients[i].Surname;
-                        sheet.Cells[sheetRow, nameColumn].Value = patients[i].Name;
-                        sheet.Cells[sheetRow, patronymicColumn].Value = patients[i].Patronymic;
-                    }
-                }
-
-                patientsChanged = false;
-            }
+            WritePatientsToFile();
 
             excel.Save();
         }
@@ -359,6 +345,8 @@ namespace CHI.Services.AttachedPatients
         /// </summary>
         private void SetColumnsOrder()
         {
+            WritePatientsToFile();
+
             int correctIndex = 1;
 
             foreach (var columnProperty in columnProperties)
@@ -382,6 +370,28 @@ namespace CHI.Services.AttachedPatients
             }
 
             SetColumnsIndexes();
+        }
+        /// <summary>
+        /// Записывает ФИО кэшированных пациентов в файл если были изменения с момента последней записи
+        /// </summary>
+        private void WritePatientsToFile()
+        {
+            if (patientsChanged)
+            {
+                for (int i = 0; i < patients.Length; i++)
+                {
+                    var sheetRow = i + headerIndex + 1;
+
+                    if (sheet.Cells[sheetRow, surnameColumn].Value == null && patients[i].FullNameExist)
+                    {
+                        sheet.Cells[sheetRow, surnameColumn].Value = patients[i].Surname;
+                        sheet.Cells[sheetRow, nameColumn].Value = patients[i].Name;
+                        sheet.Cells[sheetRow, patronymicColumn].Value = patients[i].Patronymic;
+                    }
+                }
+
+                patientsChanged = false;
+            }
         }
         /// <summary>
         /// Заменяет цифры с полом в понятные названия

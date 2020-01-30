@@ -23,7 +23,7 @@
     </UserControl.Resources>
 
 
-    <Grid d:DataContext="{d:DesignInstance vm:SrzSettingsViewModel}">
+    <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="210" />
             <ColumnDefinition Width="260" />
@@ -78,7 +78,7 @@
                 <!--Столбец Логин-->
                 <DataGridTextColumn Header="Логин"
                                     Binding="{Binding Login, ValidatesOnDataErrors=True}"
-                                    ElementStyle="{StaticResource DataGridText}"
+                                    ElementStyle="{StaticResource DataGridTextBlock}"
                                     EditingElementStyle="{StaticResource DataGridTextEditing}"
                                     MinWidth="190"/>
 
@@ -123,13 +123,11 @@
                         <DataTemplate >
                             <Grid VerticalAlignment="Stretch">
 
-                                <PasswordBox Margin="0" 
-                                             BorderThickness="0"
+                                <PasswordBox Style="{StaticResource DataGridPasswordBox}"
                                              i:PasswordBoxHelper.BoundPassword="{Binding Password, UpdateSourceTrigger=LostFocus, ValidatesOnDataErrors=True}"
                                              Visibility="{Binding DataContext.ShowProtectedPassword, Source={x:Reference proxyElement}, Converter={i:BoolToVisibleConverter}}"/>
 
-                                <TextBox Margin="0"
-                                         BorderThickness="0"
+                                <TextBox Style="{StaticResource DataGridTextEditing}"
                                          Text="{Binding Password, UpdateSourceTrigger=LostFocus,  ValidatesOnDataErrors=True}"
                                          Visibility="{Binding DataContext.ShowTextPassword, Source={x:Reference proxyElement}, Converter={i:BoolToVisibleConverter}}"/>
 

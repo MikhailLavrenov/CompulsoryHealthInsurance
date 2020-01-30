@@ -94,7 +94,7 @@
 
                     <DataGridTextColumn     Header="Название столбца"
                                             Binding="{Binding Path=Name, ValidatesOnDataErrors=True}"                                                                                 
-                                            ElementStyle="{StaticResource DataGridText}"                                    
+                                            ElementStyle="{StaticResource DataGridTextBlock}"                                    
                                             EditingElementStyle="{StaticResource DataGridTextEditing}"
                                             MinWidth="170" />
                     <DataGridTextColumn     Header="Понятное название"
