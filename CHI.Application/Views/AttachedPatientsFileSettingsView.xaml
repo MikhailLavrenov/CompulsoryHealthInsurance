@@ -98,7 +98,8 @@
                                             EditingElementStyle="{StaticResource DataGridTextEditing}"
                                             MinWidth="170" />
                     <DataGridTextColumn     Header="Понятное название"
-                                            Binding="{Binding Path=AltName, ValidatesOnDataErrors=True}"                                                                                                                  
+                                            Binding="{Binding Path=AltName, ValidatesOnDataErrors=True}"
+                                            ElementStyle="{StaticResource DataGridTextBlock}"
                                             EditingElementStyle="{StaticResource DataGridTextEditing}"
                                             MinWidth="170" />
                     <DataGridCheckBoxColumn Header="Скрыть"
