@@ -16,12 +16,13 @@ namespace CHI.Application
     public class LicenseManager : ILicenseManager
     {
         protected readonly RSACryptoServiceProvider cryptoProvider;
-        protected static readonly string publicKeyName = "licensing.pkey";
+        protected  readonly string publicKeyName = "licensing.pkey";
+        protected readonly string defaultFolder = "Licensing";
 
         /// <summary>
         /// Стандартная директория для подсистемы лицензирования
         /// </summary>
-        public string DefaultDirectory { get; } = $@"{Directory.GetCurrentDirectory()}\Licensing\";
+        public string DefaultDirectory { get; }
         /// <summary>
         /// Расширение файла лицензии
         /// </summary>
@@ -36,6 +37,11 @@ namespace CHI.Application
         /// </summary>
         public LicenseManager()
         {
+            DefaultDirectory = Path.Combine(Directory.GetCurrentDirectory(), defaultFolder);
+
+            if (!Directory.Exists(DefaultDirectory))
+                Directory.CreateDirectory(DefaultDirectory);
+
             cryptoProvider = new RSACryptoServiceProvider();
 
             Initialize();
