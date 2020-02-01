@@ -203,7 +203,6 @@ namespace CHI.Application.Models
                 AddError(ErrorMessages.Connection, nameOfAddress);
                 return false;
             }
-
         }
         #endregion
 
@@ -317,7 +316,18 @@ namespace CHI.Application.Models
             {
                 using (var service = new SRZService(SrzAddress, UseProxy, ProxyAddress, ProxyPort))
                 {
-                    if (service.Authorize(credential))
+                    bool isAuthorized;
+
+                    try
+                    {
+                        isAuthorized = service.Authorize(credential);
+                    }
+                    catch (Exception)
+                    {
+                        isAuthorized = false;
+                    }
+
+                    if (isAuthorized)
                     {
                         service.Logout();
 
@@ -326,8 +336,8 @@ namespace CHI.Application.Models
                     }
                     else
                     {
-                        credential.AddError(ErrorMessages.Connection, nameof(credential.Login));
-                        credential.AddError(ErrorMessages.Connection, nameof(credential.Password));
+                        credential.AddError(ErrorMessages.Authorization, nameof(credential.Login));
+                        credential.AddError(ErrorMessages.Authorization, nameof(credential.Password));
                     }
                 }
             });
@@ -354,7 +364,7 @@ namespace CHI.Application.Models
             SrzConnectionIsValid = false;
 
             RemoveError(ErrorMessages.Connection, nameof(SrzAddress));
-            SrzCredentials.ToList().ForEach(x => x.RemoveErrorsMessage(ErrorMessages.Connection));
+            SrzCredentials.ToList().ForEach(x => x.RemoveErrorsMessage(ErrorMessages.Authorization));
 
             TestConnectionProxy();
 
@@ -459,7 +469,18 @@ namespace CHI.Application.Models
             {
                 using (var service = new ExaminationService(ExaminationsAddress, UseProxy, ProxyAddress, ProxyPort))
                 {
-                    if (service.Authorize(credential))
+                    bool isAuthorized;
+
+                    try
+                    {
+                        isAuthorized = service.Authorize(credential);
+                    }
+                    catch (Exception)
+                    {
+                        isAuthorized = false;
+                    }
+
+                    if (isAuthorized)
                     {
                         codesMO.Add(service.FomsCodeMO);
 
@@ -470,8 +491,8 @@ namespace CHI.Application.Models
                     }
                     else
                     {
-                        credential.AddError(ErrorMessages.Connection, nameof(credential.Login));
-                        credential.AddError(ErrorMessages.Connection, nameof(credential.Password));
+                        credential.AddError(ErrorMessages.Authorization, nameof(credential.Login));
+                        credential.AddError(ErrorMessages.Authorization, nameof(credential.Password));
                     }
                 }
             });
@@ -506,7 +527,7 @@ namespace CHI.Application.Models
             ExaminationsConnectionIsValid = false;
 
             RemoveError(ErrorMessages.Connection, nameof(ExaminationsAddress));
-            ExaminationsCredentials.ToList().ForEach(x => x.RemoveErrorsMessage(ErrorMessages.Connection));
+            ExaminationsCredentials.ToList().ForEach(x => x.RemoveErrorsMessage(ErrorMessages.Authorization));
 
             TestConnectionProxy();
 
