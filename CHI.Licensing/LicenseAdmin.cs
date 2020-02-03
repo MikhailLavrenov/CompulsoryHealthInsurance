@@ -30,8 +30,8 @@ namespace CHI.Licensing
         /// </summary>
         internal LicenseAdmin()
         {
-            PublicKeyPath= $"{DefaultDirectory}{publicKeyName}";
-            SecretKeyPath = $"{DefaultDirectory}{secretKeyName}";
+            PublicKeyPath = Path.Combine(DefaultDirectory, publicKeyName);
+            SecretKeyPath = Path.Combine(DefaultDirectory, secretKeyName);
 
             Initialize();
         }

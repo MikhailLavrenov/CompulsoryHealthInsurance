@@ -4,7 +4,9 @@ using CHI.Application.Views;
 using Prism.DryIoc;
 using Prism.Ioc;
 using System;
+using System.Globalization;
 using System.Windows;
+using System.Windows.Markup;
 using System.Windows.Threading;
 
 namespace CHI.Licensing
@@ -16,7 +18,12 @@ namespace CHI.Licensing
     {
         protected override Window CreateShell()
         {
-            return Container.Resolve<LicenseAdminView>();
+            var window = Container.Resolve<LicenseAdminView>();
+
+            //устанавливает язык для DatePicker MaterialDesign
+            window.Language = XmlLanguage.GetLanguage(CultureInfo.CurrentCulture.IetfLanguageTag);
+
+            return window;
         }
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
