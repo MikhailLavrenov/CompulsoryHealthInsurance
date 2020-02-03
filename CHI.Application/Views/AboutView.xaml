@@ -111,10 +111,10 @@
         <StackPanel Grid.Row="8"  Grid.Column="0"
                 Grid.ColumnSpan="2" Orientation="Horizontal">
 
-            <Button Content="Установить лицензию" Width="170"            
+            <Button Content="Установить лицензию"           
                 Command="{Binding ImportLicenseCommand}" />
 
-            <Button Content="Открыть инструкцию"  Width="170"                
+            <Button Content="Открыть инструкцию"                
                 Command="{Binding OpenManualCommand}" />
 
         </StackPanel>
