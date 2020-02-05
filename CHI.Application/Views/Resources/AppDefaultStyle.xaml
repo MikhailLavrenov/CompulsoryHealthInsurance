@@ -71,8 +71,6 @@
                 Value="Stretch" />
         <Setter Property="VerticalAlignment"
                 Value="Center" />
-        <Setter Property="MaxHeight"
-                Value="24" />
     </Style>
 
     <!--CheckBox-->
