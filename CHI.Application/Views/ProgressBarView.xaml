@@ -51,7 +51,7 @@
                     VerticalAlignment="Top">
 
                 <b:Interaction.Behaviors>
-                    <i:ProgressBarBehaviour />
+                    <i:ProgressBarBehavior />
                 </b:Interaction.Behaviors>
 
             </Canvas>

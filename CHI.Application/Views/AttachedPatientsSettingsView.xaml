@@ -54,7 +54,7 @@
         <i:CustomContentControl prism:RegionManager.RegionName="{x:Static i:RegionNames.AttachedPatientsSettingsRegion}">
 
             <b:Interaction.Behaviors>
-                <i:CircleAnimationBaseBehaviour AnimationParametersTarget="ParentDockPanel" SkipFirstAnimation="True"/>
+                <i:CircleAnimationBaseBehavior AnimationParametersTarget="ParentDockPanel" SkipFirstAnimation="True"/>
             </b:Interaction.Behaviors>
             
         </i:CustomContentControl>

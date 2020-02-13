@@ -22,12 +22,12 @@
         </ResourceDictionary >
     </UserControl.Resources>
 
-    <Grid d:DataContext="{d:DesignInstance vm:ExaminationsViewModel }">
+    <Grid >
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="auto" />
-            <RowDefinition Height="auto" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
 

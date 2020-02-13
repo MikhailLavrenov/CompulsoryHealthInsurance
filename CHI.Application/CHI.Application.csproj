@@ -144,10 +144,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Infrastructure\Behaviours\CircleAnimationBaseBehaviour.cs" />
+    <Compile Include="Infrastructure\Behaviors\CircleAnimationBaseBehavior.cs" />
     <Compile Include="Infrastructure\Controls\CustomContentControl.cs" />
-    <Compile Include="Infrastructure\Behaviours\ProgressBarBehaviour.cs" />
-    <Compile Include="Infrastructure\Behaviours\DragWindowBehaviour.cs" />
+    <Compile Include="Infrastructure\Behaviors\ProgressBarBehavior.cs" />
+    <Compile Include="Infrastructure\Behaviors\DragWindowBehavior.cs" />
     <Compile Include="Infrastructure\Converters\InvertedBoolToVisibleConverterExtension.cs" />
     <Compile Include="Infrastructure\Controls\CustomDataGrid.cs" />
     <Compile Include="Infrastructure\Converters\BoolToVisibleConverterExtension.cs" />

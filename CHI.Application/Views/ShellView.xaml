@@ -220,7 +220,7 @@
     </Window.Resources>
 
     <b:Interaction.Behaviors>
-        <i:DragWindowBehaviour />
+        <i:DragWindowBehavior />
     </b:Interaction.Behaviors>
 
     <b:Interaction.Triggers>
@@ -410,7 +410,7 @@
                                         Margin="15,15,15,40">
                             
                             <b:Interaction.Behaviors>
-                                <i:CircleAnimationBaseBehaviour AnimationParametersTarget="MainWindow"/>
+                                <i:CircleAnimationBaseBehavior AnimationParametersTarget="MainWindow"/>
                             </b:Interaction.Behaviors>
 
                         </i:CustomContentControl>

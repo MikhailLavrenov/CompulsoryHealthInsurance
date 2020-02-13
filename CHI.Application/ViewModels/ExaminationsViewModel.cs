@@ -72,12 +72,19 @@ namespace CHI.Application.ViewModels
             //    Stage1 = examination1Stage,
             //    Stage2 = examination2Stage
             //};
+            
             //Result = new List<Tuple<PatientExaminations, bool, string>> {
             //    new Tuple<PatientExaminations, bool,string>(pe, true, ""),
             //    new Tuple<PatientExaminations,bool, string>(pe, true, ""),
             //    new Tuple<PatientExaminations,bool, string>(pe, false, "Какая то надпись"),
             //    new Tuple<PatientExaminations, bool,string>(pe, false, "Еще одна надпись"),
             //};
+
+            //for (int i = 0; i < 1000; i++)
+            //{
+            //    var item = new Tuple<PatientExaminations, bool, string>(pe, false, "Какая то надпись");
+            //    Result.Add(item);
+            //}
         }
         #endregion
 
@@ -192,7 +199,7 @@ namespace CHI.Application.ViewModels
                         {
                             if (service == null)
                             {
-                                service = new ExaminationService(Settings.SrzAddress, Settings.UseProxy, Settings.ProxyAddress, Settings.ProxyPort);
+                                service = new ExaminationService(Settings.ExaminationsAddress, Settings.UseProxy, Settings.ProxyAddress, Settings.ProxyPort);
                                 service.Authorize(circularList.GetNext());
                             }
 
