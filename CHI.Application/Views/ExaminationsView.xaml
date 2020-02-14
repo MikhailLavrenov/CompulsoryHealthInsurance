@@ -25,7 +25,20 @@
     <Grid >
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
+            <RowDefinition>
+                <RowDefinition.Style>
+                    <Style TargetType="{x:Type RowDefinition}">
+                        <Setter Property="Height"
+                                Value="*" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ShowErrors}" Value="False">
+                                <Setter Property="Height"
+                                        Value="0" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </RowDefinition.Style>
+            </RowDefinition>
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
