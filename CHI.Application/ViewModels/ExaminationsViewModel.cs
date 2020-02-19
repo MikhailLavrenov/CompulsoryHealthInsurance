@@ -105,6 +105,7 @@ namespace CHI.Application.ViewModels
                     return;
                 }
             }
+            SleepMode.PreventOn();
 
             MainRegionService.SetBusyStatus("Выбор файлов.");
 
@@ -157,6 +158,7 @@ namespace CHI.Application.ViewModels
             if (Result?.Count > 0)
                 ShowErrors = true;
 
+            SleepMode.PreventOff();
             MainRegionService.SetCompleteStatus("Завершено.");
         }
         /// <summary>

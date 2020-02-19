@@ -166,6 +166,7 @@
     <Compile Include="Infrastructure\MVVM\DelegateCommandAsync{T}.cs" />
     <Compile Include="Infrastructure\MVVM\MainRegionService.cs" />
     <Compile Include="Infrastructure\ErrorMessages.cs" />
+    <Compile Include="Infrastructure\SleepMode.cs" />
     <Compile Include="Models\ColumnProperty.cs" />
     <Compile Include="Models\Credential.cs" />
     <Compile Include="Models\CredentialScope.cs" />
