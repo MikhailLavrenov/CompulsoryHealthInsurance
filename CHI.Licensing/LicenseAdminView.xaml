@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CHI.Licensing"
-        xmlns:i="clr-namespace:CHI.Application.Infrastructure;assembly=CHI.Application"
+        xmlns:i="clr-namespace:CHI.Infrastructure;assembly=CHI"
         xmlns:prism="http://prismlibrary.com/"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         

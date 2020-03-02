@@ -1,7 +1,7 @@
 ﻿using CHI.Services.AttachedPatients;
 using System.Data.Entity;
 
-namespace CHI.Application.Models
+namespace CHI.Models
 {
     class Database : DbContext
     {

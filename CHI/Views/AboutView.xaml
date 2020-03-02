@@ -1,0 +1,123 @@
+﻿<UserControl x:Class="CHI.Application.Views.AboutView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:vm="clr-namespace:CHI.Application.ViewModels"
+             xmlns:local="clr-namespace:CHI.Application.Views"
+             xmlns:prism="http://prismlibrary.com/"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             
+             mc:Ignorable="d" 
+             d:DesignHeight="470" d:DesignWidth="800"
+             prism:ViewModelLocator.AutoWireViewModel="True">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/CHI.Application;component/Views/Resources/WindowDefaultStyle.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <Style x:Key="TextBlockRight"
+           TargetType="TextBlock"
+           BasedOn="{StaticResource {x:Type TextBlock}}">
+                <Setter Property="FontWeight"
+                Value="Medium" />
+            </Style>
+
+        </ResourceDictionary >
+    </UserControl.Resources>
+
+
+    <Grid d:DataContext="{d:DesignInstance vm:AboutViewModel}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="90"/>
+            <ColumnDefinition Width="*" MaxWidth="1000"/>
+        </Grid.ColumnDefinitions>
+
+        <TextBlock Grid.Row="0"
+                   Grid.Column="0"
+                   Text="Название" />
+        <TextBlock Grid.Row="0"
+                   Grid.Column="1"
+                   Style="{StaticResource TextBlockRight}"
+                   Text="{Binding Name}" />
+
+        <TextBlock Grid.Row="1"
+                   Grid.Column="0"
+                   Text="Версия" />
+        <TextBlock Grid.Row="1"
+                   Grid.Column="1"
+                   Style="{StaticResource TextBlockRight}"
+                   Text="{Binding Version}" />
+
+        <TextBlock Grid.Row="2"
+                   Grid.Column="0"
+                   Text="Copyright" />
+        <TextBlock Grid.Row="2"
+                   Grid.Column="1" 
+                   Style="{StaticResource TextBlockRight}"
+                   Text="{Binding Copyright}" />
+
+        <TextBlock Grid.Row="3"
+                   Grid.Column="0"
+                   Text="Автор" />
+        <TextBlock Grid.Row="3"
+                   Grid.Column="1"
+                   Style="{StaticResource TextBlockRight}"
+                   Text="{Binding Author}" />
+
+        <TextBlock Grid.Row="4"
+                   Grid.Column="0" 
+                   Text="E-mail" />
+        <TextBlock Grid.Row="4"
+                   Grid.Column="1"
+                   Style="{StaticResource TextBlockRight}"
+                   Text="{Binding Email}" />
+
+        <TextBlock Grid.Row="5"
+                   Grid.Column="0"
+                   Text="Телефон" />
+        <TextBlock Grid.Row="5"
+                   Grid.Column="1"
+                   Style="{StaticResource TextBlockRight}"
+                   Text="{Binding Phone}" />
+
+        <FrameworkElement Grid.Row="6"  Height="20"/>
+
+        <TextBlock Grid.Row="7"
+                   Grid.Column="0"
+                   Text="Лицензия" 
+                   VerticalAlignment="top" />
+        <TextBlock Grid.Row="7"
+                   Grid.Column="1"
+                   TextWrapping="Wrap"
+                   Style="{StaticResource TextBlockRight}"
+                   Text="{Binding License}" />
+
+        <StackPanel Grid.Row="8"  Grid.Column="0"
+                Grid.ColumnSpan="2" Orientation="Horizontal">
+
+            <Button Content="Установить лицензию"           
+                Command="{Binding ImportLicenseCommand}" />
+
+            <Button Content="Открыть инструкцию"                
+                Command="{Binding OpenManualCommand}" />
+
+        </StackPanel>
+
+    </Grid>
+</UserControl>

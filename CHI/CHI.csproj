@@ -1,0 +1,68 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <ApplicationIcon>AppIcon.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="licensing.pkey" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="licensing.pkey" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MaterialDesignColors" Version="1.2.2" />
+    <PackageReference Include="MaterialDesignThemes" Version="3.0.1" />
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.19" />
+    <PackageReference Include="NLog" Version="4.6.8" />
+    <PackageReference Include="NLog.Config" Version="4.6.8" />
+    <PackageReference Include="Prism.DryIoc" Version="7.2.0.1422" />
+    <PackageReference Include="Prism.Wpf" Version="7.2.0.1422" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Views\AboutView.xaml.cs">
+      <DependentUpon>AboutView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\AttachedPatientsFileSettingsView.xaml.cs">
+      <DependentUpon>AttachedPatientsFileSettingsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\AttachedPatientsSettingsView.xaml.cs">
+      <DependentUpon>AttachedPatientsSettingsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\AttachedPatientsStorageSettingsView.xaml.cs">
+      <DependentUpon>AttachedPatientsStorageSettingsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\AttachedPatientsView.xaml.cs">
+      <DependentUpon>AttachedPatientsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\ExaminationsSettingsView.xaml.cs">
+      <DependentUpon>ExaminationsSettingsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\ExaminationsView.xaml.cs">
+      <DependentUpon>ExaminationsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\NotificationDialogView.xaml.cs">
+      <DependentUpon>NotificationDialogView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\OtherSettingsView.xaml.cs">
+      <DependentUpon>OtherSettingsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\ProgressBarView.xaml.cs">
+      <DependentUpon>ProgressBarView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\ShellView.xaml.cs">
+      <SubType>Code</SubType>
+      <DependentUpon>ShellView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\SrzSettingsView.xaml.cs">
+      <DependentUpon>SrzSettingsView.xaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+</Project>

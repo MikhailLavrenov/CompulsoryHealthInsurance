@@ -1,6 +1,6 @@
-﻿using CHI.Application.Infrastructure;
-using CHI.Application.ViewModels;
-using CHI.Application.Views;
+﻿using CHI.Infrastructure;
+using CHI.ViewModels;
+using CHI.Views;
 using NLog;
 using Prism.DryIoc;
 using Prism.Ioc;
@@ -10,7 +10,7 @@ using System.Windows;
 using System.Windows.Markup;
 using System.Windows.Threading;
 
-namespace CHI.Application
+namespace CHI
 {
     /// <summary>
     /// Логика взаимодействия для App.xaml

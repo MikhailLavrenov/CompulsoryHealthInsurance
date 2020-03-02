@@ -1,0 +1,129 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <ApplicationIcon>AppIcon.ico</ApplicationIcon>
+    <AssemblyVersion>3.0.0.0</AssemblyVersion>
+    <FileVersion>3.0.0.0</FileVersion>
+    <Copyright>Copyright ©  2020</Copyright>
+    <Version>3.0.0</Version>
+    <Authors>Лавренов Михаил Владимирович</Authors>
+    <Product>ОМС</Product>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageId>CHI</PackageId>
+    <RootNamespace>CHI</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="licensing.pkey" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="licensing.pkey" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="EPPlus" Version="4.5.3.3" />
+    <PackageReference Include="MaterialDesignColors" Version="1.2.2" />
+    <PackageReference Include="MaterialDesignThemes" Version="3.0.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="3.1.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Core" Version="3.1.2" />
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.19" />
+    <PackageReference Include="NDbfReader" Version="2.3.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="NLog" Version="4.6.8" />
+    <PackageReference Include="NLog.Config" Version="4.6.8" />
+    <PackageReference Include="NLog.Schema" Version="4.6.8" />
+    <PackageReference Include="Prism.DryIoc" Version="7.2.0.1422" />
+    <PackageReference Include="Prism.Wpf" Version="7.2.0.1422" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Views\AboutView.xaml.cs">
+      <DependentUpon>AboutView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\AttachedPatientsFileSettingsView.xaml.cs">
+      <DependentUpon>AttachedPatientsFileSettingsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\AttachedPatientsSettingsView.xaml.cs">
+      <DependentUpon>AttachedPatientsSettingsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\AttachedPatientsStorageSettingsView.xaml.cs">
+      <DependentUpon>AttachedPatientsStorageSettingsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\AttachedPatientsView.xaml.cs">
+      <DependentUpon>AttachedPatientsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\ExaminationsSettingsView.xaml.cs">
+      <DependentUpon>ExaminationsSettingsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\ExaminationsView.xaml.cs">
+      <DependentUpon>ExaminationsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\NotificationDialogView.xaml.cs">
+      <DependentUpon>NotificationDialogView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\OtherSettingsView.xaml.cs">
+      <DependentUpon>OtherSettingsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\ProgressBarView.xaml.cs">
+      <DependentUpon>ProgressBarView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\ShellView.xaml.cs">
+      <SubType>Code</SubType>
+      <DependentUpon>ShellView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\SrzSettingsView.xaml.cs">
+      <DependentUpon>SrzSettingsView.xaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Views\AboutView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\AttachedPatientsFileSettingsView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\AttachedPatientsSettingsView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\AttachedPatientsStorageSettingsView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\AttachedPatientsView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\ExaminationsSettingsView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\ExaminationsView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\NotificationDialogView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\OtherSettingsView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\ProgressBarView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\Resources\AppDefaultStyle.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\Resources\WindowDefaultStyle.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\ShellView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\SrzSettingsView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+
+</Project>

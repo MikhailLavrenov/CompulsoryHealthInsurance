@@ -13,9 +13,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using CHI.Application.Models;
+using CHI.Models;
 
-namespace CHI.Application.Views
+namespace CHI.Views
 {
     /// <summary>
     /// Логика взаимодействия для MainWindow.xaml

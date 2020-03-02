@@ -1,5 +1,5 @@
-﻿using CHI.Application.Infrastructure;
-using CHI.Application.Models;
+﻿using CHI.Infrastructure;
+using CHI.Models;
 using CHI.Services.AttachedPatients;
 using CHI.Services.Common;
 using CHI.Services.SRZ;
@@ -13,7 +13,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace CHI.Application.ViewModels
+namespace CHI.ViewModels
 {
     class AttachedPatientsViewModel : DomainObject, IRegionMemberLifetime
     {

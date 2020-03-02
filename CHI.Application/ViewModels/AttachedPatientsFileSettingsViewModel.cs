@@ -1,5 +1,5 @@
-﻿using CHI.Application.Infrastructure;
-using CHI.Application.Models;
+﻿using CHI.Infrastructure;
+using CHI.Models;
 using CHI.Services.AttachedPatients;
 using Prism.Commands;
 using Prism.Regions;
@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 
-namespace CHI.Application.ViewModels
+namespace CHI.ViewModels
 {
     public class AttachedPatientsFileSettingsViewModel : DomainObject, IRegionMemberLifetime
     {

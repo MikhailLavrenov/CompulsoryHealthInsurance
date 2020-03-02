@@ -10,7 +10,7 @@ using System.Windows;
 [assembly: AssemblyTitle("ОМС Утилиты")]
 [assembly: AssemblyDescription("ОМС Утилиты")]
 [assembly: AssemblyProduct("ОМС Утилиты")]
-[assembly: AssemblyCopyright("Copyright ©  2019")]
+[assembly: AssemblyCopyright("Copyright ©  2020")]
 
 // Установка значения False для параметра ComVisible делает типы в этой сборке невидимыми
 // для компонентов COM. Если необходимо обратиться к типу в этой сборке через
