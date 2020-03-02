@@ -1,0 +1,54 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Xml.Serialization;
+
+namespace CHI.Services.BillsRegister
+{
+    /// <summary>
+    /// Представляет информацию о случае обращения за мед. помощью
+    /// </summary>
+    [XmlRoot(ElementName = "SL")]
+    public class SL
+    {
+        /// <summary>
+        /// Код лечащего врача/врача, закрывшего талон
+        /// </summary>
+        [XmlElement(ElementName = "IDDOKT")]
+        public string IDDOKT { get; set; }
+        /// <summary>
+        /// Специальность лечащего врача/врача, закрывшего талон
+        /// </summary>
+        [XmlElement(ElementName = "RPVS")]
+        public string RPVS { get; set; }
+        /// <summary>
+        /// Цель посещения
+        /// </summary>
+        [XmlElement(ElementName = "P_CEL")]
+        public string P_CEL { get; set; }
+        /// <summary>
+        /// Цель обращения
+        /// </summary>
+        [XmlElement(ElementName = "CEL")]
+        public int CEL { get; set; }
+        /// <summary>
+        /// Дата начала лечения
+        /// </summary>
+        [XmlElement(ElementName = "DATE_1")]
+        public DateTime DATE_1 { get; set; }
+        /// <summary>
+        /// Дата окончания лечения
+        /// </summary>
+        [XmlElement(ElementName = "DATE_2")]
+        public DateTime DATE_2 { get; set; }
+        /// <summary>
+        /// Список назначений
+        /// </summary>
+        [XmlElement(ElementName = "NAZ")]
+        public List<NAZ> NAZ { get; set; }
+        /// <summary>
+        /// Список оказанных услуг
+        /// </summary>
+        [XmlElement(ElementName = "USL")]
+        public List<USL> USL { get; set; }
+    }
+}
