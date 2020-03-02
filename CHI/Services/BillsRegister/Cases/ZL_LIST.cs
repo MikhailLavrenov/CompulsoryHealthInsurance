@@ -1,0 +1,24 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Xml.Serialization;
+
+namespace CHI.Services.BillsRegister
+{
+    /// <summary>
+    /// Представляет информацию о законченных случаях реестра-счетов.
+    /// </summary>
+    [XmlRoot(ElementName = "ZL_LIST")]
+    public class ZL_LIST
+    {
+        /// <summary>
+        /// Счет
+        /// </summary>
+        [XmlElement(ElementName = "SCHET")]
+        public SCHET SCHET { get; set; }
+        /// <summary>
+        /// Записи
+        /// </summary>
+        [XmlElement(ElementName = "ZAP")]
+        public List<ZAP> ZAP { get; set; }
+    }
+}
