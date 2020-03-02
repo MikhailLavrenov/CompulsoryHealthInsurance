@@ -40,7 +40,7 @@ namespace CHI.ViewModels
             var assembly = Assembly.GetExecutingAssembly();
 
             manualPath = "Инструкция.docx";
-            Name = ((AssemblyTitleAttribute)assembly.GetCustomAttributes(typeof(AssemblyTitleAttribute), false).First()).Title;
+            Name = ((AssemblyProductAttribute)assembly.GetCustomAttributes(typeof(AssemblyProductAttribute), false).First()).Product;
             Version = assembly.GetName().Version.ToString();
             Copyright = @"©  2020";
             Author = "Лавренов Михаил Владимирович";

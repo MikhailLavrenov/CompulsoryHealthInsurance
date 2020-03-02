@@ -46,7 +46,7 @@ namespace CHI.Models
             Login = InternalDecrypt(ProtectedLogin, scope);
             Password = InternalDecrypt(ProtectedPassword, scope);
         }
-        //шифрует учетные данные в соответствии с видимостью
+        //шифрует текст в соответствии с видимостью
         private static string InternalEncrypt(string text, CredentialScope scope)
         {
             if (text == null)

@@ -13,6 +13,8 @@
                 Value="Center" />
         <Setter Property="FontWeight"
                 Value="Light" />
+        <Setter Property="SnapsToDevicePixels"
+                Value="True" />
     </Style>
 
 

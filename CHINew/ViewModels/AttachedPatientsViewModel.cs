@@ -60,7 +60,7 @@ namespace CHI.ViewModels
                 return;
             }
 
-            SleepMode.PreventOn();
+            SleepMode.Deny();
             MainRegionService.SetBusyStatus("Выбор пути к файлу.");
 
             fileDialogService.DialogType = settings.DownloadNewPatientsFile ? FileDialogType.Save : FileDialogType.Open;
@@ -146,7 +146,7 @@ namespace CHI.ViewModels
             else
                 resultReport.Append($"Файл не готов, осталось найти {unknownPatients.Count} ФИО.");
 
-            SleepMode.PreventOff();
+            SleepMode.Deny();
             MainRegionService.SetCompleteStatus(resultReport.ToString());
         }
         //запускает многопоточно запросы к сайту для поиска пациентов

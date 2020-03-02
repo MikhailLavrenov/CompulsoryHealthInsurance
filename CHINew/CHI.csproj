@@ -10,7 +10,7 @@
     <Copyright>Copyright ©  2020</Copyright>
     <Version>3.0.0</Version>
     <Authors>Лавренов Михаил Владимирович</Authors>
-    <Product>ОМС</Product>
+    <Product>ОМС Утилиты</Product>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageId>CHI</PackageId>
     <RootNamespace>CHI</RootNamespace>
