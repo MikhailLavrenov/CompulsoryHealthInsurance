@@ -38,7 +38,7 @@ namespace CHI.Services.AttachedPatients
         public void Open(string filePath, IEnumerable<IColumnProperties> columnProperties)
         {
             excel = new ExcelPackage(new FileInfo(filePath));
-            sheet = excel.Workbook.Worksheets[1];
+            sheet = excel.Workbook.Worksheets.First();
             this.columnProperties = columnProperties.ToList();
             maxRow = sheet.Dimension.Rows;
             maxCol = sheet.Dimension.Columns;
