@@ -1,4 +1,5 @@
-﻿using CHI.Services.MedicalExaminations;
+﻿using CHI.Models.ServiceAccounting;
+using CHI.Services.MedicalExaminations;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -39,7 +40,21 @@ namespace CHI.Services.BillsRegister
 
         #region Методы
         /// <summary>
-        /// Получает список профилактических осмотров пациентов из xml файлов реестров-счетов. Среди всех файлов выбирает только необходимые.
+        /// Получает счет-реестр за один период (отчетный месяц года)
+        /// </summary>
+        /// <returns></returns>
+        public Register GetRegister()
+        {
+            var fomsRegistersFiles = GetFiles();
+            var fomsRegisters = DeserializeCollection<ZL_LIST>(fomsRegistersFiles);
+
+            foreach (var fomsRegistersFile in fomsRegistersFiles)
+                fomsRegistersFile.Dispose();
+
+            return ConvertToRegister(fomsRegisters);
+        }
+        /// <summary>
+        /// Получает список периодических осмотров пациентов из xml файлов реестров-счетов. Среди всех файлов выбирает только необходимые.
         /// </summary>
         /// <param name="examinationsFileNamesStartsWith">Коллекция начала имен файлов с услугами.</param>
         /// <param name="patientsFileNamesStartsWith">Коллекция начала имен файлов с пациентами.</param>
@@ -63,14 +78,14 @@ namespace CHI.Services.BillsRegister
         /// <summary>
         /// Получает список потоков  на файлы из указанных расположений  файла/файлов, начинающихся с заданных имен.
         /// </summary>
-        /// <param name="fileNamesStartsWithFilter">Коллекция начала имен файлов.</param>
+        /// <param name="fileNamesStartsWith">Коллекция начала имен файлов.</param>
         /// <returns>Список потоков файлов.</returns>
-        private List<Stream> GetFiles(IEnumerable<string> fileNamesStartsWithFilter)
+        private List<Stream> GetFiles(IEnumerable<string> fileNamesStartsWith = null)
         {
             var files = new List<Stream>();
 
             foreach (var filePath in filePaths)
-                files.AddRange(GetFilesRecursive(filePath, fileNamesStartsWithFilter));
+                files.AddRange(GetFilesRecursive(filePath, fileNamesStartsWith));
 
             return files;
         }
@@ -78,9 +93,9 @@ namespace CHI.Services.BillsRegister
         ///  Получает список потоков на файлы по заданному пути и имена которых начинаются с опеределенных строк.
         /// </summary>
         /// <param name="path">Путь к файлу.</param>
-        /// <param name="fileNamesStartsWithFilter">Коллекция начала имен файлов.</param>
+        /// <param name="fileNamesStartsWith">Коллекция начала имен файлов.</param>
         /// <returns>Список потоков файлов.</returns>
-        private List<Stream> GetFilesRecursive(string path, IEnumerable<string> fileNamesStartsWithFilter)
+        private List<Stream> GetFilesRecursive(string path, IEnumerable<string> fileNamesStartsWith = null)
         {
             var result = new List<Stream>();
             var isDirectory = new FileInfo(path).Attributes.HasFlag(FileAttributes.Directory);
@@ -90,21 +105,22 @@ namespace CHI.Services.BillsRegister
                 var entries = Directory.GetFileSystemEntries(path);
 
                 foreach (var entry in entries)
-                    result.AddRange(GetFilesRecursive(entry, fileNamesStartsWithFilter));
+                    result.AddRange(GetFilesRecursive(entry, fileNamesStartsWith));
             }
             else
             {
                 var extension = Path.GetExtension(path);
 
                 if (extension.Equals(".xml", comparer)
-                    && fileNamesStartsWithFilter.Any(x => Path.GetFileName(path).StartsWith(x, comparer)))
-                    result.Add(new FileStream(path, FileMode.Open));
+                    && (fileNamesStartsWith == null || fileNamesStartsWith.Any(x => Path.GetFileName(path).StartsWith(x, comparer))))
+                        result.Add(new FileStream(path, FileMode.Open));
+
 
                 else if (extension.Equals(".zip", comparer))
                     using (var archive = ZipFile.OpenRead(path))
                     {
                         foreach (var entry in archive.Entries)
-                            result.AddRange(ArchiveEntryGetFilesRecursive(entry, fileNamesStartsWithFilter));
+                            result.AddRange(ArchiveEntryGetFilesRecursive(entry, fileNamesStartsWith));
                     }
             }
 
@@ -114,9 +130,9 @@ namespace CHI.Services.BillsRegister
         /// Получает список потоков на файлы в архиве, имена которых начинаются с опеределенных строк.
         /// </summary>
         /// <param name="archiveEntry">Файл внутри zip архива.</param>
-        /// <param name="fileNamesStartsWithFilter">Коллекция начала имен файлов.</param>
+        /// <param name="fileNamesStartsWith">Коллекция начала имен файлов.</param>
         /// <returns>Список потоков файлов.</returns>
-        private List<Stream> ArchiveEntryGetFilesRecursive(ZipArchiveEntry archiveEntry, IEnumerable<string> fileNamesStartsWithFilter)
+        private List<Stream> ArchiveEntryGetFilesRecursive(ZipArchiveEntry archiveEntry, IEnumerable<string> fileNamesStartsWith)
         {
             var result = new List<Stream>();
 
@@ -125,7 +141,8 @@ namespace CHI.Services.BillsRegister
 
             var extension = Path.GetExtension(archiveEntry.Name);
 
-            if (extension.Equals(".xml", comparer) && fileNamesStartsWithFilter.Any(x => archiveEntry.Name.StartsWith(x, comparer)))
+            if (extension.Equals(".xml", comparer) &&
+                (fileNamesStartsWith == null || fileNamesStartsWith.Any(x => archiveEntry.Name.StartsWith(x, comparer))))
             {
                 var extractedEntry = new MemoryStream();
                 archiveEntry.Open().CopyTo(extractedEntry);
@@ -139,14 +156,14 @@ namespace CHI.Services.BillsRegister
                 using (var archive = new ZipArchive(extractedEntry))
                 {
                     foreach (var entry in archive.Entries)
-                        result.AddRange(ArchiveEntryGetFilesRecursive(entry, fileNamesStartsWithFilter));
+                        result.AddRange(ArchiveEntryGetFilesRecursive(entry, fileNamesStartsWith));
                 }
             }
 
             return result;
         }
         /// <summary>
-        /// Конвертирует десериализованные классы xml реестров-счетов в список профилактических осмотров пациентов.
+        /// Конвертирует типы xml реестров-счетов в список PatientExaminations.
         /// </summary>
         /// <param name="examinationsRegisters">Десериализованные классы услуг xml реестров-счетов.</param>
         /// <param name="patientsRegisters">>Десериализованные классы пациентов xml реестров-счетов.</param>
@@ -239,6 +256,48 @@ namespace CHI.Services.BillsRegister
             }
 
             return result;
+        }
+        /// <summary>
+        /// Конвертирует типы xml реестров-счетов в Register.
+        /// </summary>
+        private static Register ConvertToRegister(IEnumerable<ZL_LIST> fomsRegisters)
+        {
+            foreach (var item in fomsRegisters)
+                if (fomsRegisters.First().SCHET.MONTH != item.SCHET.MONTH || fomsRegisters.First().SCHET.YEAR != item.SCHET.YEAR)
+                    throw new InvalidOperationException("Реестры должны принадлежать одному периоду");
+
+            var register = new Register();
+
+            register.Month = fomsRegisters.First().SCHET.MONTH;
+            register.Year = fomsRegisters.First().SCHET.YEAR;
+
+            foreach (var fomsRegister in fomsRegisters)
+                foreach (var fomsCase in fomsRegister.ZAP)
+                {
+                    var mCase = new Case()
+                    {
+                        Place = fomsCase.Z_SL.USL_OK,
+                        VisitPurpose = fomsCase.Z_SL.SL.P_CEL,
+                        TreatmentPurpose = fomsCase.Z_SL.SL.CEL,
+                        Employee = new Employee(fomsCase.Z_SL.SL.IDDOKT, fomsCase.Z_SL.SL.RPVS)
+                    };
+
+                    foreach (var fomsServices in fomsCase.Z_SL.SL.USL)
+                    {
+                        var service = new Service()
+                        {
+                            Code = fomsServices.CODE_USL,
+                            Count = fomsServices.KOL_USL,
+                            Employee = new Employee(fomsServices.CODE_MD, fomsServices.PRVS)
+                        };
+
+                        mCase.Services.Add(service);
+                    }
+
+                    register.Cases.Add(mCase);
+                }
+                                          
+            return register;
         }
         /// <summary>
         /// Определяет этап профилактического осмотра по его типу.

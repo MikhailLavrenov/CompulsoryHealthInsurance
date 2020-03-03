@@ -23,7 +23,7 @@ namespace CHI.Services.BillsRegister
         /// Специальность медработника, выполнившего услугу
         /// </summary>
         [XmlElement(ElementName = "PRVS")]
-        public string PRVS { get; set; }
+        public int PRVS { get; set; }
         /// <summary>
         /// Код медработника, оказавшего услугу
         /// </summary>
