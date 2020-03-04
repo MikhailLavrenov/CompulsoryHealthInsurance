@@ -16,6 +16,11 @@ namespace CHI.Services.BillsRegister
         [XmlElement(ElementName = "SCHET")]
         public SCHET SCHET { get; set; }
         /// <summary>
+        /// Заголовок файла
+        /// </summary>
+        [XmlElement(ElementName = "ZGLV")]
+        public ZGLV ZGLV { get; set; }
+        /// <summary>
         /// Записи
         /// </summary>
         [XmlElement(ElementName = "ZAP")]

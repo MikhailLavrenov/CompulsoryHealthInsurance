@@ -67,7 +67,6 @@
                           Grid.Column="0"
                           Grid.ColumnSpan="2"
                           Margin="0,20,0,10"
-                          MinHeight="100"
                           ItemsSource="{Binding Settings.SrzCredentials}">
 
             <DataGrid.Columns>

@@ -44,7 +44,7 @@ namespace CHI.ViewModels
             SaveSettingsCommand = new DelegateCommand(() => Settings.Instance.Save());
             CheckSettingsCommand = new DelegateCommand(CheckSettingsExecute);
             ShowViewCommand = new DelegateCommand<Type>(x => MainRegionService.RequestNavigate(x.Name));
-            CloseWindowCommand = new DelegateCommand(() => System.Windows.Application.Current.Shutdown());
+            CloseWindowCommand = new DelegateCommand(CloseWindowExecute);
             RestoreWindowCommand = new DelegateCommand(RestoreWindowExecute);
             MaximizeWindowCommand = new DelegateCommand(MaximizeWindowExecute);
             MinimizeWindowCommand = new DelegateCommand(() => System.Windows.Application.Current.MainWindow.WindowState = WindowState.Minimized);
@@ -69,6 +69,12 @@ namespace CHI.ViewModels
                 var message = $"Нет прав на доступ к учетным записям. Создана резервная копия настроек: {Settings.Instance.BackupSettingsFile}. Заново задайте учетные данные.";
                 mainRegionService.SetCompleteStatus(message);
             }
+        }
+        private void CloseWindowExecute()
+        {
+            //Необходимо чтобы срабатывал метод INavigationAwaire при закрытии приложения
+            MainRegionService.RequestNavigate(string.Empty);
+            System.Windows.Application.Current.Shutdown();
         }
         #endregion
     }
