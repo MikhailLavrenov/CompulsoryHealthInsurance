@@ -266,10 +266,12 @@ namespace CHI.Services.BillsRegister
                 if (fomsRegisters.First().SCHET.MONTH != item.SCHET.MONTH || fomsRegisters.First().SCHET.YEAR != item.SCHET.YEAR)
                     throw new InvalidOperationException("Реестры должны принадлежать одному периоду");
 
-            var register = new Register();
-
-            register.Month = fomsRegisters.First().SCHET.MONTH;
-            register.Year = fomsRegisters.First().SCHET.YEAR;
+            var register = new Register()
+            {
+                Month = fomsRegisters.First().SCHET.MONTH,
+                Year = fomsRegisters.First().SCHET.YEAR,
+                BuildDate = fomsRegisters.First().ZGLV.DATA
+            };
 
             foreach (var fomsRegister in fomsRegisters)
                 foreach (var fomsCase in fomsRegister.ZAP)

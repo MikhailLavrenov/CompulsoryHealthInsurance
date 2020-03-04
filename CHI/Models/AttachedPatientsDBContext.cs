@@ -12,7 +12,7 @@ namespace CHI.Models
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite(@"Data Source=AttachedPAtients.db");
+            optionsBuilder.UseSqlite(@"Data Source=AttachedPatients.db");
         }
 
         public DbSet<Patient> Patients { get; set; }

@@ -61,6 +61,10 @@ namespace CHI
             containerRegistry.RegisterForNavigation<OtherSettingsView>();
             containerRegistry.RegisterForNavigation<AboutView>();
             containerRegistry.RegisterForNavigation<ProgressBarView>();
+            containerRegistry.RegisterForNavigation<DepartmentsView>();
+            containerRegistry.RegisterForNavigation<MedicsView>();
+            containerRegistry.RegisterForNavigation<SpecialtiesView>();
+            containerRegistry.RegisterForNavigation<EmployeesView>();
         }
         private void LogUnhandledException(object sender, UnhandledExceptionEventArgs args)
         {
