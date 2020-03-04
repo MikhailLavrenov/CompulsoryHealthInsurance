@@ -16,6 +16,8 @@
     <Grid d:DataContext="{d:DesignInstance vm:EmployeesViewModel}"
           HorizontalAlignment="Left">
 
+        <FrameworkElement x:Name="proxyElement" />
+
         <i:CustomDataGrid ItemsSource="{Binding Employees}">
 
             <DataGrid.Columns>
@@ -28,11 +30,24 @@
                                     MinWidth="80"
                                     IsReadOnly="True" />
 
-                <DataGridComboBoxColumn Header="Мед. работник"
-                                        ItemsSource="{Binding Medics}" 
-                                        
-                                        DisplayMemberPath="FullName"
-                                        MinWidth="300" />
+                <materialDesign:DataGridComboBoxColumn Header="Мед. работник"
+                                                       SelectedItemBinding="{Binding Medic}"
+                                                       ItemsSource="{Binding DataContext.Medics, Source={x:Reference proxyElement}}"
+                                                       DisplayMemberPath="FullName"
+                                                       MinWidth="200" />
+
+                <materialDesign:DataGridComboBoxColumn Header="Специальность"
+                                                       SelectedItemBinding="{Binding Specialty}"
+                                                       ItemsSource="{Binding DataContext.Specialties, Source={x:Reference proxyElement}}"
+                                                       DisplayMemberPath="Title"
+                                                       MinWidth="200" />
+
+                <materialDesign:DataGridComboBoxColumn Header="Отделение"
+                                                       SelectedItemBinding="{Binding Department}"
+                                                       ItemsSource="{Binding DataContext.Departments, Source={x:Reference proxyElement}}"
+                                                       DisplayMemberPath="Title"
+                                                       MinWidth="200" />
+
 
             </DataGrid.Columns>
 

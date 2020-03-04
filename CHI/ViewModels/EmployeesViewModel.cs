@@ -22,7 +22,7 @@ namespace CHI.ViewModels
 
         public EmployeesViewModel(IMainRegionService mainRegionService)
         {
-            mainRegionService.Header = "Штатная единица";
+            mainRegionService.Header = "Штатные единицы";
 
             dbContext = new ServiceAccountingDBContext();
 

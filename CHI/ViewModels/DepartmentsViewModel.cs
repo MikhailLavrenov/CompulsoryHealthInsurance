@@ -16,7 +16,7 @@ namespace CHI.ViewModels
 
         public DepartmentsViewModel(IMainRegionService mainRegionService)
         {
-            mainRegionService.Header = "Подразделения";
+            mainRegionService.Header = "Отделения";
 
             dbContext = new ServiceAccountingDBContext();
             dbContext.Departments.Load();
