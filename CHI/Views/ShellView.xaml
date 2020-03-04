@@ -371,7 +371,7 @@
                     <RadioButton Style="{StaticResource MenuButton}"
                                  Command="{Binding ShowViewCommand}"
                                  CommandParameter="{x:Type v:DepartmentsView}">
-                        <TextBlock Text="Подразделения"
+                        <TextBlock Text="Отделения"
                                    Style="{StaticResource MenuButtonText}" />
                     </RadioButton>
 
