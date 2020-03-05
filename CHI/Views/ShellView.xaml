@@ -396,6 +396,13 @@
                                    Style="{StaticResource MenuButtonText}" />
                     </RadioButton>
 
+                    <RadioButton Style="{StaticResource MenuButton}"
+                                 Command="{Binding ShowViewCommand}"
+                                 CommandParameter="{x:Type v:RegistersView}">
+                        <TextBlock Text="Реестры"
+                                   Style="{StaticResource MenuButtonText}" />
+                    </RadioButton>
+
                     <StackPanel Orientation="Horizontal"
                                 Margin="25,20,10,0">
                         <materialDesign:PackIcon Kind="InfoCircle"
