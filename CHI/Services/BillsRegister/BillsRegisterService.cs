@@ -266,11 +266,14 @@ namespace CHI.Services.BillsRegister
                 if (fomsRegisters.First().SCHET.MONTH != item.SCHET.MONTH || fomsRegisters.First().SCHET.YEAR != item.SCHET.YEAR)
                     throw new InvalidOperationException("Реестры должны принадлежать одному периоду");
 
+            var titleIndex=fomsRegisters.First().ZGLV.FILENAME.IndexOfAny("0123456789".ToCharArray());
+
             var register = new Register()
             {
                 Month = fomsRegisters.First().SCHET.MONTH,
                 Year = fomsRegisters.First().SCHET.YEAR,
-                BuildDate = fomsRegisters.First().ZGLV.DATA
+                BuildDate = fomsRegisters.First().ZGLV.DATA,
+                Title = fomsRegisters.First().ZGLV.FILENAME.Substring(titleIndex)
             };
 
             foreach (var fomsRegister in fomsRegisters)

@@ -16,7 +16,10 @@ namespace CHI.Services.BillsRegister
         /// </summary>
         [XmlElement(ElementName = "DATA")]
         public DateTime DATA { get; set; }
-
-
+        /// <summary>
+        /// Имя файла
+        /// </summary>
+        [XmlElement(ElementName = "FILENAME")]
+        public string FILENAME { get; set; }
     }
 }
