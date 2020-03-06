@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace CHI.Models.ServiceAccounting
+﻿namespace CHI.Models.ServiceAccounting
 {
     public class Employee
     {
@@ -11,16 +7,19 @@ namespace CHI.Models.ServiceAccounting
         public Specialty Specialty { get; set; }
         public Department Department { get; set; }
 
-        public Employee()
+        /// <summary>
+        /// Создает штатную единицу с заданными ФОМС кодами и неопределенными данными
+        /// </summary>
+        /// <param name="medicFomsId"></param>
+        /// <param name="specialtyFomsId"></param>
+        public static Employee CreateUnknown(string medicFomsId, int specialtyFomsId)
         {
+            return new Employee
+            {
+                Medic = Medic.CreateUnknown(medicFomsId),
+                Specialty = Specialty.CreateUnknown(specialtyFomsId)
+            };
         }
 
-        public Employee(string medicFomsId, int specialtyFomsId)
-        {
-            Medic = new Medic();
-            Medic.FomsId = medicFomsId;
-            Specialty = new Specialty();
-            Specialty.FomsId = specialtyFomsId;
-        }
     }
 }

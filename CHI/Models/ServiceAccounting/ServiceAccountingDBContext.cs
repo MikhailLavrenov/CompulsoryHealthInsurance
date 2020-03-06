@@ -1,9 +1,9 @@
-﻿using CHI.Services.AttachedPatients;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace CHI.Models.ServiceAccounting
 {
-   public  class ServiceAccountingDBContext : DbContext
+    public class ServiceAccountingDBContext : DbContext
     {
         public ServiceAccountingDBContext()
         {

@@ -14,12 +14,11 @@ namespace CHI.Services.BillsRegister
     /// </summary>
     public class BillsRegisterService
     {
-        #region Поля
         private static readonly StringComparison comparer = StringComparison.OrdinalIgnoreCase;
         private List<string> filePaths;
-        #endregion
 
-        #region Конструкторы
+        public IEnumerable<string> FileNamesNotStartsWith { get; set; }
+
         /// <summary>
         /// Конструктор
         /// </summary>
@@ -36,9 +35,7 @@ namespace CHI.Services.BillsRegister
         {
             filePaths = new List<string>() { filePath };
         }
-        #endregion
 
-        #region Методы
         /// <summary>
         /// Получает счет-реестр за один период (отчетный месяц года)
         /// </summary>
@@ -111,9 +108,10 @@ namespace CHI.Services.BillsRegister
             {
                 var extension = Path.GetExtension(path);
 
-                if (extension.Equals(".xml", comparer)
+                if (extension.Equals(".xml", comparer) 
+                    && !FileNamesNotStartsWith.Any(x => Path.GetFileName(path).StartsWith(x, comparer))
                     && (fileNamesStartsWith == null || fileNamesStartsWith.Any(x => Path.GetFileName(path).StartsWith(x, comparer))))
-                        result.Add(new FileStream(path, FileMode.Open));
+                    result.Add(new FileStream(path, FileMode.Open));
 
 
                 else if (extension.Equals(".zip", comparer))
@@ -141,8 +139,9 @@ namespace CHI.Services.BillsRegister
 
             var extension = Path.GetExtension(archiveEntry.Name);
 
-            if (extension.Equals(".xml", comparer) &&
-                (fileNamesStartsWith == null || fileNamesStartsWith.Any(x => archiveEntry.Name.StartsWith(x, comparer))))
+            if (extension.Equals(".xml", comparer)
+                && !FileNamesNotStartsWith.Any(x => archiveEntry.Name.StartsWith(x, comparer))
+                && (fileNamesStartsWith == null || fileNamesStartsWith.Any(x => archiveEntry.Name.StartsWith(x, comparer))))
             {
                 var extractedEntry = new MemoryStream();
                 archiveEntry.Open().CopyTo(extractedEntry);
@@ -266,7 +265,7 @@ namespace CHI.Services.BillsRegister
                 if (fomsRegisters.First().SCHET.MONTH != item.SCHET.MONTH || fomsRegisters.First().SCHET.YEAR != item.SCHET.YEAR)
                     throw new InvalidOperationException("Реестры должны принадлежать одному периоду");
 
-            var titleIndex=fomsRegisters.First().ZGLV.FILENAME.IndexOfAny("0123456789".ToCharArray());
+            var titleIndex = fomsRegisters.First().ZGLV.FILENAME.IndexOfAny("0123456789".ToCharArray());
 
             var register = new Register()
             {
@@ -284,7 +283,7 @@ namespace CHI.Services.BillsRegister
                         Place = fomsCase.Z_SL.USL_OK,
                         VisitPurpose = fomsCase.Z_SL.SL.P_CEL,
                         TreatmentPurpose = fomsCase.Z_SL.SL.CEL,
-                        Employee = new Employee(fomsCase.Z_SL.SL.IDDOKT, fomsCase.Z_SL.SL.RPVS)
+                        Employee = Employee.CreateUnknown(fomsCase.Z_SL.SL.IDDOKT, fomsCase.Z_SL.SL.RPVS)
                     };
 
                     foreach (var fomsServices in fomsCase.Z_SL.SL.USL)
@@ -293,7 +292,7 @@ namespace CHI.Services.BillsRegister
                         {
                             Code = fomsServices.CODE_USL,
                             Count = fomsServices.KOL_USL,
-                            Employee = new Employee(fomsServices.CODE_MD, fomsServices.PRVS)
+                            Employee = Employee.CreateUnknown(fomsServices.CODE_MD, fomsServices.PRVS)
                         };
 
                         mCase.Services.Add(service);
@@ -301,7 +300,7 @@ namespace CHI.Services.BillsRegister
 
                     register.Cases.Add(mCase);
                 }
-                                          
+
             return register;
         }
         /// <summary>
@@ -387,7 +386,6 @@ namespace CHI.Services.BillsRegister
 
             return result;
         }
-        #endregion
     }
 }
 
