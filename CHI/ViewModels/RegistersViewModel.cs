@@ -6,6 +6,8 @@ using Prism.Regions;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace CHI.ViewModels
 {
@@ -49,8 +51,13 @@ namespace CHI.ViewModels
                 return;
             }
 
+            mainRegionService.SetBusyStatus("Загрузка xml-реестров");
+
             var registerService = new BillsRegisterService(fileDialogService.FileNames);
-            var register=registerService.GetRegister();
+            registerService.FileNamesNotStartsWith = new string[] { "L" };
+            var register = registerService.GetRegister();
+
+            mainRegionService.SetBusyStatus("Сопоставление штатных единиц");
 
             var dbContext = new ServiceAccountingDBContext();
             dbContext.Employees.Load();
@@ -58,38 +65,77 @@ namespace CHI.ViewModels
             dbContext.Specialties.Load();
             dbContext.Departments.Load();
 
-            var comparer = StringComparison.OrdinalIgnoreCase;
+            var employees = dbContext.Employees.ToList();
+            var medics = dbContext.Medics.ToList();
+            var specialties = dbContext.Specialties.ToList();
+            var departments = dbContext.Departments.ToList();
 
-            foreach (var mCase in register.Cases)
+            var unknownDepartment = dbContext.Departments.AsEnumerable().FirstOrDefault(x => string.Equals(x.Title, Department.UnknownTitle, StringComparison.OrdinalIgnoreCase));
+
+            if (unknownDepartment == null)
             {
-                var foundMedic=dbContext.Medics.FirstOrDefault(x => string.Equals(x.FomsId, mCase.Employee.Medic.FomsId, comparer));
-
-                if (foundMedic != null)
-                    mCase.Employee.Medic = foundMedic;
-                else
-                    dbContext.Medics.Add(mCase.Employee.Medic);
-
-                var foundSpecialty = dbContext.Specialties.FirstOrDefault(x => x.FomsId== mCase.Employee.Specialty.FomsId);
-
-                if (foundSpecialty != null)
-                    mCase.Employee.Specialty = foundSpecialty;
-                else
-                    dbContext.Specialties.Add(mCase.Employee.Specialty);
-
-                var foundEmployee = dbContext.Employees.FirstOrDefault(x => x.Medic==mCase.Employee.Medic && x.Specialty==mCase.Employee.Specialty);
-
-                if (foundEmployee != null)
-                    mCase.Employee = foundEmployee;
-                else
-                    dbContext.Employees.Add(mCase.Employee);
+                unknownDepartment = new Department(Department.UnknownTitle);
+                dbContext.Departments.Add(unknownDepartment);
             }
 
+            int j=0;
+            Parallel.ForEach(register.Cases, (Case mCase) =>
+            //Parallel.For(0, register.Cases.Count
+            //for (int i = 0; i < register.Cases.Count; i++)
+            {
+                Interlocked.Increment(ref j);
+                mainRegionService.SetBusyStatus($"Сопоставление штатных единиц: {j} из {register.Cases.Count}");
 
+                mCase.Employee = FindEmployeeInDbOrAdd(mCase.Employee, dbContext, unknownDepartment);
+
+                foreach (var service in mCase.Services)
+                    service.Employee = FindEmployeeInDbOrAdd(service.Employee, dbContext, unknownDepartment);
+            }
+            );
+            //foreach (var mCase in register.Cases)
+            //{
+            //    mCase.Employee = FindEmployeeInDbOrAdd(mCase.Employee, dbContext, unknownDepartment);
+
+            //    foreach (var service in mCase.Services)
+            //        service.Employee = FindEmployeeInDbOrAdd(service.Employee, dbContext, unknownDepartment);
+            //}
+
+            mainRegionService.SetBusyStatus("Сохранение в базу данных");
 
             dbContext.Registers.Add(register);
             dbContext.SaveChanges();
 
             mainRegionService.SetCompleteStatus("Успешно загружено");
+        }
+
+        private static Employee FindEmployeeInDbOrAdd(Employee employee, ServiceAccountingDBContext dbContext, Department unknownDepartment)
+        {
+            var foundMedic = dbContext.Medics.AsEnumerable().FirstOrDefault(x => string.Equals(x.FomsId, employee.Medic.FomsId, StringComparison.OrdinalIgnoreCase));
+
+            if (foundMedic != null)
+                employee.Medic = foundMedic;
+            else
+                dbContext.Medics.Add(employee.Medic);
+
+            var foundSpecialty = dbContext.Specialties.AsEnumerable().FirstOrDefault(x => x.FomsId == employee.Specialty.FomsId);
+
+            if (foundSpecialty != null)
+                employee.Specialty = foundSpecialty;
+            else
+                dbContext.Specialties.Add(employee.Specialty);
+
+            var foundEmployee = dbContext.Employees.AsEnumerable().FirstOrDefault(x => x.Medic == employee.Medic && x.Specialty == employee.Specialty);
+
+            if (foundEmployee != null)
+                employee = foundEmployee;
+            else
+            {
+                employee.Department = unknownDepartment;
+
+                dbContext.Employees.Add(employee);
+            }
+
+            return employee;
         }
 
         public void OnNavigatedTo(NavigationContext navigationContext)
