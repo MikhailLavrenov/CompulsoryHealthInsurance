@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace CHI.Models.ServiceAccounting
+﻿namespace CHI.Models.ServiceAccounting
 {
     public class Medic
     {
-        public int Id { get; set; }
-        public string FomsId { get; set; }
+        string fomsId;
+
+        public int? Id { get; set; }
+        public string FomsId { get => fomsId; set => fomsId = value?.ToUpper(); }
         public string FullName { get; set; }
 
         public static Medic CreateUnknown(string fomsId)

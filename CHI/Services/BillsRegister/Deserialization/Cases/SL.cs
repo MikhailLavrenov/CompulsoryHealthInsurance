@@ -18,8 +18,8 @@ namespace CHI.Services.BillsRegister
         /// <summary>
         /// Специальность лечащего врача/врача, закрывшего талон
         /// </summary>
-        [XmlElement(ElementName = "RPVS")]
-        public int RPVS { get; set; }
+        [XmlElement(ElementName = "PRVS")]
+        public int PRVS { get; set; }
         /// <summary>
         /// Цель посещения
         /// </summary>

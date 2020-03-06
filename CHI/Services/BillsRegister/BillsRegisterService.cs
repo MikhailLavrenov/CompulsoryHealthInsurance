@@ -108,7 +108,7 @@ namespace CHI.Services.BillsRegister
             {
                 var extension = Path.GetExtension(path);
 
-                if (extension.Equals(".xml", comparer) 
+                if (extension.Equals(".xml", comparer)
                     && !FileNamesNotStartsWith.Any(x => Path.GetFileName(path).StartsWith(x, comparer))
                     && (fileNamesStartsWith == null || fileNamesStartsWith.Any(x => Path.GetFileName(path).StartsWith(x, comparer))))
                     result.Add(new FileStream(path, FileMode.Open));
@@ -272,7 +272,9 @@ namespace CHI.Services.BillsRegister
                 Month = fomsRegisters.First().SCHET.MONTH,
                 Year = fomsRegisters.First().SCHET.YEAR,
                 BuildDate = fomsRegisters.First().ZGLV.DATA,
-                Title = fomsRegisters.First().ZGLV.FILENAME.Substring(titleIndex)
+                Title = fomsRegisters.First().ZGLV.FILENAME.Substring(titleIndex),
+                Cases = new List<Case>()
+
             };
 
             foreach (var fomsRegister in fomsRegisters)
@@ -283,7 +285,8 @@ namespace CHI.Services.BillsRegister
                         Place = fomsCase.Z_SL.USL_OK,
                         VisitPurpose = fomsCase.Z_SL.SL.P_CEL,
                         TreatmentPurpose = fomsCase.Z_SL.SL.CEL,
-                        Employee = Employee.CreateUnknown(fomsCase.Z_SL.SL.IDDOKT, fomsCase.Z_SL.SL.RPVS)
+                        Employee = Employee.CreateUnknown(fomsCase.Z_SL.SL.IDDOKT, fomsCase.Z_SL.SL.PRVS),
+                        Services = new List<Service>()
                     };
 
                     foreach (var fomsServices in fomsCase.Z_SL.SL.USL)
@@ -299,7 +302,10 @@ namespace CHI.Services.BillsRegister
                     }
 
                     register.Cases.Add(mCase);
+
                 }
+
+            register.CasesCount = register.Cases.Count;
 
             return register;
         }

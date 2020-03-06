@@ -11,11 +11,8 @@ namespace CHI.Models.ServiceAccounting
         public int Year { get; set; }
         public DateTime BuildDate { get; set; }
         public string Title { get; set; }
+        public int CasesCount { get; set; }
         public List<Case> Cases { get; set; }
 
-        public Register()
-        {
-            Cases = new List<Case>();
-        }
     }
 }
