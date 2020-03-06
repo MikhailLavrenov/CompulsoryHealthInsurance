@@ -4,7 +4,7 @@
     {
         public static string UnknownTitle { get; } = "Неизвестно";
 
-        public int Id { get; set; }
+        public int? Id { get; set; }
         public string Title { get; set; }
 
         public Department(string title)

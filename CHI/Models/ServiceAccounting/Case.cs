@@ -22,9 +22,5 @@ namespace CHI.Models.ServiceAccounting
         public Employee Employee { get; set; }
         public List<Service> Services { get; set; }
 
-        public Case()
-        {
-            Services = new List<Service>();
-        }
     }
 }
