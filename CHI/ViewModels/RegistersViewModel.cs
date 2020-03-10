@@ -58,10 +58,7 @@ namespace CHI.ViewModels
 
             var dbContext = new ServiceAccountingDBContext();
 
-            var registerForSamePeriod = dbContext.Registers
-                .Include(x => x.Cases)
-                .ThenInclude(x => x.Services)
-                .FirstOrDefault(x => x.Month == register.Month && x.Year == register.Year);
+            var registerForSamePeriod = dbContext.Registers.FirstOrDefault(x => x.Month == register.Month && x.Year == register.Year);
 
             if (registerForSamePeriod != null)
             {

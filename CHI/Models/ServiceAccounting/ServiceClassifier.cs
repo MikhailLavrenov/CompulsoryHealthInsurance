@@ -12,5 +12,15 @@ namespace CHI.Models.ServiceAccounting
         /// Условная единица труда (УЕТ)
         /// </summary>
         public double LaborCost { get; set; }
+
+        public ServiceClassifier()
+        {
+        }
+
+        public ServiceClassifier(int code, double laborCost)
+        {
+            Code = code;
+            LaborCost = laborCost;
+        }
     }
 }
