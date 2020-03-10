@@ -398,6 +398,13 @@
 
                     <RadioButton Style="{StaticResource MenuButton}"
                                  Command="{Binding ShowViewCommand}"
+                                 CommandParameter="{x:Type v:ServiceClassifierView}">
+                        <TextBlock Text="Классификатор услуг"
+                                   Style="{StaticResource MenuButtonText}" />
+                    </RadioButton>
+
+                    <RadioButton Style="{StaticResource MenuButton}"
+                                 Command="{Binding ShowViewCommand}"
                                  CommandParameter="{x:Type v:RegistersView}">
                         <TextBlock Text="Реестры"
                                    Style="{StaticResource MenuButtonText}" />
