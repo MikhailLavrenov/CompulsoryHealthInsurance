@@ -13,7 +13,7 @@ namespace CHI.Services.BillsRegister
         /// Код услуги
         /// </summary>
         [XmlElement(ElementName = "CODE_USL")]
-        public string CODE_USL { get; set; }
+        public int CODE_USL { get; set; }
         /// <summary>
         /// Количество услуг
         /// </summary>

@@ -214,7 +214,7 @@ namespace CHI.Services.BillsRegister
                     var examinationKind = DispToExaminationType(examinationsRegister.SCHET.DISP, examinationYear - foundPatient.DR.Year);
 
                     if (examinationStage == 1)
-                        examination.BeginDate = treatmentCase.Z_SL.SL.USL.First(x => x.CODE_USL == "024101").DATE_IN;
+                        examination.BeginDate = treatmentCase.Z_SL.SL.USL.First(x => x.CODE_USL == 024101).DATE_IN;
                     else
                         examination.BeginDate = treatmentCase.Z_SL.SL.DATE_1;
 
