@@ -16,7 +16,28 @@
     <Grid d:DataContext="{d:DesignInstance vm:ServiceClassifierViewModel}"
           HorizontalAlignment="Left">
 
-        <i:CustomDataGrid ItemsSource="{Binding ServiceClassifier}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+        <StackPanel Orientation="Horizontal"
+                    Grid.Row="0">
+        
+        <Button Content="Загрузить"
+                Command="{Binding LoadCommand}"
+                    Cursor="Hand" />
+
+            <Button Content="Скачать пример"
+                    Command="{Binding SaveExampleCommand}" />
+
+        </StackPanel>
+
+        <FrameworkElement Grid.Row="1"
+                          Style="{StaticResource Separator}" />
+
+        <i:CustomDataGrid Grid.Row="2" ItemsSource="{Binding ServiceClassifier}">
 
             <DataGrid.Columns>
 

@@ -82,6 +82,8 @@ namespace CHI.ViewModels
         }
         private void SaveExampleExecute()
         {
+            MainRegionService.SetBusyStatus("Выбор пути");
+
             fileDialogService.DialogType = FileDialogType.Save;
             fileDialogService.FileName = "Пример для загрузки ФИО";
             fileDialogService.Filter = "Excel files (*.xslx)|*.xlsx";
@@ -91,8 +93,10 @@ namespace CHI.ViewModels
 
             var saveExampleFilePath = fileDialogService.FileName;
 
-            MainRegionService.SetBusyStatus("Открытие файла.");
+            MainRegionService.SetBusyStatus("Сохранение файла");
+
             PatientsFileService.SaveImportFileExample(saveExampleFilePath);
+
             MainRegionService.SetCompleteStatus($"Файл сохранен: {saveExampleFilePath}");
         }
         private void ClearDatabaseExecute()
