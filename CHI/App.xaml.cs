@@ -52,7 +52,6 @@ namespace CHI
 
             containerRegistry.RegisterForNavigation<NavigationMenuView>();
             containerRegistry.RegisterForNavigation<AttachedPatientsView>();
-            containerRegistry.RegisterForNavigation<AttachedPatientsSettingsView>();
             containerRegistry.RegisterForNavigation<SrzSettingsView>();
             containerRegistry.RegisterForNavigation<AttachedPatientsStorageSettingsView>();
             containerRegistry.RegisterForNavigation<AttachedPatientsFileSettingsView>();

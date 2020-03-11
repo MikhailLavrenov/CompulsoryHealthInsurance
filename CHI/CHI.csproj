@@ -48,9 +48,6 @@
     <Compile Update="Views\AttachedPatientsFileSettingsView.xaml.cs">
       <DependentUpon>AttachedPatientsFileSettingsView.xaml</DependentUpon>
     </Compile>
-    <Compile Update="Views\AttachedPatientsSettingsView.xaml.cs">
-      <DependentUpon>AttachedPatientsSettingsView.xaml</DependentUpon>
-    </Compile>
     <Compile Update="Views\AttachedPatientsStorageSettingsView.xaml.cs">
       <DependentUpon>AttachedPatientsStorageSettingsView.xaml</DependentUpon>
     </Compile>
@@ -86,9 +83,6 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Views\AttachedPatientsFileSettingsView.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Views\AttachedPatientsSettingsView.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Views\AttachedPatientsStorageSettingsView.xaml">
