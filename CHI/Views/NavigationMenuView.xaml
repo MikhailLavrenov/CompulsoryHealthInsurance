@@ -98,6 +98,12 @@
                            Style="{StaticResource MenuButtonText}" />
             </Button>
 
+            <Button Command="{Binding SwitchViewCommand}"
+                    CommandParameter="{x:Type v:ComponentsView}">
+                <TextBlock Text="Показатели"
+                           Style="{StaticResource MenuButtonText}" />
+            </Button>
+
         </StackPanel>
 
         <StackPanel Grid.Column="1" 
