@@ -11,7 +11,7 @@ namespace CHI.Models.ServiceAccounting
         public DbSet<Specialty> Specialties { get; set; }
         public DbSet<Department> Departments { get; set; }
         public DbSet<Employee> Employees { get; set; }
-        public DbSet<ServiceClassifier> ServiceClassifier { get; set; }
+        public DbSet<ServiceClassifier> ServicesClassifier { get; set; }
 
         public ServiceAccountingDBContext()
         {

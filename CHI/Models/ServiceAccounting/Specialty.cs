@@ -2,7 +2,7 @@
 {
     public class Specialty
     {
-        public int? Id { get; set; }
+        public int Id { get; set; }
         public int FomsId { get; set; }
         public string Title { get; set; }
 
