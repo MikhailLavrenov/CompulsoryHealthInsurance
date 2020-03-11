@@ -50,6 +50,7 @@ namespace CHI
             containerRegistry.Register<IFileDialogService, FileDialogService>();
             containerRegistry.RegisterDialog<NotificationDialogView, NotificationDialogViewModel>();
 
+            containerRegistry.RegisterForNavigation<NavigationMenuView>();
             containerRegistry.RegisterForNavigation<AttachedPatientsView>();
             containerRegistry.RegisterForNavigation<AttachedPatientsSettingsView>();
             containerRegistry.RegisterForNavigation<SrzSettingsView>();

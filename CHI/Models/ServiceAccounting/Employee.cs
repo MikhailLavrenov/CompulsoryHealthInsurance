@@ -2,7 +2,7 @@
 {
     public class Employee
     {
-        public int? Id { get; set; }
+        public int Id { get; set; }
         public Medic Medic { get; set; }
         public Specialty Specialty { get; set; }
         public Department Department { get; set; }

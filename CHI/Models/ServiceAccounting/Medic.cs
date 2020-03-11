@@ -4,7 +4,7 @@
     {
         string fomsId;
 
-        public int? Id { get; set; }
+        public int Id { get; set; }
         public string FomsId { get => fomsId; set => fomsId = value?.ToUpper(); }
         public string FullName { get; set; }
 

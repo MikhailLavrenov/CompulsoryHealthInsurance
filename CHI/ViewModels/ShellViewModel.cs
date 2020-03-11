@@ -1,11 +1,9 @@
 ﻿using CHI.Infrastructure;
 using CHI.Models;
 using Prism.Commands;
-using Prism.Services.Dialogs;
 using System;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Windows;
 
 namespace CHI.ViewModels
@@ -29,7 +27,7 @@ namespace CHI.ViewModels
         public DelegateCommand RestoreWindowCommand { get; }
         public DelegateCommand MaximizeWindowCommand { get; }
         public DelegateCommand MinimizeWindowCommand { get; }
-        public DelegateCommand<Type> ShowViewCommand { get; }
+        public DelegateCommand<Type> SwitchViewCommand { get; }
         #endregion
 
         #region Конструкторы
@@ -43,7 +41,7 @@ namespace CHI.ViewModels
 
             SaveSettingsCommand = new DelegateCommand(() => Settings.Instance.Save());
             CheckSettingsCommand = new DelegateCommand(CheckSettingsExecute);
-            ShowViewCommand = new DelegateCommand<Type>(x => MainRegionService.RequestNavigate(x.Name));
+            SwitchViewCommand = new DelegateCommand<Type>(x => MainRegionService.RequestNavigate(x.Name));
             CloseWindowCommand = new DelegateCommand(CloseWindowExecute);
             RestoreWindowCommand = new DelegateCommand(RestoreWindowExecute);
             MaximizeWindowCommand = new DelegateCommand(MaximizeWindowExecute);

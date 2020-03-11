@@ -225,8 +225,8 @@
 
     <b:Interaction.Triggers>
         <b:EventTrigger EventName="Loaded">
-            <b:InvokeCommandAction Command="{Binding ShowViewCommand}"
-                                   CommandParameter="{x:Type v:AttachedPatientsView}" />
+            <b:InvokeCommandAction Command="{Binding SwitchViewCommand}"
+                                   CommandParameter="{x:Type v:NavigationMenuView}" />
 
             <b:InvokeCommandAction Command="{Binding CheckSettingsCommand}" />
         </b:EventTrigger>
@@ -237,7 +237,7 @@
     </b:Interaction.Triggers>
 
     <DockPanel d:DataContext="{d:DesignInstance vm:ShellViewModel}">
-        
+
         <DockPanel.Background>
             <LinearGradientBrush EndPoint="0,0.5"
                                  StartPoint="0.5,0.5">
@@ -308,149 +308,40 @@
 
             <DockPanel>
 
-                <StackPanel Orientation="Vertical"
-                            Width="210"
-                            Background="Transparent">
-
-                    <StackPanel Orientation="Horizontal"
-                                Margin="25,23,10,10">
-                        <materialDesign:PackIcon Kind="FormatListBulleted"
-                                                 VerticalAlignment="Center"
-                                                 Margin="0,0,5,0"
-                                                 Foreground="White" />
-                        <TextBlock Text="Основное"
-                                   Style="{StaticResource MenuCaptionText}" />
-                    </StackPanel>
-
-                    <RadioButton Style="{StaticResource MenuButton}"
-                                 Command="{Binding ShowViewCommand}"
-                                 CommandParameter="{x:Type v:AttachedPatientsView}"
-                                 IsChecked="True">
-                        <TextBlock Text="Загрузка прикрепленных пациентов"
-                                   Style="{StaticResource MenuButtonText}" />
-                    </RadioButton>
-
-                    <RadioButton Style="{StaticResource MenuButton}"
-                                 Command="{Binding ShowViewCommand}"
-                                 CommandParameter="{x:Type v:ExaminationsView}">
-                        <TextBlock Text="Загрузка периодических осмотров"
-                                   Style="{StaticResource MenuButtonText}" />
-                    </RadioButton>
-
-                    <StackPanel Orientation="Horizontal"
-                                Margin="25,20,10,10">
-                        <materialDesign:PackIcon Kind="Tools"
-                                                 VerticalAlignment="Center"
-                                                 Margin="0,0,5,0"
-                                                 Foreground="White" />
-                        <TextBlock Text="Настройки"
-                                   Style="{StaticResource MenuCaptionText}" />
-                    </StackPanel>
-
-                    <RadioButton Style="{StaticResource MenuButton}"
-                                 Command="{Binding ShowViewCommand}"
-                                 CommandParameter="{x:Type v:AttachedPatientsSettingsView}">
-                        <TextBlock Text="Загрузки прикрепленых пациентов"
-                                   Style="{StaticResource MenuButtonText}" />
-                    </RadioButton>
-
-                    <RadioButton Style="{StaticResource MenuButton}"
-                                 Command="{Binding ShowViewCommand}"
-                                 CommandParameter="{x:Type v:ExaminationsSettingsView}">
-                        <TextBlock Text="Загрузки периодических осмотров"
-                                   Style="{StaticResource MenuButtonText}" />
-                    </RadioButton>
-
-                    <RadioButton Style="{StaticResource MenuButton}"
-                                 Command="{Binding ShowViewCommand}"
-                                 CommandParameter="{x:Type v:OtherSettingsView}">
-                        <TextBlock Text="Прочие настройки"
-                                   Style="{StaticResource MenuButtonText}" />
-                    </RadioButton>
-
-                    <RadioButton Style="{StaticResource MenuButton}"
-                                 Command="{Binding ShowViewCommand}"
-                                 CommandParameter="{x:Type v:DepartmentsView}">
-                        <TextBlock Text="Отделения"
-                                   Style="{StaticResource MenuButtonText}" />
-                    </RadioButton>
-
-                    <RadioButton Style="{StaticResource MenuButton}"
-                                 Command="{Binding ShowViewCommand}"
-                                 CommandParameter="{x:Type v:MedicsView}">
-                        <TextBlock Text="Медицинские работники"
-                                   Style="{StaticResource MenuButtonText}" />
-                    </RadioButton>
-
-                    <RadioButton Style="{StaticResource MenuButton}"
-                                 Command="{Binding ShowViewCommand}"
-                                 CommandParameter="{x:Type v:SpecialtiesView}">
-                        <TextBlock Text="Специальности"
-                                   Style="{StaticResource MenuButtonText}" />
-                    </RadioButton>
-
-                    <RadioButton Style="{StaticResource MenuButton}"
-                                 Command="{Binding ShowViewCommand}"
-                                 CommandParameter="{x:Type v:EmployeesView}">
-                        <TextBlock Text="Штатные единицы"
-                                   Style="{StaticResource MenuButtonText}" />
-                    </RadioButton>
-
-                    <RadioButton Style="{StaticResource MenuButton}"
-                                 Command="{Binding ShowViewCommand}"
-                                 CommandParameter="{x:Type v:ServiceClassifierView}">
-                        <TextBlock Text="Классификатор услуг"
-                                   Style="{StaticResource MenuButtonText}" />
-                    </RadioButton>
-
-                    <RadioButton Style="{StaticResource MenuButton}"
-                                 Command="{Binding ShowViewCommand}"
-                                 CommandParameter="{x:Type v:RegistersView}">
-                        <TextBlock Text="Реестры"
-                                   Style="{StaticResource MenuButtonText}" />
-                    </RadioButton>
-
-                    <StackPanel Orientation="Horizontal"
-                                Margin="25,20,10,0">
-                        <materialDesign:PackIcon Kind="InfoCircle"
-                                                 VerticalAlignment="Center"
-                                                 Margin="0,0,5,0"
-                                                 Foreground="White" />
-                        <TextBlock Text="Прочее"
-                                   Style="{StaticResource MenuCaptionText}" />
-                    </StackPanel>
-
-                    <RadioButton Style="{StaticResource MenuButton}"
-                                 Command="{Binding ShowViewCommand}"
-                                 CommandParameter="{x:Type v:AboutView}">
-                        <TextBlock Text="О программе"
-                                   Style="{StaticResource MenuButtonText}" />
-                    </RadioButton>
-
-                </StackPanel>
-
                 <Border Background="White" >
 
                     <DockPanel x:Name="MainRegionPanel">
 
                         <materialDesign:ColorZone DockPanel.Dock="Top"
                                                   Mode="Light"
-                                                  Padding="0"
+                                                  Padding="15,10,15,10"
                                                   materialDesign:ShadowAssist.ShadowDepth="Depth1">
 
-                            <TextBlock DockPanel.Dock="Top"
+                            <StackPanel Orientation="Horizontal">
+
+                                <Button Margin="0,0,10,0"
+                                        Style="{StaticResource IconButton}" 
+                                        Command="{Binding SwitchViewCommand}"                                 
+                                        CommandParameter="{x:Type v:NavigationMenuView}" >
+                                    <Viewbox VerticalAlignment="Stretch">
+                                        <materialDesign:PackIcon Kind="HomeOutline" />
+                                    </Viewbox>
+                                </Button>
+
+                                <TextBlock DockPanel.Dock="Top"
                                        HorizontalAlignment="Left"
                                        Text="{Binding MainRegionService.Header, NotifyOnTargetUpdated=True}"
                                        FontSize="20"
-                                       Margin="20,15,20,15"
                                        FontWeight="Medium"
-                                       Foreground="#FF01579B" />
+                                       Foreground="{DynamicResource PrimaryHueMidBrush}" />
+
+                            </StackPanel>
 
                         </materialDesign:ColorZone>
 
                         <i:CustomContentControl prism:RegionManager.RegionName="{x:Static i:RegionNames.MainRegion}"
                                         Margin="15,15,15,40">
-                            
+
                             <b:Interaction.Behaviors>
                                 <i:CircleAnimationBaseBehavior AnimationParametersTarget="MainWindow"/>
                             </b:Interaction.Behaviors>
@@ -467,7 +358,7 @@
                                      Opacity="0.9"
                                      HorizontalAlignment="Stretch"
                                      IsActive="{Binding MainRegionService.ShowStatus}">
-                
+
                 <materialDesign:SnackbarMessage ActionCommand="{Binding MainRegionService.CloseStatusCommand}">
 
                     <materialDesign:SnackbarMessage.ActionContent>
@@ -489,7 +380,7 @@
                     </materialDesign:SnackbarMessage.Content>
 
                 </materialDesign:SnackbarMessage>
-                
+
             </materialDesign:Snackbar>
 
         </Grid>

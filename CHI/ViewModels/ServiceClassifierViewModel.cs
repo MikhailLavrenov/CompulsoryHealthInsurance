@@ -34,25 +34,11 @@ namespace CHI.ViewModels
             mainRegionService.Header = "Классификатор Услуг";
 
             dbContext = new ServiceAccountingDBContext();
-            dbContext.ServiceClassifier.Load();
-            ServiceClassifier = dbContext.ServiceClassifier.Local.ToObservableCollection();
+            dbContext.ServicesClassifier.Load();
+            ServiceClassifier = dbContext.ServicesClassifier.Local.ToObservableCollection();
 
             LoadCommand = new DelegateCommandAsync(LoadExecute);
             SaveExampleCommand = new DelegateCommandAsync(SaveExampleExecute);
-        }
-
-        public void OnNavigatedTo(NavigationContext navigationContext)
-        {
-        }
-
-        public bool IsNavigationTarget(NavigationContext navigationContext)
-        {
-            return true;
-        }
-
-        public void OnNavigatedFrom(NavigationContext navigationContext)
-        {
-            dbContext.SaveChanges();
         }
 
         public void LoadExecute()
@@ -88,13 +74,12 @@ namespace CHI.ViewModels
 
             Application.Current.Dispatcher.Invoke(() =>
             {
-                dbContext.Database.ExecuteSqlRaw($"DELETE FROM [{nameof(dbContext.ServiceClassifier)}]");
-                dbContext.ServiceClassifier.AddRange(loadedClassifier);
+                dbContext.Database.ExecuteSqlRaw($"DELETE FROM [{nameof(dbContext.ServicesClassifier)}]");
+                dbContext = new ServiceAccountingDBContext();
+                dbContext.ServicesClassifier.AddRange(loadedClassifier);
                 dbContext.SaveChanges();
-                dbContext.ServiceClassifier.Load();
-                ServiceClassifier = dbContext.ServiceClassifier.Local.ToObservableCollection();
+                ServiceClassifier = dbContext.ServicesClassifier.Local.ToObservableCollection();
             });
-
 
             mainRegionService.SetCompleteStatus("Успешно загружено");
         }
@@ -150,5 +135,20 @@ namespace CHI.ViewModels
 
 
         }
+
+        public void OnNavigatedTo(NavigationContext navigationContext)
+        {
+        }
+
+        public bool IsNavigationTarget(NavigationContext navigationContext)
+        {
+            return true;
+        }
+
+        public void OnNavigatedFrom(NavigationContext navigationContext)
+        {
+            dbContext.SaveChanges();
+        }
+
     }
 }
