@@ -27,7 +27,8 @@ namespace CHI.ViewModels
         public DelegateCommand RestoreWindowCommand { get; }
         public DelegateCommand MaximizeWindowCommand { get; }
         public DelegateCommand MinimizeWindowCommand { get; }
-        public DelegateCommand<Type> SwitchViewCommand { get; }
+        public DelegateCommand<Type> NavigateCommand { get; }
+        public DelegateCommand NavigateBackCommand { get; }
         #endregion
 
         #region Конструкторы
@@ -41,7 +42,8 @@ namespace CHI.ViewModels
 
             SaveSettingsCommand = new DelegateCommand(() => Settings.Instance.Save());
             CheckSettingsCommand = new DelegateCommand(CheckSettingsExecute);
-            SwitchViewCommand = new DelegateCommand<Type>(x => MainRegionService.RequestNavigate(x.Name));
+            NavigateCommand = new DelegateCommand<Type>(x => MainRegionService.RequestNavigate(x.Name));
+            NavigateBackCommand = new DelegateCommand(()=>MainRegionService.RequestNavigateBack());
             CloseWindowCommand = new DelegateCommand(CloseWindowExecute);
             RestoreWindowCommand = new DelegateCommand(RestoreWindowExecute);
             MaximizeWindowCommand = new DelegateCommand(MaximizeWindowExecute);
