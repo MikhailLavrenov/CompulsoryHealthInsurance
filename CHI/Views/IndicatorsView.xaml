@@ -1,8 +1,8 @@
-﻿<UserControl x:Class="CHI.Views.ComponentsView"
+﻿<UserControl x:Class="CHI.Views.IndicatorsView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:CHI.Views"
              xmlns:i="clr-namespace:CHI.Infrastructure"
              xmlns:vm="clr-namespace:CHI.ViewModels"
@@ -18,7 +18,7 @@
 
         <FrameworkElement x:Name="proxyElement" />
 
-        <i:CustomDataGrid ItemsSource="{Binding Components}">
+        <i:CustomDataGrid ItemsSource="{Binding Indicators}">
 
             <DataGrid.Columns>
 
@@ -30,18 +30,16 @@
                                     MinWidth="80"
                                     IsReadOnly="True" />
 
-                <materialDesign:DataGridComboBoxColumn Header="Родитель"
-                                                       SelectedItemBinding="{Binding Parent}"
-                                                       ItemsSource="{Binding DataContext.Parents, Source={x:Reference proxyElement}}"
-                                                       DisplayMemberPath="Name"
-                                                       MinWidth="120" />
-
                 <DataGridTextColumn Header="Название"
                                     Binding="{Binding Name}"
                                     MinWidth="120" />
 
                 <DataGridTextColumn Header="Порядок"
                                     Binding="{Binding Order}"
+                                    MinWidth="80" />
+
+                <DataGridTextColumn Header="Вид"
+                                    Binding="{Binding Kind}"
                                     MinWidth="80" />
 
 
@@ -52,4 +50,3 @@
 
     </Grid >
 </UserControl>
-

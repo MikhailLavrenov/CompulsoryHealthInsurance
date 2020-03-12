@@ -9,8 +9,8 @@ namespace CHI.Models.ServiceAccounting
         public int Id { get; set; }
         public string Name { get; set; }
         public int Order { get; set; }
-        public IndicatorKind Kind { get; set; }
-        public Component Component { get; set; }
+        public IndicatorKind Kind { get; set; }        
         public List<Expression> Expressions { get; set; }
+        public Component Component { get; set; }
     }
 }

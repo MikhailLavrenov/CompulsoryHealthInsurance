@@ -13,6 +13,8 @@ namespace CHI.Models.ServiceAccounting
         public DbSet<Employee> Employees { get; set; }
         public DbSet<ServiceClassifier> ServicesClassifier { get; set; }
         public DbSet<Component> Components { get; set; }
+        public DbSet<Indicator> Indicators { get; set; }
+        public DbSet<Expression> Expressions { get; set; }
 
         public ServiceAccountingDBContext()
         {
@@ -56,6 +58,21 @@ namespace CHI.Models.ServiceAccounting
             //    .HasMany<Employee>()  
             //    .WithOne(x => x.Department)   
             //    .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Component>()                
+                .HasMany(x => x.Details)
+                .WithOne(x => x.Parent)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Component>()    
+                .HasMany(x => x.Indicators)  
+                .WithOne(x=>x.Component)  
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Indicator>()
+                .HasMany(x => x.Expressions)
+                .WithOne()
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
