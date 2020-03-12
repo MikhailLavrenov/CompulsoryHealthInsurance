@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace CHI.ViewModels
 {
-    public class IndicatorViewModel : DomainObject, IRegionMemberLifetime, INavigationAware
+    public class IndicatorsViewModel : DomainObject, IRegionMemberLifetime, INavigationAware
     {
         ServiceAccountingDBContext dbContext;
         ObservableCollection<Indicator> indicators;
@@ -18,7 +18,7 @@ namespace CHI.ViewModels
         public bool KeepAlive { get => false; }
         public ObservableCollection<Indicator> Indicators { get => indicators; set => SetProperty(ref indicators, value); }
 
-        public IndicatorViewModel(IMainRegionService mainRegionService)
+        public IndicatorsViewModel(IMainRegionService mainRegionService)
         {
             mainRegionService.Header = "Показатели";
 

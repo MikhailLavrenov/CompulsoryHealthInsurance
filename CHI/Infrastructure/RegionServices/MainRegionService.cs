@@ -1,7 +1,7 @@
 ﻿using CHI.Views;
 using Prism.Commands;
 using Prism.Regions;
-using System.Windows;
+using System.Collections.Generic;
 
 namespace CHI.Infrastructure
 {
@@ -10,11 +10,14 @@ namespace CHI.Infrastructure
     /// </summary>
     public class MainRegionService : DomainObject, IMainRegionService
     {
-        private string header;
-        private string status;
-        private bool isBusy;
-        private bool showStatus;
-        private IRegionManager regionManager;
+        string header;
+        string status;
+        bool isBusy;
+        bool showStatus;
+        IRegionManager regionManager;
+        string lastNavigatedView;
+        Stack<string> navigateBackCollection;
+        bool canNavigateBack;
 
         public string Header { get => header; set => SetProperty(ref header, value); }
         public string Status
@@ -28,12 +31,15 @@ namespace CHI.Infrastructure
         }
         public bool IsBusy { get => isBusy; set => SetProperty(ref isBusy, value, SwitchProgressBar); }
         public bool ShowStatus { get => showStatus; private set => SetProperty(ref showStatus, value); }
+        public bool CanNavigateBack { get => canNavigateBack; private set => SetProperty(ref canNavigateBack, value); }
 
         public DelegateCommand CloseStatusCommand { get; }
 
         public MainRegionService(IRegionManager regionManager)
         {
             this.regionManager = regionManager;
+
+            navigateBackCollection = new Stack<string>();
 
             CloseStatusCommand = new DelegateCommand(CloseStatusExecute);
         }
@@ -48,11 +54,29 @@ namespace CHI.Infrastructure
             Status = $"{statusMessage}";
             IsBusy = true;
         }
-        public void RequestNavigate(string targetName)
+        public void RequestNavigate(string targetName, bool canNavigateBack = false)
         {
+            RequestNavigate(targetName, new NavigationParameters(), canNavigateBack);
+        }
+        public void RequestNavigate(string targetName, NavigationParameters navigationParameters, bool canNavigateBack = false)
+        {
+            if (canNavigateBack)
+            {
+                navigateBackCollection.Push(lastNavigatedView);
+                CanNavigateBack = true;
+            }
+
             IsBusy = false;
             Status = string.Empty;
-            regionManager.RequestNavigate(RegionNames.MainRegion, targetName);
+            regionManager.RequestNavigate(RegionNames.MainRegion, targetName, navigationParameters);
+            lastNavigatedView = targetName;
+        }
+        public void RequestNavigateBack()
+        {
+            if (navigateBackCollection.Count > 0)
+                RequestNavigate(navigateBackCollection.Pop());
+
+            CanNavigateBack = navigateBackCollection.Count > 0;
         }
         private void SwitchProgressBar()
         {

@@ -156,18 +156,17 @@
 
             </Style>
 
-            <Style x:Key="HomeButton"
+            <Style x:Key="NavigationButton"
                    BasedOn="{StaticResource WindowButton}"
                    TargetType="{x:Type Button}">
-
+                <Setter Property="Padding"
+                        Value="0" />
                 <Setter Property="Width"
-                        Value="44" />
+                        Value="35" />
                 <Setter Property="Height"
-                        Value="44" />
+                        Value="35" />
                 <Setter Property="materialDesign:ButtonAssist.CornerRadius"
                         Value="22" />
-                <Setter Property="Padding"
-                        Value="5" />
 
             </Style>
 
@@ -180,7 +179,7 @@
 
     <b:Interaction.Triggers>
         <b:EventTrigger EventName="Loaded">
-            <b:InvokeCommandAction Command="{Binding SwitchViewCommand}"
+            <b:InvokeCommandAction Command="{Binding NavigateCommand}"
                                    CommandParameter="{x:Type v:NavigationMenuView}" />
 
             <b:InvokeCommandAction Command="{Binding CheckSettingsCommand}" />
@@ -197,7 +196,7 @@
             <LinearGradientBrush EndPoint="0,0.5"
                                  StartPoint="0.5,0.5">
                 <GradientStop Color="#FF01579B"
-                              Offset="0.475" />
+                              Offset="0" />
                 <GradientStop Color="#FF0082EA"
                               Offset="1" />
             </LinearGradientBrush>
@@ -242,12 +241,22 @@
                     Orientation="Horizontal" 
                     IsEnabled="{Binding MainRegionService.IsBusy, Converter={i:InvertBoolConverter}}">
 
-            <Button Margin="0,0,10,0"                                         
-                    Style="{StaticResource HomeButton}"                     
-                    Command="{Binding SwitchViewCommand}"                                                                         
+            <Button Style="{StaticResource NavigationButton}"
+                    Command="{Binding NavigateBackCommand}"
+                    Cursor="Hand" 
+                    Visibility="{Binding MainRegionService.CanNavigateBack, Converter={i:BoolToVisibleConverter}}">
+                <Viewbox Stretch="Fill">
+                    <materialDesign:PackIcon Kind="ArrowLeftCircleOutline"
+                                             Foreground="White" />
+                </Viewbox>
+            </Button>
+            
+            <Button Margin="0,0,10,0"
+                    Style="{StaticResource NavigationButton}"                     
+                    Command="{Binding NavigateCommand}"                                                                         
                     CommandParameter="{x:Type v:NavigationMenuView}" >
-                <Viewbox>
-                    <materialDesign:PackIcon Kind="HomeOutline" Foreground="White" />
+                <Viewbox Stretch="Fill">
+                    <materialDesign:PackIcon Kind="HouseCircleOutline" Foreground="White" />
                 </Viewbox>
             </Button>
 

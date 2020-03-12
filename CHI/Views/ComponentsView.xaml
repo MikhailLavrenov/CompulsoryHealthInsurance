@@ -44,6 +44,23 @@
                                     Binding="{Binding Order}"
                                     MinWidth="80" />
 
+                <DataGridTemplateColumn Header="Показатели"
+                                        MinWidth="80">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Style="{StaticResource IconButton}"
+                                    Margin="-5"                                   
+                                    Height="21"
+                                    Command="{Binding DataContext.EditIndicatorsCommand, Source={x:Reference proxyElement}}"
+                                    CommandParameter="{Binding}">
+                                <Viewbox Stretch="Fill">
+                                    <materialDesign:PackIcon Kind="DotsHorizontalCircleOutline" />
+                                </Viewbox>
+                            </Button>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
 
 
             </DataGrid.Columns>
