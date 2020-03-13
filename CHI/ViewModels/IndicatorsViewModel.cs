@@ -43,6 +43,8 @@ namespace CHI.ViewModels
 
         public void OnNavigatedFrom(NavigationContext navigationContext)
         {
+            component.Indicators = Indicators.ToList();
+
             dbContext.SaveChanges();
         }
        
