@@ -2,9 +2,9 @@
 using CHI.Models.ServiceAccounting;
 using Microsoft.EntityFrameworkCore;
 using Prism.Regions;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.Linq;
 
 namespace CHI.ViewModels
@@ -16,22 +16,24 @@ namespace CHI.ViewModels
         Component component;
 
         public bool KeepAlive { get => false; }
+        public Component Component { get => component; set => SetProperty(ref component, value); }
         public ObservableCollection<Indicator> Indicators { get => indicators; set => SetProperty(ref indicators, value); }
+        public List<KeyValuePair<Enum, string>> IndicatorKinds { get; } = IndicatorKind.None.GetAllValuesAndDescriptions().ToList();
 
         public IndicatorsViewModel(IMainRegionService mainRegionService)
         {
             mainRegionService.Header = "Показатели";
 
-            
+
         }
 
         public void OnNavigatedTo(NavigationContext navigationContext)
         {
             dbContext = new ServiceAccountingDBContext();
 
-            component = navigationContext.Parameters.GetValue<Component>(nameof(Component));
+            Component = navigationContext.Parameters.GetValue<Component>(nameof(Component));
 
-            dbContext.Components.Where(x => x.Id == component.Id).Include(x => x.Indicators).Load();
+            dbContext.Components.Where(x => x.Id == Component.Id).Include(x => x.Indicators).Load();
 
             Indicators = dbContext.Indicators.Local.ToObservableCollection();
         }
@@ -47,6 +49,6 @@ namespace CHI.ViewModels
 
             dbContext.SaveChanges();
         }
-       
+
     }
 }

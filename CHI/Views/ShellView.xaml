@@ -105,12 +105,12 @@
                         <ControlTemplate TargetType="{x:Type ButtonBase}">
                             <Grid Background="{TemplateBinding Background}">
 
-                                <materialDesign:Ripple Content="{TemplateBinding Content}"                                            
-                                                       ContentTemplate="{TemplateBinding ContentTemplate}"                                           
-                                                       Focusable="False"                        
-                                                       HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"                   
-                                                       VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"                          
-                                                       Padding="{TemplateBinding Padding}"                        
+                                <materialDesign:Ripple Content="{TemplateBinding Content}"
+                                                       ContentTemplate="{TemplateBinding ContentTemplate}"
+                                                       Focusable="False"
+                                                       HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                       VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                       Padding="{TemplateBinding Padding}"
                                                        SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}">
 
                                 </materialDesign:Ripple>
@@ -142,14 +142,14 @@
                 </Setter>
             </Style>
 
-            <Style x:Key="CloseButton" 
-                   TargetType="Button"                           
+            <Style x:Key="CloseButton"
+                   TargetType="Button"
                    BasedOn="{StaticResource WindowButton}">
 
                 <Style.Triggers>
-                    <Trigger Property="IsMouseOver"                                     
+                    <Trigger Property="IsMouseOver"
                              Value="True">
-                        <Setter Property="Background"                                        
+                        <Setter Property="Background"
                                 Value="Red" />
                     </Trigger>
                 </Style.Triggers>
@@ -160,11 +160,13 @@
                    BasedOn="{StaticResource WindowButton}"
                    TargetType="{x:Type Button}">
                 <Setter Property="Padding"
-                        Value="0" />
+                        Value="-3" />
+                <Setter Property="Margin"
+                        Value="3" />
                 <Setter Property="Width"
-                        Value="35" />
+                        Value="30" />
                 <Setter Property="Height"
-                        Value="35" />
+                        Value="30" />
                 <Setter Property="materialDesign:ButtonAssist.CornerRadius"
                         Value="22" />
 
@@ -203,14 +205,15 @@
         </Grid.Background>
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="auto"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0"
                     Orientation="Horizontal"
                     HorizontalAlignment="Right"
-                    VerticalAlignment="Top" Panel.ZIndex="1">
+                    VerticalAlignment="Top"
+                    Panel.ZIndex="1">
 
             <Button Style="{StaticResource WindowButton}"
                     Command="{Binding MinimizeWindowCommand}">
@@ -229,39 +232,39 @@
                 <materialDesign:PackIcon Kind="WindowRestore" />
             </Button>
 
-            <Button Style="{StaticResource CloseButton}" 
+            <Button Style="{StaticResource CloseButton}"
                     Command="{Binding CloseWindowCommand}">
                 <materialDesign:PackIcon Kind="WindowClose" />
             </Button>
 
         </StackPanel>
 
-        <StackPanel Margin="15,10,15,10"  
-                    Grid.Row="0" 
-                    Orientation="Horizontal" 
+        <StackPanel Margin="15,10,15,10"
+                    Grid.Row="0"
+                    Orientation="Horizontal"
                     IsEnabled="{Binding MainRegionService.IsBusy, Converter={i:InvertBoolConverter}}">
 
             <Button Style="{StaticResource NavigationButton}"
                     Command="{Binding NavigateBackCommand}"
-                    Cursor="Hand" 
+                    Cursor="Hand"
                     Visibility="{Binding MainRegionService.CanNavigateBack, Converter={i:BoolToVisibleConverter}}">
-                <Viewbox Stretch="Fill">
+                <Viewbox Stretch="Uniform">
                     <materialDesign:PackIcon Kind="ArrowLeftCircleOutline"
                                              Foreground="White" />
                 </Viewbox>
             </Button>
-            
-            <Button Margin="0,0,10,0"
-                    Style="{StaticResource NavigationButton}"                     
-                    Command="{Binding NavigateCommand}"                                                                         
-                    CommandParameter="{x:Type v:NavigationMenuView}" >
-                <Viewbox Stretch="Fill">
-                    <materialDesign:PackIcon Kind="HouseCircleOutline" Foreground="White" />
+
+            <Button Style="{StaticResource NavigationButton}"
+                    Command="{Binding NavigateCommand}"
+                    CommandParameter="{x:Type v:NavigationMenuView}">
+                <Viewbox Stretch="Uniform">
+                    <materialDesign:PackIcon Kind="HouseCircleOutline"
+                                             Foreground="White" />
                 </Viewbox>
             </Button>
 
-            <TextBlock DockPanel.Dock="Top"      
-                       HorizontalAlignment="Left" 
+            <TextBlock DockPanel.Dock="Top"
+                       HorizontalAlignment="Left"
                        Text="{Binding MainRegionService.Header, NotifyOnTargetUpdated=True}"
                        FontSize="20"
                        FontWeight="Medium"
@@ -271,9 +274,9 @@
 
 
         <Grid x:Name="MainRegionPanel"
-              Grid.Row="1"                
-              Background="White" 
-              IsEnabled="{Binding MainRegionService.IsBusy, Converter={i:InvertBoolConverter}}" >
+              Grid.Row="1"
+              Background="White"
+              IsEnabled="{Binding MainRegionService.IsBusy, Converter={i:InvertBoolConverter}}">
 
             <ContentControl prism:RegionManager.RegionName="{x:Static i:RegionNames.ProgressBarRegion}">
                 <ContentControl.Style>
@@ -291,11 +294,10 @@
 
             <i:CustomContentControl Margin="15,15,15,40"
                                     Background="White"
-                                    prism:RegionManager.RegionName="{x:Static i:RegionNames.MainRegion}"                                        
-                                    >
+                                    prism:RegionManager.RegionName="{x:Static i:RegionNames.MainRegion}">
 
                 <b:Interaction.Behaviors>
-                    <i:CircleAnimationBaseBehavior AnimationParametersTarget="MainWindow"/>
+                    <i:CircleAnimationBaseBehavior AnimationParametersTarget="MainWindow" />
                 </b:Interaction.Behaviors>
 
             </i:CustomContentControl>
@@ -305,7 +307,7 @@
                                      HorizontalAlignment="Stretch"
                                      VerticalAlignment="Bottom"
                                      IsActive="{Binding MainRegionService.ShowStatus}">
-                
+
                 <materialDesign:SnackbarMessage ActionCommand="{Binding MainRegionService.CloseStatusCommand}">
 
                     <materialDesign:SnackbarMessage.ActionContent>

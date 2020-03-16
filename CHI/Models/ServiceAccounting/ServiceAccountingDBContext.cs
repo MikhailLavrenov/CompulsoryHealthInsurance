@@ -19,7 +19,16 @@ namespace CHI.Models.ServiceAccounting
         public ServiceAccountingDBContext()
         {
             //Database.EnsureDeleted();
-            Database.EnsureCreated();
+
+            if(Database.EnsureCreated())
+            {
+                var root = new Component()
+                {
+                    IsRoot = true,
+                };
+                Components.Add(root);
+                SaveChanges();
+            }
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

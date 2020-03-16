@@ -44,7 +44,9 @@
         <Setter Property="MinWidth"
                 Value="0" />
         <Setter Property="Padding"
-                Value="0" />
+                Value="6" />
+        <Setter Property="Margin"
+                Value="0,0,5,0" />
         <Setter Property="Width"
                 Value="{Binding ActualHeight, RelativeSource={RelativeSource Self}}" />
         <Style.Triggers>
@@ -59,6 +61,29 @@
                         Value="DimGray" />
             </Trigger>
         </Style.Triggers>
+    </Style>
+
+    <Style x:Key="IconRedButton"
+           TargetType="{x:Type Button}"
+           BasedOn="{StaticResource IconButton}">
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver"
+                     Value="true">
+                <Setter Property="Foreground"
+                        Value="Red" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="DataGridRowButton"
+           TargetType="{x:Type Button}"
+           BasedOn="{StaticResource IconButton}">
+        <Setter Property="Padding"
+                Value="0" />
+        <Setter Property="Margin"
+                Value="-5" />
+        <Setter Property="Height"
+                Value="21" />
     </Style>
 
     <!--TextBoxes-->
@@ -188,7 +213,7 @@
 
 
     <DataTemplate x:Key="DataGridDragColumn">
-        <Viewbox Stretch="UniformToFill"
+        <Viewbox Stretch="Uniform"
                  HorizontalAlignment="Right">
             <ContentControl Content="{materialDesign:PackIcon EllipsisVertical}"
                             Foreground="LightGray" />
