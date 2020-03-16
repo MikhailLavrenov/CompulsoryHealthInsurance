@@ -16,9 +16,22 @@
     <Grid d:DataContext="{d:DesignInstance vm:ComponentsViewModel}"
           HorizontalAlignment="Left">
 
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
         <FrameworkElement x:Name="proxyElement" />
 
-        <i:CustomDataGrid ItemsSource="{Binding Indicators}">
+        <TextBlock Grid.Row="0"
+                   HorizontalAlignment="Center"
+                   Text="{Binding Component.Name}" />
+
+        <FrameworkElement Grid.Row="1"
+                          Style="{StaticResource Separator}" />
+
+        <i:CustomDataGrid Grid.Row="2" ItemsSource="{Binding Indicators}">
 
             <DataGrid.Columns>
 
@@ -38,9 +51,12 @@
                                     Binding="{Binding Order}"
                                     MinWidth="80" />
 
-                <DataGridTextColumn Header="Вид"
-                                    Binding="{Binding Kind}"
-                                    MinWidth="80" />
+                <materialDesign:DataGridComboBoxColumn Header="Вид"
+                                                       ItemsSource="{Binding DataContext.IndicatorKinds, Source={x:Reference proxyElement}, Mode=OneTime}"
+                                                       SelectedValuePath="Key"
+                                                       DisplayMemberPath="Value"
+                                                       SelectedValueBinding="{Binding Kind}"                
+                                                       MinWidth="120" />
 
 
 
