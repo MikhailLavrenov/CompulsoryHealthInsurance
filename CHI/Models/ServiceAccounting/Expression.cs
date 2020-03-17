@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace CHI.Models.ServiceAccounting
+﻿namespace CHI.Models.ServiceAccounting
 {
     public class Expression
     {
@@ -15,6 +11,6 @@ namespace CHI.Models.ServiceAccounting
         /// Цель обращения (выдумана ФОМСом)
         /// </summary>
         public int? TreatmentPurpose { get; set; }
-        public double MultiplicationFactor { get; set; }
+        public double MultiplicationFactor { get; set; } = 1;
     }
 }

@@ -42,7 +42,7 @@ namespace CHI.ViewModels
 
             SaveSettingsCommand = new DelegateCommand(() => Settings.Instance.Save());
             CheckSettingsCommand = new DelegateCommand(CheckSettingsExecute);
-            NavigateCommand = new DelegateCommand<Type>(x => MainRegionService.RequestNavigate(x.Name));
+            NavigateCommand = new DelegateCommand<Type>(x => {  MainRegionService.RequestNavigate(x.Name); MainRegionService.ClearNavigationBack(); });
             NavigateBackCommand = new DelegateCommand(()=>MainRegionService.RequestNavigateBack());
             CloseWindowCommand = new DelegateCommand(CloseWindowExecute);
             RestoreWindowCommand = new DelegateCommand(RestoreWindowExecute);

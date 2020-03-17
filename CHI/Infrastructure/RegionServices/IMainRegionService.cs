@@ -20,6 +20,7 @@ namespace CHI.Infrastructure
         void RequestNavigate(string targetName, bool canNavigateBack=false);
         void RequestNavigate(string targetName, NavigationParameters navigationParameters, bool canNavigateBack = false);
         void RequestNavigateBack();
+        void ClearNavigationBack();
 
         DelegateCommand CloseStatusCommand { get; }
     }
