@@ -28,7 +28,7 @@ namespace CHI.ViewModels
             MainRegionService = mainRegionService;
 
             Settings = Settings.Instance;
-            //MainRegionService.Header = "Настройки столбцов файла прикрепленных пациентов";
+            MainRegionService.Header = "Настройки столбцов файла прикрепленных пациентов";
 
             SetDefaultCommand = new DelegateCommand(SetDefaultExecute);
             MoveUpCommand = new DelegateCommand<ColumnProperty>(x => Settings.MoveUpColumnProperty(x as ColumnProperty));

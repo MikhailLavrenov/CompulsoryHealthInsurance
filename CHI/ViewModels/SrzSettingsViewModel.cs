@@ -33,7 +33,7 @@ namespace CHI.ViewModels
             MainRegionService = mainRegionService;
             Settings = Settings.Instance;
 
-            //MainRegionService.Header = "Настройки подключения к СРЗ";
+            MainRegionService.Header = "Настройки подключения к СРЗ";
             ShowTextPassword = false;
             ShowProtectedPassword = !ShowTextPassword;
 

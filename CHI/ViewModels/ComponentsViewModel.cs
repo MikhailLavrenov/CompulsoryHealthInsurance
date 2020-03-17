@@ -24,11 +24,11 @@ namespace CHI.ViewModels
         public List<Component> Parents { get => parents; set => SetProperty(ref parents, value); }
         public ObservableCollection<Component> Components { get => components; set => SetProperty(ref components, value); }
 
-        public DelegateCommand<Type> EditIndicatorsCommand { get; }
-        public DelegateCommand AddDetailCommand { get; }
+        public DelegateCommand AddCommand { get; }
         public DelegateCommand DeleteCommand { get; }
         public DelegateCommand MoveUpCommand { get; }
         public DelegateCommand MoveDownCommand { get; }
+        public DelegateCommand<Type> EditIndicatorsCommand { get; }
 
         public ComponentsViewModel(IMainRegionService mainRegionService)
         {
@@ -42,11 +42,11 @@ namespace CHI.ViewModels
 
             RefreshComponents();
 
+            AddCommand = new DelegateCommand(AddExecute, () => CurrentComponent != null).ObservesProperty(() => CurrentComponent);
+            DeleteCommand = new DelegateCommand(DeleteExecute, () => CurrentComponent != null && !CurrentComponent.IsRoot).ObservesProperty(() => CurrentComponent);
+            MoveUpCommand = new DelegateCommand(MoveUpExecute, MoveUpCanExecute).ObservesProperty(() => CurrentComponent);
+            MoveDownCommand = new DelegateCommand(MoveDownExecute, MoveDownCanExecute).ObservesProperty(() => CurrentComponent);
             EditIndicatorsCommand = new DelegateCommand<Type>(EditIndicatorsExecute);
-            AddDetailCommand = new DelegateCommand(AddDetailExecute);
-            DeleteCommand = new DelegateCommand(DeleteExecute, () => CurrentComponent?.IsRoot == false).ObservesProperty(() => CurrentComponent);
-            MoveUpCommand = new DelegateCommand(MoveUpExecute, () => CurrentComponent?.IsRoot == false).ObservesProperty(() => CurrentComponent);
-            MoveDownCommand = new DelegateCommand(MoveDownExecute, () => CurrentComponent?.IsRoot == false).ObservesProperty(() => CurrentComponent);
 
             DeleteCommand.RaiseCanExecuteChanged();
         }
@@ -58,20 +58,77 @@ namespace CHI.ViewModels
             Components = new ObservableCollection<Component>(root.ToListRecursive());
         }
 
-        private void AddDetailExecute()
+        private void AddExecute()
         {
             if (CurrentComponent.Details == null)
                 CurrentComponent.Details = new List<Component>();
+
+            var nextOrder = CurrentComponent.Details.Count == 0 ? 0 : CurrentComponent.Details.Last().Order + 1;
+            var insertIndex = Components.IndexOf(CurrentComponent) + nextOrder + 1;
 
             var newComponent = new Component
             {
                 Parent = CurrentComponent,
                 Name = "Новый компонент",
-                Order = CurrentComponent.Details.Count == 0 ? 0 : CurrentComponent.Details.Last().Order + 1
+                Order = nextOrder
             };
-            var insertIndex = Components.IndexOf(CurrentComponent) + newComponent.Order + 1;
+
             Components.Insert(insertIndex, newComponent);
-            dbContext.Components.Add(newComponent);
+
+            CurrentComponent.Details.Add(newComponent);
+        }
+
+        private void DeleteExecute()
+        {
+            var parentDetails = CurrentComponent.Parent.Details;
+            var offset = parentDetails.IndexOf(CurrentComponent);
+
+            parentDetails.Remove(CurrentComponent);
+
+            for (int i = offset; i < parentDetails.Count; i++)
+                parentDetails[i].Order--;
+
+            RefreshComponents();
+        }
+
+        private bool MoveUpCanExecute()
+        {
+            return CurrentComponent != null
+                && !CurrentComponent.IsRoot
+                && CurrentComponent.Order != 0;
+        }
+
+        private void MoveUpExecute()
+        {
+            var previous = CurrentComponent.Parent.Details.First(x => x.Order == CurrentComponent.Order - 1);
+
+            CurrentComponent.Order--;
+            previous.Order++;
+
+            RefreshComponents();
+
+            MoveDownCommand.RaiseCanExecuteChanged();
+            MoveUpCommand.RaiseCanExecuteChanged();
+        }
+
+        private bool MoveDownCanExecute()
+        {
+            return CurrentComponent != null
+                && !CurrentComponent.IsRoot
+                && CurrentComponent != CurrentComponent.Parent.Details.Last();
+        }
+
+        private void MoveDownExecute()
+        {
+            var next = CurrentComponent.Parent.Details.First(x => x.Order == CurrentComponent.Order + 1);
+
+            CurrentComponent.Order++;
+            next.Order--;
+
+            RefreshComponents();
+
+            MoveDownCommand.RaiseCanExecuteChanged();
+            MoveUpCommand.RaiseCanExecuteChanged();
         }
 
         private void EditIndicatorsExecute(Type view)
@@ -81,48 +138,6 @@ namespace CHI.ViewModels
             var navigationParameters = new NavigationParameters();
             navigationParameters.Add(nameof(Component), CurrentComponent);
             mainRegionService.RequestNavigate(view.Name, navigationParameters, true);
-        }
-
-        private void DeleteExecute()
-        {
-            if (CurrentComponent.IsRoot)
-                return;
-
-            var offset = CurrentComponent.Parent.Details.IndexOf(CurrentComponent) + 1;
-
-            for (int i = offset; i < CurrentComponent.Parent.Details.Count; i++)
-                CurrentComponent.Parent.Details[i].Order--;
-
-            foreach (var item in CurrentComponent.ToListRecursive())
-                Components.Remove(item);
-
-            dbContext.Remove(CurrentComponent);
-        }
-
-        private void MoveUpExecute()
-        {
-            if (CurrentComponent.Parent == null || CurrentComponent.Order == 0)
-                return;
-
-            var previous = CurrentComponent.Parent.Details.First(x => x.Order == CurrentComponent.Order - 1);
-
-            CurrentComponent.Order--;
-            previous.Order++;
-
-            RefreshComponents();
-        }
-
-        private void MoveDownExecute()
-        {
-            if (CurrentComponent.Parent == null || CurrentComponent.Order == CurrentComponent.Parent.Details.Max(x => x.Order))
-                return;
-
-            var next = CurrentComponent.Parent.Details.First(x => x.Order == CurrentComponent.Order + 1);
-
-            CurrentComponent.Order++;
-            next.Order--;
-
-            RefreshComponents();
         }
 
         public void OnNavigatedTo(NavigationContext navigationContext)
