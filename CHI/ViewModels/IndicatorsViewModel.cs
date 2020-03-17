@@ -14,30 +14,59 @@ namespace CHI.ViewModels
     {
         ServiceAccountingDBContext dbContext;
         ObservableCollection<Indicator> indicators;
-        Component component;
+        Component currentComponent;
         Indicator currentIndicator;
         IMainRegionService mainRegionService;
 
         public bool KeepAlive { get; set; }
         public Indicator CurrentIndicator { get => currentIndicator; set => SetProperty(ref currentIndicator, value); }
-        public Component Component { get => component; set => SetProperty(ref component, value); }
+        public Component CurrentComponent { get => currentComponent; set => SetProperty(ref currentComponent, value); }
         public ObservableCollection<Indicator> Indicators { get => indicators; set => SetProperty(ref indicators, value); }
         public List<KeyValuePair<Enum, string>> IndicatorKinds { get; } = IndicatorKind.None.GetAllValuesAndDescriptions().ToList();
 
+        public DelegateCommand AddCommand { get; }
+        public DelegateCommand DeleteCommand { get; }
         public DelegateCommand MoveUpCommand { get; }
         public DelegateCommand MoveDownCommand { get; }
         public DelegateCommand<Type> EditExpressionsCommand { get; }
 
         public IndicatorsViewModel(IMainRegionService mainRegionService)
         {
-            this.mainRegionService = mainRegionService;
-            mainRegionService.Header = "Показатели";
+            this.mainRegionService = mainRegionService;           
 
             dbContext = new ServiceAccountingDBContext();
 
+            AddCommand = new DelegateCommand(AddExecute);
+            DeleteCommand = new DelegateCommand(DeleteExecute,()=> CurrentIndicator!=null).ObservesProperty(() => CurrentIndicator);
             MoveUpCommand = new DelegateCommand(MoveUpExecute, MoveUpCanExecute).ObservesProperty(() => CurrentIndicator);
             MoveDownCommand = new DelegateCommand(MoveDownExecute, MoveDownCanExecute).ObservesProperty(() => CurrentIndicator);
             EditExpressionsCommand = new DelegateCommand<Type>(EditIndicatorsExecute);
+        }
+
+        private void AddExecute()
+        {
+            var newIndicator = new Indicator
+            {
+                Component = CurrentComponent,
+                Name = "Новый индикатор",
+                Order = Indicators.Count == 0 ? 0 : Indicators.Last().Order + 1
+            };
+
+            Indicators.Add(newIndicator);
+
+            CurrentComponent.Indicators.Add(newIndicator);
+        }
+
+        private void DeleteExecute()
+        {
+            var offset = Indicators.IndexOf(CurrentIndicator);
+
+            CurrentComponent.Indicators.Remove(CurrentIndicator);
+
+            Indicators.Remove(CurrentIndicator);            
+
+            for (int i = offset; i < Indicators.Count; i++)
+                Indicators[i].Order--;
         }
 
         private bool MoveUpCanExecute()
@@ -56,6 +85,9 @@ namespace CHI.ViewModels
             CurrentIndicator.Order--;
 
             Indicators.Move(itemIndex, itemIndex - 1);
+
+            MoveDownCommand.RaiseCanExecuteChanged();
+            MoveUpCommand.RaiseCanExecuteChanged();
         }
 
         private bool MoveDownCanExecute()
@@ -68,12 +100,15 @@ namespace CHI.ViewModels
         {
             var itemIndex = Indicators.IndexOf(CurrentIndicator);
 
-            var nextIndicator = Indicators[itemIndex - 1];
-           
+            var nextIndicator = Indicators[itemIndex + 1];
+
             CurrentIndicator.Order++;
             nextIndicator.Order--;
 
             Indicators.Move(itemIndex, itemIndex + 1);
+
+            MoveDownCommand.RaiseCanExecuteChanged();
+            MoveUpCommand.RaiseCanExecuteChanged();
         }
 
         private void EditIndicatorsExecute(Type view)
@@ -87,20 +122,18 @@ namespace CHI.ViewModels
 
         public void OnNavigatedTo(NavigationContext navigationContext)
         {
-            KeepAlive = false;
+            KeepAlive = false;         
 
             if (navigationContext.Parameters.ContainsKey(nameof(Component)))
             {
+                CurrentComponent = navigationContext.Parameters.GetValue<Component>(nameof(Component));
 
-                Component = navigationContext.Parameters.GetValue<Component>(nameof(Component));
+                CurrentComponent = dbContext.Components.Where(x => x.Id == CurrentComponent.Id).Include(x => x.Indicators).First();
 
-
-
-                var t=dbContext.Indicators.Include(x=>x.Component).Where(x => x.Component.Id == Component.Id).ToList();
-
-                Indicators = dbContext.Indicators.Local.ToObservableCollection();
-                Indicators = new ObservableCollection<Indicator>();
+                Indicators = new ObservableCollection<Indicator>(CurrentComponent.Indicators?.OrderBy(x => x.Order).ToList() ?? new List<Indicator>());
             }
+
+            mainRegionService.Header = $"{CurrentComponent.Name} > Показатели";
         }
 
         public bool IsNavigationTarget(NavigationContext navigationContext)
@@ -110,8 +143,6 @@ namespace CHI.ViewModels
 
         public void OnNavigatedFrom(NavigationContext navigationContext)
         {
-            Component.Indicators = Indicators.ToList();
-
             dbContext.SaveChanges();
         }
 

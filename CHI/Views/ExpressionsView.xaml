@@ -2,8 +2,9 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:CHI.Views"
+             xmlns:v="clr-namespace:CHI.Views"
              xmlns:i="clr-namespace:CHI.Infrastructure"
              xmlns:vm="clr-namespace:CHI.ViewModels"
              xmlns:prism="http://prismlibrary.com/"
@@ -12,7 +13,57 @@
              d:DesignHeight="600"
              d:DesignWidth="800"
              prism:ViewModelLocator.AutoWireViewModel="True">
-    <Grid>
-            
-    </Grid>
+
+    <DockPanel d:DataContext="{d:DesignInstance vm:ExpressionsViewModel}"
+               HorizontalAlignment="Left">
+
+        <StackPanel DockPanel.Dock="Top"
+                    Orientation="Horizontal">
+
+            <Button Style="{StaticResource IconButton}"
+                    Command="{Binding AddCommand}">
+                <Viewbox Stretch="Uniform">
+                    <materialDesign:PackIcon Kind="FileOutline" />
+                </Viewbox>
+            </Button>
+
+            <Button Style="{StaticResource IconRedButton}"
+                    Command="{Binding DeleteCommand}">
+                <Viewbox Stretch="Uniform">
+                    <materialDesign:PackIcon Kind="GarbageOutline" />
+                </Viewbox>
+            </Button>
+
+        </StackPanel>
+
+        <FrameworkElement x:Name="proxyElement" />
+
+        <i:CustomDataGrid x:Name="datagrid1"
+                          CanUserAddRows="False"
+                          CanUserDeleteRows="False"
+                          ItemsSource="{Binding Expressions}"
+                          SelectedItem="{Binding CurrentExpression}">
+
+            <DataGrid.Columns>
+
+                <DataGridTemplateColumn CellTemplate="{StaticResource DataGridDragColumn}"
+                                        IsReadOnly="True" />
+
+                <DataGridTextColumn Header="Цель посещения"
+                                    Binding="{Binding VisitPurpose}"
+                                    MinWidth="80" />
+
+                <DataGridTextColumn Header="Цель обращения"
+                                    Binding="{Binding TreatmentPurpose}"
+                                    MinWidth="80" />
+
+                <DataGridTextColumn Header="Коэффициент умножения"
+                                    Binding="{Binding MultiplicationFactor}"
+                                    MinWidth="80" />
+
+            </DataGrid.Columns>
+
+        </i:CustomDataGrid>
+
+    </DockPanel >
 </UserControl>

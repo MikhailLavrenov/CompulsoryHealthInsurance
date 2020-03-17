@@ -1,10 +1,10 @@
 ﻿<UserControl x:Class="CHI.Views.IndicatorsView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:CHI.Views"
-              xmlns:v="clr-namespace:CHI.Views"
+             xmlns:v="clr-namespace:CHI.Views"
              xmlns:i="clr-namespace:CHI.Infrastructure"
              xmlns:vm="clr-namespace:CHI.ViewModels"
              xmlns:prism="http://prismlibrary.com/"
@@ -15,14 +15,7 @@
              prism:ViewModelLocator.AutoWireViewModel="True">
 
     <DockPanel d:DataContext="{d:DesignInstance vm:ComponentsViewModel}"
-          HorizontalAlignment="Left">
-
-        <TextBlock DockPanel.Dock="Top"
-                   HorizontalAlignment="Center"
-                   Text="{Binding Component.Name}" />
-
-        <FrameworkElement DockPanel.Dock="Top"
-                          Style="{StaticResource Separator}" x:Name="proxyElement" />
+               HorizontalAlignment="Left">
 
         <StackPanel DockPanel.Dock="Top"
                     Orientation="Horizontal">
@@ -60,7 +53,13 @@
 
         </StackPanel>
 
-        <i:CustomDataGrid x:Name="datagrid1" ItemsSource="{Binding Indicators}">
+        <FrameworkElement x:Name="proxyElement" />
+
+        <i:CustomDataGrid x:Name="datagrid1"
+                          CanUserAddRows="False"
+                          CanUserDeleteRows="False"
+                          ItemsSource="{Binding Indicators}"
+                          SelectedItem="{Binding CurrentIndicator}">
 
             <DataGrid.Columns>
 
@@ -69,26 +68,26 @@
 
                 <DataGridTextColumn Header="Название"
                                     Binding="{Binding Name}"
-                                    MinWidth="120" />
+                                    MinWidth="150" />
 
-                <DataGridTextColumn Header="Порядок"
+                <!--<DataGridTextColumn Header="Порядок"
                                     Binding="{Binding Order}"
-                                    MinWidth="80" SortMemberPath="{Binding Order}" SortDirection="Descending"/>
+                                    MinWidth="80" />-->
 
                 <materialDesign:DataGridComboBoxColumn Header="Вид"
                                                        ItemsSource="{Binding DataContext.IndicatorKinds, Source={x:Reference proxyElement}, Mode=OneTime}"
                                                        SelectedValuePath="Key"
                                                        DisplayMemberPath="Value"
-                                                       SelectedValueBinding="{Binding Kind}"                
-                                                       MinWidth="120" />
+                                                       SelectedValueBinding="{Binding Kind}"
+                                                       MinWidth="200" />
 
                 <DataGridTemplateColumn Header="Выражения"
-                                            MinWidth="80">
+                                        MinWidth="80">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Button Style="{StaticResource DataGridRowButton}"
-                                        Command="{Binding DataContext.EditExpressionsCommand, Source={x:Reference datagrid1}}"
-                                        CommandParameter="{x:Type v:ExpressionsView}">
+                                    Command="{Binding DataContext.EditExpressionsCommand, Source={x:Reference datagrid1}}"
+                                    CommandParameter="{x:Type v:ExpressionsView}">
                                 <Viewbox Stretch="Uniform">
                                     <materialDesign:PackIcon Kind="EllipsisHorizontalCircle" />
                                 </Viewbox>

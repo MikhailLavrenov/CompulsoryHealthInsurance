@@ -32,8 +32,7 @@ namespace CHI.ViewModels
 
         public ComponentsViewModel(IMainRegionService mainRegionService)
         {
-            this.mainRegionService = mainRegionService;
-            mainRegionService.Header = "Показатели";
+            this.mainRegionService = mainRegionService;          
 
             dbContext = new ServiceAccountingDBContext();
             dbContext.Components.Load();
@@ -142,6 +141,8 @@ namespace CHI.ViewModels
 
         public void OnNavigatedTo(NavigationContext navigationContext)
         {
+            mainRegionService.Header = "Компоненты";
+
             KeepAlive = false;
         }
 

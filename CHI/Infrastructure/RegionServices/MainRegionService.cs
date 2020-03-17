@@ -2,6 +2,7 @@
 using Prism.Commands;
 using Prism.Regions;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CHI.Infrastructure
 {
@@ -41,7 +42,7 @@ namespace CHI.Infrastructure
 
             navigateBackCollection = new Stack<string>();
 
-            CloseStatusCommand = new DelegateCommand(CloseStatusExecute);
+            CloseStatusCommand = new DelegateCommand(()=> Status = string.Empty);
         }
 
         public void SetCompleteStatus(string statusMessage)
@@ -89,9 +90,20 @@ namespace CHI.Infrastructure
                     regionManager.Regions[RegionNames.ProgressBarRegion].RemoveAll();
             });
         }
-        private void CloseStatusExecute()
-        {
-            Status = string.Empty;
+
+        public void ClearNavigationBack()
+        {            
+            CanNavigateBack = false;
+
+            var views = regionManager.Regions[RegionNames.MainRegion].Views
+                .Where(x=> navigateBackCollection.Contains(x.GetType().Name))
+                .ToList();
+
+            foreach (var view in views)
+                regionManager.Regions[RegionNames.MainRegion].Remove(view);
+            
+           
+            navigateBackCollection.Clear();
         }
     }
 }
