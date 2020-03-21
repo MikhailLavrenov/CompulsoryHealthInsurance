@@ -22,11 +22,20 @@ namespace CHI.Models.ServiceAccounting
 
             if(Database.EnsureCreated())
             {
-                var root = new Component()
+                var rootComponent = new Component()
                 {
                     IsRoot = true,
                 };
-                Components.Add(root);
+
+                Add(rootComponent);
+
+                var rootDepartment = new Department()
+                {
+                    IsRoot = true,
+                };
+
+                Add(rootDepartment);
+
                 SaveChanges();
             }
         }
@@ -68,8 +77,13 @@ namespace CHI.Models.ServiceAccounting
             //    .WithOne(x => x.Department)   
             //    .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<Department>()
+                .HasOne(x=>x.Parent)
+                .WithMany(x => x.Childs)
+                .OnDelete(DeleteBehavior.Restrict);
+
             modelBuilder.Entity<Component>()                
-                .HasMany(x => x.Details)
+                .HasMany(x => x.Childs)
                 .WithOne(x => x.Parent)
                 .OnDelete(DeleteBehavior.Cascade);
 

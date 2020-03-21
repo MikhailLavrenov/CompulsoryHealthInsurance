@@ -62,9 +62,9 @@
             <TextBlock Text="Учет услуг" 
                            Style="{StaticResource Caption}" />
 
-            <Button Command="{Binding SwitchViewCommand}" 
-                    CommandParameter="{x:Type v:DepartmentsView}">
-                <TextBlock Text="Отделения"
+            <Button Command="{Binding SwitchViewCommand}"
+                    CommandParameter="{x:Type v:RegistersView}">
+                <TextBlock Text="Реестры"
                            Style="{StaticResource MenuButtonText}" />
             </Button>
 
@@ -80,21 +80,21 @@
                            Style="{StaticResource MenuButtonText}" />
             </Button>
 
-            <Button Command="{Binding SwitchViewCommand}" 
+            <Button Command="{Binding SwitchViewCommand}"
                     CommandParameter="{x:Type v:EmployeesView}">
-                <TextBlock Text="Штатные единицы" 
+                <TextBlock Text="Штатные единицы"
+                           Style="{StaticResource MenuButtonText}" />
+            </Button>
+
+            <Button Command="{Binding SwitchViewCommand}"
+                    CommandParameter="{x:Type v:DepartmentsView}">
+                <TextBlock Text="Отделения"
                            Style="{StaticResource MenuButtonText}" />
             </Button>
 
             <Button Command="{Binding SwitchViewCommand}" 
                     CommandParameter="{x:Type v:ServiceClassifierView}">
                 <TextBlock Text="Классификатор услуг" 
-                           Style="{StaticResource MenuButtonText}" />
-            </Button>
-
-            <Button Command="{Binding SwitchViewCommand}" 
-                    CommandParameter="{x:Type v:RegistersView}">
-                <TextBlock Text="Реестры" 
                            Style="{StaticResource MenuButtonText}" />
             </Button>
 

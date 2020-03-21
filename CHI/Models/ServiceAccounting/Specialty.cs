@@ -4,14 +4,14 @@
     {
         public int Id { get; set; }
         public int FomsId { get; set; }
-        public string Title { get; set; }
+        public string Name { get; set; }
 
         public static Specialty CreateUnknown(int fomsId)
         {
             return new Specialty
             {
                 FomsId = fomsId,
-                Title = "Неизвестно"
+                Name = "Неизвестно"
             };
         }
     }

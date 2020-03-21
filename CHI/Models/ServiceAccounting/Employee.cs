@@ -1,11 +1,16 @@
-﻿namespace CHI.Models.ServiceAccounting
+﻿using Prism.Mvvm;
+
+namespace CHI.Models.ServiceAccounting
 {
-    public class Employee
+    public class Employee : BindableBase
     {
+        Department department;
+
         public int Id { get; set; }
         public Medic Medic { get; set; }
         public Specialty Specialty { get; set; }
-        public Department Department { get; set; }
+        public Department Department { get => department; set => SetProperty(ref department, value); }
+        public int Order { get; set; }
 
         /// <summary>
         /// Создает штатную единицу с заданными ФОМС кодами и неопределенными данными

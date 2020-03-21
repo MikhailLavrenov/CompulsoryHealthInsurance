@@ -1,4 +1,6 @@
-﻿using CHI.Views;
+﻿using CHI.Models.Infrastructure;
+using CHI.Models.ServiceAccounting;
+using CHI.Views;
 using Prism.Services.Dialogs;
 using System;
 using System.Collections.Generic;
@@ -141,6 +143,35 @@ namespace CHI.Infrastructure
             }
 
             return result;
+        }
+
+        public static List<T> ToListRecursive<T>(this T obj) where T: class, IOrderedHierarchical<T>
+        {
+            var result = new List<T>();
+
+            obj.ToListRecursive(result);
+
+            return result;
+        }
+
+        public static void ToListRecursive<T>(this T obj, List<T> result) where T : class, IOrderedHierarchical<T>
+        {
+            result.Add(obj);
+
+            if (obj.Childs != null)
+                foreach (var child in obj.Childs)
+                    child.ToListRecursive(result);
+        }
+
+        public static void OrderChildsRecursive<T>(this T obj) where T : class, IOrderedHierarchical<T>
+        {
+            if (obj.Childs == null)
+                return;
+
+            obj.Childs = obj.Childs.OrderBy(x => x.Order).ToList();
+
+            foreach (var child in obj.Childs)
+                child.OrderChildsRecursive();
         }
     }
 }
