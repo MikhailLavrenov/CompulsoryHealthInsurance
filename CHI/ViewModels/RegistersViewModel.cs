@@ -73,13 +73,7 @@ namespace CHI.ViewModels
             dbContext.Specialties.Load();
             dbContext.Departments.Load();
 
-            var unknownDepartment = dbContext.Departments.Local.FirstOrDefault(x => string.Equals(x.Title, Department.UnknownTitle, StringComparison.Ordinal));
-
-            if (unknownDepartment == null)
-            {
-                unknownDepartment = new Department(Department.UnknownTitle);
-                dbContext.Departments.Add(unknownDepartment);
-            }
+            var unknownDepartment = dbContext.Departments.Local.First(x=>x.IsRoot);
 
             for (int i = 0; i < register.Cases.Count; i++)
             {
@@ -89,7 +83,12 @@ namespace CHI.ViewModels
                 mCase.Employee = FindEmployeeInDbOrAdd(mCase.Employee, dbContext, unknownDepartment);
 
                 foreach (var service in mCase.Services)
-                    service.Employee = FindEmployeeInDbOrAdd(service.Employee, dbContext, unknownDepartment);
+                {
+                    if (mCase.Employee.Specialty.FomsId == service.Employee.Specialty.FomsId && mCase.Employee.Medic.FomsId.Equals(service.Employee.Medic.FomsId))
+                        service.Employee = mCase.Employee;
+                    else
+                        service.Employee = FindEmployeeInDbOrAdd(service.Employee, dbContext, unknownDepartment);
+                }
             }
 
             mainRegionService.SetBusyStatus("Сохранение в базу данных");
@@ -104,9 +103,6 @@ namespace CHI.ViewModels
 
         private static Employee FindEmployeeInDbOrAdd(Employee employee, ServiceAccountingDBContext dbContext, Department unknownDepartment)
         {
-            var mid = employee.Medic.FomsId;
-            var sid = employee.Specialty.FomsId;
-
             var foundEmployee = dbContext.Employees.Local.FirstOrDefault(x => string.Equals(x.Medic.FomsId, employee.Medic.FomsId, StringComparison.Ordinal) && x.Specialty.FomsId == employee.Specialty.FomsId);
 
             if (foundEmployee != null)

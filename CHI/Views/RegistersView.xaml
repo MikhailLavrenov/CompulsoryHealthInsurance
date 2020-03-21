@@ -35,11 +35,6 @@
                 <DataGridTemplateColumn CellTemplate="{StaticResource DataGridDragColumn}"
                                         IsReadOnly="True" />
 
-                <DataGridTextColumn Header="Ид"
-                                    Binding="{Binding Id}"
-                                    MinWidth="80"
-                                    IsReadOnly="True" />
-
                 <DataGridTextColumn Header="Название"
                                     Binding="{Binding Title}"
                                     MinWidth="150"

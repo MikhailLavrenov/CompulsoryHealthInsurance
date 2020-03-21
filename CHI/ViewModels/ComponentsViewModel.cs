@@ -52,17 +52,17 @@ namespace CHI.ViewModels
 
         private void RefreshComponents()
         {
-            root.OrderRecursive();
+            root.OrderChildsRecursive();
 
             Components = new ObservableCollection<Component>(root.ToListRecursive());
         }
 
         private void AddExecute()
         {
-            if (CurrentComponent.Details == null)
-                CurrentComponent.Details = new List<Component>();
+            if (CurrentComponent.Childs == null)
+                CurrentComponent.Childs = new List<Component>();
 
-            var nextOrder = CurrentComponent.Details.Count == 0 ? 0 : CurrentComponent.Details.Last().Order + 1;
+            var nextOrder = CurrentComponent.Childs.Count == 0 ? 0 : CurrentComponent.Childs.Last().Order + 1;
             var insertIndex = Components.IndexOf(CurrentComponent) + nextOrder + 1;
 
             var newComponent = new Component
@@ -74,12 +74,12 @@ namespace CHI.ViewModels
 
             Components.Insert(insertIndex, newComponent);
 
-            CurrentComponent.Details.Add(newComponent);
+            CurrentComponent.Childs.Add(newComponent);
         }
 
         private void DeleteExecute()
         {
-            var parentDetails = CurrentComponent.Parent.Details;
+            var parentDetails = CurrentComponent.Parent.Childs;
             var offset = parentDetails.IndexOf(CurrentComponent);
 
             parentDetails.Remove(CurrentComponent);
@@ -99,7 +99,7 @@ namespace CHI.ViewModels
 
         private void MoveUpExecute()
         {
-            var previous = CurrentComponent.Parent.Details.First(x => x.Order == CurrentComponent.Order - 1);
+            var previous = CurrentComponent.Parent.Childs.First(x => x.Order == CurrentComponent.Order - 1);
 
             CurrentComponent.Order--;
             previous.Order++;
@@ -114,12 +114,12 @@ namespace CHI.ViewModels
         {
             return CurrentComponent != null
                 && !CurrentComponent.IsRoot
-                && CurrentComponent != CurrentComponent.Parent.Details.Last();
+                && CurrentComponent != CurrentComponent.Parent.Childs.Last();
         }
 
         private void MoveDownExecute()
         {
-            var next = CurrentComponent.Parent.Details.First(x => x.Order == CurrentComponent.Order + 1);
+            var next = CurrentComponent.Parent.Childs.First(x => x.Order == CurrentComponent.Order + 1);
 
             CurrentComponent.Order++;
             next.Order--;

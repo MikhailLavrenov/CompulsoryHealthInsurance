@@ -16,24 +16,22 @@
     <Grid d:DataContext="{d:DesignInstance vm:SpecialtiesViewModel}"
           HorizontalAlignment="Left">
 
-        <i:CustomDataGrid ItemsSource="{Binding Specialties}">
+        <i:CustomDataGrid CanUserAddRows="False"
+                          CanUserDeleteRows="False"
+                          ItemsSource="{Binding Specialties}">
 
             <DataGrid.Columns>
 
                 <DataGridTemplateColumn CellTemplate="{StaticResource DataGridDragColumn}"
                                         IsReadOnly="True" />
 
-                <DataGridTextColumn Header="Ид"
-                                    Binding="{Binding Id}"
-                                    MinWidth="80"
-                                    IsReadOnly="True" />
-
                 <DataGridTextColumn Header="Ид ФОМС"
-                                    Binding="{Binding FomsId}"
+                                    Binding="{Binding FomsId}" 
+                                    IsReadOnly="True"
                                     MinWidth="80" />
 
                 <DataGridTextColumn Header="Название"
-                                    Binding="{Binding Title}"
+                                    Binding="{Binding Name}"
                                     MinWidth="300" />
 
             </DataGrid.Columns>

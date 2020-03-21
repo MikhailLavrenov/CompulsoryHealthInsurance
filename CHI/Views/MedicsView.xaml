@@ -16,25 +16,20 @@
     <Grid d:DataContext="{d:DesignInstance vm:MedicsViewModel}"
           HorizontalAlignment="Left">
 
-        <i:CustomDataGrid ItemsSource="{Binding Medics}">
+        <i:CustomDataGrid CanUserAddRows="False" CanUserDeleteRows="False" ItemsSource="{Binding Medics}">
 
             <DataGrid.Columns>
 
                 <DataGridTemplateColumn CellTemplate="{StaticResource DataGridDragColumn}"
                                         IsReadOnly="True" />
 
-                <DataGridTextColumn Header="Ид"
-                                    Binding="{Binding Id}"
-                                    MinWidth="80"
-                                    IsReadOnly="True" />
-
                 <DataGridTextColumn Header="Ид ФОМС"
-                                    Binding="{Binding FomsId}"
+                                    Binding="{Binding FomsId}" IsReadOnly="True"
                                     MinWidth="80" />
 
                 <DataGridTextColumn Header="Фамилия И.О."
                                     Binding="{Binding FullName}"
-                                    MinWidth="300" />
+                                    MinWidth="250" />
 
             </DataGrid.Columns>
 

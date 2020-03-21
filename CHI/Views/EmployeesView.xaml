@@ -8,50 +8,75 @@
              xmlns:vm="clr-namespace:CHI.ViewModels"
              xmlns:prism="http://prismlibrary.com/"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              mc:Ignorable="d"
              d:DesignHeight="600"
              d:DesignWidth="800"
              prism:ViewModelLocator.AutoWireViewModel="True">
 
-    <Grid d:DataContext="{d:DesignInstance vm:EmployeesViewModel}"
-          HorizontalAlignment="Left">
+    <DockPanel d:DataContext="{d:DesignInstance vm:EmployeesViewModel}"
+               HorizontalAlignment="Left">
+
+        <StackPanel DockPanel.Dock="Top"
+                    Orientation="Horizontal">
+
+
+            <Button Style="{StaticResource IconButton}"
+                    Command="{Binding RefreshCommand}"
+                    Cursor="Hand">
+                <Viewbox Stretch="Uniform">
+                    <materialDesign:PackIcon Kind="Reload" />
+                </Viewbox>
+            </Button>
+            
+            <Button Style="{StaticResource IconButton}"
+                    Command="{Binding MoveUpCommand}"
+                    Cursor="Hand">
+                <Viewbox Stretch="Uniform">
+                    <materialDesign:PackIcon Kind="ArrowUpward" />
+                </Viewbox>
+            </Button>
+
+            <Button Style="{StaticResource IconButton}"
+                    Command="{Binding MoveDownCommand}">
+                <Viewbox Stretch="Uniform">
+                    <materialDesign:PackIcon Kind="ArrowDownward" />
+                </Viewbox>
+            </Button>
+
+        </StackPanel>
 
         <FrameworkElement x:Name="proxyElement" />
 
-        <i:CustomDataGrid ItemsSource="{Binding Employees}">
+        <i:CustomDataGrid x:Name="datagrid1"
+                          CanUserAddRows="False"
+                          CanUserDeleteRows="False"
+                          ItemsSource="{Binding Employees}"
+                          SelectedItem="{Binding CurrentEmployee}">
 
             <DataGrid.Columns>
 
                 <DataGridTemplateColumn CellTemplate="{StaticResource DataGridDragColumn}"
                                         IsReadOnly="True" />
 
-                <DataGridTextColumn Header="Ид"
-                                    Binding="{Binding Id}"
-                                    MinWidth="80"
-                                    IsReadOnly="True" />
-
-                <materialDesign:DataGridComboBoxColumn Header="Мед. работник"
-                                                       SelectedItemBinding="{Binding Medic}"
-                                                       ItemsSource="{Binding DataContext.Medics, Source={x:Reference proxyElement}}"
-                                                       DisplayMemberPath="FullName"
-                                                       MinWidth="200" />
-
-                <materialDesign:DataGridComboBoxColumn Header="Специальность"
-                                                       SelectedItemBinding="{Binding Specialty}"
-                                                       ItemsSource="{Binding DataContext.Specialties, Source={x:Reference proxyElement}}"
-                                                       DisplayMemberPath="Title"
-                                                       MinWidth="200" />
-
                 <materialDesign:DataGridComboBoxColumn Header="Отделение"
-                                                       SelectedItemBinding="{Binding Department}"
+                                                       SelectedItemBinding="{Binding Department, UpdateSourceTrigger=PropertyChanged}"
                                                        ItemsSource="{Binding DataContext.Departments, Source={x:Reference proxyElement}}"
-                                                       DisplayMemberPath="Title"
+                                                       DisplayMemberPath="Name"
                                                        MinWidth="200" />
+                
+                <DataGridTextColumn Header="Мед. работник"
+                                    Binding="{Binding Medic.FullName}" IsReadOnly="True"
+                                    MinWidth="150" />
 
+                <DataGridTextColumn Header="Специальность"
+                                    Binding="{Binding Specialty.Name}"
+                                    IsReadOnly="True"
+                                    MinWidth="150" />
 
             </DataGrid.Columns>
 
         </i:CustomDataGrid>
 
-    </Grid >
+    </DockPanel >
 </UserControl>
