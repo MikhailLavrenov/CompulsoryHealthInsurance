@@ -3,7 +3,6 @@ using CHI.Models.ServiceAccounting;
 using Microsoft.EntityFrameworkCore;
 using Prism.Commands;
 using Prism.Regions;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -35,13 +34,13 @@ namespace CHI.ViewModels
             mainRegionService.Header = "Подразделения";
 
             dbContext = new ServiceAccountingDBContext();
-            dbContext.Departments.Load();
+            dbContext.Departments.Include(x=>x.Employees).Load();
 
             root = dbContext.Departments.Local.Where(x => x.IsRoot).First();
 
             RefreshDepartments();
 
-            AddCommand = new DelegateCommand(AddExecute, () => CurrentDepartment != null).ObservesProperty(() => CurrentDepartment);
+            AddCommand = new DelegateCommand(AddExecute, AddCanExecute).ObservesProperty(() => CurrentDepartment);
             DeleteCommand = new DelegateCommand(DeleteExecute, () => CurrentDepartment != null && !CurrentDepartment.IsRoot).ObservesProperty(() => CurrentDepartment);
             MoveUpCommand = new DelegateCommand(MoveUpExecute, MoveUpCanExecute).ObservesProperty(() => CurrentDepartment);
             MoveDownCommand = new DelegateCommand(MoveDownExecute, MoveDownCanExecute).ObservesProperty(() => CurrentDepartment);
@@ -56,6 +55,14 @@ namespace CHI.ViewModels
             Departments = new ObservableCollection<Department>(root.ToListRecursive());
         }
 
+        private bool AddCanExecute()
+        {
+            if (CurrentDepartment == null || CurrentDepartment.Employees == null)
+                return true;
+
+            return CurrentDepartment.Employees.Count == 0;
+        }
+
         private void AddExecute()
         {
             if (CurrentDepartment.Childs == null)
@@ -68,7 +75,15 @@ namespace CHI.ViewModels
             {
                 Parent = CurrentDepartment,
                 Name = "Новый компонент",
-                Order = nextOrder
+                Order = nextOrder,                            
+                Parameters = new List<Parameter> 
+                {
+                    new Parameter (0,ParameterKind.DepartmentCalculatedPlan),
+                    new Parameter (1,ParameterKind.DepartmenHandPlan),
+                    new Parameter (2,ParameterKind.DepartmentFact),
+                    new Parameter (3,ParameterKind.DepartmentRejectedFact),
+                    new Parameter (4,ParameterKind.DepartmentPercent),            
+                }        
             };
 
             Departments.Insert(insertIndex, newDepartment);

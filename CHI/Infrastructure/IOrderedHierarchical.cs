@@ -6,6 +6,8 @@ namespace CHI.Models.Infrastructure
 {
     public interface IOrderedHierarchical<T> where T : class
     {
+        public bool IsRoot { get; set; }
+
         public int Order { get; set; }
 
         public T Parent { get; set; }
