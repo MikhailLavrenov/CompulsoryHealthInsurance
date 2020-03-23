@@ -4,6 +4,7 @@ using CHI.Services.BillsRegister;
 using Microsoft.EntityFrameworkCore;
 using Prism.Regions;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
@@ -73,21 +74,21 @@ namespace CHI.ViewModels
             dbContext.Specialties.Load();
             dbContext.Departments.Load();
 
-            var unknownDepartment = dbContext.Departments.Local.First(x=>x.IsRoot);
+            var defaultDepartment = dbContext.Departments.Local.First(x => x.IsRoot);
 
             for (int i = 0; i < register.Cases.Count; i++)
             {
                 var mCase = register.Cases[i];
                 mainRegionService.SetBusyStatus($"Сопоставление штатных единиц: {i} из {register.Cases.Count}");
 
-                mCase.Employee = FindEmployeeInDbOrAdd(mCase.Employee, dbContext, unknownDepartment);
+                mCase.Employee = FindEmployeeInDbOrAdd(mCase.Employee, dbContext, defaultDepartment);
 
                 foreach (var service in mCase.Services)
                 {
                     if (mCase.Employee.Specialty.FomsId == service.Employee.Specialty.FomsId && mCase.Employee.Medic.FomsId.Equals(service.Employee.Medic.FomsId))
                         service.Employee = mCase.Employee;
                     else
-                        service.Employee = FindEmployeeInDbOrAdd(service.Employee, dbContext, unknownDepartment);
+                        service.Employee = FindEmployeeInDbOrAdd(service.Employee, dbContext, defaultDepartment);
                 }
             }
 
@@ -101,14 +102,14 @@ namespace CHI.ViewModels
             mainRegionService.SetCompleteStatus("Успешно загружено");
         }
 
-        private static Employee FindEmployeeInDbOrAdd(Employee employee, ServiceAccountingDBContext dbContext, Department unknownDepartment)
+        private static Employee FindEmployeeInDbOrAdd(Employee employee, ServiceAccountingDBContext dbContext, Department defaultDepartment)
         {
             var foundEmployee = dbContext.Employees.Local.FirstOrDefault(x => string.Equals(x.Medic.FomsId, employee.Medic.FomsId, StringComparison.Ordinal) && x.Specialty.FomsId == employee.Specialty.FomsId);
 
             if (foundEmployee != null)
                 return foundEmployee;
 
-            employee.Department = unknownDepartment;
+            employee.Department = defaultDepartment;
 
             var foundMedic = dbContext.Medics.Local.FirstOrDefault(x => string.Equals(x.FomsId, employee.Medic.FomsId, StringComparison.Ordinal));
 
@@ -124,7 +125,13 @@ namespace CHI.ViewModels
             else
                 dbContext.Specialties.Add(employee.Specialty);
 
-            
+            employee.Parameters = new List<Parameter>            
+            {
+                new Parameter (0,ParameterKind.EmployeePlan),
+                new Parameter (1,ParameterKind.EmployeeFact),
+                new Parameter (2,ParameterKind.EmployeeRejectedFact),
+                new Parameter (3,ParameterKind.EmployeePercent),
+            };
 
             dbContext.Employees.Add(employee);
 

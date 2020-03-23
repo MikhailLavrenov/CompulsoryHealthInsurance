@@ -1,4 +1,5 @@
 ﻿using Prism.Mvvm;
+using System.Collections.Generic;
 
 namespace CHI.Models.ServiceAccounting
 {
@@ -11,6 +12,7 @@ namespace CHI.Models.ServiceAccounting
         public Specialty Specialty { get; set; }
         public Department Department { get => department; set => SetProperty(ref department, value); }
         public int Order { get; set; }
+        public List<Parameter> Parameters { get; set; }
 
         /// <summary>
         /// Создает штатную единицу с заданными ФОМС кодами и неопределенными данными
@@ -25,6 +27,5 @@ namespace CHI.Models.ServiceAccounting
                 Specialty = Specialty.CreateUnknown(specialtyFomsId)
             };
         }
-
     }
 }

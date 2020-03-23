@@ -4,9 +4,7 @@ using System.Text;
 
 namespace CHI.Models.ServiceAccounting
 {
-    public class ReportCell
+    public class HeaderItem
     {
-        public Indicator Indicator { get; set; }
-        public double Value { get; set; }
     }
 }
