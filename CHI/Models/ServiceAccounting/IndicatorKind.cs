@@ -5,9 +5,10 @@ namespace CHI.Models.ServiceAccounting
     public enum IndicatorKind
     {
         [Description("Пусто")] None = 0,
-        [Description("Кол-во случаев")] CasesCount = 1,
-        [Description("Кол-во услуг")] ServicesCount = 2,
-        [Description("Кол-во УЕТ")] LaborAmount = 3,
-        [Description("Кол-во койко-дней")] BedDaysCount = 4,
+        [Description("Cлучаи")] Cases = 1,
+        [Description("Услуги")] Services = 2,
+        [Description("УЕТы")] LaborCost = 3,
+        [Description("Койко-дни")] BedDays = 4,
+        [Description("Стоимость")] Cost = 5,
     }
 }

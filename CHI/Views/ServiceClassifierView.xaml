@@ -52,6 +52,10 @@
                                     Binding="{Binding LaborCost}"
                                     MinWidth="120" />
 
+                <DataGridTextColumn Header="Стоимость"
+                                    Binding="{Binding Price}"
+                                    MinWidth="120" />
+
             </DataGrid.Columns>
 
         </i:CustomDataGrid>
