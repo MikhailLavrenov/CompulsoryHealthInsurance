@@ -22,7 +22,7 @@ namespace CHI.ViewModels
         public Indicator CurrentIndicator { get => currentIndicator; set => SetProperty(ref currentIndicator, value); }
         public Expression CurrentExpression { get => currentExpression; set => SetProperty(ref currentExpression, value); }
         public ObservableCollection<Expression> Expressions { get => expressions; set => SetProperty(ref expressions, value); }
-        public List<KeyValuePair<Enum, string>> IndicatorKinds { get; } = IndicatorKind.None.GetAllValuesAndDescriptions().ToList();
+        public List<KeyValuePair<Enum, string>> ExpressionKinds { get; } = ExpressionKind.None.GetAllValuesAndDescriptions().ToList();
 
         public DelegateCommand AddCommand { get; }
         public DelegateCommand DeleteCommand { get; }

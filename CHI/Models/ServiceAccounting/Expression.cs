@@ -3,14 +3,10 @@
     public class Expression
     {
         public int Id { get; set; }
-        /// <summary>
-        /// Цель посещения
-        /// </summary>
-        public double? VisitPurpose { get; set; }
-        /// <summary>
-        /// Цель обращения (выдумана ФОМСом)
-        /// </summary>
-        public int? TreatmentPurpose { get; set; }
+
+        public bool IsCommonFilter { get; set; }
+        public ExpressionKind Kind { get; set; }
+        public string Value { get; set; }        
         public double MultiplicationFactor { get; set; } = 1;
     }
 }
