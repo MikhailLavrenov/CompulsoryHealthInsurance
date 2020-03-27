@@ -6,58 +6,73 @@ namespace CHI.Models.ServiceAccounting
 {
     public class Report
     {
-        public List<HeaderItem> RowHeaders { get; set; }
-        public List<HeaderItem> ColumnHeaders { get; set; }
-        public ValueItem[,] Values { get; set; }
+        HeaderGroup rootRowHeader;
+        HeaderGroup rootColumnHeader;
+
+        public List<HeaderItem> RowHeaders { get; private set; }
+        public List<HeaderItem> ColumnHeaders { get; private set; }
+        public ValueItem[,] Values { get; private set; }
 
 
         public Report(Department rootDepartment, Component rootComponent)
         {
             rootComponent.OrderChildsRecursive();
             var components = rootComponent.ToListRecursive()
-                .Where(x => x.Indicators != null && x.Indicators.Count != 0)
+                .Where(x => x.Indicators?.Any() ?? false)
                 .ToList();
 
             var indicators = new List<Indicator>();
 
             foreach (var component in components)
-                indicators.AddRange(component.Indicators.OrderBy(x => x.Order).ToList());
+            {
+                component.Indicators = component.Indicators.OrderBy(x => x.Order).ToList();
+
+                indicators.AddRange(component.Indicators);
+            }
+
+            rootColumnHeader = HeaderGroup.CreateHeadersRecursive(null, rootComponent);
 
             ColumnHeaders = new List<HeaderItem>();
-
+            foreach (var header in rootColumnHeader.ToListRecursive().Skip(1).Where(x => x.HeaderItems?.Any() ?? false))
+                ColumnHeaders.AddRange(header.HeaderItems);
 
 
             rootDepartment.OrderChildsRecursive();
             var departments = rootDepartment.ToListRecursive()
-                .Where(x => x.Employees != null && x.Employees.Count != 0)
+                .Where(x => x.Employees?.Any() ?? false)
                 .ToList();
 
             var parameters = new List<Parameter>();
 
             foreach (var department in departments)
-                foreach (var employee in department.Employees.OrderBy(x => x.Order))
-                    parameters.AddRange(employee.Parameters.OrderBy(x=>x.Order).ToList());
-            
+            {
+                department.Employees = department.Employees.OrderBy(x => x.Order).ToList();
+                department.Parameters = department.Parameters.OrderBy(x => x.Order).ToList();
 
+                foreach (var employee in department.Employees)
+                {
+                    employee.Parameters = employee.Parameters.OrderBy(x => x.Order).ToList();
 
+                    parameters.AddRange(employee.Parameters);
+                }
+            }
 
+            rootRowHeader = HeaderGroup.CreateHeadersRecursive(null, rootDepartment);
 
+            RowHeaders = new List<HeaderItem>();
+            foreach (var header in rootRowHeader.ToListRecursive().Skip(1).Where(x => x.HeaderItems?.Any() ?? false))
+                RowHeaders.AddRange(header.HeaderItems);
 
 
             Values = new ValueItem[parameters.Count, indicators.Count];
 
             for (int row = 0; row < parameters.Count; row++)
                 for (int col = 0; col < indicators.Count; col++)
-                {
                     Values[row, col] = new ValueItem(row, col, parameters[row], indicators[col]);
-                }
         }
 
 
-        private static void CreateHeaderItem(Component component)
-        {
 
-        }
 
     }
 }

@@ -48,7 +48,7 @@ namespace CHI.ViewModels
             dbContext.Employees.Load();
             Medics = dbContext.Medics.ToList();
             Specialties = dbContext.Specialties.ToList();
-            Departments = dbContext.Departments.Where(x=>x.IsRoot || x.Childs==null).ToList();           
+            Departments = dbContext.Departments.Where(x=>x.IsRoot || x.Childs==null || x.Childs.Count==0).ToList();           
 
             RefreshCommand = new DelegateCommand(RefreshExecute);
             MoveUpCommand = new DelegateCommand(MoveUpExecute, MoveUpCanExecute).ObservesProperty(() => CurrentEmployee);

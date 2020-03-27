@@ -63,6 +63,12 @@
                            Style="{StaticResource Caption}" />
 
             <Button Command="{Binding SwitchViewCommand}"
+                    CommandParameter="{x:Type v:ReportView}">
+                <TextBlock Text="Отчет"
+                           Style="{StaticResource MenuButtonText}" />
+            </Button>
+            
+            <Button Command="{Binding SwitchViewCommand}"
                     CommandParameter="{x:Type v:RegistersView}">
                 <TextBlock Text="Реестры"
                            Style="{StaticResource MenuButtonText}" />
