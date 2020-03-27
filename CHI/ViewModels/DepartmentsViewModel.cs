@@ -57,10 +57,10 @@ namespace CHI.ViewModels
 
         private bool AddCanExecute()
         {
-            if (CurrentDepartment == null || CurrentDepartment.Employees == null)
-                return true;
+            if (CurrentDepartment == null)
+                return false;
 
-            return CurrentDepartment.Employees.Count == 0;
+            return CurrentDepartment.IsRoot || !(CurrentDepartment.Employees?.Any()??false);
         }
 
         private void AddExecute()
