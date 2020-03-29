@@ -7,14 +7,16 @@ namespace CHI.Models.ServiceAccounting
         public DbSet<Register> Registers { get; set; }
         public DbSet<Case> Cases { get; set; }
         public DbSet<Service> Services { get; set; }
-        public DbSet<Medic> Medics { get; set; }
-        public DbSet<Specialty> Specialties { get; set; }
         public DbSet<Department> Departments { get; set; }
         public DbSet<Employee> Employees { get; set; }
+        public DbSet<Medic> Medics { get; set; }
+        public DbSet<Specialty> Specialties { get; set; }
+        public DbSet<Parameter> Parameters { get; set; }
         public DbSet<ServiceClassifier> ServicesClassifier { get; set; }
         public DbSet<Component> Components { get; set; }
         public DbSet<Indicator> Indicators { get; set; }
         public DbSet<Expression> Expressions { get; set; }
+
 
         public ServiceAccountingDBContext()
         {

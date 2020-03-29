@@ -12,7 +12,8 @@
              mc:Ignorable="d"
              d:DesignHeight="600"
              d:DesignWidth="800"
-             prism:ViewModelLocator.AutoWireViewModel="True">
+             prism:ViewModelLocator.AutoWireViewModel="True"
+             Cursor="Hand">
 
     <UserControl.Resources>
         <ResourceDictionary>
