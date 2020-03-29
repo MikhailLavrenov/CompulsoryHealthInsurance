@@ -13,7 +13,6 @@ namespace CHI.Models.ServiceAccounting
         public List<HeaderItem> ColumnHeaders { get; private set; }
         public ValueItem[,] Values { get; private set; }
 
-
         public Report(Department rootDepartment, Component rootComponent)
         {
             rootComponent.OrderChildsRecursive();
@@ -71,8 +70,10 @@ namespace CHI.Models.ServiceAccounting
                     Values[row, col] = new ValueItem(row, col, parameters[row], indicators[col]);
         }
 
+        public void Build(List<Case> cases)
+        {
 
-
+        }
 
     }
 }
