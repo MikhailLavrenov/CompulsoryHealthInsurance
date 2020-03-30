@@ -28,7 +28,7 @@ namespace CHI.ViewModels
         public DelegateCommand DeleteCommand { get; }
         public DelegateCommand MoveUpCommand { get; }
         public DelegateCommand MoveDownCommand { get; }
-        public DelegateCommand<Type> EditIndicatorsCommand { get; }
+        public DelegateCommand<Type> NavigateCommand { get; }
 
         public ComponentsViewModel(IMainRegionService mainRegionService)
         {
@@ -45,7 +45,7 @@ namespace CHI.ViewModels
             DeleteCommand = new DelegateCommand(DeleteExecute, () => CurrentComponent != null && !CurrentComponent.IsRoot).ObservesProperty(() => CurrentComponent);
             MoveUpCommand = new DelegateCommand(MoveUpExecute, MoveUpCanExecute).ObservesProperty(() => CurrentComponent);
             MoveDownCommand = new DelegateCommand(MoveDownExecute, MoveDownCanExecute).ObservesProperty(() => CurrentComponent);
-            EditIndicatorsCommand = new DelegateCommand<Type>(EditIndicatorsExecute);
+            NavigateCommand = new DelegateCommand<Type>(NavigateExecute);
 
             DeleteCommand.RaiseCanExecuteChanged();
         }
@@ -130,7 +130,7 @@ namespace CHI.ViewModels
             MoveUpCommand.RaiseCanExecuteChanged();
         }
 
-        private void EditIndicatorsExecute(Type view)
+        private void NavigateExecute(Type view)
         {
             KeepAlive = true;
 

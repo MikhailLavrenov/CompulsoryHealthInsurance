@@ -2,13 +2,13 @@
 
 namespace CHI.Models.ServiceAccounting
 {
-    public enum ExpressionKind
+    public enum CaseFilterKind
     {
         [Description("Пусто")] None = 0,
         [Description("Цель обращения")] TreatmentPurpose = 1,
         [Description("Цель посещения")] VisitPurpose = 2, 
-        [Description("Код услуги")] ServiceCode = 3,
-        [Description("Сумма вложенных")] SumOfNested = 4,
-
+        [Description("Содержит услугу")] ContainsService = 3,
+        [Description("Не содержит услугу")] NotContainsService = 4,
+        [Description("Итог")] Total = 5,
     }
 }

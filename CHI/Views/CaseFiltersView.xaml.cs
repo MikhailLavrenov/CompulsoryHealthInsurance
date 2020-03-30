@@ -14,11 +14,11 @@ using System.Windows.Shapes;
 namespace CHI.Views
 {
     /// <summary>
-    /// Логика взаимодействия для ExpressionsView.xaml
+    /// Логика взаимодействия для IndicatorView.xaml
     /// </summary>
-    public partial class ExpressionsView : UserControl
+    public partial class CaseFilterView : UserControl
     {
-        public ExpressionsView()
+        public CaseFilterView()
         {
             InitializeComponent();
         }

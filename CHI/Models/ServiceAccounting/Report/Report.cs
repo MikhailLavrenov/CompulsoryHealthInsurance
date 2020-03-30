@@ -73,6 +73,10 @@ namespace CHI.Models.ServiceAccounting
         public void Build(List<Case> cases)
         {
 
+
+
+
+
         }
 
     }

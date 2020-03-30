@@ -9,6 +9,7 @@ namespace CHI.Models.ServiceAccounting
         public string Name { get; set; }
         public int Order { get; set; }
         public bool IsRoot { get; set; } = false;
+        public List<CaseFilter> CaseFilters { get; set; }
         public List<Indicator> Indicators { get; set; }
 
         public Component Parent { get; set; }

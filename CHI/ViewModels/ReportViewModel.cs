@@ -23,7 +23,7 @@ namespace CHI.ViewModels
         public bool IsGrowing { get => isGrowing; set => SetProperty(ref isGrowing, value); }
         public Dictionary<int, string> Months { get; } = Enumerable.Range(1, 12).ToDictionary(x => x, x => CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(x));
 
-        DelegateCommandAsync BuildReportCommand { get; }
+        public DelegateCommandAsync BuildReportCommand { get; }
 
         public ReportViewModel(IMainRegionService mainRegionService)
         {
@@ -36,8 +36,13 @@ namespace CHI.ViewModels
                 .Include(x => x.Specialty)
                 .Include(x => x.Parameters)
                 .Load();
+
             dbContext.Departments.Include(x => x.Parameters).Load();
-            dbContext.Components.Include(x => x.Indicators).ThenInclude(x => x.Expressions).Load();
+
+            dbContext.Components
+                .Include(x => x.Indicators)
+                .Include(x=>x.CaseFilters)
+                .Load();
 
             var rootDepartment = dbContext.Departments.Local.First(x => x.IsRoot);
             var rootComponent = dbContext.Components.Local.First(x => x.IsRoot);

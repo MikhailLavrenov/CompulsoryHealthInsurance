@@ -79,9 +79,25 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Button Style="{StaticResource DataGridRowButton}"
-                                        Command="{Binding DataContext.EditIndicatorsCommand, Source={x:Reference datagrid1}}"
+                                    Command="{Binding DataContext.NavigateCommand, Source={x:Reference datagrid1}}"
                                         CommandParameter="{x:Type v:IndicatorsView}"
                                         Visibility="{Binding IsRoot, Converter={i:InvertedBoolToVisibleConverter}}">
+                                <Viewbox Stretch="Uniform">
+                                    <materialDesign:PackIcon Kind="EllipsisHorizontalCircle" />
+                                </Viewbox>
+                            </Button>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn Header="Фильтр случаев"
+                                        MinWidth="120">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Style="{StaticResource DataGridRowButton}"
+                                    Command="{Binding DataContext.NavigateCommand, Source={x:Reference datagrid1}}"
+                                    CommandParameter="{x:Type v:CaseFilterView}"
+                                    Visibility="{Binding IsRoot, Converter={i:InvertedBoolToVisibleConverter}}">
                                 <Viewbox Stretch="Uniform">
                                     <materialDesign:PackIcon Kind="EllipsisHorizontalCircle" />
                                 </Viewbox>

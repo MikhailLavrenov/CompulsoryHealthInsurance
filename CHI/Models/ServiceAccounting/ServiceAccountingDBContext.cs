@@ -15,14 +15,14 @@ namespace CHI.Models.ServiceAccounting
         public DbSet<ServiceClassifier> ServicesClassifier { get; set; }
         public DbSet<Component> Components { get; set; }
         public DbSet<Indicator> Indicators { get; set; }
-        public DbSet<Expression> Expressions { get; set; }
+        public DbSet<CaseFilter> CaseFilters { get; set; }
 
 
         public ServiceAccountingDBContext()
         {
             //Database.EnsureDeleted();
 
-            if(Database.EnsureCreated())
+            if (Database.EnsureCreated())
             {
                 var rootComponent = new Component()
                 {
@@ -80,24 +80,25 @@ namespace CHI.Models.ServiceAccounting
             //    .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Department>()
-                .HasOne(x=>x.Parent)
+                .HasOne(x => x.Parent)
                 .WithMany(x => x.Childs)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<Component>()                
+            modelBuilder.Entity<Component>()
                 .HasMany(x => x.Childs)
                 .WithOne(x => x.Parent)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<Component>()    
-                .HasMany(x => x.Indicators)  
-                .WithOne(x=>x.Component)  
+            modelBuilder.Entity<Component>()   
+                .HasMany(x => x.CaseFilters)   
+                .WithOne(x => x.Component)  
                 .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<Indicator>()
-                .HasMany(x => x.Expressions)
-                .WithOne()
+            modelBuilder.Entity<Component>()
+                .HasMany(x => x.Indicators)
+                .WithOne(x => x.Component)
                 .OnDelete(DeleteBehavior.Cascade);
+
         }
     }
 }

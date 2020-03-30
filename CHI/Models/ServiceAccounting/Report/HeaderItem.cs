@@ -11,10 +11,10 @@ namespace CHI.Models.ServiceAccounting
 
         public HeaderGroup Group { get; set; }
 
-        public HeaderItem(string name, HeaderGroup headerGroup)
+        public HeaderItem(HeaderGroup headerGroup,string name)
         {
-            Name = name;
             Group = headerGroup;
+            Name = name;
         }
 
         public static List<HeaderItem> CreateHeaderItems(HeaderGroup headerGroup, List<Indicator> indicators)
@@ -23,7 +23,7 @@ namespace CHI.Models.ServiceAccounting
 
             if (indicators?.Any() ?? false)
                 foreach (var indicator in indicators)
-                    items.Add(new HeaderItem(indicator.Name, headerGroup));
+                    items.Add(new HeaderItem(headerGroup, indicator.FacadeKind.GetDescription()));
 
             return items;
         }
@@ -34,7 +34,7 @@ namespace CHI.Models.ServiceAccounting
 
             if (parameters?.Any() ?? false)
                 foreach (var parameter in parameters)
-                    items.Add(new HeaderItem(parameter.Kind.GetDescription(), headerGroup));
+                    items.Add(new HeaderItem(headerGroup,parameter.Kind.GetDescription()));
 
             return items;
         }
