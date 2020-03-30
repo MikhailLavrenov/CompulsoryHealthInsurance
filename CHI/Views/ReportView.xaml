@@ -74,7 +74,8 @@
                 Grid.Column="0"
                 Grid.ColumnSpan="3"
                 Content="Ок"
-                Command="{Binding BuildReportCommand}" />
+                Command="{Binding BuildReportCommand}"
+                Cursor="Hand" />
 
 
     </Grid>

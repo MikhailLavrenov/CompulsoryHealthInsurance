@@ -69,7 +69,7 @@ namespace CHI
             containerRegistry.RegisterForNavigation<ServiceClassifierView>();
             containerRegistry.RegisterForNavigation<ComponentsView>();
             containerRegistry.RegisterForNavigation<IndicatorsView>();
-            containerRegistry.RegisterForNavigation<ExpressionsView>();
+            containerRegistry.RegisterForNavigation<CaseFilterView>();
             containerRegistry.RegisterForNavigation<ReportView>();
         }
         private void LogUnhandledException(object sender, UnhandledExceptionEventArgs args)

@@ -18,7 +18,7 @@ namespace CHI.ViewModels
         Indicator currentIndicator;
         IMainRegionService mainRegionService;
 
-        public bool KeepAlive { get; set; }
+        public bool KeepAlive { get => false; }
         public Indicator CurrentIndicator { get => currentIndicator; set => SetProperty(ref currentIndicator, value); }
         public Component CurrentComponent { get => currentComponent; set => SetProperty(ref currentComponent, value); }
         public ObservableCollection<Indicator> Indicators { get => indicators; set => SetProperty(ref indicators, value); }
@@ -28,7 +28,6 @@ namespace CHI.ViewModels
         public DelegateCommand DeleteCommand { get; }
         public DelegateCommand MoveUpCommand { get; }
         public DelegateCommand MoveDownCommand { get; }
-        public DelegateCommand<Type> EditExpressionsCommand { get; }
 
         public IndicatorsViewModel(IMainRegionService mainRegionService)
         {
@@ -40,7 +39,6 @@ namespace CHI.ViewModels
             DeleteCommand = new DelegateCommand(DeleteExecute,()=> CurrentIndicator!=null).ObservesProperty(() => CurrentIndicator);
             MoveUpCommand = new DelegateCommand(MoveUpExecute, MoveUpCanExecute).ObservesProperty(() => CurrentIndicator);
             MoveDownCommand = new DelegateCommand(MoveDownExecute, MoveDownCanExecute).ObservesProperty(() => CurrentIndicator);
-            EditExpressionsCommand = new DelegateCommand<Type>(EditIndicatorsExecute);
         }
 
         private void AddExecute()
@@ -48,7 +46,6 @@ namespace CHI.ViewModels
             var newIndicator = new Indicator
             {
                 Component = CurrentComponent,
-                Name = "Новый индикатор",
                 Order = Indicators.Count == 0 ? 0 : Indicators.Last().Order + 1
             };
 
@@ -111,19 +108,8 @@ namespace CHI.ViewModels
             MoveUpCommand.RaiseCanExecuteChanged();
         }
 
-        private void EditIndicatorsExecute(Type view)
-        {
-            KeepAlive = true;
-
-            var navigationParameters = new NavigationParameters();
-            navigationParameters.Add(nameof(Indicator), CurrentIndicator);
-            mainRegionService.RequestNavigate(view.Name, navigationParameters, true);
-        }
-
         public void OnNavigatedTo(NavigationContext navigationContext)
         {
-            KeepAlive = false;         
-
             if (navigationContext.Parameters.ContainsKey(nameof(Component)))
             {
                 CurrentComponent = navigationContext.Parameters.GetValue<Component>(nameof(Component));

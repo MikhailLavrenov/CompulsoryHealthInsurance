@@ -1,16 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace CHI.Models.ServiceAccounting
+﻿namespace CHI.Models.ServiceAccounting
 {
     public class Indicator
     {
         public int Id { get; set; }
-        public string Name { get; set; }
         public int Order { get; set; }
-        public IndicatorKind Kind { get; set; }        
-        public List<Expression> Expressions { get; set; }
+        public IndicatorKind FacadeKind { get; set; }
+        public IndicatorKind ValueKind { get; set; }
+        public double MultiplicationFactor { get; set; } = 1;
+        public double DivideFactor { get; set; } = 1;
+
         public Component Component { get; set; }
     }
 }

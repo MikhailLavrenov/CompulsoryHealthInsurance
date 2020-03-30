@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="CHI.Views.ExpressionsView"
+﻿<UserControl x:Class="CHI.Views.CaseFilterView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -14,7 +14,7 @@
              d:DesignWidth="800"
              prism:ViewModelLocator.AutoWireViewModel="True">
 
-    <DockPanel d:DataContext="{d:DesignInstance vm:ExpressionsViewModel}"
+    <DockPanel d:DataContext="{d:DesignInstance vm:CaseFilterViewModel}"
                HorizontalAlignment="Left">
 
         <StackPanel DockPanel.Dock="Top"
@@ -41,32 +41,25 @@
         <i:CustomDataGrid x:Name="datagrid1"
                           CanUserAddRows="False"
                           CanUserDeleteRows="False"
-                          ItemsSource="{Binding Expressions}"
-                          SelectedItem="{Binding CurrentExpression}">
+                          ItemsSource="{Binding CaseFilters}"
+                          SelectedItem="{Binding CurrentCaseFilter}">
 
             <DataGrid.Columns>
 
                 <DataGridTemplateColumn CellTemplate="{StaticResource DataGridDragColumn}"
                                         IsReadOnly="True" />
 
-                <DataGridCheckBoxColumn Header="Общ. фильтр"
-                                        Binding="{Binding IsCommonFilter}"
-                                        MinWidth="80" />
-                
-                <materialDesign:DataGridComboBoxColumn Header="Тип"
-                                                       ItemsSource="{Binding DataContext.ExpressionKinds, Source={x:Reference proxyElement}, Mode=OneTime}"
+                <materialDesign:DataGridComboBoxColumn Header="Вид"
+                                                       ItemsSource="{Binding DataContext.CaseFilterKinds, Source={x:Reference proxyElement}, Mode=OneTime}"
                                                        SelectedValuePath="Key"
                                                        DisplayMemberPath="Value"
                                                        SelectedValueBinding="{Binding Kind}"
-                                                       MinWidth="200" />
+                                                       MinWidth="250" />
 
-                <DataGridTextColumn Header="Значение"
-                                    Binding="{Binding Value}"
-                                    MinWidth="120" />
+                <DataGridTextColumn Header="Код"
+                                    Binding="{Binding Code}"
+                                    MinWidth="100" />
 
-                <DataGridTextColumn Header="Коэф. умножения"
-                                    Binding="{Binding MultiplicationFactor}"
-                                    MinWidth="80" />
 
             </DataGrid.Columns>
 

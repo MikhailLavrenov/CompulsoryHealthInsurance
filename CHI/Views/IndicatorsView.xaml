@@ -66,37 +66,31 @@
                 <DataGridTemplateColumn CellTemplate="{StaticResource DataGridDragColumn}"
                                         IsReadOnly="True" />
 
-                <DataGridTextColumn Header="Название"
-                                    Binding="{Binding Name}"
-                                    MinWidth="150" />
-
                 <!--<DataGridTextColumn Header="Порядок"
                                     Binding="{Binding Order}"
                                     MinWidth="80" />-->
 
-                <materialDesign:DataGridComboBoxColumn Header="Вид"
+                <materialDesign:DataGridComboBoxColumn Header="Внешний вид"
                                                        ItemsSource="{Binding DataContext.IndicatorKinds, Source={x:Reference proxyElement}, Mode=OneTime}"
                                                        SelectedValuePath="Key"
                                                        DisplayMemberPath="Value"
-                                                       SelectedValueBinding="{Binding Kind}"
+                                                       SelectedValueBinding="{Binding FacadeKind}"
                                                        MinWidth="200" />
 
-                <DataGridTemplateColumn Header="Выражения"
-                                        MinWidth="80">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <Button Style="{StaticResource DataGridRowButton}"
-                                    Command="{Binding DataContext.EditExpressionsCommand, Source={x:Reference datagrid1}}"
-                                    CommandParameter="{x:Type v:ExpressionsView}">
-                                <Viewbox Stretch="Uniform">
-                                    <materialDesign:PackIcon Kind="EllipsisHorizontalCircle" />
-                                </Viewbox>
-                            </Button>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
+                <materialDesign:DataGridComboBoxColumn Header="Вид значения"
+                                                       ItemsSource="{Binding DataContext.IndicatorKinds, Source={x:Reference proxyElement}, Mode=OneTime}"
+                                                       SelectedValuePath="Key"
+                                                       DisplayMemberPath="Value"
+                                                       SelectedValueBinding="{Binding ValueKind}"
+                                                       MinWidth="200" />
 
+                <DataGridTextColumn Header="Коэф. умножения"
+                                    Binding="{Binding MultiplicationFactor}"
+                                    MinWidth="80" />
 
+                <DataGridTextColumn Header="Коэф. деления"
+                                    Binding="{Binding DivideFactor}"
+                                    MinWidth="80" />
 
             </DataGrid.Columns>
 
