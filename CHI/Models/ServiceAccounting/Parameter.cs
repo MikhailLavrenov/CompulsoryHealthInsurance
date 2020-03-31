@@ -10,8 +10,6 @@ namespace CHI.Models.ServiceAccounting
         public int Id { get; set; }
         public ParameterKind Kind { get; set; }
         public int Order { get; set; }
-        [NotMapped]
-        public List<Case> DataContext { get; set; }
 
         public Department Department { get; set; }
         public Employee Employee { get; set; }
