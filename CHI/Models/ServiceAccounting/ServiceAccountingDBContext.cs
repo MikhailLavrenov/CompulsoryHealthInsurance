@@ -91,7 +91,7 @@ namespace CHI.Models.ServiceAccounting
 
             modelBuilder.Entity<Component>()   
                 .HasMany(x => x.CaseFilters)   
-                .WithOne(x => x.Component)  
+                .WithOne()  
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Component>()

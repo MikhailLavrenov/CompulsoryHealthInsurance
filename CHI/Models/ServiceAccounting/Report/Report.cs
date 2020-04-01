@@ -6,17 +6,17 @@ namespace CHI.Models.ServiceAccounting
 {
     public class Report
     {
-        RowHeaderGroup rootRowHeader;
-        ColumnHeaderGroup rootColumnHeader;
+        RowHeaderGroup rootRow;
+        ColumnHeaderGroup rootColumn;
         int rowsCount;
         int columnsCount;
         int maxRowPriority;
         int maxColumnPriority;
 
-        public List<RowHeaderItem> RowHeaders { get; private set; }
-        public List<ColumnHeaderItem> ColumnHeaders { get; private set; }
+        public List<RowHeaderItem> Rows { get; private set; }
+        public List<ColumnHeaderItem> Columns { get; private set; }
         public ValueItem[,] Values { get; private set; }
-        public List<ValueItem> ValuesList { get; private set; }
+
 
         public Report(Department rootDepartment, Component rootComponent)
         {
@@ -34,13 +34,15 @@ namespace CHI.Models.ServiceAccounting
                 indicators.AddRange(component.Indicators);
             }
 
-            rootColumnHeader = ColumnHeaderGroup.CreateHeadersRecursive(null, rootComponent);
+            rootColumn = ColumnHeaderGroup.CreateHeadersRecursive(null, rootComponent);
 
-            ColumnHeaders = new List<ColumnHeaderItem>();
-            foreach (var header in rootColumnHeader.ToListRecursive().Skip(1).Where(x => x.HeaderItems?.Any() ?? false))
-                ColumnHeaders.AddRange(header.HeaderItems);
+            Columns = new List<ColumnHeaderItem>();
+            foreach (var header in rootColumn.ToListRecursive().Skip(1).Where(x => x.HeaderItems?.Any() ?? false))
+                Columns.AddRange(header.HeaderItems);
 
-            maxColumnPriority = ColumnHeaders.Max(x => x.Priority);
+            Enumerable.Range(0, Columns.Count).ToList().ForEach(x => Columns[x].Index = x);
+
+            maxColumnPriority = Columns.Max(x => x.Priority);
 
 
             rootDepartment.OrderChildsRecursive();
@@ -63,57 +65,57 @@ namespace CHI.Models.ServiceAccounting
                 }
             }
 
-            rootRowHeader = RowHeaderGroup.CreateHeadersRecursive(null, rootDepartment);
+            rootRow = RowHeaderGroup.CreateHeadersRecursive(null, rootDepartment);
 
-            RowHeaders = new List<RowHeaderItem>();
-            foreach (var header in rootRowHeader.ToListRecursive().Skip(1).Where(x => x.HeaderItems?.Any() ?? false))
-                RowHeaders.AddRange(header.HeaderItems);
+            Rows = new List<RowHeaderItem>();
+            foreach (var header in rootRow.ToListRecursive().Skip(1).Where(x => x.HeaderItems?.Any() ?? false))
+                Rows.AddRange(header.HeaderItems);
 
-            maxRowPriority = RowHeaders.Max(x => x.Priority);
+            Enumerable.Range(0, Rows.Count).ToList().ForEach(x => Rows[x].Index = x);
+
+            maxRowPriority = Rows.Max(x => x.Priority);
 
             Values = new ValueItem[parameters.Count, indicators.Count];
 
             rowsCount = parameters.Count;
             columnsCount = indicators.Count;
 
-            for (int row = 0; row < RowHeaders.Count; row++)
-                for (int col = 0; col < ColumnHeaders.Count; col++)
-                    Values[row, col] = new ValueItem(row, col, RowHeaders[row], ColumnHeaders[col]);
-
-            ValuesList = Values.Cast<ValueItem>().ToList();
+            for (int row = 0; row < Rows.Count; row++)
+                for (int col = 0; col < Columns.Count; col++)
+                    Values[row, col] = new ValueItem(row, col, Rows[row], Columns[col]);
         }
+
 
         public void Build(List<Case> cases)
         {
-            RowHeaders
-                .Where(x => x.Group.Employee != null)
-                .Select(x => x.Group)
-                .Distinct()
-                .ToList()
-                .ForEach(x => x.FactCases = cases.Where(y => y.Employee == x.Employee).ToList());
+            foreach (var row in Rows.Where(x => x.Parameter.Kind == ParameterKind.EmployeeFact))
+            {
+                var rowCases = cases.Where(x=> x.Employee == row.Parameter.Employee).ToList();
 
-            for (int rowPriority = maxRowPriority; rowPriority <= 0; rowPriority--)
-                for (int columnPriority = maxColumnPriority; columnPriority <= 0; columnPriority--)
-                    foreach (var valueItem in ValuesList.Where(x => x.RowHeader.Priority == rowPriority && x.ColumnHeader.Priority == columnPriority))
+                ColumnHeaderGroup lastGroup=null;
+                List<Case> selectedCases=null;
+
+                foreach (var column in Columns.Where(x => x.Group.CaseFilters.First().Kind != CaseFilterKind.Total))
+                {
+                    var valueItem = Values[row.Index, column.Index];
+
+                    if (lastGroup == null || lastGroup != valueItem.ColumnHeader.Group)
                     {
+                        selectedCases = new List<Case>();
+
+                        foreach (var caseFilter in column.Group.CaseFilters)
+                        {
 
 
-
+                        }
 
                     }
-            {
 
 
 
-
-
-
-
-
-
-
-
+                }
             }
+
 
 
 

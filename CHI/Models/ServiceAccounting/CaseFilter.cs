@@ -6,15 +6,8 @@
         public CaseFilterKind Kind { get; set; }
         public double? Code { get; set; }
 
-        public Component Component { get; set; }
-
         public CaseFilter()
         {
-        }
-
-        public CaseFilter(Component component)
-        {
-            Component = component;
         }
     }
 }
