@@ -9,7 +9,7 @@ namespace CHI.Models.ServiceAccounting
         public string Name { get; set; }
         public Parameter Parameter { get; set; }
         public int Priority { get; set; }
-        //public int RowIndex { get; set; }
+        public int Index { get; set; }
         public RowHeaderGroup Group { get; set; }
 
 

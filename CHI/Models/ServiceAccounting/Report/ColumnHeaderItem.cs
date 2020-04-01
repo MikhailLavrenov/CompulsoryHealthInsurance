@@ -9,7 +9,7 @@ namespace CHI.Models.ServiceAccounting
         public string Name { get; set; }
         public Indicator Indicator { get; set; }
         public int Priority { get; set; }
-        //public int ColumnIndex { get; set; }
+        public int Index { get; set; }
         public ColumnHeaderGroup Group { get; set; }
 
 
