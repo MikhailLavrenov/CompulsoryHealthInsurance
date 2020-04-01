@@ -6,14 +6,15 @@ namespace CHI.Models.ServiceAccounting
 {
     public class Report
     {
-        HeaderGroup rootRowHeader;
-        HeaderGroup rootColumnHeader;
+        RowHeaderGroup rootRowHeader;
+        ColumnHeaderGroup rootColumnHeader;
         int rowsCount;
         int columnsCount;
-        int maxPriority;
+        int maxRowPriority;
+        int maxColumnPriority;
 
-        public List<HeaderItem> RowHeaders { get; private set; }
-        public List<HeaderItem> ColumnHeaders { get; private set; }
+        public List<RowHeaderItem> RowHeaders { get; private set; }
+        public List<ColumnHeaderItem> ColumnHeaders { get; private set; }
         public ValueItem[,] Values { get; private set; }
         public List<ValueItem> ValuesList { get; private set; }
 
@@ -33,11 +34,13 @@ namespace CHI.Models.ServiceAccounting
                 indicators.AddRange(component.Indicators);
             }
 
-            rootColumnHeader = HeaderGroup.CreateHeadersRecursive(null, rootComponent);
+            rootColumnHeader = ColumnHeaderGroup.CreateHeadersRecursive(null, rootComponent);
 
-            ColumnHeaders = new List<HeaderItem>();
+            ColumnHeaders = new List<ColumnHeaderItem>();
             foreach (var header in rootColumnHeader.ToListRecursive().Skip(1).Where(x => x.HeaderItems?.Any() ?? false))
                 ColumnHeaders.AddRange(header.HeaderItems);
+
+            maxColumnPriority = ColumnHeaders.Max(x => x.Priority);
 
 
             rootDepartment.OrderChildsRecursive();
@@ -60,82 +63,62 @@ namespace CHI.Models.ServiceAccounting
                 }
             }
 
-            rootRowHeader = HeaderGroup.CreateHeadersRecursive(null, rootDepartment);
+            rootRowHeader = RowHeaderGroup.CreateHeadersRecursive(null, rootDepartment);
 
-            RowHeaders = new List<HeaderItem>();
+            RowHeaders = new List<RowHeaderItem>();
             foreach (var header in rootRowHeader.ToListRecursive().Skip(1).Where(x => x.HeaderItems?.Any() ?? false))
                 RowHeaders.AddRange(header.HeaderItems);
 
+            maxRowPriority = RowHeaders.Max(x => x.Priority);
 
             Values = new ValueItem[parameters.Count, indicators.Count];
 
             rowsCount = parameters.Count;
             columnsCount = indicators.Count;
-            maxPriority = 0;
 
-            for (int row = 0; row < parameters.Count; row++)
-                for (int col = 0; col < indicators.Count; col++)
-                {
-                    Values[row, col] = new ValueItem(row, col, parameters[row], indicators[col]);
-
-                    if (Values[row, col].Priority > maxPriority)
-                        maxPriority = Values[row, col].Priority;
-                }
+            for (int row = 0; row < RowHeaders.Count; row++)
+                for (int col = 0; col < ColumnHeaders.Count; col++)
+                    Values[row, col] = new ValueItem(row, col, RowHeaders[row], ColumnHeaders[col]);
 
             ValuesList = Values.Cast<ValueItem>().ToList();
         }
 
         public void Build(List<Case> cases)
         {
-            var employeesFactDataSource = new Dictionary<Employee, List<Case>>();
-
-            Enumerable.Range(0, Values.GetLength(0))
-                .Select(x => Values[x, 0].Parameter)
-                .Where(x => x.Kind == ParameterKind.EmployeeFact)
-                .Select(x => x.Employee)
+            RowHeaders
+                .Where(x => x.Group.Employee != null)
+                .Select(x => x.Group)
+                .Distinct()
                 .ToList()
-                .ForEach(x => employeesFactDataSource.Add(x, cases.Where(y => y.Employee == x).ToList()));
+                .ForEach(x => x.FactCases = cases.Where(y => y.Employee == x.Employee).ToList());
 
-
-            for (int priority = maxPriority; priority <= 0; priority--)
-                foreach (var valueItem in ValuesList.Where(x => x.Priority == priority))
-                {
-                    var parameter = valueItem.Parameter;
-                    var indicator= valueItem.Indicator;
-                    var component = valueItem.Indicator.Component;
-
-
-                    if (valueItem.Parameter.Kind == ParameterKind.EmployeeFact)
+            for (int rowPriority = maxRowPriority; rowPriority <= 0; rowPriority--)
+                for (int columnPriority = maxColumnPriority; columnPriority <= 0; columnPriority--)
+                    foreach (var valueItem in ValuesList.Where(x => x.RowHeader.Priority == rowPriority && x.ColumnHeader.Priority == columnPriority))
                     {
-                        if (valueItem.Indicator.Component.CaseFilters.First().Kind == CaseFilterKind.Total)
-                        {
-
-                        }
-                        else
-                        {
-
-
-
-
-
-                        }
-
-
-
-
-
-
-
 
 
 
 
                     }
+            {
 
 
 
 
-                }
+
+
+
+
+
+
+
+            }
+
+
+
+
+
 
 
 
