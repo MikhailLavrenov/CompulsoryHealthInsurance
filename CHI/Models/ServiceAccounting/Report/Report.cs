@@ -86,14 +86,14 @@ namespace CHI.Models.ServiceAccounting
         }
 
 
-        public void Build(List<Case> cases)
+        public void Build(List<Case> factCases)
         {
             foreach (var row in Rows.Where(x => x.Parameter.Kind == ParameterKind.EmployeeFact))
             {
-                var rowCases = cases.Where(x=> x.Employee == row.Parameter.Employee).ToList();
+                var rowCases = factCases.Where(x => x.Employee == row.Parameter.Employee).ToList();
 
-                ColumnHeaderGroup lastGroup=null;
-                List<Case> selectedCases=null;
+                ColumnHeaderGroup lastGroup = null;
+                IEnumerable<Case> selectedCases = null;
 
                 foreach (var column in Columns.Where(x => x.Group.CaseFilters.First().Kind != CaseFilterKind.Total))
                 {
@@ -101,15 +101,33 @@ namespace CHI.Models.ServiceAccounting
 
                     if (lastGroup == null || lastGroup != valueItem.ColumnHeader.Group)
                     {
-                        selectedCases = new List<Case>();
+                        var filterGroups = column.Group.Component.CaseFilters
+                            .GroupBy(x => x.Kind)
+                            .Select(x => new { x.Key, Codes = x.Select(y => y.Code).ToList() });
 
-                        foreach (var caseFilter in column.Group.CaseFilters)
-                        {
+                        var treatmentCodes = filterGroups.FirstOrDefault(x => x.Key == CaseFilterKind.TreatmentPurpose)?.Codes;
+                        var visitCodes = filterGroups.FirstOrDefault(x => x.Key == CaseFilterKind.VisitPurpose)?.Codes;
+                        var containsServiceCodes = filterGroups.FirstOrDefault(x => x.Key == CaseFilterKind.ContainsService)?.Codes;
+                        var notContainsServiceCodes = filterGroups.FirstOrDefault(x => x.Key == CaseFilterKind.NotContainsService)?.Codes;
 
+                        //IEnumerable<Case> query= factCases;
+                        //selectedCases = new List<Case>();
 
-                        }
+                        selectedCases = factCases;
 
+                        if (treatmentCodes?.Any() ?? false)
+                            selectedCases = selectedCases.Join(treatmentCodes, mCase => mCase.VisitPurpose, code => code, (mCase, code) => mCase);
+                        if (visitCodes?.Any() ?? false)
+                            selectedCases = selectedCases.Join(visitCodes, mCase => mCase.VisitPurpose, code => code, (mCase, code) => mCase);
+                        if (containsServiceCodes?.Any() ?? false)
+                            selectedCases = selectedCases.Where(x => x.Services.Any(y => containsServiceCodes.Contains(y.Code)));
+                        if (notContainsServiceCodes?.Any() ?? false)
+                            selectedCases = selectedCases.Where(x => x.Services.Any(y => !containsServiceCodes.Contains(y.Code)));
+
+                        selectedCases = selectedCases.ToList();
                     }
+
+                    valueItem.ColumnHeader.Indicator.ValueKind
 
 
 
