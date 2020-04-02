@@ -6,8 +6,5 @@
         public Employee Employee { get; set; }
         public double Count { get; set; }
         public int Code { get; set; }
-
-        //string code;
-        //public string Code { get => code; set => code = value?.ToUpper(); }
     }
 }

@@ -31,6 +31,11 @@ namespace CHI.Services.BillsRegister
         [XmlElement(ElementName = "CEL")]
         public int CEL { get; set; }
         /// <summary>
+        /// Колчество койко-дней
+        /// </summary>
+        [XmlElement(ElementName = "KD")]
+        public int KD { get; set; }
+        /// <summary>
         /// Дата начала лечения
         /// </summary>
         [XmlElement(ElementName = "DATE_1")]

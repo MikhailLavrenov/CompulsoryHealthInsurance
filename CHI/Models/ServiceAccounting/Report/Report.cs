@@ -86,8 +86,9 @@ namespace CHI.Models.ServiceAccounting
         }
 
 
-        public void Build(List<Case> factCases)
+        public void Build(List<Case> factCases, List<ServiceClassifier> classifiers)
         {
+            //считает факт по оказанным случаям
             foreach (var row in Rows.Where(x => x.Parameter.Kind == ParameterKind.EmployeeFact))
             {
                 var rowCases = factCases.Where(x => x.Employee == row.Parameter.Employee).ToList();
@@ -127,18 +128,70 @@ namespace CHI.Models.ServiceAccounting
                         selectedCases = selectedCases.ToList();
                     }
 
-                    valueItem.ColumnHeader.Indicator.ValueKind
+                    switch (valueItem.ColumnHeader.Indicator.ValueKind)
+                    {
+                        case IndicatorKind.Cases:
+                            valueItem.Value = selectedCases.Count();
+                            break;
 
+                        case IndicatorKind.Services:
+                            valueItem.Value = selectedCases.Select(x => x.Services.Count == 0 ? 0 : x.Services.Count - 1).Sum();
+                            break;
 
+                        case IndicatorKind.BedDays:
+                            valueItem.Value = selectedCases.Sum(x => x.BedDays);
+                            break;
 
+                        case IndicatorKind.LaborCost:
+                            valueItem.Value = selectedCases
+                                .SelectMany(x => x.Services)
+                                .GroupBy(x => x.Code)
+                                .Select(x => new { Code = x.Key, Count = x.Sum(y => y.Count) })
+                                .Join(classifiers, service => service.Code, classifier => classifier.Code, (service, classifier) => service.Count * classifier.LaborCost)
+                                .Sum();
+                            break;
+
+                        case IndicatorKind.Cost:
+                            valueItem.Value = selectedCases
+                                .SelectMany(x => x.Services)
+                                .GroupBy(x => x.Code)
+                                .Select(x => new { Code = x.Key, Count = x.Sum(y => y.Count) })
+                                .Join(classifiers, service => service.Code, classifier => classifier.Code, (service, classifier) => service.Count * classifier.Price)
+                                .Sum();
+                            break;
+                    }
+
+                    valueItem.Value = valueItem.Value * column.Indicator.MultiplicationFactor / column.Indicator.DivideFactor;
                 }
             }
 
+            //суммирует строки
+            foreach (var row in Rows.Where(x => x.Parameter.Kind == ParameterKind.DepartmentCalculatedPlan || x.Parameter.Kind == ParameterKind.DepartmentFact || x.Parameter.Kind == ParameterKind.DepartmentRejectedFact))
+                foreach (var column in Columns.OrderByDescending(x => x.Priority))
+                {
+                    var valueItem = Values[row.Index, column.Index];
+                    valueItem.Value = 0;
 
+                    row.Group.Childs
+                        .SelectMany(x => x.HeaderItems)
+                        .Where(x => x.Parameter.Kind == row.Parameter.Kind)
+                        .ToList()
+                        .ForEach(x => valueItem.Value += Values[x.Index, column.Index].Value);
+                }
 
+            //суммирует столбцы
+            foreach (var row in Rows.OrderByDescending(x => x.Priority))
+                foreach (var column in Columns.Where(x => x.Group.Component.CaseFilters.First().Kind == CaseFilterKind.Total))
+                {
+                    var valueItem = Values[row.Index, column.Index];
+                    valueItem.Value = 0;
 
-
-
+                    column.Group.Childs
+                        .SelectMany(x => x.HeaderItems)
+                        .Where(x=>x.Indicator.FacadeKind==column.Indicator.ValueKind)
+                        .ToList()
+                        .ForEach(x=>valueItem.Value += Values[row.Index, x.Index].Value);
+                }
 
 
 
