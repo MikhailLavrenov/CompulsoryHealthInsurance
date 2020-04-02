@@ -19,6 +19,7 @@ namespace CHI.Models.ServiceAccounting
         /// Цель обращения (выдумана ФОМСом)
         /// </summary>
         public int TreatmentPurpose { get; set; }
+        public int BedDays { get; set; }
         public Employee Employee { get; set; }
         public List<Service> Services { get; set; }
 

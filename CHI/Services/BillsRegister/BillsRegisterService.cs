@@ -285,6 +285,7 @@ namespace CHI.Services.BillsRegister
                         Place = fomsCase.Z_SL.USL_OK,
                         VisitPurpose = fomsCase.Z_SL.SL.P_CEL,
                         TreatmentPurpose = fomsCase.Z_SL.SL.CEL,
+                        BedDays = fomsCase.Z_SL.SL.KD,
                         Employee = Employee.CreateUnknown(fomsCase.Z_SL.SL.IDDOKT, fomsCase.Z_SL.SL.PRVS),
                         Services = new List<Service>()
                     };
