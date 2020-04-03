@@ -1,5 +1,6 @@
 ﻿using CHI.Infrastructure;
 using CHI.Models.ServiceAccounting;
+using CHI.Services.Report;
 using Microsoft.EntityFrameworkCore;
 using Prism.Regions;
 using System;
@@ -15,7 +16,7 @@ namespace CHI.ViewModels
         int year = DateTime.Now.Year;
         int month = DateTime.Now.Month;
         bool isGrowing;
-        Report report;
+        ReportService report;
 
         public bool KeepAlive { get => false; }
         public int Year { get => year; set => SetProperty(ref year, value); }
@@ -47,7 +48,7 @@ namespace CHI.ViewModels
             var rootDepartment = dbContext.Departments.Local.First(x => x.IsRoot);
             var rootComponent = dbContext.Components.Local.First(x => x.IsRoot);
 
-            report = new Report(rootDepartment, rootComponent);
+            report = new ReportService(rootDepartment, rootComponent);
 
             BuildReportCommand = new DelegateCommandAsync(BuildReportExecute);
         }
@@ -59,13 +60,20 @@ namespace CHI.ViewModels
             if (IsGrowing)
                 dbContext.Registers
                     .Where(x => x.Year == Year && x.Month <= Month)
-                    .Include(x => x.Cases).ThenInclude(x => x.Services).ToList().ForEach(x => cases.AddRange(x.Cases));
+                    .Include(x => x.Cases).ThenInclude(x => x.Services)
+                    .ToList()
+                    .ForEach(x => cases.AddRange(x.Cases));
             else
                 dbContext.Registers
                     .Where(x => x.Year == Year && x.Month == Month)
-                    .Include(x => x.Cases).ThenInclude(x => x.Services).ToList().ForEach(x => cases.AddRange(x.Cases));
+                    .Include(x => x.Cases).ThenInclude(x => x.Services)
+                    .ToList()
+                    .ForEach(x => cases.AddRange(x.Cases));
 
-            report.Build(cases);
+            var plans=dbContext.Plans.Where(x => x.Month == Month && x.Year == Year).ToList();
+            var classifier = dbContext.ServicesClassifier.ToList();
+
+            report.Build(cases,plans, classifier);
         }
 
         public void OnNavigatedTo(NavigationContext navigationContext)

@@ -1,10 +1,11 @@
 ﻿using CHI.Infrastructure;
+using CHI.Models.ServiceAccounting;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CHI.Models.ServiceAccounting
+namespace CHI.Services.Report
 {
-    public class Report
+    public class ReportService
     {
         RowHeaderGroup rootRow;
         ColumnHeaderGroup rootColumn;
@@ -18,7 +19,7 @@ namespace CHI.Models.ServiceAccounting
         public ValueItem[,] Values { get; private set; }
 
 
-        public Report(Department rootDepartment, Component rootComponent)
+        public ReportService(Department rootDepartment, Component rootComponent)
         {
             rootComponent.OrderChildsRecursive();
             var components = rootComponent.ToListRecursive()
@@ -86,9 +87,9 @@ namespace CHI.Models.ServiceAccounting
         }
 
 
-        public void Build(List<Case> factCases, List<ServiceClassifier> classifiers)
+        public void Build(List<Case> factCases, List<Plan> plans, List<ServiceClassifier> classifiers)
         {
-            //считает факт по оказанным случаям
+            //заполняет факт по оказанным случаям
             foreach (var row in Rows.Where(x => x.Parameter.Kind == ParameterKind.EmployeeFact))
             {
                 var rowCases = factCases.Where(x => x.Employee == row.Parameter.Employee).ToList();
@@ -165,6 +166,18 @@ namespace CHI.Models.ServiceAccounting
                 }
             }
 
+            //заполняет план
+            foreach (var row in Rows.Where(x => x.Parameter.Kind == ParameterKind.EmployeePlan || x.Parameter.Kind == ParameterKind.DepartmentHandPlan))
+                foreach (var column in Columns.Where(x => x.Group.Component.IsCanPlanning))
+                {
+                    var valueItem = Values[row.Index, column.Index];
+
+                    var plan = plans.Where(x => x.Parameter.Id == row.Parameter.Id && x.Indicator.Id == column.Indicator.Id).FirstOrDefault();
+
+                    valueItem.ValueContext = plan;
+                    valueItem.Value = plan.Value;
+                }
+
             //суммирует строки
             foreach (var row in Rows.Where(x => x.Parameter.Kind == ParameterKind.DepartmentCalculatedPlan || x.Parameter.Kind == ParameterKind.DepartmentFact || x.Parameter.Kind == ParameterKind.DepartmentRejectedFact))
                 foreach (var column in Columns.OrderByDescending(x => x.Priority))
@@ -188,13 +201,10 @@ namespace CHI.Models.ServiceAccounting
 
                     column.Group.Childs
                         .SelectMany(x => x.HeaderItems)
-                        .Where(x=>x.Indicator.FacadeKind==column.Indicator.ValueKind)
+                        .Where(x => x.Indicator.FacadeKind == column.Indicator.ValueKind)
                         .ToList()
-                        .ForEach(x=>valueItem.Value += Values[row.Index, x.Index].Value);
+                        .ForEach(x => valueItem.Value += Values[row.Index, x.Index].Value);
                 }
-
-
-
         }
 
     }

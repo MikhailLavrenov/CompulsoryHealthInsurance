@@ -1,8 +1,9 @@
 ﻿using CHI.Infrastructure;
+using CHI.Models.ServiceAccounting;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CHI.Models.ServiceAccounting
+namespace CHI.Services.Report
 {
     public class ColumnHeaderItem
     {

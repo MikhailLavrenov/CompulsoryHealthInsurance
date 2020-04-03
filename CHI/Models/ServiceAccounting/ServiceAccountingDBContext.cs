@@ -16,7 +16,7 @@ namespace CHI.Models.ServiceAccounting
         public DbSet<Component> Components { get; set; }
         public DbSet<Indicator> Indicators { get; set; }
         public DbSet<CaseFilter> CaseFilters { get; set; }
-
+        public DbSet<Plan> Plans { get; set; }
 
         public ServiceAccountingDBContext()
         {

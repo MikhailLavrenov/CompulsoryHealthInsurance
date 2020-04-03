@@ -79,7 +79,7 @@ namespace CHI.ViewModels
                 Parameters = new List<Parameter> 
                 {
                     new Parameter (0,ParameterKind.DepartmentCalculatedPlan),
-                    new Parameter (1,ParameterKind.DepartmenHandPlan),
+                    new Parameter (1,ParameterKind.DepartmentHandPlan),
                     new Parameter (2,ParameterKind.DepartmentFact),
                     new Parameter (3,ParameterKind.DepartmentRejectedFact),
                     new Parameter (4,ParameterKind.DepartmentPercent),            

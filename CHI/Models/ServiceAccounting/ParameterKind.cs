@@ -13,7 +13,7 @@ namespace CHI.Models.ServiceAccounting
         [Description("Отклонено")] EmployeeRejectedFact = 3,
         [Description("% Вып")] EmployeePercent = 4,
         [Description("План")] DepartmentCalculatedPlan = 5,
-        [Description("План отд")] DepartmenHandPlan = 6,        
+        [Description("План отд")] DepartmentHandPlan = 6,        
         [Description("Факт")] DepartmentFact = 7,
         [Description("Отклонено")] DepartmentRejectedFact = 8,
         [Description("% Вып")] DepartmentPercent = 9
