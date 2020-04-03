@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 
-namespace CHI.Models.ServiceAccounting
+namespace CHI.Services.Report
 {
     public class ValueItem
     {
@@ -9,7 +9,7 @@ namespace CHI.Models.ServiceAccounting
         public double Value { get; set; }
         public int RowIndex { get; set; }
         public int ColumnIndex { get; set; }
-        public object DataContext { get; set; }
+        public object ValueContext { get; set; }
 
         public ValueItem(int rowIndex, int columnIndex, RowHeaderItem rowHeader, ColumnHeaderItem columnHeader)
         {

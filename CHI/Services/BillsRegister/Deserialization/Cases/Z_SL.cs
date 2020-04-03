@@ -27,6 +27,29 @@ namespace CHI.Services.BillsRegister
         /// </summary>
         [XmlElement(ElementName = "RSLT_D")]
         public int RSLT_D { get; set; }
+
+        /// <summary>
+        /// Тип оплаты:
+        /// 0 – не принято решение об оплате;
+        /// 1 – полная;
+        /// 2 – полный отказ;
+        /// 3 – частичный отказ;
+        /// </summary>
+        [XmlElement(ElementName = "OPLATA")]
+        public int OPLATA { get; set; }
+
+        /// <summary>
+        /// Сумма, принятая к оплате 
+        /// </summary>
+        [XmlElement(ElementName = "SANK")]
+        public int SANK { get; set; }
+
+        /// <summary>
+        /// Сумма санкций
+        /// </summary>
+        [XmlElement(ElementName = "SANK_IT")]
+        public int SANK_IT { get; set; }
+
         /// <summary>
         /// Случай обращения за мед. помощью
         /// </summary>

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace CHI.Models.ServiceAccounting
+﻿namespace CHI.Models.ServiceAccounting
 {
     public class Plan
     {
@@ -13,5 +9,11 @@ namespace CHI.Models.ServiceAccounting
         public Indicator Indicator { get; set; }
         public Parameter Parameter { get; set; }
         public double Value { get; set; }
+
+        public Plan(Indicator indicator, Parameter parameter)
+        {
+            Indicator = indicator;
+            Parameter = parameter;
+        }
     }
 }

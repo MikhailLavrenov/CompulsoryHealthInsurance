@@ -74,6 +74,10 @@
                                         Binding="{Binding Name}"
                                         MinWidth="200" />
 
+                <DataGridCheckBoxColumn Header="Планирование"
+                                        Binding="{Binding IsCanPlanning}"
+                                        MinWidth="80" />
+
                 <DataGridTemplateColumn Header="Показатели"
                                             MinWidth="80">
                     <DataGridTemplateColumn.CellTemplate>
