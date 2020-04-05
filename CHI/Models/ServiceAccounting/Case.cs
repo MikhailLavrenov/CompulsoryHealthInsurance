@@ -8,6 +8,10 @@ namespace CHI.Models.ServiceAccounting
     {
         public int Id { get; set; }
         /// <summary>
+        /// Идентификатор законченного случая из реестра
+        /// </summary>
+        public int IdCase { get; set; }
+        /// <summary>
         /// Условия оказания
         /// </summary>
         public int Place { get; set; }
@@ -19,7 +23,22 @@ namespace CHI.Models.ServiceAccounting
         /// Цель обращения (выдумана ФОМСом)
         /// </summary>
         public int TreatmentPurpose { get; set; }
+        /// <summary>
+        /// Койко-дни
+        /// </summary>
         public int BedDays { get; set; }
+        /// <summary>
+        /// Оплачено сумма
+        /// </summary>
+        public double AmountPaid { get; set; }
+        /// <summary>
+        /// Снято с оплаты сумма
+        /// </summary>
+        public double AmountUnpaid { get; set; }
+        /// <summary>
+        /// Статус оплаты
+        /// </summary>
+        public PaidKind PaidStatus { get; set; }
         public Employee Employee { get; set; }
         public List<Service> Services { get; set; }
 

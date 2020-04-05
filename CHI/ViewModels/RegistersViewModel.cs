@@ -14,14 +14,17 @@ namespace CHI.ViewModels
     public class RegistersViewModel : DomainObject, IRegionMemberLifetime, INavigationAware
     {
         ServiceAccountingDBContext dbContext;
+        Register currentRegister;
         ObservableCollection<Register> registers;
         IFileDialogService fileDialogService;
         IMainRegionService mainRegionService;
 
         public bool KeepAlive { get => false; }
+        public Register CurrentRegister { get => currentRegister; set => SetProperty(ref currentRegister, value); }
         public ObservableCollection<Register> Registers { get => registers; set => SetProperty(ref registers, value); }
 
-        public DelegateCommandAsync LoadCommand { get; }
+        public DelegateCommandAsync LoadRegisterCommand { get; }
+        public DelegateCommandAsync LoadPaymentStateCommand { get; }
 
         public RegistersViewModel(IMainRegionService mainRegionService, IFileDialogService fileDialogService)
         {
@@ -34,7 +37,8 @@ namespace CHI.ViewModels
             dbContext.Registers.Load();
             Registers = dbContext.Registers.Local.ToObservableCollection();
 
-            LoadCommand = new DelegateCommandAsync(LoadExecute);
+            LoadRegisterCommand = new DelegateCommandAsync(LoadExecute);
+            LoadPaymentStateCommand = new DelegateCommandAsync(LoadPaymentStateExecute, () => CurrentRegister != null).ObservesProperty(() => CurrentRegister);
         }
 
         private void LoadExecute()
@@ -125,7 +129,7 @@ namespace CHI.ViewModels
             else
                 dbContext.Specialties.Add(employee.Specialty);
 
-            employee.Parameters = new List<Parameter>            
+            employee.Parameters = new List<Parameter>
             {
                 new Parameter (0,ParameterKind.EmployeePlan),
                 new Parameter (1,ParameterKind.EmployeeFact),
@@ -136,6 +140,49 @@ namespace CHI.ViewModels
             dbContext.Employees.Add(employee);
 
             return employee;
+        }
+
+        private void LoadPaymentStateExecute()
+        {
+            mainRegionService.SetBusyStatus("Выбор файлов");
+
+            fileDialogService.DialogType = FileDialogType.Open;
+            fileDialogService.Filter = "Archive files (*.zip)|*.zip|Xml files (*.xml)|*.xml";
+            fileDialogService.MiltiSelect = true;
+
+            if (fileDialogService.ShowDialog() != true)
+            {
+                mainRegionService.SetCompleteStatus("Отменено");
+                return;
+            }
+
+            mainRegionService.SetBusyStatus("Загрузка xml-реестров");
+
+            var registerService = new BillsRegisterService(fileDialogService.FileNames);
+            registerService.FileNamesNotStartsWith = new string[] { "L" };
+            var paidRegister = registerService.GetRegister();
+
+            var dbContext = new ServiceAccountingDBContext();
+
+            var register = dbContext.Registers.FirstOrDefault(x => x.Month == paidRegister.Month && x.Year == paidRegister.Year);
+
+            if (register == null)
+                mainRegionService.SetCompleteStatus("Период загружаемого реестра не соотвествует выбранному");
+
+            mainRegionService.SetBusyStatus("Установка статуса оплаты");
+
+            var casePairs=register.Cases.Join(paidRegister.Cases, mcase => mcase.IdCase, paidCase => paidCase.IdCase, (mcase, paidCase) => new { mcase, paidCase }).ToList();
+
+            foreach (var casePair in casePairs)
+            {
+                casePair.mcase.PaidStatus = casePair.paidCase.PaidStatus;
+                casePair.mcase.AmountPaid = casePair.paidCase.AmountPaid;
+                casePair.mcase.AmountUnpaid = casePair.paidCase.AmountUnpaid;
+            }
+
+            dbContext.SaveChanges();
+
+            mainRegionService.SetCompleteStatus("Загрузка статуса оплаты завершена");
         }
 
         public void OnNavigatedTo(NavigationContext navigationContext)

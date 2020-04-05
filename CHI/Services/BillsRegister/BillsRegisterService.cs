@@ -282,10 +282,14 @@ namespace CHI.Services.BillsRegister
                 {
                     var mCase = new Case()
                     {
+                        IdCase= fomsCase.Z_SL.IDCASE,
                         Place = fomsCase.Z_SL.USL_OK,
                         VisitPurpose = fomsCase.Z_SL.SL.P_CEL,
                         TreatmentPurpose = fomsCase.Z_SL.SL.CEL,
                         BedDays = fomsCase.Z_SL.SL.KD,
+                        PaidStatus= (PaidKind)fomsCase.Z_SL.OPLATA,
+                        AmountPaid= fomsCase.Z_SL.SUMP,
+                        AmountUnpaid= fomsCase.Z_SL.SANK_IT,
                         Employee = Employee.CreateUnknown(fomsCase.Z_SL.SL.IDDOKT, fomsCase.Z_SL.SL.PRVS),
                         Services = new List<Service>()
                     };
