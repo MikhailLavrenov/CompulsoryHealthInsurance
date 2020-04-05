@@ -41,7 +41,7 @@ namespace CHI.ViewModels
 
         private void AddExecute()
         {
-            var newCaseFilter = new CaseFilter { Component = CurrentComponent };
+            var newCaseFilter = new CaseFilter();
 
             CaseFilters.Add(newCaseFilter);
 

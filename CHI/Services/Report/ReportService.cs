@@ -115,7 +115,7 @@ namespace CHI.Services.Report
                         //IEnumerable<Case> query= factCases;
                         //selectedCases = new List<Case>();
 
-                        selectedCases = factCases;
+                        selectedCases = factCases.Where(x => x.PaidStatus != PaidKind.Refuse);
 
                         if (treatmentCodes?.Any() ?? false)
                             selectedCases = selectedCases.Join(treatmentCodes, mCase => mCase.VisitPurpose, code => code, (mCase, code) => mCase);
@@ -154,11 +154,15 @@ namespace CHI.Services.Report
 
                         case IndicatorKind.Cost:
                             valueItem.Value = selectedCases
+                                .Where(x => x.PaidStatus == PaidKind.None)
                                 .SelectMany(x => x.Services)
                                 .GroupBy(x => x.Code)
                                 .Select(x => new { Code = x.Key, Count = x.Sum(y => y.Count) })
                                 .Join(classifiers, service => service.Code, classifier => classifier.Code, (service, classifier) => service.Count * classifier.Price)
-                                .Sum();
+                                .Sum()
+                                + selectedCases
+                                .Where(x => x.PaidStatus == PaidKind.Full || x.PaidStatus == PaidKind.Partly)
+                                .Sum(x => x.AmountPaid);
                             break;
                     }
 
@@ -205,7 +209,30 @@ namespace CHI.Services.Report
                         .ToList()
                         .ForEach(x => valueItem.Value += Values[row.Index, x.Index].Value);
                 }
+
+            //вычисляет проценты в штатных единицах
+            foreach (var row in Rows.Where(x => x.Parameter.Kind == ParameterKind.EmployeePercent ))
+                foreach (var column in Columns)
+                {
+                    var dividend = Values[row.Group.HeaderItems.First(x => x.Parameter.Kind == ParameterKind.EmployeePlan).Index, column.Index].Value;
+                    var divider = Values[row.Group.HeaderItems.First(x => x.Parameter.Kind == ParameterKind.EmployeeFact).Index, column.Index].Value;
+
+                    Values[row.Index, column.Index].Value = dividend / divider;
+                }
+
+            //вычисляет проценты в подразделениях
+            foreach (var row in Rows.Where(x =>  x.Parameter.Kind == ParameterKind.DepartmentPercent))
+                foreach (var column in Columns)
+                {
+                    var dividend = Values[row.Group.HeaderItems.First(x => x.Parameter.Kind == ParameterKind.DepartmentHandPlan).Index, column.Index].Value;
+                    var divider = Values[row.Group.HeaderItems.First(x => x.Parameter.Kind == ParameterKind.DepartmentFact).Index, column.Index].Value;
+
+                    Values[row.Index, column.Index].Value = dividend / divider;
+                }
+
         }
+
+
 
     }
 }

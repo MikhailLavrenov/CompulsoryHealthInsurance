@@ -10,6 +10,11 @@ namespace CHI.Services.BillsRegister
     public class Z_SL
     {
         /// <summary>
+        /// Номер записи в реестре законченных случаев
+        /// </summary>
+        [XmlElement(ElementName = "IDCASE")]
+        public int IDCASE { get; set; }
+        /// <summary>
         /// Условия оказания
         /// </summary>
         [XmlElement(ElementName = "USL_OK")]
@@ -41,8 +46,8 @@ namespace CHI.Services.BillsRegister
         /// <summary>
         /// Сумма, принятая к оплате 
         /// </summary>
-        [XmlElement(ElementName = "SANK")]
-        public int SANK { get; set; }
+        [XmlElement(ElementName = "SUMP")]
+        public int SUMP { get; set; }
 
         /// <summary>
         /// Сумма санкций
