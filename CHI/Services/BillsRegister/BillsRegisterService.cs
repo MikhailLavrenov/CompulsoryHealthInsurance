@@ -40,16 +40,30 @@ namespace CHI.Services.BillsRegister
         /// Получает счет-реестр за один период (отчетный месяц года)
         /// </summary>
         /// <returns></returns>
-        public Register GetRegister()
+        public Register GetRegister(bool casePaymentOnly)
         {
             var fomsRegistersFiles = GetFiles();
-            var fomsRegisters = DeserializeCollection<ZL_LIST>(fomsRegistersFiles);
 
-            foreach (var fomsRegistersFile in fomsRegistersFiles)
-                fomsRegistersFile.Dispose();
+            if (casePaymentOnly)
+            {
+                var fomsRegisters = DeserializeCollection<CasesPayment.ZL_LIST>(fomsRegistersFiles);
 
-            return ConvertToRegister(fomsRegisters);
+                foreach (var fomsRegistersFile in fomsRegistersFiles)
+                    fomsRegistersFile.Dispose();
+
+                return ConvertToRegisterWithPayment(fomsRegisters);
+            }
+            else
+            {
+                var fomsRegisters = DeserializeCollection<ZL_LIST>(fomsRegistersFiles);
+
+                foreach (var fomsRegistersFile in fomsRegistersFiles)
+                    fomsRegistersFile.Dispose();
+
+                return ConvertToRegister(fomsRegisters);
+            }
         }
+
         /// <summary>
         /// Получает список периодических осмотров пациентов из xml файлов реестров-счетов. Среди всех файлов выбирает только необходимые.
         /// </summary>
@@ -72,6 +86,7 @@ namespace CHI.Services.BillsRegister
 
             return ConvertToPatientExaminations(examinationsRegisters, patientsRegisters);
         }
+
         /// <summary>
         /// Получает список потоков  на файлы из указанных расположений  файла/файлов, начинающихся с заданных имен.
         /// </summary>
@@ -86,6 +101,7 @@ namespace CHI.Services.BillsRegister
 
             return files;
         }
+
         /// <summary>
         ///  Получает список потоков на файлы по заданному пути и имена которых начинаются с опеределенных строк.
         /// </summary>
@@ -124,6 +140,7 @@ namespace CHI.Services.BillsRegister
 
             return result;
         }
+
         /// <summary>
         /// Получает список потоков на файлы в архиве, имена которых начинаются с опеределенных строк.
         /// </summary>
@@ -161,6 +178,7 @@ namespace CHI.Services.BillsRegister
 
             return result;
         }
+
         /// <summary>
         /// Конвертирует типы xml реестров-счетов в список PatientExaminations.
         /// </summary>
@@ -256,6 +274,7 @@ namespace CHI.Services.BillsRegister
 
             return result;
         }
+
         /// <summary>
         /// Конвертирует типы xml реестров-счетов в Register.
         /// </summary>
@@ -282,14 +301,14 @@ namespace CHI.Services.BillsRegister
                 {
                     var mCase = new Case()
                     {
-                        IdCase= fomsCase.Z_SL.IDCASE,
+                        IdCase = fomsCase.Z_SL.IDCASE,
                         Place = fomsCase.Z_SL.USL_OK,
                         VisitPurpose = fomsCase.Z_SL.SL.P_CEL,
                         TreatmentPurpose = fomsCase.Z_SL.SL.CEL,
                         BedDays = fomsCase.Z_SL.SL.KD,
-                        PaidStatus= (PaidKind)fomsCase.Z_SL.OPLATA,
-                        AmountPaid= fomsCase.Z_SL.SUMP,
-                        AmountUnpaid= fomsCase.Z_SL.SANK_IT,
+                        PaidStatus = (PaidKind)fomsCase.Z_SL.OPLATA,
+                        AmountPaid = fomsCase.Z_SL.SUMP,
+                        AmountUnpaid = fomsCase.Z_SL.SANK_IT,
                         Employee = Employee.CreateUnknown(fomsCase.Z_SL.SL.IDDOKT, fomsCase.Z_SL.SL.PRVS),
                         Services = new List<Service>()
                     };
@@ -314,6 +333,48 @@ namespace CHI.Services.BillsRegister
 
             return register;
         }
+
+        /// <summary>
+        /// Конвертирует типы xml реестров-счетов в Register.
+        /// </summary>
+        private static Register ConvertToRegisterWithPayment(IEnumerable<CasesPayment.ZL_LIST> fomsRegisters)
+        {
+            foreach (var item in fomsRegisters)
+                if (fomsRegisters.First().SCHET.MONTH != item.SCHET.MONTH || fomsRegisters.First().SCHET.YEAR != item.SCHET.YEAR)
+                    throw new InvalidOperationException("Реестры должны принадлежать одному периоду");
+
+            var titleIndex = fomsRegisters.First().ZGLV.FILENAME.IndexOfAny("0123456789".ToCharArray());
+
+            var register = new Register()
+            {
+                Month = fomsRegisters.First().SCHET.MONTH,
+                Year = fomsRegisters.First().SCHET.YEAR,
+                BuildDate = fomsRegisters.First().ZGLV.DATA,
+                Title = fomsRegisters.First().ZGLV.FILENAME.Substring(titleIndex),
+                Cases = new List<Case>()
+
+            };
+
+            foreach (var fomsRegister in fomsRegisters)
+                foreach (var fomsCase in fomsRegister.ZAP)
+                {
+                    var mCase = new Case()
+                    {
+                        IdCase = fomsCase.Z_SL.IDCASE,
+                        PaidStatus = (PaidKind)fomsCase.Z_SL.OPLATA,
+                        AmountPaid = fomsCase.Z_SL.SUMP,
+                        AmountUnpaid = fomsCase.Z_SL.SANK_IT,
+                    };
+
+                    register.Cases.Add(mCase);
+
+                }
+
+            register.CasesCount = register.Cases.Count;
+
+            return register;
+        }
+
         /// <summary>
         /// Определяет этап профилактического осмотра по его типу.
         /// </summary>
@@ -332,6 +393,7 @@ namespace CHI.Services.BillsRegister
                     return 0;
             }
         }
+
         /// <summary>
         /// Опеределяет вид осмотра по его типу и возрасту пациента.
         /// </summary>
@@ -351,6 +413,7 @@ namespace CHI.Services.BillsRegister
                     return ExaminationKind.None;
             }
         }
+
         /// <summary>
         /// Опеределяет группу здоровья по результату профилактического осмотра.
         /// </summary>
@@ -375,6 +438,7 @@ namespace CHI.Services.BillsRegister
                     return HealthGroup.None;
             }
         }
+
         /// <summary>
         /// Десериализует коллекцию потоков в список указанного типа T.
         /// </summary>
@@ -397,6 +461,7 @@ namespace CHI.Services.BillsRegister
 
             return result;
         }
+
     }
 }
 
