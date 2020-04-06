@@ -13,7 +13,10 @@ namespace CHI.Services.Report
         public int Level { get; set; }
         public int Position { get; set; } = -1;
         public Component Component { get; set; }
-        public List<CaseFilter> CaseFilters { get; set; }
+        public List<double> TreatmentCodes { get; set; }
+        public List<double> VisitCodes { get; set; }
+        public List<double> ContainsServiceCodes { get; set; }
+        public List<double> NotContainsServiceCodes { get; set; }
         public List<ColumnHeaderItem> HeaderItems { get; set; }
 
         public ColumnHeaderGroup Parent { get; set; }
@@ -27,12 +30,22 @@ namespace CHI.Services.Report
             Name = component.Name;
             IsRoot = component.IsRoot;
             Order = component.Order;
-            CaseFilters = component.CaseFilters.OrderBy(x => x.Kind).ToList();
+
             Parent = parent;
             Level = IsRoot ? -1 : parent.Level + 1;
 
+            var groupedFilters = component.CaseFilters
+                .OrderBy(x => x.Kind)
+                .GroupBy(x => x.Kind)
+                .Select(x => new { x.Key, Codes = x.Select(y => y.Code).ToList() });
+
+            TreatmentCodes = groupedFilters.FirstOrDefault(x => x.Key == CaseFilterKind.TreatmentPurpose)?.Codes ?? new List<double>();
+            VisitCodes = groupedFilters.FirstOrDefault(x => x.Key == CaseFilterKind.VisitPurpose)?.Codes ?? new List<double>();
+            ContainsServiceCodes = groupedFilters.FirstOrDefault(x => x.Key == CaseFilterKind.ContainsService)?.Codes ?? new List<double>();
+            NotContainsServiceCodes = groupedFilters.FirstOrDefault(x => x.Key == CaseFilterKind.NotContainsService)?.Codes ?? new List<double>();
+
             Childs = new List<ColumnHeaderGroup>();
-            var HeaderItems = new List<ColumnHeaderItem>();
+            HeaderItems = new List<ColumnHeaderItem>();
 
             if (component.Indicators?.Any() ?? false)
                 foreach (var indicator in component.Indicators)

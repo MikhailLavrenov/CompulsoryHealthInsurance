@@ -59,7 +59,7 @@ namespace CHI.ViewModels
 
             var registerService = new BillsRegisterService(fileDialogService.FileNames);
             registerService.FileNamesNotStartsWith = new string[] { "L" };
-            var register = registerService.GetRegister();
+            var register = registerService.GetRegister(false);
 
             var dbContext = new ServiceAccountingDBContext();
 
@@ -160,7 +160,7 @@ namespace CHI.ViewModels
 
             var registerService = new BillsRegisterService(fileDialogService.FileNames);
             registerService.FileNamesNotStartsWith = new string[] { "L" };
-            var paidRegister = registerService.GetRegister();
+            var paidRegister = registerService.GetRegister(true);
 
             var dbContext = new ServiceAccountingDBContext();
 
