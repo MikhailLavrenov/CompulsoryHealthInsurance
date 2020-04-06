@@ -10,7 +10,7 @@ namespace CHI.Models.ServiceAccounting
         /// <summary>
         /// Идентификатор законченного случая из реестра
         /// </summary>
-        public int IdCase { get; set; }
+        public long IdCase { get; set; }
         /// <summary>
         /// Условия оказания
         /// </summary>

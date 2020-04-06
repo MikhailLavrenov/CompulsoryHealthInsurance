@@ -13,7 +13,7 @@ namespace CHI.Services.BillsRegister
         /// Номер записи в реестре законченных случаев
         /// </summary>
         [XmlElement(ElementName = "IDCASE")]
-        public int IDCASE { get; set; }
+        public long IDCASE { get; set; }
         /// <summary>
         /// Условия оказания
         /// </summary>

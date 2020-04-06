@@ -61,7 +61,7 @@ namespace CHI.Services.Report
                     header.Childs.Add(CreateHeadersRecursive(header, child));
             else if (department.Employees?.Any() ?? false)
                 foreach (var employee in department.Employees)
-                    header.Childs.Add(new RowHeaderGroup(employee, parent));
+                    header.Childs.Add(new RowHeaderGroup(employee, header));
 
             return header;
         }

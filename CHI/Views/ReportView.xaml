@@ -19,6 +19,17 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/CHI;component/Views/Resources/WindowDefaultStyle.xaml" />
             </ResourceDictionary.MergedDictionaries>
+
+            <Style TargetType="TextBlock"
+                   x:Key="HeaderCell">
+
+                <!--<Setter Property="Width"
+                        Value="100" />-->
+                <!--<Setter Property="Height"
+                        Value="25" />-->
+
+            </Style>
+
         </ResourceDictionary >
     </UserControl.Resources>
 
@@ -30,10 +41,7 @@
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
-            <RowDefinition Height="auto" />
-            <RowDefinition Height="auto" />
-            <RowDefinition Height="auto" />
-            <RowDefinition Height="auto" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
@@ -41,6 +49,7 @@
             <ColumnDefinition Width="auto" />
             <ColumnDefinition Width="Auto"
                               MinWidth="200" />
+            <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
         <FrameworkElement Grid.Column="1"
@@ -67,8 +76,8 @@
                    Grid.Column="0"
                    Text="Нарастающий" />
         <CheckBox Grid.Row="2"
-                 Grid.Column="2"
-                 IsChecked="{Binding IsGrowing}" />
+                  Grid.Column="2"
+                  IsChecked="{Binding IsGrowing}" />
 
         <Button Grid.Row="3"
                 Grid.Column="0"
@@ -76,6 +85,121 @@
                 Content="Ок"
                 Command="{Binding BuildReportCommand}"
                 Cursor="Hand" />
+
+        <FrameworkElement Grid.Row="4"
+                          Grid.Column="0"
+                          Style="{StaticResource Separator}" />
+
+        <Grid Grid.Row="5"
+              Grid.Column="0"
+              Grid.ColumnSpan="4">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+            </Grid.RowDefinitions>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="auto" />
+            </Grid.ColumnDefinitions>
+
+            <!--Заголовки столбцов-->
+            <ItemsControl Grid.Row="0"
+                          Grid.Column="1"
+                          ItemsSource="{Binding Report.Columns}">
+
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Vertical"
+                                    Width="100">
+                            <TextBlock Style="{StaticResource HeaderCell}"
+                                       Text="{Binding Group.Name}" />
+                            <TextBlock Style="{StaticResource HeaderCell}"
+                                       Text="{Binding Name}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+
+            </ItemsControl>
+
+            <!--Заголовки строк-->
+            <ItemsControl Grid.Row="1"
+                          Grid.Column="0"
+                          ItemsSource="{Binding Report.Rows}">
+
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel Orientation="Vertical" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal"
+                                    Margin="0,3,0,3">
+                            <StackPanel Orientation="Vertical"
+                                        Width="150">
+                                <TextBlock Style="{StaticResource HeaderCell}"
+                                           Text="{Binding Group.Name}" />
+                                <TextBlock Style="{StaticResource HeaderCell}"
+                                           Text="{Binding Group.SubName}" />
+                            </StackPanel>
+                            <TextBlock Width="100"
+                                       Style="{StaticResource HeaderCell}"
+                                       Text="{Binding Name}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+
+            </ItemsControl>
+
+            <!--Значения-->
+            <ItemsControl Grid.Row="1"
+                          Grid.Column="1"
+                          ItemsSource="{Binding Report.Values}">
+
+                <!--Строки-->
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel Orientation="Vertical" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+
+                        <!--Столбцы-->
+                        <ItemsControl ItemsSource="{Binding}">
+
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <VirtualizingStackPanel Orientation="Horizontal" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Width="100" Margin="0,6,0,17" Text="{Binding Value}" />
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+
+                        </ItemsControl>
+
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+
+            </ItemsControl>
+
+
+
+        </Grid>
 
 
     </Grid>
