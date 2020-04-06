@@ -10,6 +10,9 @@
         public Parameter Parameter { get; set; }
         public double Value { get; set; }
 
+        public Plan()
+        {
+        }
         public Plan(Indicator indicator, Parameter parameter)
         {
             Indicator = indicator;

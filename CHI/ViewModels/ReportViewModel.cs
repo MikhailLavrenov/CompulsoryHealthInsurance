@@ -16,13 +16,14 @@ namespace CHI.ViewModels
         int year = DateTime.Now.Year;
         int month = DateTime.Now.Month;
         bool isGrowing;
-        ReportService report;
+      
 
         public bool KeepAlive { get => false; }
         public int Year { get => year; set => SetProperty(ref year, value); }
         public int Month { get => month; set => SetProperty(ref month, value); }
         public bool IsGrowing { get => isGrowing; set => SetProperty(ref isGrowing, value); }
         public Dictionary<int, string> Months { get; } = Enumerable.Range(1, 12).ToDictionary(x => x, x => CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(x));
+        public ReportService Report { get; set; }
 
         public DelegateCommandAsync BuildReportCommand { get; }
 
@@ -48,7 +49,7 @@ namespace CHI.ViewModels
             var rootDepartment = dbContext.Departments.Local.First(x => x.IsRoot);
             var rootComponent = dbContext.Components.Local.First(x => x.IsRoot);
 
-            report = new ReportService(rootDepartment, rootComponent);
+            Report = new ReportService(rootDepartment, rootComponent);
 
             BuildReportCommand = new DelegateCommandAsync(BuildReportExecute);
         }
@@ -73,7 +74,7 @@ namespace CHI.ViewModels
             var plans=dbContext.Plans.Where(x => x.Month == Month && x.Year == Year).ToList();
             var classifier = dbContext.ServicesClassifier.ToList();
 
-            report.Build(cases,plans, classifier);
+            Report.Build(cases,plans, classifier);
         }
 
         public void OnNavigatedTo(NavigationContext navigationContext)
