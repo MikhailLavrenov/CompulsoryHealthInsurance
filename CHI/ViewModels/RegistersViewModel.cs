@@ -85,6 +85,18 @@ namespace CHI.ViewModels
                 var mCase = register.Cases[i];
                 mainRegionService.SetBusyStatus($"Сопоставление штатных единиц: {i} из {register.Cases.Count}");
 
+                //в некоторых реестрах не указан врач закрывший случай
+                if (string.IsNullOrEmpty(mCase.Employee.Medic.FomsId))
+                {
+                    var maxDate = mCase.Services.Select(x => x.Date).Max();
+                    var medicFomsCodes=mCase.Services.Where(x =>x.Date== maxDate && x.Employee.Specialty.FomsId == (mCase.Employee.Specialty.FomsId)).Select(x => x.Employee.Medic.FomsId).Distinct();
+
+                    if (medicFomsCodes.Count() == 1)
+                        mCase.Employee.Medic.FomsId = medicFomsCodes.First();
+                    else
+                        throw new InvalidOperationException("Не удается однозначно определить мед. работника закрывшего случай");
+                }
+
                 mCase.Employee = FindEmployeeInDbOrAdd(mCase.Employee, dbContext, defaultDepartment);
 
                 foreach (var service in mCase.Services)

@@ -11,7 +11,7 @@ namespace CHI.Services.Report
         public bool IsRoot { get; set; }
         public int Order { get; set; }
         public int Level { get; set; }
-        public int Position { get; set; } = -1;
+        public int Index { get; set; }
         public Component Component { get; set; }
         public List<double> TreatmentCodes { get; set; }
         public List<double> VisitCodes { get; set; }

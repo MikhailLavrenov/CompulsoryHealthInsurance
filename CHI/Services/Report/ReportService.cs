@@ -10,8 +10,10 @@ namespace CHI.Services.Report
         RowHeaderGroup rootRow;
         ColumnHeaderGroup rootColumn;
 
-        public List<RowHeaderItem> Rows { get; private set; }
-        public List<ColumnHeaderItem> Columns { get; private set; }
+        public List<RowHeaderGroup> RowGroups { get; set; }
+        public List<ColumnHeaderGroup> ColumnGroups { get; set; }
+        public List<RowHeaderItem> RowItems { get; private set; }
+        public List<ColumnHeaderItem> ColumnItems { get; private set; }
         public ValueItem[][] Values { get; private set; }
 
 
@@ -33,11 +35,11 @@ namespace CHI.Services.Report
 
             rootColumn = ColumnHeaderGroup.CreateHeadersRecursive(null, rootComponent);
 
-            Columns = new List<ColumnHeaderItem>();
-            foreach (var header in rootColumn.ToListRecursive().Skip(1).Where(x => x.HeaderItems?.Any() ?? false))
-                Columns.AddRange(header.HeaderItems);
+            ColumnGroups = rootColumn.ToListRecursive().Skip(1).ToList();
+            ColumnItems = ColumnGroups.SelectMany(x => x.HeaderItems).ToList();
 
-            Enumerable.Range(0, Columns.Count).ToList().ForEach(x => Columns[x].Index = x);
+            Enumerable.Range(0, ColumnItems.Count).ToList().ForEach(x => ColumnItems[x].Index = x);
+            Enumerable.Range(0, ColumnGroups.Count).ToList().ForEach(x => ColumnGroups[x].Index = x);
 
 
             rootDepartment.OrderChildsRecursive();
@@ -62,20 +64,20 @@ namespace CHI.Services.Report
 
             rootRow = RowHeaderGroup.CreateHeadersRecursive(null, rootDepartment);
 
-            Rows = new List<RowHeaderItem>();
-            foreach (var header in rootRow.ToListRecursive().Skip(1).Where(x => x.HeaderItems?.Any() ?? false))
-                Rows.AddRange(header.HeaderItems);
+            RowGroups = rootRow.ToListRecursive().Skip(1).ToList();
+            RowItems = RowGroups.SelectMany(x => x.HeaderItems).ToList();
 
-            Enumerable.Range(0, Rows.Count).ToList().ForEach(x => Rows[x].Index = x);
+            Enumerable.Range(0, RowItems.Count).ToList().ForEach(x => RowItems[x].Index = x);
+            Enumerable.Range(0, RowGroups.Count).ToList().ForEach(x => RowGroups[x].Index = x);
 
-            Values = new ValueItem[Rows.Count][];
+            Values = new ValueItem[RowItems.Count][];
 
-            for (int row = 0; row < Rows.Count; row++)
+            for (int row = 0; row < RowItems.Count; row++)
             {
                 Values[row] = new ValueItem[indicators.Count];
 
-                for (int col = 0; col < Columns.Count; col++)
-                    Values[row][col] = new ValueItem(row, col, Rows[row], Columns[col]);
+                for (int col = 0; col < ColumnItems.Count; col++)
+                    Values[row][col] = new ValueItem(row, col, RowItems[row], ColumnItems[col]);
             }
         }
 
@@ -83,8 +85,8 @@ namespace CHI.Services.Report
         public void Build(List<Case> factCases, List<Plan> plans, List<ServiceClassifier> classifiers)
         {
             //заполняет план
-            foreach (var row in Rows.Where(x => x.Parameter.Kind == ParameterKind.EmployeePlan || x.Parameter.Kind == ParameterKind.DepartmentHandPlan))
-                foreach (var column in Columns.Where(x => x.Group.Component.IsCanPlanning))
+            foreach (var row in RowItems.Where(x => x.Parameter.Kind == ParameterKind.EmployeePlan || x.Parameter.Kind == ParameterKind.DepartmentHandPlan))
+                foreach (var column in ColumnItems.Where(x => x.Group.Component.IsCanPlanning))
                 {
                     var valueItem = Values[row.Index][column.Index];
 
@@ -101,8 +103,8 @@ namespace CHI.Services.Report
             SetValuesFromCases(factCases, classifiers, true);
 
             //суммирует строки
-            foreach (var row in Rows.Where(x => x.Parameter.Kind == ParameterKind.DepartmentCalculatedPlan || x.Parameter.Kind == ParameterKind.DepartmentFact || x.Parameter.Kind == ParameterKind.DepartmentRejectedFact))
-                foreach (var column in Columns.OrderByDescending(x => x.Priority))
+            foreach (var row in RowItems.Where(x => x.Parameter.Kind == ParameterKind.DepartmentCalculatedPlan || x.Parameter.Kind == ParameterKind.DepartmentFact || x.Parameter.Kind == ParameterKind.DepartmentRejectedFact))
+                foreach (var column in ColumnItems.OrderByDescending(x => x.Priority))
                 {
                     var valueItem = Values[row.Index][column.Index];
                     valueItem.Value = 0;
@@ -115,37 +117,38 @@ namespace CHI.Services.Report
                 }
 
             //суммирует столбцы
-            foreach (var row in Rows.OrderByDescending(x => x.Priority))
-                foreach (var column in Columns.Where(x => x.Group.Component.CaseFilters.First().Kind == CaseFilterKind.Total))
+            foreach (var row in RowItems.OrderByDescending(x => x.Priority))
+                foreach (var column in ColumnItems.Where(x => x.Group.Component.CaseFilters.First().Kind == CaseFilterKind.Total))
                 {
-                    var valueItem = Values[row.Index][ column.Index];
+                    var valueItem = Values[row.Index][column.Index];
                     valueItem.Value = 0;
 
                     column.Group.Childs
                         .SelectMany(x => x.HeaderItems)
                         .Where(x => x.Indicator.FacadeKind == column.Indicator.ValueKind)
                         .ToList()
-                        .ForEach(x => valueItem.Value += Values[row.Index][ x.Index].Value);
+                        .ForEach(x => valueItem.Value += Values[row.Index][x.Index].Value);
                 }
 
             //вычисляет проценты в штатных единицах
-            foreach (var row in Rows.Where(x => x.Parameter.Kind == ParameterKind.EmployeePercent))
-                foreach (var column in Columns)
+            foreach (var row in RowItems.Where(x => x.Parameter.Kind == ParameterKind.EmployeePercent))
+                foreach (var column in ColumnItems)
                 {
-                    var dividend = Values[row.Group.HeaderItems.First(x => x.Parameter.Kind == ParameterKind.EmployeePlan).Index][ column.Index].Value;
-                    var divider = Values[row.Group.HeaderItems.First(x => x.Parameter.Kind == ParameterKind.EmployeeFact).Index][ column.Index].Value;
+                    var dividend = Values[row.Group.HeaderItems.First(x => x.Parameter.Kind == ParameterKind.EmployeePlan).Index][column.Index].Value;
+                    var divider = Values[row.Group.HeaderItems.First(x => x.Parameter.Kind == ParameterKind.EmployeeFact).Index][column.Index].Value;
 
-                    Values[row.Index][ column.Index].Value = dividend / divider;
+                    if (divider!=0)
+                    Values[row.Index][column.Index].Value = dividend / divider;
                 }
 
             //вычисляет проценты в подразделениях
-            foreach (var row in Rows.Where(x => x.Parameter.Kind == ParameterKind.DepartmentPercent))
-                foreach (var column in Columns)
+            foreach (var row in RowItems.Where(x => x.Parameter.Kind == ParameterKind.DepartmentPercent))
+                foreach (var column in ColumnItems)
                 {
-                    var dividend = Values[row.Group.HeaderItems.First(x => x.Parameter.Kind == ParameterKind.DepartmentHandPlan).Index][ column.Index].Value;
-                    var divider = Values[row.Group.HeaderItems.First(x => x.Parameter.Kind == ParameterKind.DepartmentFact).Index][ column.Index].Value;
+                    var dividend = Values[row.Group.HeaderItems.First(x => x.Parameter.Kind == ParameterKind.DepartmentHandPlan).Index][column.Index].Value;
+                    var divider = Values[row.Group.HeaderItems.First(x => x.Parameter.Kind == ParameterKind.DepartmentFact).Index][column.Index].Value;
 
-                    Values[row.Index][ column.Index].Value = dividend / divider;
+                    Values[row.Index][column.Index].Value = dividend / divider;
                 }
 
         }
@@ -154,16 +157,16 @@ namespace CHI.Services.Report
         {
             cases = cases.Where(x => x.PaidStatus != PaidKind.Refuse == isPaymentAccepted).ToList();
 
-            foreach (var row in Rows.Where(x => x.Parameter.Kind == ParameterKind.EmployeeFact))
+            foreach (var row in RowItems.Where(x => x.Parameter.Kind == ParameterKind.EmployeeFact))
             {
                 var employeeCases = cases.Where(x => x.Employee == row.Parameter.Employee).ToList();
 
                 ColumnHeaderGroup lastGroup = null;
                 IEnumerable<Case> selectedCases = null;
 
-                foreach (var column in Columns.Where(x => x.Group.Component.CaseFilters.First().Kind != CaseFilterKind.Total))
+                foreach (var column in ColumnItems.Where(x => x.Group.Component.CaseFilters.First().Kind != CaseFilterKind.Total))
                 {
-                    var valueItem = Values[row.Index][ column.Index];
+                    var valueItem = Values[row.Index][column.Index];
 
                     if (lastGroup == null || lastGroup != valueItem.ColumnHeader.Group)
                     {
