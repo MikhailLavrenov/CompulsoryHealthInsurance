@@ -319,6 +319,7 @@ namespace CHI.Services.BillsRegister
                         {
                             Code = fomsServices.CODE_USL,
                             Count = fomsServices.KOL_USL,
+                            Date= fomsServices.DATE_OUT,
                             Employee = Employee.CreateUnknown(fomsServices.CODE_MD, fomsServices.PRVS)
                         };
 

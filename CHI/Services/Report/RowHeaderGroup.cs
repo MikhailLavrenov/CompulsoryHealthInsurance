@@ -12,6 +12,7 @@ namespace CHI.Services.Report
         public bool IsRoot { get; set; }
         public int Order { get; set; }
         public int Level { get; set; }
+        public int Index { get; set; }
         public Department Department { get; set; }
         public Employee Employee { get; set; }
         public List<RowHeaderItem> HeaderItems { get; set; }
