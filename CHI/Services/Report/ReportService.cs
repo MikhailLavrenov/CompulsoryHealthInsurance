@@ -137,8 +137,8 @@ namespace CHI.Services.Report
                     var dividend = Values[row.Group.HeaderItems.First(x => x.Parameter.Kind == ParameterKind.EmployeePlan).Index][column.Index].Value;
                     var divider = Values[row.Group.HeaderItems.First(x => x.Parameter.Kind == ParameterKind.EmployeeFact).Index][column.Index].Value;
 
-                    if (divider!=0)
-                    Values[row.Index][column.Index].Value = dividend / divider;
+                    if (divider != 0)
+                        Values[row.Index][column.Index].Value = dividend / divider;
                 }
 
             //вычисляет проценты в подразделениях
@@ -148,7 +148,8 @@ namespace CHI.Services.Report
                     var dividend = Values[row.Group.HeaderItems.First(x => x.Parameter.Kind == ParameterKind.DepartmentHandPlan).Index][column.Index].Value;
                     var divider = Values[row.Group.HeaderItems.First(x => x.Parameter.Kind == ParameterKind.DepartmentFact).Index][column.Index].Value;
 
-                    Values[row.Index][column.Index].Value = dividend / divider;
+                    if (divider != 0)
+                        Values[row.Index][column.Index].Value = dividend / divider;
                 }
 
         }
