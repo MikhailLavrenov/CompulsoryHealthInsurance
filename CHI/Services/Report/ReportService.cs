@@ -113,7 +113,7 @@ namespace CHI.Services.Report
                         .SelectMany(x => x.HeaderItems)
                         .Where(x => x.Parameter.Kind == row.Parameter.Kind)
                         .ToList()
-                        .ForEach(x => valueItem.Value += Values[x.Index][column.Index].Value);
+                        .ForEach(x => valueItem.Value += Values[x.Index][column.Index].Value ?? 0);
                 }
 
             //суммирует столбцы
@@ -127,7 +127,7 @@ namespace CHI.Services.Report
                         .SelectMany(x => x.HeaderItems)
                         .Where(x => x.Indicator.FacadeKind == column.Indicator.ValueKind)
                         .ToList()
-                        .ForEach(x => valueItem.Value += Values[row.Index][x.Index].Value);
+                        .ForEach(x => valueItem.Value += Values[row.Index][x.Index].Value ?? 0);
                 }
 
             //вычисляет проценты в штатных единицах
