@@ -4,11 +4,11 @@ namespace CHI.Services.Report
 {
     public class ValueItem : BindableBase
     {
-        double value;
+        double? value;
 
         public RowHeaderItem RowHeader { get; set; }
         public ColumnHeaderItem ColumnHeader { get; set; }
-        public double Value { get => value; set => SetProperty(ref this.value, value); }
+        public double? Value { get => value; set => SetProperty(ref this.value, value); }
         public int RowIndex { get; set; }
         public int ColumnIndex { get; set; }
         public object ValueContext { get; set; }
