@@ -72,7 +72,7 @@ namespace CHI.ViewModels
                     .ForEach(x => cases.AddRange(x.Cases));
 
             var plans=dbContext.Plans.Where(x => x.Month == Month && x.Year == Year).ToList();
-            var classifier = dbContext.ServicesClassifier.ToList();
+            var classifier = dbContext.ServiceClassifierItems.ToList();
 
             Report.Build(cases,plans, classifier);
         }

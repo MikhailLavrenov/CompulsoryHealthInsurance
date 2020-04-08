@@ -12,7 +12,8 @@ namespace CHI.Models.ServiceAccounting
         public DbSet<Medic> Medics { get; set; }
         public DbSet<Specialty> Specialties { get; set; }
         public DbSet<Parameter> Parameters { get; set; }
-        public DbSet<ServiceClassifier> ServicesClassifier { get; set; }
+        public DbSet<ServiceClassifierItem> ServiceClassifierItems { get; set; }
+        public DbSet<ServiceClassifier> ServiceClassifiers { get; set; }
         public DbSet<Component> Components { get; set; }
         public DbSet<Indicator> Indicators { get; set; }
         public DbSet<CaseFilter> CaseFilters { get; set; }
@@ -20,7 +21,7 @@ namespace CHI.Models.ServiceAccounting
 
         public ServiceAccountingDBContext()
         {
-            //Database.EnsureDeleted();
+            Database.EnsureDeleted();
 
             if (Database.EnsureCreated())
             {

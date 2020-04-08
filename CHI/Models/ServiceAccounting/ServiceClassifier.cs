@@ -7,11 +7,9 @@ namespace CHI.Models.ServiceAccounting
     public class ServiceClassifier
     {
         public int Id { get; set; }
-        public int Code { get; set; }
-        /// <summary>
-        /// Условная единица труда (УЕТ)
-        /// </summary>
-        public double LaborCost { get; set; }
-        public double Price { get; set; }
+        public DateTime ValidFrom{ get; set; }
+        public DateTime ValidTo { get; set; }
+        public List<ServiceClassifierItem> ServiceClassifierItems { get; set; }
+
     }
 }
