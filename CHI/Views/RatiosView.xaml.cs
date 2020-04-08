@@ -16,9 +16,9 @@ namespace CHI.Views
     /// <summary>
     /// Логика взаимодействия для IndicatorView.xaml
     /// </summary>
-    public partial class CaseFiltersView : UserControl
+    public partial class RatiosView : UserControl
     {
-        public CaseFiltersView()
+        public RatiosView()
         {
             InitializeComponent();
         }

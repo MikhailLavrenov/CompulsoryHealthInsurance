@@ -99,8 +99,8 @@
             </Button>
 
             <Button Command="{Binding SwitchViewCommand}" 
-                    CommandParameter="{x:Type v:ServiceClassifierItemsView}">
-                <TextBlock Text="Классификатор услуг" 
+                    CommandParameter="{x:Type v:ServiceClassifiersView}">
+                <TextBlock Text="Классификаторы услуг" 
                            Style="{StaticResource MenuButtonText}" />
             </Button>
 
