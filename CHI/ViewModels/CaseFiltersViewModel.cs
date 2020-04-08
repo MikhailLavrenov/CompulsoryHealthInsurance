@@ -10,7 +10,7 @@ using System.Linq;
 
 namespace CHI.ViewModels
 {
-    public class CaseFilterViewModel : DomainObject, IRegionMemberLifetime, INavigationAware
+    public class CaseFiltersViewModel : DomainObject, IRegionMemberLifetime, INavigationAware
     {
         ServiceAccountingDBContext dbContext;
         ObservableCollection<CaseFilter> caseFilters;
@@ -29,7 +29,7 @@ namespace CHI.ViewModels
         public DelegateCommand MoveUpCommand { get; }
         public DelegateCommand MoveDownCommand { get; }
 
-        public CaseFilterViewModel(IMainRegionService mainRegionService)
+        public CaseFiltersViewModel(IMainRegionService mainRegionService)
         {
             this.mainRegionService = mainRegionService;
 

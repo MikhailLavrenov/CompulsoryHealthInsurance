@@ -230,7 +230,9 @@ namespace CHI.Services.Report
                             break;
                     }
 
-                    valueItem.Value = valueItem.Value * column.Indicator.MultiplicationFactor / column.Indicator.DivideFactor;
+                    var ratio = column.Indicator.Ratios.First();
+
+                    valueItem.Value = valueItem.Value * ratio.Multiplier / ratio.Divider;
                 }
             }
 

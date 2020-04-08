@@ -60,6 +60,9 @@
     <Compile Update="Views\ExaminationsView.xaml.cs">
       <DependentUpon>ExaminationsView.xaml</DependentUpon>
     </Compile>
+    <Compile Update="Views\ServiceClassifierItemsView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Views\NotificationDialogView.xaml.cs">
       <DependentUpon>NotificationDialogView.xaml</DependentUpon>
     </Compile>
@@ -95,6 +98,9 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Views\ExaminationsView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\ServiceClassifierItemsView.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Views\NotificationDialogView.xaml">

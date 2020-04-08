@@ -2,6 +2,7 @@
 using CHI.ViewModels;
 using CHI.Views;
 using NLog;
+using OfficeOpenXml;
 using Prism.DryIoc;
 using Prism.Ioc;
 using System;
@@ -37,6 +38,8 @@ namespace CHI
         {
             base.OnInitialized();
 
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+
             logger = Container.Resolve<ILogger>();
 
             AppDomain.CurrentDomain.UnhandledException += LogUnhandledException;
@@ -70,7 +73,8 @@ namespace CHI
             containerRegistry.RegisterForNavigation<ServiceClassifierItemsView>();
             containerRegistry.RegisterForNavigation<ComponentsView>();
             containerRegistry.RegisterForNavigation<IndicatorsView>();
-            containerRegistry.RegisterForNavigation<CaseFilterView>();
+            containerRegistry.RegisterForNavigation<RatiosView>();
+            containerRegistry.RegisterForNavigation<CaseFiltersView>();
             containerRegistry.RegisterForNavigation<ReportView>();
         }
         private void LogUnhandledException(object sender, UnhandledExceptionEventArgs args)

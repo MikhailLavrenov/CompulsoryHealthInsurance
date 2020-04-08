@@ -21,7 +21,7 @@ namespace CHI.Models.ServiceAccounting
 
         public ServiceAccountingDBContext()
         {
-            Database.EnsureDeleted();
+            //Database.EnsureDeleted();
 
             if (Database.EnsureCreated())
             {
@@ -60,26 +60,6 @@ namespace CHI.Models.ServiceAccounting
                 .WithOne()
                 .OnDelete(DeleteBehavior.Cascade);
 
-            //modelBuilder.Entity<Employee>()
-            //    .HasMany<Case>()
-            //    .WithOne(x => x.Employee)
-            //    .OnDelete(DeleteBehavior.Restrict);
-
-            //modelBuilder.Entity<Medic>()    
-            //    .HasMany<Employee>()    
-            //    .WithOne(x => x.Medic)   
-            //    .OnDelete(DeleteBehavior.Restrict);
-
-            //modelBuilder.Entity<Specialty>()   
-            //    .HasMany<Employee>()    
-            //    .WithOne(x => x.Specialty)   
-            //    .OnDelete(DeleteBehavior.Restrict);
-
-            //modelBuilder.Entity<Department>()   
-            //    .HasMany<Employee>()  
-            //    .WithOne(x => x.Department)   
-            //    .OnDelete(DeleteBehavior.Restrict);
-
             modelBuilder.Entity<Department>()
                 .HasOne(x => x.Parent)
                 .WithMany(x => x.Childs)
@@ -98,6 +78,16 @@ namespace CHI.Models.ServiceAccounting
             modelBuilder.Entity<Component>()
                 .HasMany(x => x.Indicators)
                 .WithOne(x => x.Component)
+                .OnDelete(DeleteBehavior.Cascade);    
+            
+            modelBuilder.Entity<Indicator>()
+                .HasMany(x => x.Ratios)
+                .WithOne()
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<ServiceClassifier>()    
+                .HasMany(x => x.ServiceClassifierItems)  
+                .WithOne() 
                 .OnDelete(DeleteBehavior.Cascade);
 
         }

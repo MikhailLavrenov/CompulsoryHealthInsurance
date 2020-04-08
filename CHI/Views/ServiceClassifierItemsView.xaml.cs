@@ -14,7 +14,7 @@ using System.Windows.Shapes;
 namespace CHI.Views
 {
     /// <summary>
-    /// Логика взаимодействия для ServiceClassifierView.xaml
+    /// Логика взаимодействия для IndicatorView.xaml
     /// </summary>
     public partial class ServiceClassifierItemsView : UserControl
     {

@@ -34,74 +34,35 @@
                 </Viewbox>
             </Button>
 
-            <FrameworkElement Style="{StaticResource Separator}" />
-
-            <Button Style="{StaticResource IconButton}"
-                    Command="{Binding MoveUpCommand}"
-                    Cursor="Hand">
-                <Viewbox Stretch="Uniform">
-                    <materialDesign:PackIcon Kind="ArrowUpward" />
-                </Viewbox>
-            </Button>
-
-            <Button Style="{StaticResource IconButton}"
-                    Command="{Binding MoveDownCommand}">
-                <Viewbox Stretch="Uniform">
-                    <materialDesign:PackIcon Kind="ArrowDownward" />
-                </Viewbox>
-            </Button>
-
         </StackPanel>
 
         <i:CustomDataGrid x:Name="datagrid1"                              
-                          ItemsSource="{Binding Components}"
+                          ItemsSource="{Binding ServiceClassifiers}"
                               CanUserAddRows="False"
                               CanUserDeleteRows="False"
-                              SelectedItem="{Binding CurrentComponent, Mode=OneWayToSource}">
+                              SelectedItem="{Binding CurrentServiceClassifier, Mode=OneWayToSource}">
 
             <DataGrid.Columns>
 
                 <DataGridTemplateColumn CellTemplate="{StaticResource DataGridDragColumn}"
                                             IsReadOnly="True" />
 
-                <DataGridTextColumn Header="Родитель"
-                                        Binding="{Binding Parent.Name}"
-                                        MinWidth="200"
-                                        IsReadOnly="True" />
+                <DataGridTextColumn Header="Действует с"
+                                        Binding="{Binding ValidFrom, StringFormat='{}{0:MM.yyyy}'}"
+                                        MinWidth="100" />
 
 
-                <DataGridTextColumn Header="Название"
-                                        Binding="{Binding Name}"
-                                        MinWidth="200" />
+                <DataGridTextColumn Header="Действует по"
+                                        Binding="{Binding ValidTo, StringFormat='{}{0:MM.yyyy}'}"
+                                        MinWidth="100" />
 
-                <DataGridCheckBoxColumn Header="Планирование"
-                                        Binding="{Binding IsCanPlanning}"
-                                        MinWidth="80" />
-
-                <DataGridTemplateColumn Header="Показатели"
-                                            MinWidth="80">
+                <DataGridTemplateColumn Header="Услуги"
+                                            MinWidth="100">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Button Style="{StaticResource DataGridRowButton}"
                                     Command="{Binding DataContext.NavigateCommand, Source={x:Reference datagrid1}}"
-                                        CommandParameter="{x:Type v:IndicatorsView}"
-                                        Visibility="{Binding IsRoot, Converter={i:InvertedBoolToVisibleConverter}}">
-                                <Viewbox Stretch="Uniform">
-                                    <materialDesign:PackIcon Kind="EllipsisHorizontalCircle" />
-                                </Viewbox>
-                            </Button>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-
-                <DataGridTemplateColumn Header="Фильтр случаев"
-                                        MinWidth="120">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <Button Style="{StaticResource DataGridRowButton}"
-                                    Command="{Binding DataContext.NavigateCommand, Source={x:Reference datagrid1}}"
-                                    CommandParameter="{x:Type v:CaseFilterView}"
-                                    Visibility="{Binding IsRoot, Converter={i:InvertedBoolToVisibleConverter}}">
+                                        CommandParameter="{x:Type v:ServiceClassifierItemsView}">
                                 <Viewbox Stretch="Uniform">
                                     <materialDesign:PackIcon Kind="EllipsisHorizontalCircle" />
                                 </Viewbox>

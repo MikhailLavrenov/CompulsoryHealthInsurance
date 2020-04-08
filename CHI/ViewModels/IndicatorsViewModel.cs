@@ -18,7 +18,7 @@ namespace CHI.ViewModels
         Indicator currentIndicator;
         IMainRegionService mainRegionService;
 
-        public bool KeepAlive { get => false; }
+        public bool KeepAlive { get; set; }
         public Indicator CurrentIndicator { get => currentIndicator; set => SetProperty(ref currentIndicator, value); }
         public Component CurrentComponent { get => currentComponent; set => SetProperty(ref currentComponent, value); }
         public ObservableCollection<Indicator> Indicators { get => indicators; set => SetProperty(ref indicators, value); }
@@ -28,6 +28,7 @@ namespace CHI.ViewModels
         public DelegateCommand DeleteCommand { get; }
         public DelegateCommand MoveUpCommand { get; }
         public DelegateCommand MoveDownCommand { get; }
+        public DelegateCommand<Type> NavigateCommand { get; }
 
         public IndicatorsViewModel(IMainRegionService mainRegionService)
         {
@@ -39,6 +40,7 @@ namespace CHI.ViewModels
             DeleteCommand = new DelegateCommand(DeleteExecute,()=> CurrentIndicator!=null).ObservesProperty(() => CurrentIndicator);
             MoveUpCommand = new DelegateCommand(MoveUpExecute, MoveUpCanExecute).ObservesProperty(() => CurrentIndicator);
             MoveDownCommand = new DelegateCommand(MoveDownExecute, MoveDownCanExecute).ObservesProperty(() => CurrentIndicator);
+            NavigateCommand = new DelegateCommand<Type>(NavigateExecute);
         }
 
         private void AddExecute()
@@ -108,6 +110,16 @@ namespace CHI.ViewModels
             MoveUpCommand.RaiseCanExecuteChanged();
         }
 
+        private void NavigateExecute(Type view)
+        {
+            KeepAlive = true;
+
+            var navigationParameters = new NavigationParameters();
+            navigationParameters.Add(nameof(Indicator), CurrentIndicator);
+            mainRegionService.RequestNavigate(view.Name, navigationParameters, true);
+        }
+
+
         public void OnNavigatedTo(NavigationContext navigationContext)
         {
             if (navigationContext.Parameters.ContainsKey(nameof(Component)))
@@ -120,6 +132,8 @@ namespace CHI.ViewModels
             }
 
             mainRegionService.Header = $"{CurrentComponent.Name} > Показатели";
+
+            KeepAlive = false;
         }
 
         public bool IsNavigationTarget(NavigationContext navigationContext)

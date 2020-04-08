@@ -84,13 +84,20 @@
                                                        SelectedValueBinding="{Binding ValueKind}"
                                                        MinWidth="200" />
 
-                <DataGridTextColumn Header="Коэф. умножения"
-                                    Binding="{Binding MultiplicationFactor}"
-                                    MinWidth="80" />
-
-                <DataGridTextColumn Header="Коэф. деления"
-                                    Binding="{Binding DivideFactor}"
-                                    MinWidth="80" />
+                <DataGridTemplateColumn Header="Коэффициенты"
+                                            MinWidth="80">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Style="{StaticResource DataGridRowButton}"
+                                    Command="{Binding DataContext.NavigateCommand, Source={x:Reference datagrid1}}"                                        
+                                    CommandParameter="{x:Type v:RatiosView}">
+                                <Viewbox Stretch="Uniform">
+                                    <materialDesign:PackIcon Kind="EllipsisHorizontalCircle" />
+                                </Viewbox>
+                            </Button>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
 
             </DataGrid.Columns>
 

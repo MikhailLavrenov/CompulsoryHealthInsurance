@@ -2,47 +2,69 @@
 using CHI.Models.ServiceAccounting;
 using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml;
+using Prism.Commands;
 using Prism.Regions;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Windows;
 
 namespace CHI.ViewModels
 {
-    class ServiceClassifierItemsViewModel : DomainObject, IRegionMemberLifetime, INavigationAware
+    public class ServiceClassifierItemsViewModel : DomainObject, IRegionMemberLifetime, INavigationAware
     {
         ServiceAccountingDBContext dbContext;
-        ObservableCollection<ServiceClassifierItem> serviceClassifier;
-        IFileDialogService fileDialogService;
+        ObservableCollection<ServiceClassifierItem> serviceClassifierItems;
+        ServiceClassifier currentServiceClassifier;
+        ServiceClassifierItem currentServiceClassifierItem;
         IMainRegionService mainRegionService;
-        int codeColumn = 1;
-        int laborCostColumn = 2;
-        int priceColumn = 3;
+        IFileDialogService fileDialogService;
 
         public bool KeepAlive { get => false; }
-        public ObservableCollection<ServiceClassifierItem> ServiceClassifier { get => serviceClassifier; set => SetProperty(ref serviceClassifier, value); }
+        public ServiceClassifierItem CurrentServiceClassifierItem { get => currentServiceClassifierItem; set => SetProperty(ref currentServiceClassifierItem, value); }
+        public ServiceClassifier CurrentServiceClassifier { get => currentServiceClassifier; set => SetProperty(ref currentServiceClassifier, value); }
+        public ObservableCollection<ServiceClassifierItem> ServiceClassifierItems { get => serviceClassifierItems; set => SetProperty(ref serviceClassifierItems, value); }
+
+        public DelegateCommand AddCommand { get; }
+        public DelegateCommand DeleteCommand { get; }
         public DelegateCommandAsync LoadCommand { get; }
         public DelegateCommandAsync SaveExampleCommand { get; }
 
+
         public ServiceClassifierItemsViewModel(IMainRegionService mainRegionService, IFileDialogService fileDialogService)
         {
-            this.fileDialogService = fileDialogService;
             this.mainRegionService = mainRegionService;
+            this.fileDialogService = fileDialogService;
 
-            mainRegionService.Header = "Классификатор Услуг";
+            mainRegionService.Header = "Классификатор услуг";
 
             dbContext = new ServiceAccountingDBContext();
-            dbContext.ServiceClassifierItems.Load();
-            ServiceClassifier = dbContext.ServiceClassifierItems.Local.ToObservableCollection();
 
+            AddCommand = new DelegateCommand(AddExecute);
+            DeleteCommand = new DelegateCommand(DeleteExecute, () => CurrentServiceClassifierItem != null).ObservesProperty(() => CurrentServiceClassifierItem);
             LoadCommand = new DelegateCommandAsync(LoadExecute);
             SaveExampleCommand = new DelegateCommandAsync(SaveExampleExecute);
         }
 
-        public void LoadExecute()
+        private void AddExecute()
+        {
+            var newServiceClassifierItem = new ServiceClassifierItem();
+
+            CurrentServiceClassifier.ServiceClassifierItems.Add(newServiceClassifierItem);
+
+            ServiceClassifierItems.Add(newServiceClassifierItem);
+        }
+
+        private void DeleteExecute()
+        {
+            CurrentServiceClassifier.ServiceClassifierItems.Remove(CurrentServiceClassifierItem);
+
+            ServiceClassifierItems.Remove(CurrentServiceClassifierItem);
+        }
+
+        private void LoadExecute()
         {
             mainRegionService.SetBusyStatus("Выбор файла");
 
@@ -60,33 +82,35 @@ namespace CHI.ViewModels
             using var excel = new ExcelPackage(new FileInfo(fileDialogService.FileName));
             var sheet = excel.Workbook.Worksheets.First();
 
-            var loadedClassifier = new List<ServiceClassifierItem>();
+            var loadedClassifierItems = new List<ServiceClassifierItem>();
 
             for (int i = 2; i <= sheet.Dimension.Rows; i++)
             {
                 var serviceClassifier = new ServiceClassifierItem
                 {
-                    Code = int.Parse(sheet.Cells[i, codeColumn].Value.ToString()),
-                    LaborCost = double.Parse(sheet.Cells[i, laborCostColumn].Value.ToString()),
-                    Price = double.Parse(sheet.Cells[i, priceColumn].Value.ToString())
+                    Code = int.Parse(sheet.Cells[i, 1].Value.ToString(), CultureInfo.InvariantCulture),
+                    LaborCost = double.Parse(sheet.Cells[i, 2].Value.ToString(), CultureInfo.InvariantCulture),
+                    Price = double.Parse(sheet.Cells[i, 3].Value.ToString(), CultureInfo.InvariantCulture)
                 };
 
-                loadedClassifier.Add(serviceClassifier);
+                loadedClassifierItems.Add(serviceClassifier);
             }
 
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                dbContext.Database.ExecuteSqlRaw($"DELETE FROM [{nameof(dbContext.ServiceClassifierItems)}]");
-                dbContext = new ServiceAccountingDBContext();
-                dbContext.ServiceClassifierItems.AddRange(loadedClassifier);
-                dbContext.SaveChanges();
-                ServiceClassifier = dbContext.ServiceClassifierItems.Local.ToObservableCollection();
-            });
+            ServiceClassifierItems.Where(x => loadedClassifierItems.Any(y => y.Code == x.Code))
+                .ToList()
+                .ForEach(y => CurrentServiceClassifier.ServiceClassifierItems.Remove(y));
+
+            CurrentServiceClassifier.ServiceClassifierItems.AddRange(loadedClassifierItems);
+            ServiceClassifierItems = new ObservableCollection<ServiceClassifierItem>(CurrentServiceClassifier.ServiceClassifierItems);
+
+            //Application.Current.Dispatcher.Invoke(() =>
+            //{
+            //});
 
             mainRegionService.SetCompleteStatus("Успешно загружено");
         }
 
-        public void SaveExampleExecute()
+        private void SaveExampleExecute()
         {
             mainRegionService.SetBusyStatus("Выбор пути");
 
@@ -100,7 +124,7 @@ namespace CHI.ViewModels
             var saveExampleFilePath = fileDialogService.FileName;
 
             mainRegionService.SetBusyStatus("Сохранение файла");
-
+            
             using var excel = new ExcelPackage();
 
             var sheet = excel.Workbook.Worksheets.Add("Лист1");
@@ -130,17 +154,26 @@ namespace CHI.ViewModels
             sheet.Cells.LoadFromArrays(new string[][] { new[] { "Код услуги", "УЕТ", "Цена" } });
             sheet.Cells[2, 1].LoadFromCollection(collection);
             sheet.Cells.AutoFitColumns();
-            sheet.SelectedRange[1, 1, 1, priceColumn].Style.Font.Bold = true;
+            sheet.SelectedRange[1, 1, 1, 3].Style.Font.Bold = true;
             excel.SaveAs(new FileInfo(fileDialogService.FileName));
 
 
             mainRegionService.SetCompleteStatus($"Файл сохранен: {saveExampleFilePath}");
-
-
         }
 
         public void OnNavigatedTo(NavigationContext navigationContext)
         {
+            if (navigationContext.Parameters.ContainsKey(nameof(ServiceClassifier)))
+            {
+                CurrentServiceClassifier = navigationContext.Parameters.GetValue<ServiceClassifier>(nameof(ServiceClassifier));
+
+                CurrentServiceClassifier = dbContext.ServiceClassifiers.Where(x => x.Id == CurrentServiceClassifier.Id).Include(x => x.ServiceClassifierItems).First();
+
+                if (CurrentServiceClassifier.ServiceClassifierItems == null)
+                    CurrentServiceClassifier.ServiceClassifierItems = new List<ServiceClassifierItem>();
+
+                ServiceClassifierItems = new ObservableCollection<ServiceClassifierItem>(CurrentServiceClassifier.ServiceClassifierItems);
+            }
         }
 
         public bool IsNavigationTarget(NavigationContext navigationContext)
