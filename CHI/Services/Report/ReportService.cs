@@ -82,7 +82,7 @@ namespace CHI.Services.Report
         }
 
 
-        public void Build(List<Case> factCases, List<Plan> plans, List<ServiceClassifier> classifiers)
+        public void Build(List<Case> factCases, List<Plan> plans, List<ServiceClassifierItem> classifiers)
         {
             //заполняет план
             foreach (var row in RowItems.Where(x => x.Parameter.Kind == ParameterKind.EmployeePlan || x.Parameter.Kind == ParameterKind.DepartmentHandPlan))
@@ -154,7 +154,7 @@ namespace CHI.Services.Report
 
         }
 
-        private void SetValuesFromCases(List<Case> cases, List<ServiceClassifier> classifiers, bool isPaymentAccepted)
+        private void SetValuesFromCases(List<Case> cases, List<ServiceClassifierItem> classifiers, bool isPaymentAccepted)
         {
             cases = cases.Where(x => x.PaidStatus != PaidKind.Refuse == isPaymentAccepted).ToList();
 

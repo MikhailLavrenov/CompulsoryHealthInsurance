@@ -16,9 +16,9 @@ namespace CHI.Views
     /// <summary>
     /// Логика взаимодействия для ServiceClassifierView.xaml
     /// </summary>
-    public partial class ServiceClassifierView : UserControl
+    public partial class ServiceClassifierItemsView : UserControl
     {
-        public ServiceClassifierView()
+        public ServiceClassifierItemsView()
         {
             InitializeComponent();
         }

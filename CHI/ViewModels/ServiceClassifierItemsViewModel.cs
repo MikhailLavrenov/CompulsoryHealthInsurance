@@ -12,10 +12,10 @@ using System.Windows;
 
 namespace CHI.ViewModels
 {
-    class ServiceClassifierViewModel : DomainObject, IRegionMemberLifetime, INavigationAware
+    class ServiceClassifierItemsViewModel : DomainObject, IRegionMemberLifetime, INavigationAware
     {
         ServiceAccountingDBContext dbContext;
-        ObservableCollection<ServiceClassifier> serviceClassifier;
+        ObservableCollection<ServiceClassifierItem> serviceClassifier;
         IFileDialogService fileDialogService;
         IMainRegionService mainRegionService;
         int codeColumn = 1;
@@ -23,11 +23,11 @@ namespace CHI.ViewModels
         int priceColumn = 3;
 
         public bool KeepAlive { get => false; }
-        public ObservableCollection<ServiceClassifier> ServiceClassifier { get => serviceClassifier; set => SetProperty(ref serviceClassifier, value); }
+        public ObservableCollection<ServiceClassifierItem> ServiceClassifier { get => serviceClassifier; set => SetProperty(ref serviceClassifier, value); }
         public DelegateCommandAsync LoadCommand { get; }
         public DelegateCommandAsync SaveExampleCommand { get; }
 
-        public ServiceClassifierViewModel(IMainRegionService mainRegionService, IFileDialogService fileDialogService)
+        public ServiceClassifierItemsViewModel(IMainRegionService mainRegionService, IFileDialogService fileDialogService)
         {
             this.fileDialogService = fileDialogService;
             this.mainRegionService = mainRegionService;
@@ -35,8 +35,8 @@ namespace CHI.ViewModels
             mainRegionService.Header = "Классификатор Услуг";
 
             dbContext = new ServiceAccountingDBContext();
-            dbContext.ServicesClassifier.Load();
-            ServiceClassifier = dbContext.ServicesClassifier.Local.ToObservableCollection();
+            dbContext.ServiceClassifierItems.Load();
+            ServiceClassifier = dbContext.ServiceClassifierItems.Local.ToObservableCollection();
 
             LoadCommand = new DelegateCommandAsync(LoadExecute);
             SaveExampleCommand = new DelegateCommandAsync(SaveExampleExecute);
@@ -60,11 +60,11 @@ namespace CHI.ViewModels
             using var excel = new ExcelPackage(new FileInfo(fileDialogService.FileName));
             var sheet = excel.Workbook.Worksheets.First();
 
-            var loadedClassifier = new List<ServiceClassifier>();
+            var loadedClassifier = new List<ServiceClassifierItem>();
 
             for (int i = 2; i <= sheet.Dimension.Rows; i++)
             {
-                var serviceClassifier = new ServiceClassifier
+                var serviceClassifier = new ServiceClassifierItem
                 {
                     Code = int.Parse(sheet.Cells[i, codeColumn].Value.ToString()),
                     LaborCost = double.Parse(sheet.Cells[i, laborCostColumn].Value.ToString()),
@@ -76,11 +76,11 @@ namespace CHI.ViewModels
 
             Application.Current.Dispatcher.Invoke(() =>
             {
-                dbContext.Database.ExecuteSqlRaw($"DELETE FROM [{nameof(dbContext.ServicesClassifier)}]");
+                dbContext.Database.ExecuteSqlRaw($"DELETE FROM [{nameof(dbContext.ServiceClassifierItems)}]");
                 dbContext = new ServiceAccountingDBContext();
-                dbContext.ServicesClassifier.AddRange(loadedClassifier);
+                dbContext.ServiceClassifierItems.AddRange(loadedClassifier);
                 dbContext.SaveChanges();
-                ServiceClassifier = dbContext.ServicesClassifier.Local.ToObservableCollection();
+                ServiceClassifier = dbContext.ServiceClassifierItems.Local.ToObservableCollection();
             });
 
             mainRegionService.SetCompleteStatus("Успешно загружено");
