@@ -1,5 +1,6 @@
 ﻿using CHI.Infrastructure;
 using CHI.Models.ServiceAccounting;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -237,6 +238,7 @@ namespace CHI.Services.Report
             }
 
         }
+
 
     }
 }

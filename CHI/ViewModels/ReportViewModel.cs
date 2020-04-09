@@ -16,7 +16,7 @@ namespace CHI.ViewModels
         int year = DateTime.Now.Year;
         int month = DateTime.Now.Month;
         bool isGrowing;
-      
+
 
         public bool KeepAlive { get => false; }
         public int Year { get => year; set => SetProperty(ref year, value); }
@@ -43,7 +43,7 @@ namespace CHI.ViewModels
 
             dbContext.Components
                 .Include(x => x.Indicators)
-                .Include(x=>x.CaseFilters)
+                .Include(x => x.CaseFilters)
                 .Load();
 
             var rootDepartment = dbContext.Departments.Local.First(x => x.IsRoot);
@@ -71,10 +71,14 @@ namespace CHI.ViewModels
                     .ToList()
                     .ForEach(x => cases.AddRange(x.Cases));
 
-            var plans=dbContext.Plans.Where(x => x.Month == Month && x.Year == Year).ToList();
-            var classifier = dbContext.ServiceClassifierItems.ToList();
+            var plans = dbContext.Plans.Where(x => x.Month == Month && x.Year == Year).ToList();
 
-            Report.Build(cases,plans, classifier);
+            var classifier = dbContext.ServiceClassifiers
+                .Where(x => ExtensionMethods.PeriodBetweenDates(x.ValidFrom, x.ValidTo, Month, Year))
+                .Include(x => x.ServiceClassifierItems)
+                .ToList();
+
+            Report.Build(cases, plans, classifier);
         }
 
         public void OnNavigatedTo(NavigationContext navigationContext)
