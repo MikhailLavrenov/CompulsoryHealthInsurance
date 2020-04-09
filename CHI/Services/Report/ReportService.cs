@@ -82,33 +82,40 @@ namespace CHI.Services.Report
             }
         }
 
-
-        public void Build(List<Case> factCases, List<Plan> plans, List<ServiceClassifierItem> classifiers)
+        public void Build(List<Register> registers, List<Plan> plans, List<ServiceClassifier> classifiers, int monthBegin, int monthEnd, int year)
         {
+            foreach (var valueItemsRow in Values)
+                foreach (var valueItem in valueItemsRow)
+                    valueItem.Value = 0;
+
             //заполняет план
             foreach (var row in RowItems.Where(x => x.Parameter.Kind == ParameterKind.EmployeePlan || x.Parameter.Kind == ParameterKind.DepartmentHandPlan))
                 foreach (var column in ColumnItems.Where(x => x.Group.Component.IsCanPlanning))
                 {
                     var valueItem = Values[row.Index][column.Index];
 
-                    var plan = plans.Where(x => x.Parameter.Id == row.Parameter.Id && x.Indicator.Id == column.Indicator.Id).FirstOrDefault();
-
-                    valueItem.ValueContext = plan;
-                    valueItem.Value = plan.Value;
+                    valueItem.Value = plans.Where(x => x.Parameter.Id == row.Parameter.Id && x.Indicator.Id == column.Indicator.Id).Sum(x => x.Value);
                 }
 
-            //заполняет факт
-            SetValuesFromCases(factCases, classifiers, true);
 
-            //заполняет ошибки (снятия)
-            SetValuesFromCases(factCases, classifiers, true);
+            for (int month = monthBegin; month < monthEnd; month++)
+            {
+                var cases = registers.FirstOrDefault(x => x.Month == month)?.Cases ?? new List<Case>();
+                var classifier = classifiers.FirstOrDefault(x => BetweenDates(x.ValidFrom, x.ValidTo, month, year))?.ServiceClassifierItems ?? new List<ServiceClassifierItem>();
+
+                //заполняет факт
+                SetValuesFromCases(month, year, cases, classifier, true);
+
+                //заполняет ошибки (снятия)
+                SetValuesFromCases(month, year, cases, classifier, false);
+            }
 
             //суммирует строки
             foreach (var row in RowItems.Where(x => x.Parameter.Kind == ParameterKind.DepartmentCalculatedPlan || x.Parameter.Kind == ParameterKind.DepartmentFact || x.Parameter.Kind == ParameterKind.DepartmentRejectedFact))
                 foreach (var column in ColumnItems.OrderByDescending(x => x.Priority))
                 {
                     var valueItem = Values[row.Index][column.Index];
-                    valueItem.Value = 0;
+                    valueItem.Value = null;
 
                     row.Group.Childs
                         .SelectMany(x => x.HeaderItems)
@@ -152,93 +159,192 @@ namespace CHI.Services.Report
                     if (divider != 0)
                         Values[row.Index][column.Index].Value = dividend / divider;
                 }
-
         }
 
-        private void SetValuesFromCases(List<Case> cases, List<ServiceClassifierItem> classifiers, bool isPaymentAccepted)
+        //private void SetValuesFromCases(int month, int year, List<Case> cases, List<ServiceClassifierItem> classifierItems, bool isPaymentAccepted)
+        //{
+        //    cases = cases.Where(x => x.PaidStatus != PaidKind.Refuse == isPaymentAccepted).ToList();
+
+        //    foreach (var row in RowItems.Where(x => x.Parameter.Kind == ParameterKind.EmployeeFact))
+        //    {
+        //        var employeeCases = cases.Where(x => x.Employee == row.Parameter.Employee).ToList();
+
+        //        ColumnHeaderGroup lastGroup = null;
+        //        IEnumerable<Case> selectedCases = null;
+
+        //        foreach (var column in ColumnItems.Where(x => x.Group.Component.CaseFilters.First().Kind != CaseFilterKind.Total))
+        //        {
+        //            var valueItem = Values[row.Index][column.Index];
+
+        //            if (lastGroup == null || lastGroup != valueItem.ColumnHeader.Group)
+        //            {
+        //                //IEnumerable<Case> query= factCases;
+        //                //selectedCases = new List<Case>();
+
+        //                selectedCases = employeeCases;
+
+        //                if (column.Group.TreatmentCodes.Any())
+        //                    selectedCases = selectedCases.Where(x => column.Group.TreatmentCodes.Contains(x.TreatmentPurpose));
+        //                if (column.Group.VisitFilters.Any())
+        //                    selectedCases = selectedCases.Where(x => column.Group.VisitFilters.Contains(x.VisitPurpose));
+        //                if (column.Group.ContainsServiceFilters.Any())
+        //                    selectedCases = selectedCases.Where(x => x.Services.Any(y => column.Group.ContainsServiceFilters.Contains(y.Code)));
+        //                if (column.Group.NotContainsServiceFilters.Any())
+        //                    selectedCases = selectedCases.Where(x => x.Services.Any(y => !column.Group.NotContainsServiceFilters.Contains(y.Code)));
+
+        //                selectedCases = selectedCases.ToList();
+        //            }
+
+        //            switch (valueItem.ColumnHeader.Indicator.ValueKind)
+        //            {
+        //                case IndicatorKind.Cases:
+        //                    valueItem.Value = selectedCases.Count();
+        //                    break;
+
+        //                case IndicatorKind.Services:
+        //                    valueItem.Value = selectedCases.Select(x => x.Services.Count == 0 ? 0 : x.Services.Count - 1).Sum();
+        //                    break;
+
+        //                case IndicatorKind.BedDays:
+        //                    valueItem.Value = selectedCases.Sum(x => x.BedDays);
+        //                    break;
+
+        //                case IndicatorKind.LaborCost:
+        //                    valueItem.Value = selectedCases
+        //                        .SelectMany(x => x.Services)
+        //                        .GroupBy(x => x.Code)
+        //                        .Select(x => new { Code = x.Key, Count = x.Sum(y => y.Count) })
+        //                        .Join(classifierItems, service => service.Code, classifier => classifier.Code, (service, classifier) => service.Count * classifier.LaborCost)
+        //                        .Sum();
+        //                    break;
+
+        //                case IndicatorKind.Cost:
+        //                    if (isPaymentAccepted)
+        //                        valueItem.Value = selectedCases
+        //                            .Where(x => x.PaidStatus == PaidKind.None)
+        //                            .SelectMany(x => x.Services)
+        //                            .GroupBy(x => x.Code)
+        //                            .Select(x => new { Code = x.Key, Count = x.Sum(y => y.Count) })
+        //                            .Join(classifierItems, service => service.Code, classifier => classifier.Code, (service, classifier) => service.Count * classifier.Price)
+        //                            .Sum()
+        //                            + selectedCases
+        //                            .Where(x => x.PaidStatus == PaidKind.Full || x.PaidStatus == PaidKind.Partly)
+        //                            .Sum(x => x.AmountPaid);
+        //                    else
+        //                        valueItem.Value = selectedCases
+        //                            .Where(x => x.PaidStatus == PaidKind.Refuse || x.PaidStatus == PaidKind.Partly)
+        //                            .Sum(x => x.AmountUnpaid);
+        //                    break;
+        //            }
+
+        //            var ratio = column.Indicator.Ratios.First();
+
+        //            valueItem.Value = valueItem.Value * ratio.Multiplier / ratio.Divider;
+        //        }
+        //    }
+
+        //}
+
+        private void SetValuesFromCases(int month, int year, IEnumerable<Case> cases, List<ServiceClassifierItem> classifierItems, bool isPaymentAccepted)
         {
+            var filters = ColumnGroups.Select(x => new
+            {
+                TreatmentCodes = x.TreatmentFilters.Where(y => BetweenDates(y.ValidFrom, y.ValidTo, month, year)).Select(x => x.Code).ToList(),
+                VisitCodes = x.VisitFilters.Where(y => BetweenDates(y.ValidFrom, y.ValidTo, month, year)).Select(x => x.Code).ToList(),
+                ContainsServiceCodes = x.ContainsServiceFilters.Where(y => BetweenDates(y.ValidFrom, y.ValidTo, month, year)).Select(x => x.Code).ToList(),
+                NotContainsServiceCodes = x.NotContainsServiceFilters.Where(y => BetweenDates(y.ValidFrom, y.ValidTo, month, year)).Select(x => x.Code).ToList()
+            })
+                .ToList();
+
             cases = cases.Where(x => x.PaidStatus != PaidKind.Refuse == isPaymentAccepted).ToList();
 
-            foreach (var row in RowItems.Where(x => x.Parameter.Kind == ParameterKind.EmployeeFact))
+            foreach (var rowGroup in RowGroups.Where(x => x.Employee != null))
             {
-                var employeeCases = cases.Where(x => x.Employee == row.Parameter.Employee).ToList();
+                var employeeCases = cases.Where(x => x.Employee.Id == rowGroup.Employee.Id).ToList();
 
-                ColumnHeaderGroup lastGroup = null;
-                IEnumerable<Case> selectedCases = null;
-
-                foreach (var column in ColumnItems.Where(x => x.Group.Component.CaseFilters.First().Kind != CaseFilterKind.Total))
+                foreach (var columnGroup in ColumnGroups.Where(x => x.Component.CaseFilters.First().Kind != CaseFilterKind.Total))
                 {
-                    var valueItem = Values[row.Index][column.Index];
+                    IEnumerable<Case> selectedCases = employeeCases;
 
-                    if (lastGroup == null || lastGroup != valueItem.ColumnHeader.Group)
-                    {
-                        //IEnumerable<Case> query= factCases;
-                        //selectedCases = new List<Case>();
+                    var filter = filters[columnGroup.Index];
 
-                        selectedCases = employeeCases;
+                    if (filter.TreatmentCodes.Any())
+                        selectedCases = selectedCases.Where(x => filter.TreatmentCodes.Contains(x.TreatmentPurpose));
+                    if (filter.VisitCodes.Any())
+                        selectedCases = selectedCases.Where(x => filter.VisitCodes.Contains(x.VisitPurpose));
+                    if (filter.ContainsServiceCodes.Any())
+                        selectedCases = selectedCases.Where(x => x.Services.Any(y => filter.ContainsServiceCodes.Contains(y.Code)));
+                    if (filter.NotContainsServiceCodes.Any())
+                        selectedCases = selectedCases.Where(x => x.Services.Any(y => !filter.NotContainsServiceCodes.Contains(y.Code)));
 
-                        if (column.Group.TreatmentCodes.Any())
-                            selectedCases = selectedCases.Where(x => column.Group.TreatmentCodes.Contains(x.TreatmentPurpose));
-                        if (column.Group.VisitCodes.Any())
-                            selectedCases = selectedCases.Where(x => column.Group.VisitCodes.Contains(x.VisitPurpose));
-                        if (column.Group.ContainsServiceCodes.Any())
-                            selectedCases = selectedCases.Where(x => x.Services.Any(y => column.Group.ContainsServiceCodes.Contains(y.Code)));
-                        if (column.Group.NotContainsServiceCodes.Any())
-                            selectedCases = selectedCases.Where(x => x.Services.Any(y => !column.Group.NotContainsServiceCodes.Contains(y.Code)));
+                    selectedCases = selectedCases.ToList();
 
-                        selectedCases = selectedCases.ToList();
-                    }
+                    foreach (var rowItem in rowGroup.HeaderItems)
+                        foreach (var columnItem in columnGroup.HeaderItems)
+                        {
+                            var valueItem = Values[rowItem.Index][columnItem.Index];
 
-                    switch (valueItem.ColumnHeader.Indicator.ValueKind)
-                    {
-                        case IndicatorKind.Cases:
-                            valueItem.Value = selectedCases.Count();
-                            break;
+                            switch (valueItem.ColumnHeader.Indicator.ValueKind)
+                            {
+                                case IndicatorKind.Cases:
+                                    valueItem.Value = selectedCases.Count();
+                                    break;
 
-                        case IndicatorKind.Services:
-                            valueItem.Value = selectedCases.Select(x => x.Services.Count == 0 ? 0 : x.Services.Count - 1).Sum();
-                            break;
+                                case IndicatorKind.Services:
+                                    valueItem.Value = selectedCases.Select(x => x.Services.Count == 0 ? 0 : x.Services.Count - 1).Sum();
+                                    break;
 
-                        case IndicatorKind.BedDays:
-                            valueItem.Value = selectedCases.Sum(x => x.BedDays);
-                            break;
+                                case IndicatorKind.BedDays:
+                                    valueItem.Value = selectedCases.Sum(x => x.BedDays);
+                                    break;
 
-                        case IndicatorKind.LaborCost:
-                            valueItem.Value = selectedCases
-                                .SelectMany(x => x.Services)
-                                .GroupBy(x => x.Code)
-                                .Select(x => new { Code = x.Key, Count = x.Sum(y => y.Count) })
-                                .Join(classifiers, service => service.Code, classifier => classifier.Code, (service, classifier) => service.Count * classifier.LaborCost)
-                                .Sum();
-                            break;
+                                case IndicatorKind.LaborCost:
+                                    valueItem.Value = selectedCases
+                                        .SelectMany(x => x.Services)
+                                        .GroupBy(x => x.Code)
+                                        .Select(x => new { Code = x.Key, Count = x.Sum(y => y.Count) })
+                                        .Join(classifierItems, service => service.Code, classifier => classifier.Code, (service, classifier) => service.Count * classifier.LaborCost)
+                                        .Sum();
+                                    break;
 
-                        case IndicatorKind.Cost:
-                            if (isPaymentAccepted)
-                                valueItem.Value = selectedCases
-                                    .Where(x => x.PaidStatus == PaidKind.None)
-                                    .SelectMany(x => x.Services)
-                                    .GroupBy(x => x.Code)
-                                    .Select(x => new { Code = x.Key, Count = x.Sum(y => y.Count) })
-                                    .Join(classifiers, service => service.Code, classifier => classifier.Code, (service, classifier) => service.Count * classifier.Price)
-                                    .Sum()
-                                    + selectedCases
-                                    .Where(x => x.PaidStatus == PaidKind.Full || x.PaidStatus == PaidKind.Partly)
-                                    .Sum(x => x.AmountPaid);
-                            else
-                                valueItem.Value = selectedCases
-                                    .Where(x => x.PaidStatus == PaidKind.Refuse || x.PaidStatus == PaidKind.Partly)
-                                    .Sum(x => x.AmountUnpaid);
-                            break;
-                    }
+                                case IndicatorKind.Cost:
+                                    if (isPaymentAccepted)
+                                        valueItem.Value = selectedCases
+                                            .Where(x => x.PaidStatus == PaidKind.None)
+                                            .SelectMany(x => x.Services)
+                                            .GroupBy(x => x.Code)
+                                            .Select(x => new { Code = x.Key, Count = x.Sum(y => y.Count) })
+                                            .Join(classifierItems, service => service.Code, classifier => classifier.Code, (service, classifier) => service.Count * classifier.Price)
+                                            .Sum()
+                                            + selectedCases
+                                            .Where(x => x.PaidStatus == PaidKind.Full || x.PaidStatus == PaidKind.Partly)
+                                            .Sum(x => x.AmountPaid);
+                                    else
+                                        valueItem.Value = selectedCases
+                                            .Where(x => x.PaidStatus == PaidKind.Refuse || x.PaidStatus == PaidKind.Partly)
+                                            .Sum(x => x.AmountUnpaid);
+                                    break;
+                            }
 
-                    var ratio = column.Indicator.Ratios.First();
+                            var ratio = columnItem.Indicator.Ratios.FirstOrDefault(x => BetweenDates(x.ValidFrom, x.ValidTo, month, year));
 
-                    valueItem.Value = valueItem.Value * ratio.Multiplier / ratio.Divider;
+                            if (ratio != null)
+                                valueItem.Value = valueItem.Value * ratio.Multiplier / ratio.Divider;
+                        }
                 }
             }
 
         }
 
+
+        private static bool BetweenDates(DateTime? date1, DateTime? date2, int periodMonth, int periodYear)
+        {
+            var limit1 = date1.HasValue ? date1.Value.Year * 100 + date1.Value.Month : 0;
+            var limit2 = date2.HasValue ? date2.Value.Year * 100 + date2.Value.Month : int.MaxValue;
+            var period = periodYear * 100 + periodMonth;
+
+            return limit1 <= period && period <= limit2;
+        }
 
     }
 }
