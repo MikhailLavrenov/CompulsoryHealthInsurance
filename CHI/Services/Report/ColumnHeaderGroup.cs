@@ -13,10 +13,10 @@ namespace CHI.Services.Report
         public int Level { get; set; }
         public int Index { get; set; }
         public Component Component { get; set; }
-        public List<double> TreatmentCodes { get; set; }
-        public List<double> VisitCodes { get; set; }
-        public List<double> ContainsServiceCodes { get; set; }
-        public List<double> NotContainsServiceCodes { get; set; }
+        public List<CaseFilter> TreatmentFilters { get; set; }
+        public List<CaseFilter> VisitFilters { get; set; }
+        public List<CaseFilter> ContainsServiceFilters { get; set; }
+        public List<CaseFilter> NotContainsServiceFilters { get; set; }
         public List<ColumnHeaderItem> HeaderItems { get; set; }
 
         public ColumnHeaderGroup Parent { get; set; }
@@ -34,15 +34,12 @@ namespace CHI.Services.Report
             Parent = parent;
             Level = IsRoot ? -1 : parent.Level + 1;
 
-            var groupedFilters = component.CaseFilters
-                .OrderBy(x => x.Kind)
-                .GroupBy(x => x.Kind)
-                .Select(x => new { x.Key, Codes = x.Select(y => y.Code).ToList() });
+            var groupedFilters = component.CaseFilters.GroupBy(x => x.Kind).ToList();
 
-            TreatmentCodes = groupedFilters.FirstOrDefault(x => x.Key == CaseFilterKind.TreatmentPurpose)?.Codes ?? new List<double>();
-            VisitCodes = groupedFilters.FirstOrDefault(x => x.Key == CaseFilterKind.VisitPurpose)?.Codes ?? new List<double>();
-            ContainsServiceCodes = groupedFilters.FirstOrDefault(x => x.Key == CaseFilterKind.ContainsService)?.Codes ?? new List<double>();
-            NotContainsServiceCodes = groupedFilters.FirstOrDefault(x => x.Key == CaseFilterKind.NotContainsService)?.Codes ?? new List<double>();
+            TreatmentFilters = groupedFilters.FirstOrDefault(x => x.Key == CaseFilterKind.TreatmentPurpose)?.ToList() ?? new List<CaseFilter>();
+            VisitFilters = groupedFilters.FirstOrDefault(x => x.Key == CaseFilterKind.VisitPurpose)?.ToList() ?? new List<CaseFilter>();
+            ContainsServiceFilters = groupedFilters.FirstOrDefault(x => x.Key == CaseFilterKind.ContainsService)?.ToList() ?? new List<CaseFilter>();
+            NotContainsServiceFilters = groupedFilters.FirstOrDefault(x => x.Key == CaseFilterKind.NotContainsService)?.ToList() ?? new List<CaseFilter>();
 
             Childs = new List<ColumnHeaderGroup>();
             HeaderItems = new List<ColumnHeaderItem>();

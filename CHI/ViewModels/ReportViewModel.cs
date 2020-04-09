@@ -42,7 +42,7 @@ namespace CHI.ViewModels
             dbContext.Departments.Include(x => x.Parameters).Load();
 
             dbContext.Components
-                .Include(x => x.Indicators)
+                .Include(x => x.Indicators).ThenInclude(x => x.Ratios)
                 .Include(x => x.CaseFilters)
                 .Load();
 
@@ -51,34 +51,39 @@ namespace CHI.ViewModels
 
             Report = new ReportService(rootDepartment, rootComponent);
 
+            dbContext.ServiceClassifiers.Load();
+
             BuildReportCommand = new DelegateCommandAsync(BuildReportExecute);
         }
 
         private void BuildReportExecute()
         {
-            var cases = new List<Case>();
+            var month1 = IsGrowing ? 1 : Month;
+            var month2 = Month;
 
-            if (IsGrowing)
-                dbContext.Registers
-                    .Where(x => x.Year == Year && x.Month <= Month)
-                    .Include(x => x.Cases).ThenInclude(x => x.Services)
-                    .ToList()
-                    .ForEach(x => cases.AddRange(x.Cases));
-            else
-                dbContext.Registers
-                    .Where(x => x.Year == Year && x.Month == Month)
-                    .Include(x => x.Cases).ThenInclude(x => x.Services)
-                    .ToList()
-                    .ForEach(x => cases.AddRange(x.Cases));
-
-            var plans = dbContext.Plans.Where(x => x.Month == Month && x.Year == Year).ToList();
-
-            var classifier = dbContext.ServiceClassifiers
-                .Where(x => ExtensionMethods.PeriodBetweenDates(x.ValidFrom, x.ValidTo, Month, Year))
-                .Include(x => x.ServiceClassifierItems)
+            var registers = dbContext.Registers
+                .Where(x => x.Year == Year && month1 <= x.Month && x.Month >= month2)
+                .Include(x => x.Cases).ThenInclude(x => x.Services)
                 .ToList();
 
-            Report.Build(cases, plans, classifier);
+            var plans = dbContext.Plans.Where(x => x.Year == Year && month1 <= x.Month && x.Month >= month2 ).ToList();
+
+            var classifiers = dbContext.ServiceClassifiers
+                     .Where(x => PeriodsIntersects(x.ValidFrom, x.ValidTo, month1, month2, Year))
+                     .Include(x => x.ServiceClassifierItems)
+                     .ToList();
+
+            Report.Build(registers, plans, classifiers, month1, month2, Year);
+        }
+
+        public static bool PeriodsIntersects(DateTime? period1date1, DateTime? period1date2, int period2Month1, int period2Month2, int period2Year)
+        {
+            var p1d1 = period1date1.HasValue ? period1date1.Value.Year * 100 + period1date1.Value.Month : 0;
+            var p1d2 = period1date2.HasValue ? period1date2.Value.Year * 100 + period1date2.Value.Month : int.MaxValue;
+            var p2d1 = period2Year * 100 + period2Month1;
+            var p2d2 = period2Year * 100 + period2Month2;
+
+            return !(p2d2 < p1d1 || p1d2 < p2d1);
         }
 
         public void OnNavigatedTo(NavigationContext navigationContext)

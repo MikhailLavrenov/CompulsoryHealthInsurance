@@ -173,15 +173,5 @@ namespace CHI.Infrastructure
             foreach (var child in obj.Childs)
                 child.OrderChildsRecursive();
         }
-
-        public static bool PeriodBetweenDates(DateTime? date1, DateTime? date2, int periodMonth, int periodYear)
-        {
-            var limit1 = date1.HasValue ? date1.Value.Year * 100 + date1.Value.Month : 0;
-            var limit2 = date2.HasValue ? date2.Value.Year * 100 + date2.Value.Month : int.MaxValue;
-            var period = periodYear * 100 + periodMonth;
-
-            return limit1 <= period && period <= limit2;
-        }
-
     }
 }
