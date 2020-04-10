@@ -89,7 +89,7 @@ namespace CHI.ViewModels
                 if (string.IsNullOrEmpty(mCase.Employee.Medic.FomsId))
                 {
                     var maxDate = mCase.Services.Select(x => x.Date).Max();
-                    var medicFomsCodes=mCase.Services.Where(x =>x.Date== maxDate && x.Employee.Specialty.FomsId == (mCase.Employee.Specialty.FomsId)).Select(x => x.Employee.Medic.FomsId).Distinct();
+                    var medicFomsCodes=mCase.Services.Where(x =>x.Date== maxDate && x.Employee.Specialty.FomsId == mCase.Employee.Specialty.FomsId).Select(x => x.Employee.Medic.FomsId).Distinct();
 
                     if (medicFomsCodes.Count() == 1)
                         mCase.Employee.Medic.FomsId = medicFomsCodes.First();

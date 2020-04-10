@@ -51,8 +51,6 @@ namespace CHI.ViewModels
 
             Report = new ReportService(rootDepartment, rootComponent);
 
-            dbContext.ServiceClassifiers.Load();
-
             BuildReportCommand = new DelegateCommandAsync(BuildReportExecute);
         }
 
@@ -68,10 +66,13 @@ namespace CHI.ViewModels
 
             var plans = dbContext.Plans.Where(x => x.Year == Year && month1 <= x.Month && x.Month >= month2 ).ToList();
 
-            var classifiers = dbContext.ServiceClassifiers
-                     .Where(x => PeriodsIntersects(x.ValidFrom, x.ValidTo, month1, month2, Year))
-                     .Include(x => x.ServiceClassifierItems)
-                     .ToList();
+            var classifiers = dbContext.ServiceClassifiers.ToList()
+                .AsEnumerable()                     
+                .Where(x => PeriodsIntersects(x.ValidFrom, x.ValidTo, month1, month2, Year))
+                .ToList()
+                .AsQueryable()
+                .Include(x => x.ServiceClassifierItems)                  
+                .ToList();
 
             Report.Build(registers, plans, classifiers, month1, month2, Year);
         }

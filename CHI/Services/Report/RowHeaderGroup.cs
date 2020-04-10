@@ -31,6 +31,7 @@ namespace CHI.Services.Report
             IsRoot = department.IsRoot;            
             Parent = parent;
             Level = IsRoot ? -1 : parent.Level + 1;
+            Department = department;
 
             Childs = new List<RowHeaderGroup>();
 
@@ -45,6 +46,7 @@ namespace CHI.Services.Report
             IsRoot = false;
             Parent = parent;
             Level = parent.Level + 1;
+            Employee = employee;
 
             Childs = new List<RowHeaderGroup>();
 

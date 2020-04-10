@@ -98,7 +98,7 @@ namespace CHI.Services.Report
                 }
 
 
-            for (int month = monthBegin; month < monthEnd; month++)
+            for (int month = monthBegin; month <= monthEnd; month++)
             {
                 var cases = registers.FirstOrDefault(x => x.Month == month)?.Cases ?? new List<Case>();
                 var classifier = classifiers.FirstOrDefault(x => BetweenDates(x.ValidFrom, x.ValidTo, month, year))?.ServiceClassifierItems ?? new List<ServiceClassifierItem>();
@@ -110,12 +110,14 @@ namespace CHI.Services.Report
                 SetValuesFromCases(month, year, cases, classifier, false);
             }
 
+
             //суммирует строки
-            foreach (var row in RowItems.Where(x => x.Parameter.Kind == ParameterKind.DepartmentCalculatedPlan || x.Parameter.Kind == ParameterKind.DepartmentFact || x.Parameter.Kind == ParameterKind.DepartmentRejectedFact))
-                foreach (var column in ColumnItems.OrderByDescending(x => x.Priority))
+            foreach (var row in RowItems
+                .Where(x => x.Parameter.Kind == ParameterKind.DepartmentCalculatedPlan || x.Parameter.Kind == ParameterKind.DepartmentFact || x.Parameter.Kind == ParameterKind.DepartmentRejectedFact)
+                .OrderByDescending(x => x.Priority))
+                foreach (var column in ColumnItems)
                 {
                     var valueItem = Values[row.Index][column.Index];
-                    valueItem.Value = null;
 
                     row.Group.Childs
                         .SelectMany(x => x.HeaderItems)
@@ -124,41 +126,42 @@ namespace CHI.Services.Report
                         .ForEach(x => valueItem.Value += Values[x.Index][column.Index].Value ?? 0);
                 }
 
-            //суммирует столбцы
-            foreach (var row in RowItems.OrderByDescending(x => x.Priority))
-                foreach (var column in ColumnItems.Where(x => x.Group.Component.CaseFilters.First().Kind == CaseFilterKind.Total))
-                {
-                    var valueItem = Values[row.Index][column.Index];
-                    valueItem.Value = 0;
+            ////суммирует столбцы
+            //foreach (var row in RowItems)
+            //    foreach (var column in ColumnItems.Where(x => x.Group.Component.CaseFilters.First().Kind == CaseFilterKind.Total).OrderByDescending(x => x.Priority))
+            //    {
+            //        var valueItem = Values[row.Index][column.Index];
+            //        valueItem.Value = 0;
 
-                    column.Group.Childs
-                        .SelectMany(x => x.HeaderItems)
-                        .Where(x => x.Indicator.FacadeKind == column.Indicator.ValueKind)
-                        .ToList()
-                        .ForEach(x => valueItem.Value += Values[row.Index][x.Index].Value ?? 0);
-                }
+            //        column.Group.Childs
+            //            .SelectMany(x => x.HeaderItems)
+            //            .Where(x => x.Indicator.FacadeKind == column.Indicator.ValueKind)
+            //            .ToList()
+            //            .ForEach(x => valueItem.Value += Values[row.Index][x.Index].Value ?? 0);
+            //    }
 
-            //вычисляет проценты в штатных единицах
-            foreach (var row in RowItems.Where(x => x.Parameter.Kind == ParameterKind.EmployeePercent))
-                foreach (var column in ColumnItems)
-                {
-                    var dividend = Values[row.Group.HeaderItems.First(x => x.Parameter.Kind == ParameterKind.EmployeePlan).Index][column.Index].Value;
-                    var divider = Values[row.Group.HeaderItems.First(x => x.Parameter.Kind == ParameterKind.EmployeeFact).Index][column.Index].Value;
+            ////вычисляет проценты в штатных единицах
+            //foreach (var row in RowItems.Where(x => x.Parameter.Kind == ParameterKind.EmployeePercent))
+            //    foreach (var column in ColumnItems)
+            //    {
+            //        var dividend = Values[row.Group.HeaderItems.First(x => x.Parameter.Kind == ParameterKind.EmployeePlan).Index][column.Index].Value;
+            //        var divider = Values[row.Group.HeaderItems.First(x => x.Parameter.Kind == ParameterKind.EmployeeFact).Index][column.Index].Value;
 
-                    if (divider != 0)
-                        Values[row.Index][column.Index].Value = dividend / divider;
-                }
+            //        if (divider != 0)
+            //            Values[row.Index][column.Index].Value = dividend / divider;
+            //    }
 
-            //вычисляет проценты в подразделениях
-            foreach (var row in RowItems.Where(x => x.Parameter.Kind == ParameterKind.DepartmentPercent))
-                foreach (var column in ColumnItems)
-                {
-                    var dividend = Values[row.Group.HeaderItems.First(x => x.Parameter.Kind == ParameterKind.DepartmentHandPlan).Index][column.Index].Value;
-                    var divider = Values[row.Group.HeaderItems.First(x => x.Parameter.Kind == ParameterKind.DepartmentFact).Index][column.Index].Value;
+            ////вычисляет проценты в подразделениях
+            //foreach (var row in RowItems.Where(x => x.Parameter.Kind == ParameterKind.DepartmentPercent))
+            //    foreach (var column in ColumnItems)
+            //    {
+            //        var dividend = Values[row.Group.HeaderItems.First(x => x.Parameter.Kind == ParameterKind.DepartmentHandPlan).Index][column.Index].Value;
+            //        var divider = Values[row.Group.HeaderItems.First(x => x.Parameter.Kind == ParameterKind.DepartmentFact).Index][column.Index].Value;
 
-                    if (divider != 0)
-                        Values[row.Index][column.Index].Value = dividend / divider;
-                }
+            //        if (divider != 0)
+            //            Values[row.Index][column.Index].Value = dividend / divider;
+            //    }
+
         }
 
         //private void SetValuesFromCases(int month, int year, List<Case> cases, List<ServiceClassifierItem> classifierItems, bool isPaymentAccepted)
@@ -279,7 +282,7 @@ namespace CHI.Services.Report
 
                     selectedCases = selectedCases.ToList();
 
-                    foreach (var rowItem in rowGroup.HeaderItems)
+                    foreach (var rowItem in rowGroup.HeaderItems.Where(x=> (isPaymentAccepted && x.Parameter.Kind== ParameterKind.EmployeeFact) || (!isPaymentAccepted && x.Parameter.Kind == ParameterKind.EmployeeRejectedFact)))
                         foreach (var columnItem in columnGroup.HeaderItems)
                         {
                             var valueItem = Values[rowItem.Index][columnItem.Index];

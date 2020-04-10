@@ -103,10 +103,6 @@ namespace CHI.ViewModels
             CurrentServiceClassifier.ServiceClassifierItems.AddRange(loadedClassifierItems);
             ServiceClassifierItems = new ObservableCollection<ServiceClassifierItem>(CurrentServiceClassifier.ServiceClassifierItems);
 
-            //Application.Current.Dispatcher.Invoke(() =>
-            //{
-            //});
-
             mainRegionService.SetCompleteStatus("Успешно загружено");
         }
 
@@ -128,6 +124,8 @@ namespace CHI.ViewModels
             using var excel = new ExcelPackage();
 
             var sheet = excel.Workbook.Worksheets.Add("Лист1");
+
+            sheet.Cells.LoadFromArrays(new string[][] { new[] { "Код услуги", "УЕТ", "Цена" } });
 
             var collection = new List<Tuple<int, double, double>> {
 
@@ -151,12 +149,12 @@ namespace CHI.ViewModels
                 new Tuple<int, double, double> ( 22149,      0,            1263    ),
                 new Tuple<int, double, double> ( 22050,      0,            985.5   ),
             };
-            sheet.Cells.LoadFromArrays(new string[][] { new[] { "Код услуги", "УЕТ", "Цена" } });
+            
             sheet.Cells[2, 1].LoadFromCollection(collection);
             sheet.Cells.AutoFitColumns();
             sheet.SelectedRange[1, 1, 1, 3].Style.Font.Bold = true;
-            excel.SaveAs(new FileInfo(fileDialogService.FileName));
 
+            excel.SaveAs(new FileInfo(fileDialogService.FileName));
 
             mainRegionService.SetCompleteStatus($"Файл сохранен: {saveExampleFilePath}");
         }

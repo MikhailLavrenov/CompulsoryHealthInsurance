@@ -13,8 +13,27 @@
              d:DesignWidth="800"
              prism:ViewModelLocator.AutoWireViewModel="True">
 
-    <Grid d:DataContext="{d:DesignInstance vm:SpecialtiesViewModel}"
+    <DockPanel d:DataContext="{d:DesignInstance vm:SpecialtiesViewModel}"
           HorizontalAlignment="Left">
+
+        <StackPanel DockPanel.Dock="Top"
+                    Orientation="Horizontal">
+
+            <Button Style="{StaticResource IconButton}"
+                    Command="{Binding LoadCommand}">
+                <Viewbox Stretch="Uniform">
+                    <materialDesign:PackIcon Kind="Import" />
+                </Viewbox>
+            </Button>
+
+            <Button Style="{StaticResource IconButton}"
+                    Command="{Binding SaveExampleCommand}">
+                <Viewbox Stretch="Uniform">
+                    <materialDesign:PackIcon Kind="ContentSaveMoveOutline" />
+                </Viewbox>
+            </Button>
+
+        </StackPanel>
 
         <i:CustomDataGrid CanUserAddRows="False"
                           CanUserDeleteRows="False"
@@ -38,6 +57,6 @@
 
         </i:CustomDataGrid>
 
-    </Grid >
+    </DockPanel>
     
 </UserControl>
