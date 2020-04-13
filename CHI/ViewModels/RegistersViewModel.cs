@@ -79,6 +79,7 @@ namespace CHI.ViewModels
             dbContext.Departments.Load();
 
             var defaultDepartment = dbContext.Departments.Local.First(x => x.IsRoot);
+            List<int> caseClosingCodes = null;
 
             for (int i = 0; i < register.Cases.Count; i++)
             {
@@ -89,12 +90,40 @@ namespace CHI.ViewModels
                 if (string.IsNullOrEmpty(mCase.Employee.Medic.FomsId))
                 {
                     var maxDate = mCase.Services.Select(x => x.Date).Max();
-                    var medicFomsCodes=mCase.Services.Where(x =>x.Date== maxDate && x.Employee.Specialty.FomsId == mCase.Employee.Specialty.FomsId).Select(x => x.Employee.Medic.FomsId).Distinct();
+                    var laterServices = mCase.Services.Where(x => x.Date == maxDate && x.Employee.Specialty.FomsId == mCase.Employee.Specialty.FomsId).ToList();
+                    var medicFomsIds = laterServices.Select(x => x.Employee.Medic.FomsId).Distinct().ToList();
 
-                    if (medicFomsCodes.Count() == 1)
-                        mCase.Employee.Medic.FomsId = medicFomsCodes.First();
+                    if (medicFomsIds.Count() == 1)
+                        mCase.Employee.Medic.FomsId = medicFomsIds.First();
                     else
-                        throw new InvalidOperationException("Не удается однозначно определить мед. работника закрывшего случай");
+                    {
+                        if (caseClosingCodes == null)
+                        {
+                            var classifierId = dbContext.ServiceClassifiers
+                                .ToList()
+                                .Where(x => ExtensionMethods.BetweenDates(x.ValidFrom, x.ValidTo, register.Month, register.Year))
+                                .FirstOrDefault()?.Id;
+
+                            caseClosingCodes = classifierId == null ?
+                                    new List<int>()
+                                    : 
+                                    dbContext.ServiceClassifiers
+                                    .Where(x => x.Id == classifierId)
+                                    .Include(x => x.ServiceClassifierItems)
+                                    .First()
+                                    .ServiceClassifierItems
+                                    .Where(x => x.IsCaseClosing)                             
+                                    .Select(x => x.Code)                             
+                                    .ToList();
+                        }
+
+                        medicFomsIds = laterServices.Where(x => caseClosingCodes.Contains(x.Code)).Select(x => x.Employee.Medic.FomsId).Distinct().ToList();
+
+                        if (medicFomsIds.Count() == 1)
+                            mCase.Employee.Medic.FomsId = medicFomsIds.First();
+                        else
+                            throw new InvalidOperationException($"Не удается однозначно определить мед. работника закрывшего случай {mCase.IdCase}");
+                    }
                 }
 
                 mCase.Employee = FindEmployeeInDbOrAdd(mCase.Employee, dbContext, defaultDepartment);
@@ -183,7 +212,7 @@ namespace CHI.ViewModels
 
             mainRegionService.SetBusyStatus("Установка статуса оплаты");
 
-            var casePairs=register.Cases.Join(paidRegister.Cases, mcase => mcase.IdCase, paidCase => paidCase.IdCase, (mcase, paidCase) => new { mcase, paidCase }).ToList();
+            var casePairs = register.Cases.Join(paidRegister.Cases, mcase => mcase.IdCase, paidCase => paidCase.IdCase, (mcase, paidCase) => new { mcase, paidCase }).ToList();
 
             foreach (var casePair in casePairs)
             {

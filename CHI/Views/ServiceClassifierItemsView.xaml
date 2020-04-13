@@ -75,6 +75,10 @@
                                     Binding="{Binding Price}"
                                     MinWidth="100" />
 
+                <DataGridCheckBoxColumn Header="Закрывает случай"
+                                    Binding="{Binding IsCaseClosing}"
+                                    MinWidth="120" />
+
             </DataGrid.Columns>
 
         </i:CustomDataGrid>

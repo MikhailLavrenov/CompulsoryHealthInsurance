@@ -13,5 +13,6 @@ namespace CHI.Models.ServiceAccounting
         /// </summary>
         public double LaborCost { get; set; }
         public double Price { get; set; }
+        public bool IsCaseClosing { get; set; }
     }
 }

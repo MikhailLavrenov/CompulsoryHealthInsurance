@@ -1,7 +1,9 @@
 ﻿using CHI.Infrastructure;
 using CHI.Models.ServiceAccounting;
+using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace CHI.Services.Report
@@ -11,7 +13,7 @@ namespace CHI.Services.Report
         RowHeaderGroup rootRow;
         ColumnHeaderGroup rootColumn;
 
-        public int MoneyRoundDigits { get; set; } 
+        public int MoneyRoundDigits { get; set; }
         public List<RowHeaderGroup> RowGroups { get; set; }
         public List<ColumnHeaderGroup> ColumnGroups { get; set; }
         public List<RowHeaderItem> RowItems { get; private set; }
@@ -102,7 +104,7 @@ namespace CHI.Services.Report
             for (int month = monthBegin; month <= monthEnd; month++)
             {
                 var cases = registers.FirstOrDefault(x => x.Month == month)?.Cases ?? new List<Case>();
-                var classifier = classifiers.FirstOrDefault(x => BetweenDates(x.ValidFrom, x.ValidTo, month, year))?.ServiceClassifierItems ?? new List<ServiceClassifierItem>();
+                var classifier = classifiers.FirstOrDefault(x => ExtensionMethods.BetweenDates(x.ValidFrom, x.ValidTo, month, year))?.ServiceClassifierItems ?? new List<ServiceClassifierItem>();
 
                 //заполняет факт
                 SetValuesFromCases(month, year, cases, classifier, true);
@@ -188,7 +190,7 @@ namespace CHI.Services.Report
             foreach (var row in RowItems)
                 foreach (var column in ColumnItems)
                 {
-                    var valueItem = Values[row.Index][column.Index];                    
+                    var valueItem = Values[row.Index][column.Index];
 
                     if (valueItem.Value == null)
                         continue;
@@ -199,7 +201,7 @@ namespace CHI.Services.Report
                     else if (row.Parameter.Kind == ParameterKind.DepartmentPercent)
                         valueItem.Value = Math.Round(valueItem.Value.Value, 1, MidpointRounding.AwayFromZero);
 
-                    else if (column.Indicator.FacadeKind== IndicatorKind.Cost)
+                    else if (column.Indicator.FacadeKind == IndicatorKind.Cost)
                         valueItem.Value = Math.Round(valueItem.Value.Value, MoneyRoundDigits, MidpointRounding.AwayFromZero);
 
                     else
@@ -211,10 +213,10 @@ namespace CHI.Services.Report
         {
             var filters = ColumnGroups.Select(x => new
             {
-                TreatmentCodes = x.TreatmentFilters.Where(y => BetweenDates(y.ValidFrom, y.ValidTo, month, year)).Select(x => x.Code).ToList(),
-                VisitCodes = x.VisitFilters.Where(y => BetweenDates(y.ValidFrom, y.ValidTo, month, year)).Select(x => x.Code).ToList(),
-                ContainsServiceCodes = x.ContainsServiceFilters.Where(y => BetweenDates(y.ValidFrom, y.ValidTo, month, year)).Select(x => x.Code).ToList(),
-                NotContainsServiceCodes = x.NotContainsServiceFilters.Where(y => BetweenDates(y.ValidFrom, y.ValidTo, month, year)).Select(x => x.Code).ToList()
+                TreatmentCodes = x.TreatmentFilters.Where(y => ExtensionMethods.BetweenDates(y.ValidFrom, y.ValidTo, month, year)).Select(x => x.Code).ToList(),
+                VisitCodes = x.VisitFilters.Where(y => ExtensionMethods.BetweenDates(y.ValidFrom, y.ValidTo, month, year)).Select(x => x.Code).ToList(),
+                ContainsServiceCodes = x.ContainsServiceFilters.Where(y => ExtensionMethods.BetweenDates(y.ValidFrom, y.ValidTo, month, year)).Select(x => x.Code).ToList(),
+                NotContainsServiceCodes = x.NotContainsServiceFilters.Where(y => ExtensionMethods.BetweenDates(y.ValidFrom, y.ValidTo, month, year)).Select(x => x.Code).ToList()
             })
                 .ToList();
 
@@ -263,7 +265,7 @@ namespace CHI.Services.Report
                                 case IndicatorKind.LaborCost:
                                     valueItem.Value += selectedCases
                                         .SelectMany(x => x.Services)
-                                        .GroupBy(x => x.Code, (Code, Services)=> new {Code, Count= Services.Sum(x=>x.Count) })
+                                        .GroupBy(x => x.Code, (Code, Services) => new { Code, Count = Services.Sum(x => x.Count) })
                                         .Join(classifierItems, service => service.Code, classifier => classifier.Code,
                                         (service, classifier) => service.Count * classifier.LaborCost)
                                         .Sum();
@@ -275,7 +277,7 @@ namespace CHI.Services.Report
                                             .Where(x => x.PaidStatus == PaidKind.None)
                                             .SelectMany(x => x.Services)
                                             .GroupBy(x => x.Code, (Code, Services) => new { Code, Count = Services.Sum(x => x.Count) })
-                                            .Join(classifierItems, service => service.Code, classifier => classifier.Code, 
+                                            .Join(classifierItems, service => service.Code, classifier => classifier.Code,
                                             (service, classifier) => service.Count * classifier.Price)
                                             .Sum()
                                             + selectedCases
@@ -288,7 +290,7 @@ namespace CHI.Services.Report
                                     break;
                             }
 
-                            var ratio = columnItem.Indicator.Ratios.FirstOrDefault(x => BetweenDates(x.ValidFrom, x.ValidTo, month, year));
+                            var ratio = columnItem.Indicator.Ratios.FirstOrDefault(x => ExtensionMethods.BetweenDates(x.ValidFrom, x.ValidTo, month, year));
 
                             if (ratio != null)
                                 valueItem.Value = valueItem.Value * ratio.Multiplier / ratio.Divider;
@@ -298,14 +300,49 @@ namespace CHI.Services.Report
 
         }
 
-        private static bool BetweenDates(DateTime? date1, DateTime? date2, int periodMonth, int periodYear)
+        public void SaveExcel(string path)
         {
-            var limit1 = date1.HasValue ? date1.Value.Year * 100 + date1.Value.Month : 0;
-            var limit2 = date2.HasValue ? date2.Value.Year * 100 + date2.Value.Month : int.MaxValue;
-            var period = periodYear * 100 + periodMonth;
+            using var excel = new ExcelPackage();
 
-            return limit1 <= period && period <= limit2;
+            var sheet = excel.Workbook.Worksheets.Add("Лист1");
+
+            for (int i = 0; i < ColumnItems.Count; i++)
+            {
+                if ((i > 0 && ColumnItems[i - 1].Group != ColumnItems[i].Group) || i == 0)
+                {
+                    sheet.Cells[1, i + 2, 1, i + 2 + ColumnItems[i].Group.Childs.Count].Merge = true;
+
+                    sheet.Cells[1, i + 2].Value = ColumnItems[i].Group.Name;
+
+                    var drawingColor = ExtensionMethods.GetDrawingColor(ColumnItems[i].Group.ColorBrush.Color);
+                    sheet.Cells[1, i + 2].Style.Fill.BackgroundColor.SetColor(drawingColor);
+                }
+
+                sheet.Cells[2, i + 2].Value = ColumnItems[i].Name;
+            }
+
+
+            for (int i = 0; i < RowItems.Count; i++)
+            {
+                if ((i > 0 && RowItems[i - 1].Group != RowItems[i].Group) || i == 0)
+                {
+                    sheet.Cells[i + 2, 1, i + 2 + RowItems[i].Group.Childs.Count, 1].Merge = true;
+
+                    sheet.Cells[i + 2, 1].Value = RowItems[i].Group.Name;
+
+                    var drawingColor = ExtensionMethods.GetDrawingColor(RowItems[i].Group.ColorBrush.Color);
+                    sheet.Cells[i + 2, 1].Style.Fill.BackgroundColor.SetColor(drawingColor);
+                }
+
+                sheet.Cells[i + 2, 2].Value = RowItems[i].Name;
+            }
+
+            sheet.Cells[3, 3].LoadFromArrays(Values.Select(x => x.Select(y => y.Value.ToString()).ToArray()).ToArray());
+
+            sheet.Cells.AutoFitColumns();
+            //sheet.SelectedRange[1, 1, 1, 4].Style.Font.Bold = true;
+
+            excel.SaveAs(new FileInfo(path));
         }
-
     }
 }

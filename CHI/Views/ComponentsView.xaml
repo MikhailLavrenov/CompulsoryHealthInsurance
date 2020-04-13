@@ -69,7 +69,6 @@
                                         MinWidth="200"
                                         IsReadOnly="True" />
 
-
                 <DataGridTextColumn Header="Название"
                                         Binding="{Binding Name}"
                                         MinWidth="200" />
@@ -77,6 +76,19 @@
                 <DataGridCheckBoxColumn Header="Планирование"
                                         Binding="{Binding IsCanPlanning}"
                                         MinWidth="80"/>
+
+                <DataGridTemplateColumn Width="50">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border Margin="0,-8,0,-8" 
+                                    Background="{Binding HexColor, Converter={i:HexToSolidColorBrushConverterExtension}}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                
+                <DataGridTextColumn Header="Цвет"
+                                    MinWidth="80" 
+                                    Binding="{Binding HexColor}" />
 
                 <DataGridTemplateColumn Header="Показатели"
                                             MinWidth="80">

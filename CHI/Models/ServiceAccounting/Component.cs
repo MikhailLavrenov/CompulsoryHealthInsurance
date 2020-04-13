@@ -1,5 +1,6 @@
 ﻿using CHI.Models.Infrastructure;
 using System.Collections.Generic;
+using System.Windows.Media;
 
 namespace CHI.Models.ServiceAccounting
 {
@@ -8,6 +9,7 @@ namespace CHI.Models.ServiceAccounting
         public int Id { get; set; }
         public string Name { get; set; }
         public int Order { get; set; }
+        public string HexColor { get; set; } = "#FFFFFF";
         public bool IsRoot { get; set; } = false;
         public bool IsCanPlanning { get; set; }
         public List<CaseFilter> CaseFilters { get; set; }

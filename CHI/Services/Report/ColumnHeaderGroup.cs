@@ -2,6 +2,7 @@
 using CHI.Models.ServiceAccounting;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Media;
 
 namespace CHI.Services.Report
 {
@@ -12,6 +13,8 @@ namespace CHI.Services.Report
         public int Order { get; set; }
         public int Level { get; set; }
         public int Index { get; set; }
+        public SolidColorBrush ColorBrush { get; set; }
+
         public Component Component { get; set; }
         public List<CaseFilter> TreatmentFilters { get; set; }
         public List<CaseFilter> VisitFilters { get; set; }
@@ -30,6 +33,7 @@ namespace CHI.Services.Report
             Name = component.Name;
             IsRoot = component.IsRoot;
             Order = component.Order;
+            ColorBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(component.HexColor));
 
             Parent = parent;
             Level = IsRoot ? -1 : parent.Level + 1;
