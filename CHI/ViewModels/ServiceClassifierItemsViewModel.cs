@@ -90,7 +90,8 @@ namespace CHI.ViewModels
                 {
                     Code = int.Parse(sheet.Cells[i, 1].Value.ToString(), CultureInfo.InvariantCulture),
                     LaborCost = double.Parse(sheet.Cells[i, 2].Value.ToString(), CultureInfo.InvariantCulture),
-                    Price = double.Parse(sheet.Cells[i, 3].Value.ToString(), CultureInfo.InvariantCulture)
+                    Price = double.Parse(sheet.Cells[i, 3].Value.ToString(), CultureInfo.InvariantCulture),
+                    IsCaseClosing = sheet.Cells[i, 4].Value.ToString() == "1" ? true : false
                 };
 
                 loadedClassifierItems.Add(serviceClassifier);
@@ -120,39 +121,39 @@ namespace CHI.ViewModels
             var saveExampleFilePath = fileDialogService.FileName;
 
             mainRegionService.SetBusyStatus("Сохранение файла");
-            
+
             using var excel = new ExcelPackage();
 
             var sheet = excel.Workbook.Worksheets.Add("Лист1");
 
-            sheet.Cells.LoadFromArrays(new string[][] { new[] { "Код услуги", "УЕТ", "Цена" } });
+            sheet.Cells.LoadFromArrays(new string[][] { new[] { "Код услуги", "УЕТ", "Цена", "Закрывает случай (0-Нет, 1-Да)" } });
 
-            var collection = new List<Tuple<int, double, double>> {
+            var collection = new List<Tuple<int, double, double, int>> {
 
-                new Tuple<int, double, double> ( 612111,     0.5,          0       ),
-                new Tuple<int, double, double> ( 622110,     0.31,         0       ),
-                new Tuple<int, double, double> ( 622111,     0.5,          0       ),
-                new Tuple<int, double, double> ( 612112,     1.5,          0       ),
-                new Tuple<int, double, double> ( 622112,     1.5,          0       ),
-                new Tuple<int, double, double> ( 612113,     4.21,         0       ),
-                new Tuple<int, double, double> ( 622113,     4.21,         0       ),
-                new Tuple<int, double, double> ( 612117,     1.68,         0       ),
-                new Tuple<int, double, double> ( 612120,     1.18,         0       ),
-                new Tuple<int, double, double> ( 622120,     1.18,         0       ),
-                new Tuple<int, double, double> ( 612154,     1.37,         0       ),
-                new Tuple<int, double, double> ( 622154,     1.37,         0       ),
-                new Tuple<int, double, double> ( 612121,     1.5,          0       ),
-                new Tuple<int, double, double> ( 622121,     1.5,          0       ),
-                new Tuple<int, double, double> ( 22048,      0,            1501.75 ),
-                new Tuple<int, double, double> ( 22148,      0,            2065.77 ),
-                new Tuple<int, double, double> ( 22049,      0,            3611    ),
-                new Tuple<int, double, double> ( 22149,      0,            1263    ),
-                new Tuple<int, double, double> ( 22050,      0,            985.5   ),
+                new Tuple<int, double, double, int> ( 622111,     0.5,          0,          0 ),
+                new Tuple<int, double, double, int> ( 622110,     0.31,         0,          1 ),
+                new Tuple<int, double, double, int> ( 612112,     1.5,          0,          0 ),
+                new Tuple<int, double, double, int> ( 622112,     1.5,          0,          1 ),
+                new Tuple<int, double, double, int> ( 612113,     4.21,         0,          0 ),
+                new Tuple<int, double, double, int> ( 622113,     4.21,         0,          0 ),
+                new Tuple<int, double, double, int> ( 612117,     1.68,         0,          1 ),
+                new Tuple<int, double, double, int> ( 612111,     0.5,          0,          1 ),
+                new Tuple<int, double, double, int> ( 612120,     1.18,         0,          1 ),
+                new Tuple<int, double, double, int> ( 622120,     1.18,         0,          0 ),
+                new Tuple<int, double, double, int> ( 612154,     1.37,         0,          1 ),
+                new Tuple<int, double, double, int> ( 622154,     1.37,         0,          1 ),
+                new Tuple<int, double, double, int> ( 612121,     1.5,          0,          0 ),
+                new Tuple<int, double, double, int> ( 622121,     1.5,          0,          1 ),
+                new Tuple<int, double, double, int> ( 22048,      0,            1501.75,    0 ),
+                new Tuple<int, double, double, int> ( 22148,      0,            2065.77,    1 ),
+                new Tuple<int, double, double, int> ( 22049,      0,            3611,       0 ),
+                new Tuple<int, double, double, int> ( 22149,      0,            1263,       1 ),
+                new Tuple<int, double, double, int> ( 22050,      0,            985.5,      1 ),
             };
-            
+
             sheet.Cells[2, 1].LoadFromCollection(collection);
             sheet.Cells.AutoFitColumns();
-            sheet.SelectedRange[1, 1, 1, 3].Style.Font.Bold = true;
+            sheet.SelectedRange[1, 1, 1, 4].Style.Font.Bold = true;
 
             excel.SaveAs(new FileInfo(fileDialogService.FileName));
 

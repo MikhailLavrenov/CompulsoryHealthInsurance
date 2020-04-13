@@ -80,12 +80,18 @@
                   Grid.Column="2"
                   IsChecked="{Binding IsGrowing}" />
 
-        <Button Grid.Row="3"
+        <StackPanel Grid.Row="3"
                 Grid.Column="0"
-                Grid.ColumnSpan="3"
-                Content="Ок"
-                Command="{Binding BuildReportCommand}"
-                Cursor="Hand" />
+                Grid.ColumnSpan="3" Orientation="Horizontal">
+            
+        <Button                 Content="Ок"
+                Command="{Binding BuildReportCommand}" />
+
+            <Button 
+                Content="В excel"
+                Command="{Binding SaveExcelCommand}" />
+            
+        </StackPanel>
 
         <FrameworkElement Grid.Row="4"
                           Grid.Column="0"

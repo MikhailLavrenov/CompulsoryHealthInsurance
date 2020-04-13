@@ -74,6 +74,19 @@
                                     Binding="{Binding Name}"
                                     MinWidth="200" />
 
+                <DataGridTemplateColumn Width="50">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border Margin="0,-8,0,-8" 
+                                    Background="{Binding HexColor, Converter={i:HexToSolidColorBrushConverterExtension}}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTextColumn Header="Цвет"
+                                    MinWidth="80" 
+                                    Binding="{Binding HexColor}" />
+
             </DataGrid.Columns>
 
         </i:CustomDataGrid>

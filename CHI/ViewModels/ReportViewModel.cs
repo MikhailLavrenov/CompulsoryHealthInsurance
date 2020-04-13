@@ -16,6 +16,8 @@ namespace CHI.ViewModels
         int year = DateTime.Now.Year;
         int month = DateTime.Now.Month;
         bool isGrowing;
+        IMainRegionService mainRegionService;
+        IFileDialogService fileDialogService;
 
 
         public bool KeepAlive { get => false; }
@@ -26,9 +28,13 @@ namespace CHI.ViewModels
         public ReportService Report { get; set; }
 
         public DelegateCommandAsync BuildReportCommand { get; }
+        public DelegateCommandAsync SaveExcelCommand { get; }
 
-        public ReportViewModel(IMainRegionService mainRegionService)
+        public ReportViewModel(IMainRegionService mainRegionService, IFileDialogService fileDialogService)
         {
+            this.mainRegionService = mainRegionService;
+            this.fileDialogService = fileDialogService;
+
             mainRegionService.Header = "Отчет";
 
             dbContext = new ServiceAccountingDBContext();
@@ -52,6 +58,7 @@ namespace CHI.ViewModels
             Report = new ReportService(rootDepartment, rootComponent);
 
             BuildReportCommand = new DelegateCommandAsync(BuildReportExecute);
+            SaveExcelCommand = new DelegateCommandAsync(SaveExcelExecute);
         }
 
         private void BuildReportExecute()
@@ -64,7 +71,7 @@ namespace CHI.ViewModels
                 .Include(x => x.Cases).ThenInclude(x => x.Services)
                 .ToList();
 
-            var plans = dbContext.Plans.Where(x => x.Year == Year && month1 <= x.Month && x.Month >= month2 ).ToList();
+            var plans = dbContext.Plans.Where(x => x.Year == Year && month1 <= x.Month && x.Month >= month2).ToList();
 
             var classifierId = dbContext.ServiceClassifiers
                 .AsEnumerable()
@@ -75,6 +82,26 @@ namespace CHI.ViewModels
 
 
             Report.Build(registers, plans, classifiers, month1, month2, Year);
+        }
+
+        private void SaveExcelExecute()
+        {
+            mainRegionService.SetBusyStatus("Выбор пути");
+
+            fileDialogService.DialogType = FileDialogType.Save;
+            fileDialogService.FileName = "Отчет по выполнению объемов";
+            fileDialogService.Filter = "Excel files (*.xslx)|*.xlsx";
+
+            if (fileDialogService.ShowDialog() != true)
+                return;
+
+            var filePath = fileDialogService.FileName;
+
+            mainRegionService.SetBusyStatus("Сохранение файла");
+
+            Report.SaveExcel(filePath);
+
+            mainRegionService.SetCompleteStatus($"Файл сохранен: {filePath}");
         }
 
         public static bool PeriodsIntersects(DateTime? period1date1, DateTime? period1date2, int period2Month1, int period2Month2, int period2Year)
