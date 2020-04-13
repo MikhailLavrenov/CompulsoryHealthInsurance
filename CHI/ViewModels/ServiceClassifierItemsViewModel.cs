@@ -40,8 +40,6 @@ namespace CHI.ViewModels
 
             mainRegionService.Header = "Классификатор услуг";
 
-            dbContext = new ServiceAccountingDBContext();
-
             AddCommand = new DelegateCommand(AddExecute);
             DeleteCommand = new DelegateCommand(DeleteExecute, () => CurrentServiceClassifierItem != null).ObservesProperty(() => CurrentServiceClassifierItem);
             LoadCommand = new DelegateCommandAsync(LoadExecute);
@@ -102,7 +100,10 @@ namespace CHI.ViewModels
                 .ForEach(y => CurrentServiceClassifier.ServiceClassifierItems.Remove(y));
 
             CurrentServiceClassifier.ServiceClassifierItems.AddRange(loadedClassifierItems);
-            ServiceClassifierItems = new ObservableCollection<ServiceClassifierItem>(CurrentServiceClassifier.ServiceClassifierItems);
+
+            dbContext.SaveChanges();
+
+            Refresh();
 
             mainRegionService.SetCompleteStatus("Успешно загружено");
         }
@@ -160,18 +161,25 @@ namespace CHI.ViewModels
             mainRegionService.SetCompleteStatus($"Файл сохранен: {saveExampleFilePath}");
         }
 
+        private void Refresh()
+        {
+            dbContext = new ServiceAccountingDBContext();
+
+            CurrentServiceClassifier = dbContext.ServiceClassifiers.Where(x => x.Id == CurrentServiceClassifier.Id).Include(x => x.ServiceClassifierItems).First();
+
+            if (CurrentServiceClassifier.ServiceClassifierItems == null)
+                CurrentServiceClassifier.ServiceClassifierItems = new List<ServiceClassifierItem>();
+
+            ServiceClassifierItems = new ObservableCollection<ServiceClassifierItem>(CurrentServiceClassifier.ServiceClassifierItems);
+        }
+
         public void OnNavigatedTo(NavigationContext navigationContext)
         {
             if (navigationContext.Parameters.ContainsKey(nameof(ServiceClassifier)))
             {
                 CurrentServiceClassifier = navigationContext.Parameters.GetValue<ServiceClassifier>(nameof(ServiceClassifier));
 
-                CurrentServiceClassifier = dbContext.ServiceClassifiers.Where(x => x.Id == CurrentServiceClassifier.Id).Include(x => x.ServiceClassifierItems).First();
-
-                if (CurrentServiceClassifier.ServiceClassifierItems == null)
-                    CurrentServiceClassifier.ServiceClassifierItems = new List<ServiceClassifierItem>();
-
-                ServiceClassifierItems = new ObservableCollection<ServiceClassifierItem>(CurrentServiceClassifier.ServiceClassifierItems);
+                Refresh();
             }
         }
 
