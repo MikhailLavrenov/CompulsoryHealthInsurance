@@ -33,13 +33,12 @@ namespace CHI.ViewModels
 
             mainRegionService.Header = "Реестры";
 
-            dbContext = new ServiceAccountingDBContext();
-            dbContext.Registers.Load();
-            Registers = dbContext.Registers.Local.ToObservableCollection();
+            Refresh();
 
             LoadRegisterCommand = new DelegateCommandAsync(LoadExecute);
             LoadPaymentStateCommand = new DelegateCommandAsync(LoadPaymentStateExecute, () => CurrentRegister != null).ObservesProperty(() => CurrentRegister);
         }
+
 
         private void LoadExecute()
         {
@@ -61,121 +60,121 @@ namespace CHI.ViewModels
             registerService.FileNamesNotStartsWith = new string[] { "L" };
             var register = registerService.GetRegister(false);
 
-            var dbContext = new ServiceAccountingDBContext();
+            using var localDbContext = new ServiceAccountingDBContext();
 
-            var registerForSamePeriod = dbContext.Registers.FirstOrDefault(x => x.Month == register.Month && x.Year == register.Year);
+            var registerForSamePeriod = localDbContext.Registers.FirstOrDefault(x => x.Month == register.Month && x.Year == register.Year);
 
             if (registerForSamePeriod != null)
-            {
-                dbContext.Remove(registerForSamePeriod);
-                dbContext.SaveChanges();
-            }
+                localDbContext.Registers.Remove(registerForSamePeriod);
 
             mainRegionService.SetBusyStatus("Сопоставление штатных единиц");
 
-            dbContext.Employees.Load();
-            dbContext.Medics.Load();
-            dbContext.Specialties.Load();
-            dbContext.Departments.Load();
+            localDbContext.Employees.Load();
+            localDbContext.Medics.Load();
+            localDbContext.Specialties.Load();
+            localDbContext.Departments.Load();
 
-            var defaultDepartment = dbContext.Departments.Local.First(x => x.IsRoot);
+            var defaultDepartment = localDbContext.Departments.Local.First(x => x.IsRoot);
+
+            //в некоторых реестрах не указан врач закрывший случай
             List<int> caseClosingCodes = null;
 
-            for (int i = 0; i < register.Cases.Count; i++)
+            foreach (var mCase in register.Cases.Where(x => string.IsNullOrEmpty(x.Employee.Medic.FomsId)))
             {
-                var mCase = register.Cases[i];
-                mainRegionService.SetBusyStatus($"Сопоставление штатных единиц: {i} из {register.Cases.Count}");
+                var maxDate = mCase.Services.Select(x => x.Date).Max();
+                var laterServices = mCase.Services.Where(x => x.Date == maxDate && x.Employee.Specialty.FomsId == mCase.Employee.Specialty.FomsId).ToList();
+                var medicFomsIds = laterServices.Select(x => x.Employee.Medic.FomsId).Distinct().ToList();
 
-                //в некоторых реестрах не указан врач закрывший случай
-                if (string.IsNullOrEmpty(mCase.Employee.Medic.FomsId))
+                if (medicFomsIds.Count() == 1)
+                    mCase.Employee.Medic.FomsId = medicFomsIds.First();
+                else
                 {
-                    var maxDate = mCase.Services.Select(x => x.Date).Max();
-                    var laterServices = mCase.Services.Where(x => x.Date == maxDate && x.Employee.Specialty.FomsId == mCase.Employee.Specialty.FomsId).ToList();
-                    var medicFomsIds = laterServices.Select(x => x.Employee.Medic.FomsId).Distinct().ToList();
+                    if (caseClosingCodes == null)
+                    {
+                        var classifierId = dbContext.ServiceClassifiers
+                            .ToList()
+                            .Where(x => ExtensionMethods.BetweenDates(x.ValidFrom, x.ValidTo, register.Month, register.Year))
+                            .FirstOrDefault()?.Id;
+
+                        caseClosingCodes = classifierId == null ?
+                                new List<int>()
+                                :
+                                dbContext.ServiceClassifiers
+                                .Where(x => x.Id == classifierId)
+                                .Include(x => x.ServiceClassifierItems)
+                                .First()
+                                .ServiceClassifierItems
+                                .Where(x => x.IsCaseClosing)
+                                .Select(x => x.Code)
+                                .ToList();
+                    }
+
+                    medicFomsIds = laterServices.Where(x => caseClosingCodes.Contains(x.Code)).Select(x => x.Employee.Medic.FomsId).Distinct().ToList();
 
                     if (medicFomsIds.Count() == 1)
                         mCase.Employee.Medic.FomsId = medicFomsIds.First();
                     else
-                    {
-                        if (caseClosingCodes == null)
-                        {
-                            var classifierId = dbContext.ServiceClassifiers
-                                .ToList()
-                                .Where(x => ExtensionMethods.BetweenDates(x.ValidFrom, x.ValidTo, register.Month, register.Year))
-                                .FirstOrDefault()?.Id;
-
-                            caseClosingCodes = classifierId == null ?
-                                    new List<int>()
-                                    : 
-                                    dbContext.ServiceClassifiers
-                                    .Where(x => x.Id == classifierId)
-                                    .Include(x => x.ServiceClassifierItems)
-                                    .First()
-                                    .ServiceClassifierItems
-                                    .Where(x => x.IsCaseClosing)                             
-                                    .Select(x => x.Code)                             
-                                    .ToList();
-                        }
-
-                        medicFomsIds = laterServices.Where(x => caseClosingCodes.Contains(x.Code)).Select(x => x.Employee.Medic.FomsId).Distinct().ToList();
-
-                        if (medicFomsIds.Count() == 1)
-                            mCase.Employee.Medic.FomsId = medicFomsIds.First();
-                        else
-                            throw new InvalidOperationException($"Не удается однозначно определить мед. работника закрывшего случай {mCase.IdCase}");
-                    }
+                        throw new InvalidOperationException($"Не удается однозначно определить мед. работника закрывшего случай {mCase.IdCase}");
                 }
+            }
 
-                mCase.Employee = FindEmployeeInDbOrAdd(mCase.Employee, dbContext, defaultDepartment);
 
-                foreach (var service in mCase.Services)
+            var casesGroups = register.Cases.GroupBy(x => new { MedicFomsId = x.Employee.Medic.FomsId, SpecialtyFomsId = x.Employee.Specialty.FomsId }).ToList();
+
+            var progressCounter = 0;
+
+            foreach (var casesGroup in casesGroups)
+            {
+                var employee = FindEmployeeInDbOrAdd(casesGroup.Key.MedicFomsId, casesGroup.Key.SpecialtyFomsId, localDbContext, defaultDepartment);
+
+                foreach (var mCase in casesGroup)
                 {
-                    if (mCase.Employee.Specialty.FomsId == service.Employee.Specialty.FomsId && mCase.Employee.Medic.FomsId.Equals(service.Employee.Medic.FomsId))
-                        service.Employee = mCase.Employee;
-                    else
-                        service.Employee = FindEmployeeInDbOrAdd(service.Employee, dbContext, defaultDepartment);
+                    mainRegionService.SetBusyStatus($"Сопоставление штатных единиц: {++progressCounter} из {register.Cases.Count}");
+
+                    mCase.Employee = employee;
+
+                    foreach (var service in mCase.Services)
+                    {
+                        if (mCase.Employee.Specialty.FomsId == service.Employee.Specialty.FomsId && mCase.Employee.Medic.FomsId.Equals(service.Employee.Medic.FomsId))
+                            service.Employee = mCase.Employee;
+                        else
+                            service.Employee = FindEmployeeInDbOrAdd(service.Employee.Medic.FomsId, service.Employee.Specialty.FomsId, localDbContext, defaultDepartment);
+                    }
                 }
             }
 
             mainRegionService.SetBusyStatus("Сохранение в базу данных");
 
-            dbContext.Registers.Add(register);
-            dbContext.SaveChanges();
+            localDbContext.Registers.Add(register);
+            localDbContext.SaveChanges();
 
-            Application.Current.Dispatcher.Invoke(() => Registers = dbContext.Registers.Local.ToObservableCollection());
+            Application.Current.Dispatcher.Invoke(() => Refresh());
 
             mainRegionService.SetCompleteStatus("Успешно загружено");
         }
 
-        private static Employee FindEmployeeInDbOrAdd(Employee employee, ServiceAccountingDBContext dbContext, Department defaultDepartment)
+        private static Employee FindEmployeeInDbOrAdd(string medicFomsId, int specialtyFomsId, ServiceAccountingDBContext dbContext, Department defaultDepartment)
         {
-            var foundEmployee = dbContext.Employees.Local.FirstOrDefault(x => string.Equals(x.Medic.FomsId, employee.Medic.FomsId, StringComparison.Ordinal) && x.Specialty.FomsId == employee.Specialty.FomsId);
+            var employee = dbContext.Employees.Local.FirstOrDefault(x => x.Specialty.FomsId == specialtyFomsId && string.Equals(x.Medic.FomsId, medicFomsId, StringComparison.Ordinal));
 
-            if (foundEmployee != null)
-                return foundEmployee;
+            if (employee != null)
+                return employee;
 
-            employee.Department = defaultDepartment;
+            var medic = dbContext.Medics.Local.FirstOrDefault(x => string.Equals(x.FomsId, medicFomsId, StringComparison.Ordinal));
+            var specialty = dbContext.Specialties.Local.FirstOrDefault(x => x.FomsId == specialtyFomsId);
 
-            var foundMedic = dbContext.Medics.Local.FirstOrDefault(x => string.Equals(x.FomsId, employee.Medic.FomsId, StringComparison.Ordinal));
-
-            if (foundMedic != null)
-                employee.Medic = foundMedic;
-            else
-                dbContext.Medics.Add(employee.Medic);
-
-            var foundSpecialty = dbContext.Specialties.Local.FirstOrDefault(x => x.FomsId == employee.Specialty.FomsId);
-
-            if (foundSpecialty != null)
-                employee.Specialty = foundSpecialty;
-            else
-                dbContext.Specialties.Add(employee.Specialty);
-
-            employee.Parameters = new List<Parameter>
+            employee = new Employee
             {
-                new Parameter (0,ParameterKind.EmployeePlan),
-                new Parameter (1,ParameterKind.EmployeeFact),
-                new Parameter (2,ParameterKind.EmployeeRejectedFact),
-                new Parameter (3,ParameterKind.EmployeePercent),
+                Medic = medic == null ? Medic.CreateUnknown(medicFomsId) : medic,
+                Specialty = specialty == null ? Specialty.CreateUnknown(specialtyFomsId) : specialty,
+                Department = defaultDepartment,
+                Parameters = new List<Parameter>
+                {
+                    new Parameter (0,ParameterKind.EmployeePlan),
+                    new Parameter (1,ParameterKind.EmployeeFact),
+                    new Parameter (2,ParameterKind.EmployeeRejectedFact),
+                    new Parameter (3,ParameterKind.EmployeePercent),
+                }
             };
 
             dbContext.Employees.Add(employee);
@@ -224,6 +223,13 @@ namespace CHI.ViewModels
             dbContext.SaveChanges();
 
             mainRegionService.SetCompleteStatus("Загрузка статуса оплаты завершена");
+        }
+
+        private void Refresh()
+        {
+            dbContext = new ServiceAccountingDBContext();
+            dbContext.Registers.Load();
+            Registers = dbContext.Registers.Local.ToObservableCollection();
         }
 
         public void OnNavigatedTo(NavigationContext navigationContext)

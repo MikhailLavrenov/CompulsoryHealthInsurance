@@ -69,6 +69,10 @@ namespace CHI.ViewModels
                     medic.FullName = loadedFullName;
             }
 
+            dbContext.SaveChanges();
+
+            dbContext = new ServiceAccountingDBContext();
+            dbContext.Medics.Load();
             Medics = dbContext.Medics.Local.ToObservableCollection();
 
             mainRegionService.SetCompleteStatus("Успешно загружено");

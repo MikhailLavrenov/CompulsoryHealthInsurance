@@ -70,6 +70,10 @@ namespace CHI.ViewModels
                     specialty.Name = loadedName;
             }
 
+            dbContext.SaveChanges();
+
+            dbContext =new ServiceAccountingDBContext();
+            dbContext.Specialties.Load();
             Specialties = dbContext.Specialties.Local.ToObservableCollection();
 
             mainRegionService.SetCompleteStatus("Успешно загружено");

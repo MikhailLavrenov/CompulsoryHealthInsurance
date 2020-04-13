@@ -1,10 +1,12 @@
 ﻿using CHI.Infrastructure;
 using CHI.Models.ServiceAccounting;
 using OfficeOpenXml;
+using OfficeOpenXml.Style;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Windows;
 
 namespace CHI.Services.Report
 {
@@ -310,15 +312,19 @@ namespace CHI.Services.Report
             {
                 if ((i > 0 && ColumnItems[i - 1].Group != ColumnItems[i].Group) || i == 0)
                 {
-                    sheet.Cells[1, i + 2, 1, i + 2 + ColumnItems[i].Group.Childs.Count].Merge = true;
+                    sheet.Cells[1, i + 3, 1, i + 3 + ColumnItems[i].Group.HeaderItems.Count-1].Merge = true;
 
-                    sheet.Cells[1, i + 2].Value = ColumnItems[i].Group.Name;
-
-                    var drawingColor = ExtensionMethods.GetDrawingColor(ColumnItems[i].Group.ColorBrush.Color);
-                    sheet.Cells[1, i + 2].Style.Fill.BackgroundColor.SetColor(drawingColor);
+                    sheet.Cells[1, i + 3].Value = ColumnItems[i].Group.Name;
+                    System.Drawing.Color drawingColor= new System.Drawing.Color();
+                    Application.Current.Dispatcher.Invoke(() => drawingColor = ExtensionMethods.GetDrawingColor(ColumnItems[i].Group.ColorBrush.Color));
+                    sheet.Cells[1, i + 3].Style.Fill.SetBackground(drawingColor);
                 }
 
-                sheet.Cells[2, i + 2].Value = ColumnItems[i].Name;
+                sheet.Cells[2, i + 3].Value = ColumnItems[i].Name;
+
+                System.Drawing.Color drawingColor2 = new System.Drawing.Color();
+                Application.Current.Dispatcher.Invoke(() => drawingColor2 = ExtensionMethods.GetDrawingColor(ColumnItems[i].Group.ColorBrush.Color));
+                sheet.Cells[2, i + 3].Style.Fill.SetBackground(drawingColor2);
             }
 
 
@@ -326,21 +332,41 @@ namespace CHI.Services.Report
             {
                 if ((i > 0 && RowItems[i - 1].Group != RowItems[i].Group) || i == 0)
                 {
-                    sheet.Cells[i + 2, 1, i + 2 + RowItems[i].Group.Childs.Count, 1].Merge = true;
+                    sheet.Cells[i + 3, 1, i + 3 + RowItems[i].Group.HeaderItems.Count-1, 1].Merge = true;
 
-                    sheet.Cells[i + 2, 1].Value = RowItems[i].Group.Name;
-
-                    var drawingColor = ExtensionMethods.GetDrawingColor(RowItems[i].Group.ColorBrush.Color);
-                    sheet.Cells[i + 2, 1].Style.Fill.BackgroundColor.SetColor(drawingColor);
+                    sheet.Cells[i + 3, 1].Value = RowItems[i].Group.Name;
+                    System.Drawing.Color drawingColor = new System.Drawing.Color();
+                    Application.Current.Dispatcher.Invoke(() => drawingColor = ExtensionMethods.GetDrawingColor(RowItems[i].Group.ColorBrush.Color));
+                    sheet.Cells[i + 3, 1].Style.Fill.SetBackground(drawingColor);
                 }
 
-                sheet.Cells[i + 2, 2].Value = RowItems[i].Name;
+                sheet.Cells[i + 3, 2].Value = RowItems[i].Name;
+
+                System.Drawing.Color drawingColor2 = new System.Drawing.Color();
+                Application.Current.Dispatcher.Invoke(() => drawingColor2 = ExtensionMethods.GetDrawingColor(RowItems[i].Group.ColorBrush.Color));
+                sheet.Cells[i + 3, 2].Style.Fill.SetBackground(drawingColor2);
             }
 
             sheet.Cells[3, 3].LoadFromArrays(Values.Select(x => x.Select(y => y.Value.ToString()).ToArray()).ToArray());
 
-            sheet.Cells.AutoFitColumns();
-            //sheet.SelectedRange[1, 1, 1, 4].Style.Font.Bold = true;
+            sheet.Cells.Style.VerticalAlignment = ExcelVerticalAlignment.Top;
+            sheet.Row(1).Style.Font.Bold = true;
+            sheet.Row(2).Style.Font.Bold = true;
+            sheet.Column(1).Style.Font.Bold = true;
+            sheet.Column(2).Style.Font.Bold = true;
+            sheet.Cells[1,1,2,2].Merge = true;
+            sheet.DefaultColWidth = 9;
+            sheet.Column(1).Width = 20;
+            sheet.Column(2).Width = 9;
+
+            var range = sheet.Cells[1,1, sheet.Dimension.Rows, sheet.Dimension.Columns];
+
+            range.Style.Border.Left.Style = ExcelBorderStyle.Hair;
+            range.Style.Border.Top.Style = ExcelBorderStyle.Hair;
+            range.Style.Border.Right.Style = ExcelBorderStyle.Hair;
+            range.Style.Border.Bottom.Style = ExcelBorderStyle.Hair;
+
+            sheet.View.FreezePanes(3, 3);
 
             excel.SaveAs(new FileInfo(path));
         }
