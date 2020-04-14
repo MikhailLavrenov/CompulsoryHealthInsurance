@@ -14,6 +14,7 @@ namespace CHI.Services.Report
         public int Order { get; set; }
         public int Level { get; set; }
         public int Index { get; set; }
+        public Color Color { get; set; }
         public SolidColorBrush ColorBrush { get; set; }
 
         public Department Department { get; set; }
@@ -34,7 +35,8 @@ namespace CHI.Services.Report
             IsRoot = department.IsRoot;            
             Parent = parent;
             Level = IsRoot ? -1 : parent.Level + 1;
-            ColorBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(department.HexColor));
+            Color = (Color)ColorConverter.ConvertFromString(department.HexColor);
+            ColorBrush = new SolidColorBrush(Color);
 
             Department = department;
 
@@ -51,7 +53,7 @@ namespace CHI.Services.Report
             IsRoot = false;
             Parent = parent;
             Level = parent.Level + 1;
-            ColorBrush = new SolidColorBrush(Colors.Transparent);
+            Color = Colors.Transparent;
 
             Employee = employee;
 

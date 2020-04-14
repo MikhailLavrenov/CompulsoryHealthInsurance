@@ -13,6 +13,7 @@ namespace CHI.Services.Report
         public int Order { get; set; }
         public int Level { get; set; }
         public int Index { get; set; }
+        public Color Color { get; set; }
         public SolidColorBrush ColorBrush { get; set; }
 
         public Component Component { get; set; }
@@ -33,7 +34,8 @@ namespace CHI.Services.Report
             Name = component.Name;
             IsRoot = component.IsRoot;
             Order = component.Order;
-            ColorBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(component.HexColor));
+            Color = (Color)ColorConverter.ConvertFromString(component.HexColor);
+            ColorBrush = new SolidColorBrush(Color);
 
             Parent = parent;
             Level = IsRoot ? -1 : parent.Level + 1;
