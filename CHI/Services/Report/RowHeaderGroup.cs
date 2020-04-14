@@ -1,13 +1,19 @@
 ﻿using CHI.Models.Infrastructure;
 using CHI.Models.ServiceAccounting;
+using Prism.Commands;
+using Prism.Mvvm;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Media;
 
 namespace CHI.Services.Report
 {
-    public class RowHeaderGroup : IOrderedHierarchical<RowHeaderGroup>
+    public class RowHeaderGroup : BindableBase, IOrderedHierarchical<RowHeaderGroup>
     {
+        bool? isCollapsed;
+        bool isVisible=true;
+
         public string Name { get; set; }
         public string SubName { get; set; }
         public bool IsRoot { get; set; }
@@ -16,6 +22,24 @@ namespace CHI.Services.Report
         public int Index { get; set; }
         public Color Color { get; set; }
         public SolidColorBrush ColorBrush { get; set; }
+        public bool CanCollapse { get; private set; }
+        public bool? IsCollapsed { get => isCollapsed; private set => SetProperty(ref isCollapsed, value); }
+        public bool IsVisible
+        {
+            get => isVisible;
+            set
+            {
+                if (isVisible != value)
+                {
+                    SetProperty(ref isVisible, value);
+
+                    if (!isVisible && IsCollapsed == false)
+                        SwitchCollapseExecute();
+
+                    IsVisibleChangedEvent(this, new EventArgs());
+                }
+            }
+        }
 
         public Department Department { get; set; }
         public Employee Employee { get; set; }
@@ -25,6 +49,9 @@ namespace CHI.Services.Report
         public RowHeaderGroup Parent { get; set; }
         public List<RowHeaderGroup> Childs { get; set; }
 
+        public DelegateCommand SwitchCollapseCommand { get; }
+
+        public event EventHandler IsVisibleChangedEvent;
 
 
         public RowHeaderGroup(Department department, RowHeaderGroup parent)
@@ -32,17 +59,22 @@ namespace CHI.Services.Report
             Name = department.Name;
             SubName = string.Empty;
             Order = department.Order;
-            IsRoot = department.IsRoot;            
+            IsRoot = department.IsRoot;
             Parent = parent;
             Level = IsRoot ? -1 : parent.Level + 1;
             Color = (Color)ColorConverter.ConvertFromString(department.HexColor);
             ColorBrush = new SolidColorBrush(Color);
+            CanCollapse = (department.Childs?.Any() ?? false) || (department.Employees?.Any() ?? false);
+            IsCollapsed = CanCollapse ? false : (bool?)null;
+            IsVisible = true;
 
             Department = department;
 
             Childs = new List<RowHeaderGroup>();
 
             SetHeaderItems(department.Parameters);
+
+            SwitchCollapseCommand = new DelegateCommand(SwitchCollapseExecute, () => CanCollapse);
         }
 
         public RowHeaderGroup(Employee employee, RowHeaderGroup parent)
@@ -54,12 +86,17 @@ namespace CHI.Services.Report
             Parent = parent;
             Level = parent.Level + 1;
             Color = Colors.Transparent;
+            CanCollapse = false;
+            IsCollapsed = null;
+            IsVisible = true;
 
             Employee = employee;
 
             Childs = new List<RowHeaderGroup>();
 
             SetHeaderItems(employee.Parameters);
+
+            SwitchCollapseCommand = new DelegateCommand(SwitchCollapseExecute, () => CanCollapse);
         }
 
 
@@ -85,6 +122,14 @@ namespace CHI.Services.Report
             if (parameters?.Any() ?? false)
                 foreach (var parameter in parameters)
                     HeaderItems.Add(new RowHeaderItem(this, parameter));
+        }
+
+        private void SwitchCollapseExecute()
+        {
+            IsCollapsed = !IsCollapsed;
+
+            foreach (var child in Childs)
+                child.IsVisible = !IsCollapsed.Value;
         }
     }
 }

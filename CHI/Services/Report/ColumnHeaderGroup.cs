@@ -1,13 +1,19 @@
 ﻿using CHI.Models.Infrastructure;
 using CHI.Models.ServiceAccounting;
+using Prism.Commands;
+using Prism.Mvvm;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Media;
 
 namespace CHI.Services.Report
 {
-    public class ColumnHeaderGroup : IOrderedHierarchical<ColumnHeaderGroup>
+    public class ColumnHeaderGroup : BindableBase, IOrderedHierarchical<ColumnHeaderGroup>
     {
+        bool? isCollapsed;
+        bool isVisible=true;
+
         public string Name { get; set; }
         public bool IsRoot { get; set; }
         public int Order { get; set; }
@@ -15,18 +21,39 @@ namespace CHI.Services.Report
         public int Index { get; set; }
         public Color Color { get; set; }
         public SolidColorBrush ColorBrush { get; set; }
+        public bool CanCollapse { get; private set; }
+        public bool? IsCollapsed { get => isCollapsed; private set => SetProperty(ref isCollapsed, value); }
+        public bool IsVisible
+        {
+            get => isVisible;
+            set
+            {
+                if (isVisible != value)
+                {
+                    SetProperty(ref isVisible, value);
+
+                    if (!isVisible && IsCollapsed == false)
+                        SwitchCollapseExecute();
+
+                    IsVisibleChangedEvent(this, new EventArgs());
+                }
+            }
+        }
+
+        public List<ColumnHeaderItem> HeaderItems { get; set; }
 
         public Component Component { get; set; }
         public List<CaseFilter> TreatmentFilters { get; set; }
         public List<CaseFilter> VisitFilters { get; set; }
         public List<CaseFilter> ContainsServiceFilters { get; set; }
         public List<CaseFilter> NotContainsServiceFilters { get; set; }
-        public List<ColumnHeaderItem> HeaderItems { get; set; }
 
         public ColumnHeaderGroup Parent { get; set; }
         public List<ColumnHeaderGroup> Childs { get; set; }
 
+        public DelegateCommand SwitchCollapseCommand { get; }
 
+        public event EventHandler IsVisibleChangedEvent;
 
         public ColumnHeaderGroup(Component component, ColumnHeaderGroup parent)
         {
@@ -36,6 +63,11 @@ namespace CHI.Services.Report
             Order = component.Order;
             Color = (Color)ColorConverter.ConvertFromString(component.HexColor);
             ColorBrush = new SolidColorBrush(Color);
+            CanCollapse = component.Childs?.Any() ?? false;
+            IsCollapsed = CanCollapse ? false : (bool?)null;
+            IsVisible = true;
+
+
 
             Parent = parent;
             Level = IsRoot ? -1 : parent.Level + 1;
@@ -53,8 +85,9 @@ namespace CHI.Services.Report
             if (component.Indicators?.Any() ?? false)
                 foreach (var indicator in component.Indicators)
                     HeaderItems.Add(new ColumnHeaderItem(this, indicator));
-        }
 
+            SwitchCollapseCommand = new DelegateCommand(SwitchCollapseExecute, () => CanCollapse);
+        }
 
 
         public static ColumnHeaderGroup CreateHeadersRecursive(ColumnHeaderGroup parent, Component component)
@@ -68,5 +101,12 @@ namespace CHI.Services.Report
             return header;
         }
 
+        private void SwitchCollapseExecute()
+        {
+            IsCollapsed = !IsCollapsed;
+
+            foreach (var child in Childs)
+                child.IsVisible = !IsCollapsed.Value;
+        }
     }
 }
