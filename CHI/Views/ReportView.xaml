@@ -31,6 +31,19 @@
 
             </Style>
 
+            <Style TargetType="Border"
+                   x:Key="BorderCellStyle">
+
+                <Setter Property="BorderThickness"
+                        Value="0,0,1,1" />
+                <Setter Property="BorderBrush"
+                        Value="LightGray" />
+                <Setter Property="SnapsToDevicePixels"
+                        Value="True"/>
+
+
+            </Style>
+
         </ResourceDictionary >
     </UserControl.Resources>
 
@@ -82,23 +95,23 @@
 
         <StackPanel Grid.Row="3"
                 Grid.Column="0"
-                Grid.ColumnSpan="3" Orientation="Horizontal">
-            
-        <Button                 Content="Ок"
+                Grid.ColumnSpan="3" 
+                    Orientation="Horizontal">
+
+            <Button Content="Ок"
                 Command="{Binding BuildReportCommand}" />
 
             <Button 
                 Content="В excel"
                 Command="{Binding SaveExcelCommand}" />
-            
+
         </StackPanel>
 
         <FrameworkElement Grid.Row="4"
                           Grid.Column="0"
                           Style="{StaticResource Separator}" />
 
-
-        <Grid  Grid.Row="5"
+        <Grid Grid.Row="5"
                Grid.Column="0"
                Grid.ColumnSpan="4">
 
@@ -112,6 +125,13 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
+            <Border Grid.RowSpan="2"
+                    Grid.ColumnSpan="2" 
+                    BorderThickness="1" 
+                    BorderBrush="LightGray" 
+                    SnapsToDevicePixels="True" 
+                    Panel.ZIndex="1"/>
+
             <!--Заголовки столбцов-->
             <ScrollViewer Grid.Row="0"
                           Grid.Column="1"
@@ -119,44 +139,51 @@
                           VerticalScrollBarVisibility="Hidden"
                           HorizontalScrollBarVisibility="Hidden"
                           Margin="0,0,17,0">
+
+                    <ItemsControl ItemsSource="{Binding Report.ColumnGroups}" >
+
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <VirtualizingStackPanel Orientation="Horizontal" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Vertical">
+                                <Border Style="{StaticResource BorderCellStyle}"                                         
+                                            Background="{Binding ColorBrush}">
+                                    <TextBlock Style="{StaticResource HeaderCell}"                                                                                          
+                                               Text="{Binding Name}" />
+                                    </Border>
+                                    <!--Элементы HeaderItems столбца заголовка-->
+                                    <ItemsControl ItemsSource="{Binding HeaderItems}">
+
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <VirtualizingStackPanel Orientation="Horizontal" />
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Style="{StaticResource BorderCellStyle}"                                                    
+                                                        Background="{Binding Group.ColorBrush}">
+                                                    <TextBlock Style="{StaticResource HeaderCell}"                                                                                                                 
+                                                               Width="70"                                                                                                                
+                                                               Text="{Binding Name}" />
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+
+                                    </ItemsControl>
+
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+
+                    </ItemsControl>
                 
-                <ItemsControl ItemsSource="{Binding Report.ColumnGroups}" >
-
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <VirtualizingStackPanel Orientation="Horizontal" />
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <StackPanel Orientation="Vertical">
-                                <TextBlock Style="{StaticResource HeaderCell}"
-                                           Text="{Binding Name}" />
-                                <!--Элементы HeaderItems столбца заголовка-->
-                                <ItemsControl ItemsSource="{Binding HeaderItems}">
-
-                                    <ItemsControl.ItemsPanel>
-                                        <ItemsPanelTemplate>
-                                            <VirtualizingStackPanel Orientation="Horizontal" />
-                                        </ItemsPanelTemplate>
-                                    </ItemsControl.ItemsPanel>
-
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <TextBlock Style="{StaticResource HeaderCell}"
-                                                       Width="50"
-                                                       Text="{Binding Name}" />
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-
-                                </ItemsControl>
-
-                            </StackPanel>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-
-                </ItemsControl>
             </ScrollViewer>
             <!--Заголовки строк-->
             <ScrollViewer Grid.Row="1"
@@ -166,49 +193,55 @@
                           HorizontalScrollBarVisibility="Hidden"
                           Margin="0,0,0,17">
 
-                <ItemsControl ItemsSource="{Binding Report.RowGroups}"
-                              >
+                    <ItemsControl ItemsSource="{Binding Report.RowGroups}">
 
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <VirtualizingStackPanel Orientation="Vertical" />
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <VirtualizingStackPanel Orientation="Vertical" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
 
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <StackPanel Orientation="Horizontal">
-                                <StackPanel Orientation="Vertical"
-                                            Width="150">
-                                    <TextBlock Style="{StaticResource HeaderCell}"
-                                               Text="{Binding Name}" />
-                                    <TextBlock Style="{StaticResource HeaderCell}"
-                                               Text="{Binding SubName}" />
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <Border Style="{StaticResource BorderCellStyle}" 
+                                        Background="{Binding ColorBrush}">
+                                        <StackPanel Orientation="Vertical"                                            
+                                                Width="150">
+                                            <TextBlock Style="{StaticResource HeaderCell}"                                               
+                                                   Text="{Binding Name}" />
+                                            <TextBlock Style="{StaticResource HeaderCell}"                                               
+                                                   Text="{Binding SubName}" />
+                                        </StackPanel>
+                                    </Border>
+
+                                    <!--Элементы HeaderItems столбца заголовка-->
+                                    <ItemsControl ItemsSource="{Binding HeaderItems}">
+
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <VirtualizingStackPanel Orientation="Vertical" />
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Style="{StaticResource BorderCellStyle}" 
+                                                    Background="{Binding Group.ColorBrush}">
+                                                    <TextBlock Style="{StaticResource HeaderCell}"                                                       
+                                                           Text="{Binding Name}" />
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+
+                                    </ItemsControl>
+
                                 </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
 
-                                <!--Элементы HeaderItems столбца заголовка-->
-                                <ItemsControl ItemsSource="{Binding HeaderItems}">
+                    </ItemsControl>
 
-                                    <ItemsControl.ItemsPanel>
-                                        <ItemsPanelTemplate>
-                                            <VirtualizingStackPanel Orientation="Vertical" />
-                                        </ItemsPanelTemplate>
-                                    </ItemsControl.ItemsPanel>
-
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <TextBlock Style="{StaticResource HeaderCell}"
-                                                       Text="{Binding Name}" />
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-
-                                </ItemsControl>
-
-                            </StackPanel>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-
-                </ItemsControl>
             </ScrollViewer>
 
             <!--Значения-->
@@ -225,46 +258,48 @@
                                                       SyncHorizontal="True" />
                 </b:Interaction.Behaviors>
 
-                <ItemsControl SelectiveScrollingGrid.SelectiveScrollingOrientation="Both"
+                    <ItemsControl SelectiveScrollingGrid.SelectiveScrollingOrientation="Both"
                               ItemsSource="{Binding Report.Values}">
 
-                    <!--Строки-->
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <VirtualizingStackPanel Orientation="Vertical" />
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
+                        <!--Строки-->
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <VirtualizingStackPanel Orientation="Vertical" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
 
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
 
-                            <!--Столбцы-->
-                            <ItemsControl ItemsSource="{Binding}">
+                                <!--Столбцы-->
+                                <ItemsControl ItemsSource="{Binding}">
 
-                                <ItemsControl.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <VirtualizingStackPanel Orientation="Horizontal" />
-                                    </ItemsPanelTemplate>
-                                </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <VirtualizingStackPanel Orientation="Horizontal" />
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
 
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <TextBlock Width="50"
-                                                   Text="{Binding Value}" />
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Style="{StaticResource BorderCellStyle}">
+                                                <TextBlock Width="70"                                                  
+                                                       Text="{Binding Value}" />
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
 
-                            </ItemsControl>
+                                </ItemsControl>
 
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
 
-                </ItemsControl>
+                    </ItemsControl>
+
             </ScrollViewer>
 
-
+                
         </Grid>
-
 
     </Grid>
 </UserControl>

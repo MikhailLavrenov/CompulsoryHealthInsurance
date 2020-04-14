@@ -308,58 +308,59 @@ namespace CHI.Services.Report
 
             var sheet = excel.Workbook.Worksheets.Add("Лист1");
 
+            //вставляет в excel заголовки столбцов
             for (int i = 0; i < ColumnItems.Count; i++)
             {
                 if ((i > 0 && ColumnItems[i - 1].Group != ColumnItems[i].Group) || i == 0)
                 {
-                    sheet.Cells[1, i + 3, 1, i + 3 + ColumnItems[i].Group.HeaderItems.Count-1].Merge = true;
+                    sheet.Cells[1, i + 3, 1, i + 3 + ColumnItems[i].Group.HeaderItems.Count - 1].Merge = true;
 
                     sheet.Cells[1, i + 3].Value = ColumnItems[i].Group.Name;
-                    System.Drawing.Color drawingColor= new System.Drawing.Color();
-                    Application.Current.Dispatcher.Invoke(() => drawingColor = ExtensionMethods.GetDrawingColor(ColumnItems[i].Group.ColorBrush.Color));
+                    var drawingColor = ExtensionMethods.GetDrawingColor(ColumnItems[i].Group.Color);
                     sheet.Cells[1, i + 3].Style.Fill.SetBackground(drawingColor);
                 }
 
                 sheet.Cells[2, i + 3].Value = ColumnItems[i].Name;
 
-                System.Drawing.Color drawingColor2 = new System.Drawing.Color();
-                Application.Current.Dispatcher.Invoke(() => drawingColor2 = ExtensionMethods.GetDrawingColor(ColumnItems[i].Group.ColorBrush.Color));
+                var drawingColor2 = ExtensionMethods.GetDrawingColor(ColumnItems[i].Group.Color);
                 sheet.Cells[2, i + 3].Style.Fill.SetBackground(drawingColor2);
             }
 
-
+            //вставляет в excel заголовки строк
             for (int i = 0; i < RowItems.Count; i++)
             {
                 if ((i > 0 && RowItems[i - 1].Group != RowItems[i].Group) || i == 0)
                 {
-                    sheet.Cells[i + 3, 1, i + 3 + RowItems[i].Group.HeaderItems.Count-1, 1].Merge = true;
+                    sheet.Cells[i + 3, 1, i + 3 + RowItems[i].Group.HeaderItems.Count - 1, 1].Merge = true;
 
-                    sheet.Cells[i + 3, 1].Value = RowItems[i].Group.Name;
-                    System.Drawing.Color drawingColor = new System.Drawing.Color();
-                    Application.Current.Dispatcher.Invoke(() => drawingColor = ExtensionMethods.GetDrawingColor(RowItems[i].Group.ColorBrush.Color));
+                    sheet.Cells[i + 3, 1].Style.WrapText = true;
+                    sheet.Cells[i + 3, 1].Value = $"{RowItems[i].Group.Name}{Environment.NewLine}{RowItems[i].Group.SubName}";
+                    var drawingColor = ExtensionMethods.GetDrawingColor(RowItems[i].Group.Color);
                     sheet.Cells[i + 3, 1].Style.Fill.SetBackground(drawingColor);
                 }
 
                 sheet.Cells[i + 3, 2].Value = RowItems[i].Name;
 
                 System.Drawing.Color drawingColor2 = new System.Drawing.Color();
-                Application.Current.Dispatcher.Invoke(() => drawingColor2 = ExtensionMethods.GetDrawingColor(RowItems[i].Group.ColorBrush.Color));
+                drawingColor2 = ExtensionMethods.GetDrawingColor(RowItems[i].Group.Color);
                 sheet.Cells[i + 3, 2].Style.Fill.SetBackground(drawingColor2);
             }
 
+            //вставляет в excel значения отчета
             sheet.Cells[3, 3].LoadFromArrays(Values.Select(x => x.Select(y => y.Value.ToString()).ToArray()).ToArray());
 
+            //форматирование
             sheet.Cells.Style.VerticalAlignment = ExcelVerticalAlignment.Top;
             sheet.Row(1).Style.Font.Bold = true;
             sheet.Row(2).Style.Font.Bold = true;
             sheet.Column(1).Style.Font.Bold = true;
             sheet.Column(2).Style.Font.Bold = true;
-            sheet.Cells[1,1,2,2].Merge = true;
+            sheet.Cells[1, 1, 2, 2].Merge = true;
             sheet.DefaultColWidth = 9;
             sheet.Column(1).Width = 20;
             sheet.Column(2).Width = 9;
 
-            var range = sheet.Cells[1,1, sheet.Dimension.Rows, sheet.Dimension.Columns];
+            var range = sheet.Cells[1, 1, sheet.Dimension.Rows, sheet.Dimension.Columns];
 
             range.Style.Border.Left.Style = ExcelBorderStyle.Hair;
             range.Style.Border.Top.Style = ExcelBorderStyle.Hair;
