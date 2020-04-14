@@ -1,11 +1,12 @@
 ﻿using CHI.Infrastructure;
 using CHI.Models.ServiceAccounting;
+using Prism.Mvvm;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace CHI.Services.Report
 {
-    public class ColumnHeaderItem
+    public class ColumnHeaderItem:BindableBase
     {
         public string Name { get; set; }
         public Indicator Indicator { get; set; }
