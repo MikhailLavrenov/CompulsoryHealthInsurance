@@ -366,6 +366,17 @@ namespace CHI.Services.Report
             range.Style.Border.Top.Style = ExcelBorderStyle.Hair;
             range.Style.Border.Right.Style = ExcelBorderStyle.Hair;
             range.Style.Border.Bottom.Style = ExcelBorderStyle.Hair;
+           
+            sheet.OutLineSummaryRight = false;
+            sheet.OutLineSummaryBelow = false;
+
+            foreach (var columnItem in ColumnItems.Where(x=>x.Group.Level>0))
+                for (int i = 1; i <= columnItem.Group.Level; i++)
+                    sheet.Column(columnItem.Index+3).OutlineLevel = i;
+           
+            foreach (var rowItems in RowItems.Where(x => x.Group.Level > 0))
+                for (int i = 1; i <= rowItems.Group.Level; i++)
+                    sheet.Row(rowItems.Index + 3).OutlineLevel = i;
 
             sheet.View.FreezePanes(3, 3);
 
