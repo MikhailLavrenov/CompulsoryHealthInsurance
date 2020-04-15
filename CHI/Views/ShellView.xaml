@@ -24,7 +24,8 @@
         TextElement.FontWeight="Medium"
         TextElement.FontSize="14"
         FontFamily="{materialDesign:MaterialDesignFont}"
-        prism:ViewModelLocator.AutoWireViewModel="True">
+        prism:ViewModelLocator.AutoWireViewModel="True"
+        SnapsToDevicePixels="True">
 
     <Window.Style>
 
@@ -68,7 +69,7 @@
                         Value="White" />
             </Style>
 
-            <Style x:Key="MenuButtonText"
+            <!--<Style x:Key="MenuButtonText"
                    TargetType="TextBlock"
                    BasedOn="{StaticResource {x:Type TextBlock}}">
                 <Setter Property="Margin"
@@ -77,74 +78,11 @@
                         Value="Wrap" />
                 <Setter Property="Width"
                         Value="170" />
-            </Style>
-
-            <Style x:Key="WindowButton"
-                   TargetType="{x:Type ButtonBase}"
-                   BasedOn="{StaticResource MaterialDesignFlatButton}">
-                <Setter Property="IsTabStop"
-                        Value="False" />
-                <Setter Property="Margin"
-                        Value="0" />
-                <Setter Property="Width"
-                        Value="40" />
-                <Setter Property="Height"
-                        Value="30" />
-                <Setter Property="Padding"
-                        Value="0" />
-                <Setter Property="materialDesign:ShadowAssist.ShadowDepth"
-                        Value="Depth0" />
-                <Setter Property="Foreground"
-                        Value="White" />
-                <Setter Property="Background"
-                        Value="Transparent" />
-                <Setter Property="materialDesign:ButtonAssist.CornerRadius"
-                        Value="0" />
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="{x:Type ButtonBase}">
-                            <Grid Background="{TemplateBinding Background}">
-
-                                <materialDesign:Ripple Content="{TemplateBinding Content}"
-                                                       ContentTemplate="{TemplateBinding ContentTemplate}"
-                                                       Focusable="False"
-                                                       HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                                       VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
-                                                       Padding="{TemplateBinding Padding}"
-                                                       SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}">
-
-                                </materialDesign:Ripple>
-                                <Border Background="White"
-                                        Opacity="0"
-                                        x:Name="SelectionHue"
-                                        CornerRadius="{Binding Path=(materialDesign:ButtonAssist.CornerRadius), RelativeSource={RelativeSource TemplatedParent}}"
-                                        BorderThickness="0">
-                                </Border>
-                            </Grid>
-                            <ControlTemplate.Triggers>
-
-                                <Trigger Property="IsEnabled"
-                                         Value="false">
-                                    <Setter Property="Opacity"
-                                            Value="0.23" />
-                                </Trigger>
-
-                                <Trigger Property="IsMouseOver"
-                                         Value="true">
-                                    <Setter TargetName="SelectionHue"
-                                            Property="Opacity"
-                                            Value="0.15" />
-                                </Trigger>
-
-                            </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>
+            </Style>-->
 
             <Style x:Key="CloseButton"
                    TargetType="Button"
-                   BasedOn="{StaticResource WindowButton}">
+                   BasedOn="{StaticResource IconTransparentButton}">
 
                 <Style.Triggers>
                     <Trigger Property="IsMouseOver"
@@ -153,22 +91,6 @@
                                 Value="Red" />
                     </Trigger>
                 </Style.Triggers>
-
-            </Style>
-
-            <Style x:Key="NavigationButton"
-                   BasedOn="{StaticResource WindowButton}"
-                   TargetType="{x:Type Button}">
-                <Setter Property="Padding"
-                        Value="-3" />
-                <Setter Property="Margin"
-                        Value="3" />
-                <Setter Property="Width"
-                        Value="30" />
-                <Setter Property="Height"
-                        Value="30" />
-                <Setter Property="materialDesign:ButtonAssist.CornerRadius"
-                        Value="22" />
 
             </Style>
 
@@ -215,24 +137,36 @@
                     VerticalAlignment="Top"
                     Panel.ZIndex="1">
 
-            <Button Style="{StaticResource WindowButton}"
+            <Button Style="{StaticResource IconTransparentButton}"
+                    Width="40"
+                    Height="30"
+                    Foreground="White"
                     Command="{Binding MinimizeWindowCommand}">
                 <materialDesign:PackIcon Kind="WindowMinimize" />
             </Button>
 
-            <Button Style="{StaticResource WindowButton}"
+            <Button Style="{StaticResource IconTransparentButton}"
+                    Width="40"
+                    Height="30"
+                    Foreground="White"
                     Command="{Binding MaximizeWindowCommand}"
                     Visibility="{Binding IsMaximizedWidow, Converter={i:InvertedBoolToVisibleConverter}}">
                 <materialDesign:PackIcon Kind="WindowMaximize" />
             </Button>
 
-            <Button Style="{StaticResource WindowButton}"
+            <Button Style="{StaticResource IconTransparentButton}"
+                    Width="40"
+                    Height="30"
+                    Foreground="White"
                     Command="{Binding RestoreWindowCommand}"
                     Visibility="{Binding IsMaximizedWidow, Converter={i:BoolToVisibleConverter}}">
                 <materialDesign:PackIcon Kind="WindowRestore" />
             </Button>
 
             <Button Style="{StaticResource CloseButton}"
+                    Width="40"
+                    Height="30"
+                    Foreground="White"
                     Command="{Binding CloseWindowCommand}">
                 <materialDesign:PackIcon Kind="WindowClose" />
             </Button>
@@ -244,7 +178,10 @@
                     Orientation="Horizontal"
                     IsEnabled="{Binding MainRegionService.IsBusy, Converter={i:InvertBoolConverter}}">
 
-            <Button Style="{StaticResource NavigationButton}"
+            <Button Style="{StaticResource IconTransparentButton}"
+                    Width="35" 
+                    Height="35"
+                    materialDesign:ButtonAssist.CornerRadius="17.5"
                     Command="{Binding NavigateBackCommand}"
                     Cursor="Hand"
                     Visibility="{Binding MainRegionService.CanNavigateBack, Converter={i:BoolToVisibleConverter}}">
@@ -254,7 +191,10 @@
                 </Viewbox>
             </Button>
 
-            <Button Style="{StaticResource NavigationButton}"
+            <Button Style="{StaticResource IconTransparentButton}"
+                    Width="40" 
+                    Height="40"
+                    materialDesign:ButtonAssist.CornerRadius="20"
                     Command="{Binding NavigateCommand}"
                     CommandParameter="{x:Type v:NavigationMenuView}">
                 <Viewbox Stretch="Uniform">

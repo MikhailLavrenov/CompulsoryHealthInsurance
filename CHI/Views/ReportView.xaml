@@ -157,10 +157,15 @@
                                 <Border Style="{StaticResource BorderCellStyle}"
                                         Background="{Binding ColorBrush}">
                                     <StackPanel Orientation="Vertical">
-                                        <Button Style="{StaticResource IconButton}"
+                                        <Button Style="{StaticResource IconTransparentButton}" HorizontalAlignment="Left"
                                                 Command="{Binding SwitchCollapseCommand}"
                                                 Visibility="{Binding CanCollapse, Converter={i:BoolToVisibleHiddenConverter}}">
-                                            +/-
+                                            <Viewbox Stretch="Uniform">
+                                                <StackPanel>
+                                                    <materialDesign:PackIcon Kind="ChevronDownCircleOutline" Visibility="{Binding IsCollapsed, Converter={i:BoolToVisibleConverter}}"/>
+                                                    <materialDesign:PackIcon Kind="ChevronRightCircleOutline"  Visibility="{Binding IsCollapsed, Converter={i:InvertedBoolToVisibleConverter}}"/>
+                                                </StackPanel>
+                                            </Viewbox>
                                         </Button>
                                         <TextBlock Style="{StaticResource HeaderCell}"
                                                    Text="{Binding Name}" />
@@ -219,12 +224,18 @@
                                 <Border Style="{StaticResource BorderCellStyle}"
                                         Background="{Binding ColorBrush}">
                                     <StackPanel Orientation="Horizontal">
-                                        <Button Style="{StaticResource IconButton}"
+                                        <Button Style="{StaticResource IconTransparentButton}"
+                                                VerticalAlignment="Top" Width="20" Height="20" 
                                                 Command="{Binding SwitchCollapseCommand}"
                                                 Visibility="{Binding CanCollapse, Converter={i:BoolToVisibleHiddenConverter}}">
-                                            +/-
+                                            <Viewbox Stretch="Uniform" >
+                                                <StackPanel>
+                                                    <materialDesign:PackIcon Kind="ChevronRightCircleOutline"  Visibility="{Binding IsCollapsed, Converter={i:BoolToVisibleConverter}}"/>
+                                                    <materialDesign:PackIcon Kind="ChevronDownCircleOutline" Visibility="{Binding IsCollapsed, Converter={i:InvertedBoolToVisibleConverter}}"/>
+                                                </StackPanel>
+                                            </Viewbox>
                                         </Button>
-                                        <StackPanel Orientation="Vertical"
+                                        <StackPanel Orientation="Vertical" 
                                                     Width="150">
                                             <TextBlock Style="{StaticResource HeaderCell}"
                                                        Text="{Binding Name}" />

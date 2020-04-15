@@ -9,13 +9,13 @@ namespace CHI.Infrastructure
     /// <summary>
     /// Расширение разметки xaml, конвертирует bool в Visibility
     /// </summary>
-    [ValueConversion(typeof(bool), typeof(Visibility))]
+    [ValueConversion(typeof(bool?), typeof(Visibility))]
     public class BoolToVisibleConverterExtension : MarkupExtension, IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            var visible = (bool)value;
-            return visible ? Visibility.Visible : Visibility.Collapsed;
+            var visible = (bool?)value;
+            return visible == true ? Visibility.Visible : Visibility.Collapsed;
         }
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
