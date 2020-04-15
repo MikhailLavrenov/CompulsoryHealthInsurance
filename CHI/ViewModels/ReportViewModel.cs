@@ -67,11 +67,11 @@ namespace CHI.ViewModels
             var month2 = Month;
 
             var registers = dbContext.Registers
-                .Where(x => x.Year == Year && month1 <= x.Month && x.Month >= month2)
-                .Include(x => x.Cases).ThenInclude(x => x.Services)
+                .Where(x => x.Year == Year && month1 <= x.Month && x.Month <= month2)
+                .Include(x => x.Cases).ThenInclude(x => x.Services)                
                 .ToList();
 
-            var plans = dbContext.Plans.Where(x => x.Year == Year && month1 <= x.Month && x.Month >= month2).ToList();
+            var plans = dbContext.Plans.Where(x => x.Year == Year && month1 <= x.Month && x.Month <= month2).ToList();
 
             var classifierId = dbContext.ServiceClassifiers
                 .AsEnumerable()
