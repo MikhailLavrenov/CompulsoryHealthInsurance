@@ -204,12 +204,12 @@ namespace CHI.ViewModels
 
             var dbContext = new ServiceAccountingDBContext();
 
-            var register = dbContext.Registers.FirstOrDefault(x => x.Month == paidRegister.Month && x.Year == paidRegister.Year);
+            var register = dbContext.Registers.Where(x => x.Month == paidRegister.Month && x.Year == paidRegister.Year).Include(x=>x.Cases).FirstOrDefault();
 
             if (register == null)
-                mainRegionService.SetCompleteStatus("Период загружаемого реестра не соотвествует выбранному");
+                mainRegionService.SetCompleteStatus("Период загружаемого реестра не соответствует выбранному");
 
-            mainRegionService.SetBusyStatus("Установка статуса оплаты");
+            mainRegionService.SetBusyStatus("Запись статусов оплаты");
 
             var casePairs = register.Cases.Join(paidRegister.Cases, mcase => mcase.IdCase, paidCase => paidCase.IdCase, (mcase, paidCase) => new { mcase, paidCase }).ToList();
 
@@ -221,10 +221,12 @@ namespace CHI.ViewModels
             }
 
             register.PaymentStateCasesCount = register.Cases.Count(x => x.PaidStatus != PaidKind.None);
-
+           
             dbContext.SaveChanges();
 
-            mainRegionService.SetCompleteStatus("Загрузка статуса оплаты завершена");
+            Refresh();
+
+            mainRegionService.SetCompleteStatus($"Загрузка статусов оплаты завершена. В файле(ах) {paidRegister.Cases.Count} случая, загружено {casePairs.Count()}.");
         }
 
         private void Refresh()

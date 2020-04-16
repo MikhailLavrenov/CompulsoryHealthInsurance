@@ -301,7 +301,7 @@ namespace CHI.Services.BillsRegister
                 {
                     var mCase = new Case()
                     {
-                        IdCase = fomsCase.Z_SL.IDCASE,
+                        IdCase = fomsCase.Z_SL.SL.SL_ID,
                         Place = fomsCase.Z_SL.USL_OK,
                         VisitPurpose = fomsCase.Z_SL.SL.P_CEL,
                         TreatmentPurpose = fomsCase.Z_SL.SL.CEL,
@@ -361,7 +361,7 @@ namespace CHI.Services.BillsRegister
                 {
                     var mCase = new Case()
                     {
-                        IdCase = fomsCase.Z_SL.IDCASE,
+                        IdCase = fomsCase.Z_SL.SL.SL_ID,
                         PaidStatus = (PaidKind)fomsCase.Z_SL.OPLATA,
                         AmountPaid = fomsCase.Z_SL.SUMP,
                         AmountUnpaid = fomsCase.Z_SL.SANK_IT,

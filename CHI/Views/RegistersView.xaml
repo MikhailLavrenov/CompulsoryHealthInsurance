@@ -64,7 +64,7 @@
                                     IsReadOnly="True" />
 
 
-                <DataGridTextColumn Header="Проверенно СМО"
+                <DataGridTextColumn Header="Инф. об оплате"
                                     Binding="{Binding PaymentStateCasesCount}"
                                     MinWidth="80"
                                     IsReadOnly="True" />
