@@ -39,7 +39,7 @@ namespace CHI.ViewModels
 
             root = dbContext.Components.Local.Where(x => x.IsRoot).First();
 
-            RefreshComponents();
+            Refresh();
 
             AddCommand = new DelegateCommand(AddExecute, () => CurrentComponent != null).ObservesProperty(() => CurrentComponent);
             DeleteCommand = new DelegateCommand(DeleteExecute, () => CurrentComponent != null && !CurrentComponent.IsRoot).ObservesProperty(() => CurrentComponent);
@@ -50,7 +50,7 @@ namespace CHI.ViewModels
             DeleteCommand.RaiseCanExecuteChanged();
         }
 
-        private void RefreshComponents()
+        private void Refresh()
         {
             root.OrderChildsRecursive();
 
@@ -63,7 +63,8 @@ namespace CHI.ViewModels
                 CurrentComponent.Childs = new List<Component>();
 
             var nextOrder = CurrentComponent.Childs.Count == 0 ? 0 : CurrentComponent.Childs.Last().Order + 1;
-            var insertIndex = Components.IndexOf(CurrentComponent) + nextOrder + 1;
+            //var insertIndex = Components.IndexOf(CurrentComponent) + nextOrder + 1;
+            //var insertIndex = CurrentComponent.IsRoot? Components.Count : CurrentComponent.Parent.Childs.IndexOf(CurrentComponent)+1
 
             var newComponent = new Component
             {
@@ -72,9 +73,11 @@ namespace CHI.ViewModels
                 Order = nextOrder
             };
 
-            Components.Insert(insertIndex, newComponent);
+            //Components.Insert(insertIndex, newComponent);
 
             CurrentComponent.Childs.Add(newComponent);
+
+            Refresh();
         }
 
         private void DeleteExecute()
@@ -87,7 +90,7 @@ namespace CHI.ViewModels
             for (int i = offset; i < parentDetails.Count; i++)
                 parentDetails[i].Order--;
 
-            RefreshComponents();
+            Refresh();
         }
 
         private bool MoveUpCanExecute()
@@ -104,7 +107,7 @@ namespace CHI.ViewModels
             CurrentComponent.Order--;
             previous.Order++;
 
-            RefreshComponents();
+            Refresh();
 
             MoveDownCommand.RaiseCanExecuteChanged();
             MoveUpCommand.RaiseCanExecuteChanged();
@@ -124,7 +127,7 @@ namespace CHI.ViewModels
             CurrentComponent.Order++;
             next.Order--;
 
-            RefreshComponents();
+            Refresh();
 
             MoveDownCommand.RaiseCanExecuteChanged();
             MoveUpCommand.RaiseCanExecuteChanged();
