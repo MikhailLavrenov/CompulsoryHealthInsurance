@@ -11,6 +11,11 @@ namespace CHI.Services.BillsRegister
     public class SL
     {
         /// <summary>
+        /// Идентификатор случая
+        /// </summary>
+        [XmlElement(ElementName = "SL_ID")]
+        public string SL_ID { get; set; }
+        /// <summary>
         /// Код лечащего врача/врача, закрывшего талон
         /// </summary>
         [XmlElement(ElementName = "IDDOKT")]
