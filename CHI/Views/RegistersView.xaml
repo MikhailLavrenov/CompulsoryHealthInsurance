@@ -36,7 +36,7 @@
         <FrameworkElement Grid.Row="1"
                           Style="{StaticResource Separator}" />
 
-        <i:CustomDataGrid Grid.Row="2" CanUserAddRows="False" ItemsSource="{Binding Registers, Mode=TwoWay}">
+        <i:CustomDataGrid Grid.Row="2" CanUserAddRows="False" ItemsSource="{Binding Registers, Mode=TwoWay}" SelectedItem="{Binding CurrentRegister}">
 
             <DataGrid.Columns>
 
@@ -58,8 +58,14 @@
                                     MinWidth="80"
                                     IsReadOnly="True" />
 
-                <DataGridTextColumn Header="Кол-во случаев"
+                <DataGridTextColumn Header="Случаев"
                                     Binding="{Binding CasesCount}"
+                                    MinWidth="80"
+                                    IsReadOnly="True" />
+
+
+                <DataGridTextColumn Header="Проверенно СМО"
+                                    Binding="{Binding PaymentStateCasesCount}"
                                     MinWidth="80"
                                     IsReadOnly="True" />
 

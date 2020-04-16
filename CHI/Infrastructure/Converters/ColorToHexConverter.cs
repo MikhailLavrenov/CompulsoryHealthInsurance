@@ -20,7 +20,7 @@ namespace CHI.Infrastructure
         }
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            var drawingColor = ExtensionMethods.GetDrawingColor(((SolidColorBrush)value).Color);
+            var drawingColor = Helpers.GetDrawingColor(((SolidColorBrush)value).Color);
 
             return System.Drawing.ColorTranslator.ToHtml(drawingColor);
         }

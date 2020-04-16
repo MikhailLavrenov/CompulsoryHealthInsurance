@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Windows;
 
 namespace CHI.Services.Report
 {
@@ -106,7 +105,7 @@ namespace CHI.Services.Report
             for (int month = monthBegin; month <= monthEnd; month++)
             {
                 var cases = registers.FirstOrDefault(x => x.Month == month)?.Cases ?? new List<Case>();
-                var classifier = classifiers.FirstOrDefault(x => ExtensionMethods.BetweenDates(x.ValidFrom, x.ValidTo, month, year))?.ServiceClassifierItems ?? new List<ServiceClassifierItem>();
+                var classifier = classifiers.FirstOrDefault(x => Helpers.BetweenDates(x.ValidFrom, x.ValidTo, month, year))?.ServiceClassifierItems ?? new List<ServiceClassifierItem>();
 
                 //заполняет факт
                 SetValuesFromCases(month, year, cases, classifier, true);
@@ -215,10 +214,10 @@ namespace CHI.Services.Report
         {
             var filters = ColumnGroups.Select(x => new
             {
-                TreatmentCodes = x.TreatmentFilters.Where(y => ExtensionMethods.BetweenDates(y.ValidFrom, y.ValidTo, month, year)).Select(x => x.Code).ToList(),
-                VisitCodes = x.VisitFilters.Where(y => ExtensionMethods.BetweenDates(y.ValidFrom, y.ValidTo, month, year)).Select(x => x.Code).ToList(),
-                ContainsServiceCodes = x.ContainsServiceFilters.Where(y => ExtensionMethods.BetweenDates(y.ValidFrom, y.ValidTo, month, year)).Select(x => x.Code).ToList(),
-                NotContainsServiceCodes = x.NotContainsServiceFilters.Where(y => ExtensionMethods.BetweenDates(y.ValidFrom, y.ValidTo, month, year)).Select(x => x.Code).ToList()
+                TreatmentCodes = x.TreatmentFilters.Where(y => Helpers.BetweenDates(y.ValidFrom, y.ValidTo, month, year)).Select(x => x.Code).ToList(),
+                VisitCodes = x.VisitFilters.Where(y => Helpers.BetweenDates(y.ValidFrom, y.ValidTo, month, year)).Select(x => x.Code).ToList(),
+                ContainsServiceCodes = x.ContainsServiceFilters.Where(y => Helpers.BetweenDates(y.ValidFrom, y.ValidTo, month, year)).Select(x => x.Code).ToList(),
+                NotContainsServiceCodes = x.NotContainsServiceFilters.Where(y => Helpers.BetweenDates(y.ValidFrom, y.ValidTo, month, year)).Select(x => x.Code).ToList()
             })
                 .ToList();
 
@@ -292,7 +291,7 @@ namespace CHI.Services.Report
                                     break;
                             }
 
-                            var ratio = columnItem.Indicator.Ratios.FirstOrDefault(x => ExtensionMethods.BetweenDates(x.ValidFrom, x.ValidTo, month, year));
+                            var ratio = columnItem.Indicator.Ratios.FirstOrDefault(x => Helpers.BetweenDates(x.ValidFrom, x.ValidTo, month, year));
 
                             if (ratio != null)
                                 valueItem.Value = valueItem.Value * ratio.Multiplier / ratio.Divider;
@@ -316,13 +315,13 @@ namespace CHI.Services.Report
                     sheet.Cells[1, i + 3, 1, i + 3 + ColumnItems[i].Group.HeaderItems.Count - 1].Merge = true;
 
                     sheet.Cells[1, i + 3].Value = ColumnItems[i].Group.Name;
-                    var drawingColor = ExtensionMethods.GetDrawingColor(ColumnItems[i].Group.Color);
+                    var drawingColor = Helpers.GetDrawingColor(ColumnItems[i].Group.Color);
                     sheet.Cells[1, i + 3].Style.Fill.SetBackground(drawingColor);
                 }
 
                 sheet.Cells[2, i + 3].Value = ColumnItems[i].Name;
 
-                var drawingColor2 = ExtensionMethods.GetDrawingColor(ColumnItems[i].Group.Color);
+                var drawingColor2 = Helpers.GetDrawingColor(ColumnItems[i].Group.Color);
                 sheet.Cells[2, i + 3].Style.Fill.SetBackground(drawingColor2);
             }
 
@@ -335,19 +334,27 @@ namespace CHI.Services.Report
 
                     sheet.Cells[i + 3, 1].Style.WrapText = true;
                     sheet.Cells[i + 3, 1].Value = $"{RowItems[i].Group.Name}{Environment.NewLine}{RowItems[i].Group.SubName}";
-                    var drawingColor = ExtensionMethods.GetDrawingColor(RowItems[i].Group.Color);
+                    var drawingColor = Helpers.GetDrawingColor(RowItems[i].Group.Color);
                     sheet.Cells[i + 3, 1].Style.Fill.SetBackground(drawingColor);
                 }
 
                 sheet.Cells[i + 3, 2].Value = RowItems[i].Name;
 
                 System.Drawing.Color drawingColor2 = new System.Drawing.Color();
-                drawingColor2 = ExtensionMethods.GetDrawingColor(RowItems[i].Group.Color);
+                drawingColor2 = Helpers.GetDrawingColor(RowItems[i].Group.Color);
                 sheet.Cells[i + 3, 2].Style.Fill.SetBackground(drawingColor2);
             }
 
             //вставляет в excel значения отчета
-            sheet.Cells[3, 3].LoadFromArrays(Values.Select(x => x.Select(y => y.Value.ToString()).ToArray()).ToArray());
+            foreach (var rowValues in Values)
+                foreach (var valueItem in rowValues)
+                {
+                    sheet.Cells[valueItem.RowIndex + 3, valueItem.ColumnIndex + 3].Value = valueItem.Value;
+
+                    var drawingColor = Helpers.GetDrawingColor(valueItem.Color);
+                    sheet.Cells[valueItem.RowIndex + 3, valueItem.ColumnIndex + 3].Style.Fill.SetBackground(drawingColor);
+                }
+
 
             //форматирование
             sheet.Cells.Style.VerticalAlignment = ExcelVerticalAlignment.Top;
@@ -366,14 +373,14 @@ namespace CHI.Services.Report
             range.Style.Border.Top.Style = ExcelBorderStyle.Hair;
             range.Style.Border.Right.Style = ExcelBorderStyle.Hair;
             range.Style.Border.Bottom.Style = ExcelBorderStyle.Hair;
-           
+
             sheet.OutLineSummaryRight = false;
             sheet.OutLineSummaryBelow = false;
 
-            foreach (var columnItem in ColumnItems.Where(x=>x.Group.Level>0))
+            foreach (var columnItem in ColumnItems.Where(x => x.Group.Level > 0))
                 for (int i = 1; i <= columnItem.Group.Level; i++)
-                    sheet.Column(columnItem.Index+3).OutlineLevel = i;
-           
+                    sheet.Column(columnItem.Index + 3).OutlineLevel = i;
+
             foreach (var rowItems in RowItems.Where(x => x.Group.Level > 0))
                 for (int i = 1; i <= rowItems.Group.Level; i++)
                     sheet.Row(rowItems.Index + 3).OutlineLevel = i;

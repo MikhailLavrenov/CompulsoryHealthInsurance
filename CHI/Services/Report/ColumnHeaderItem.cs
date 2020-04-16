@@ -20,7 +20,7 @@ namespace CHI.Services.Report
         {
             Group = headerGroup;
             Indicator = indicator;
-            Name= indicator.FacadeKind.GetDescription();
+            Name= indicator.FacadeKind.GetShortDescription();
             Priority = headerGroup.Level + 1;
         }
 

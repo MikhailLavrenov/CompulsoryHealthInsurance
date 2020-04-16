@@ -20,7 +20,6 @@ namespace CHI.Services.Report
         public int Level { get; set; }
         public int Index { get; set; }
         public Color Color { get; set; }
-        public SolidColorBrush ColorBrush { get; set; }
         public bool CanCollapse { get; private set; }
         public bool? IsCollapsed { get => isCollapsed; private set => SetProperty(ref isCollapsed, value); }
         public bool IsVisible
@@ -62,7 +61,6 @@ namespace CHI.Services.Report
             IsRoot = component.IsRoot;
             Order = component.Order;
             Color = (Color)ColorConverter.ConvertFromString(component.HexColor);
-            ColorBrush = new SolidColorBrush(Color);
             CanCollapse = component.Childs?.Any() ?? false;
             IsCollapsed = CanCollapse ? false : (bool?)null;
             IsVisible = true;

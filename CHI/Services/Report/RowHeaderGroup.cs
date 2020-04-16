@@ -12,7 +12,7 @@ namespace CHI.Services.Report
     public class RowHeaderGroup : BindableBase, IOrderedHierarchical<RowHeaderGroup>
     {
         bool? isCollapsed;
-        bool isVisible=true;
+        bool isVisible = true;
 
         public string Name { get; set; }
         public string SubName { get; set; }
@@ -21,7 +21,6 @@ namespace CHI.Services.Report
         public int Level { get; set; }
         public int Index { get; set; }
         public Color Color { get; set; }
-        public SolidColorBrush ColorBrush { get; set; }
         public bool CanCollapse { get; private set; }
         public bool? IsCollapsed { get => isCollapsed; private set => SetProperty(ref isCollapsed, value); }
         public bool IsVisible
@@ -63,7 +62,6 @@ namespace CHI.Services.Report
             Parent = parent;
             Level = IsRoot ? -1 : parent.Level + 1;
             Color = (Color)ColorConverter.ConvertFromString(department.HexColor);
-            ColorBrush = new SolidColorBrush(Color);
             CanCollapse = (department.Childs?.Any() ?? false) || (department.Employees?.Any() ?? false);
             IsCollapsed = CanCollapse ? false : (bool?)null;
             IsVisible = true;
@@ -85,7 +83,7 @@ namespace CHI.Services.Report
             IsRoot = false;
             Parent = parent;
             Level = parent.Level + 1;
-            Color = Colors.Transparent;
+            Color = Parent.Childs.Count % 2 == 1 ? Colors.WhiteSmoke : Colors.Transparent;
             CanCollapse = false;
             IsCollapsed = null;
             IsVisible = true;

@@ -39,10 +39,10 @@
                    Text="Доступ к учетным записям" />
         <ComboBox Grid.Row="0"
                   Grid.Column="1"
-                  ItemsSource="{Binding Path=Settings.CredentialsScope, Converter={i:EnumToCollectionConverter}, Mode=OneTime}"
+                  ItemsSource="{Binding Settings.CredentialsScope, Converter={i:EnumToCollectionConverter}, Mode=OneTime}"
                   SelectedValuePath="Key"
                   DisplayMemberPath="Value"
-                  SelectedValue="{Binding Path=Settings.CredentialsScope}" />
+                  SelectedValue="{Binding Settings.CredentialsScope}" />
 
         <TextBlock Grid.Row="1"
                    Grid.Column="0"

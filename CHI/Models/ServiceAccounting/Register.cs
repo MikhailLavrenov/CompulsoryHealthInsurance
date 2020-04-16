@@ -12,6 +12,7 @@ namespace CHI.Models.ServiceAccounting
         public DateTime BuildDate { get; set; }
         public string Title { get; set; }
         public int CasesCount { get; set; }
+        public int PaymentStateCasesCount { get; set; }
         public List<Case> Cases { get; set; }
 
     }

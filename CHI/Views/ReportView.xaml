@@ -10,6 +10,7 @@
              xmlns:prism="http://prismlibrary.com/"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:po="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"
              mc:Ignorable="d"
              d:DesignHeight="600"
              d:DesignWidth="800"
@@ -31,13 +32,16 @@
 
             </Style>
 
+            <SolidColorBrush x:Key="CellBorderBrush"
+                             Color="DarkGray"/>
+
             <Style TargetType="Border"
                    x:Key="BorderCellStyle">
 
                 <Setter Property="BorderThickness"
                         Value="0,0,1,1" />
                 <Setter Property="BorderBrush"
-                        Value="LightGray" />
+                        Value="{StaticResource CellBorderBrush}" />
                 <Setter Property="SnapsToDevicePixels"
                         Value="True" />
 
@@ -130,7 +134,7 @@
             <Border Grid.RowSpan="2"
                     Grid.ColumnSpan="2"
                     BorderThickness="1"
-                    BorderBrush="LightGray"
+                    BorderBrush="{StaticResource CellBorderBrush}"
                     SnapsToDevicePixels="True"
                     Panel.ZIndex="1" />
 
@@ -154,8 +158,15 @@
                         <DataTemplate>
                             <StackPanel Orientation="Vertical"
                                         Visibility="{Binding IsVisible, Converter={i:BoolToVisibleConverter}}">
+
+                                <StackPanel.Resources>
+                                    <SolidColorBrush x:Key="HeaderBrush"                     
+                                                     Color="{Binding Color}"                     
+                                                     po:Freeze="True"/>
+                                </StackPanel.Resources>
+
                                 <Border Style="{StaticResource BorderCellStyle}"
-                                        Background="{Binding ColorBrush}">
+                                        Background="{StaticResource HeaderBrush}">
                                     <StackPanel Orientation="Vertical">
                                         <Button Style="{StaticResource IconTransparentButton}" HorizontalAlignment="Left"
                                                 Command="{Binding SwitchCollapseCommand}"
@@ -183,7 +194,7 @@
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
                                             <Border Style="{StaticResource BorderCellStyle}"
-                                                    Background="{Binding Group.ColorBrush}">
+                                                    Background="{StaticResource HeaderBrush}">
                                                 <TextBlock Style="{StaticResource HeaderCell}"
                                                            Width="70"
                                                            Text="{Binding Name}" />
@@ -219,10 +230,18 @@
 
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
+
                             <StackPanel Orientation="Horizontal"
                                         Visibility="{Binding IsVisible, Converter={i:BoolToVisibleConverter}}">
+
+                                <StackPanel.Resources>
+                                    <SolidColorBrush x:Key="HeaderBrush"                     
+                                                     Color="{Binding Color}"                     
+                                                     po:Freeze="True"/>
+                                </StackPanel.Resources>
+
                                 <Border Style="{StaticResource BorderCellStyle}"
-                                        Background="{Binding ColorBrush}">
+                                        Background="{StaticResource HeaderBrush}">
                                     <StackPanel Orientation="Horizontal">
                                         <Button Style="{StaticResource IconTransparentButton}"
                                                 VerticalAlignment="Top" Width="20" Height="20" 
@@ -257,9 +276,10 @@
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
                                             <Border Style="{StaticResource BorderCellStyle}"
-                                                    Background="{Binding Group.ColorBrush}">
+                                                    Background="{StaticResource HeaderBrush}">
                                                 <TextBlock Style="{StaticResource HeaderCell}"
-                                                           Text="{Binding Name}" />
+                                                           Text="{Binding Name}"
+                                                           Width="70"/>
                                             </Border>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
@@ -313,6 +333,9 @@
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
                                         <Border Style="{StaticResource BorderCellStyle}" Visibility="{Binding IsVisible, Converter={i:BoolToVisibleConverter}}">
+                                            <Border.Background>
+                                                <SolidColorBrush Color="{Binding Color}"/>
+                                            </Border.Background>
                                             <TextBlock Width="70"
                                                        Text="{Binding Value}" />
                                         </Border>

@@ -22,7 +22,7 @@ namespace CHI.ViewModels
         public CaseFilter CurrentCaseFilter { get => currentCaseFilter; set => SetProperty(ref currentCaseFilter, value); }
         public Component CurrentComponent { get => currentComponent; set => SetProperty(ref currentComponent, value); }
         public ObservableCollection<CaseFilter> CaseFilters { get => caseFilters; set => SetProperty(ref caseFilters, value); }
-        public List<KeyValuePair<Enum, string>> CaseFilterKinds { get; } = CaseFilterKind.None.GetAllValuesAndDescriptions().ToList();
+        public List<KeyValuePair<Enum, string>> CaseFilterKinds { get; } = Helpers.GetAllValuesAndDescriptions(typeof(CaseFilterKind));
 
         public DelegateCommand AddCommand { get; }
         public DelegateCommand DeleteCommand { get; }
