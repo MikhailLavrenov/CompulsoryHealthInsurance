@@ -19,7 +19,7 @@ namespace CHI.Services.Report
         {            
             Group = headerGroup;
             Parameter = parameter;
-            Name = parameter.Kind.GetDescription();
+            Name = parameter.Kind.GetShortDescription();
             Priority = headerGroup.Level + 1;
         }
 

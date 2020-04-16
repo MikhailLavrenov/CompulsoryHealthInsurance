@@ -15,7 +15,7 @@ namespace CHI.Infrastructure
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return (value as Enum).GetAllValuesAndDescriptions();
+            return Helpers.GetAllValuesAndDescriptions(value.GetType());
         }
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {

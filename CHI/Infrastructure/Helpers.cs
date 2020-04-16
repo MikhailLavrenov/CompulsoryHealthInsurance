@@ -16,7 +16,7 @@ namespace CHI.Infrastructure
     /// <summary>
     /// Содержит все расширяющие методы
     /// </summary>
-    public static class ExtensionMethods
+    public static class Helpers
     {
         /// <summary>
         /// Возвращает описание (Description) перечисления (enum)
@@ -30,20 +30,56 @@ namespace CHI.Infrastructure
             Attribute attribute = Attribute.GetCustomAttribute(fieldInfo, typeof(DescriptionAttribute), false);
             DescriptionAttribute descriptionAttribute = attribute as DescriptionAttribute;
 
-            return descriptionAttribute.Description;
+            return descriptionAttribute?.Description ?? string.Empty; ;
         }
+
+        /// <summary>
+        /// Возвращает  краткое описание (ShortDescription) перечисления (enum)
+        /// </summary>
+        /// <param name="value">Перечисление (enum)</param>
+        /// <returns>Краткое описание</returns>
+        public static string GetShortDescription(this Enum value)
+        {
+            Type type = value.GetType();
+            FieldInfo fieldInfo = type.GetField(value.ToString());
+            Attribute attribute = Attribute.GetCustomAttribute(fieldInfo, typeof(MultipleDescriptionAttribute), false);
+            MultipleDescriptionAttribute descriptionAttribute = attribute as MultipleDescriptionAttribute;
+
+            return descriptionAttribute?.ShortDescription??string.Empty;
+        }
+
         /// <summary>
         /// Возвращает список всех значений enum и их описаний 
         /// </summary>
         /// <typeparam name="T">Перечисление (enum)</typeparam>
         /// <returns>Перечисление значений и описаний</returns>
-        public static IEnumerable<KeyValuePair<Enum, string>> GetAllValuesAndDescriptions(this Enum en)
+        public static List<KeyValuePair<Enum, string>> GetAllValuesAndDescriptions(Type enumType)
         {
-            return Enum.GetValues(en.GetType())
+            if (!enumType.IsSubclassOf(typeof(Enum)))
+                throw new ArgumentException("Предоставленный тип не является наследником Enum");
+
+            return Enum.GetValues(enumType)
                 .Cast<Enum>()
                 .Select(x => new KeyValuePair<Enum, string>(x, x.GetDescription()))
                 .ToList();
         }
+
+        /// <summary>
+        /// Возвращает список всех значений enum и их кратких описаний 
+        /// </summary>
+        /// <typeparam name="T">Перечисление (enum)</typeparam>
+        /// <returns>Перечисление значений и кратких описаний</returns>
+        public static List<KeyValuePair<Enum, string>> GetAllValuesAndShortDescriptions(Type enumType)
+        {
+            if (!enumType.IsSubclassOf(typeof(Enum)))
+                throw new ArgumentException("Предоставленный тип не является наследником Enum");
+
+            return Enum.GetValues(enumType)
+                .Cast<Enum>()
+                .Select(x => new KeyValuePair<Enum, string>(x, x.GetShortDescription()))
+                .ToList();
+        }
+
         // Находит в логическом дереве родительский элемент с заданным Именем
         public static FrameworkElement FindParent(this FrameworkElement element, string foundName)
         {
@@ -57,6 +93,7 @@ namespace CHI.Infrastructure
 
             return null;
         }
+
         // Находит в логическом дереве родительский элемент соответствующий типу T
         public static T FindLogicalParent<T>(this UIElement element) where T : UIElement
         {
@@ -70,6 +107,7 @@ namespace CHI.Infrastructure
 
             return null;
         }
+
         // Находит в визульном дереве родительский элемент соответствующий типу T
         public static T FindVisualParent<T>(this UIElement element) where T : UIElement
         {
@@ -83,6 +121,7 @@ namespace CHI.Infrastructure
 
             return null;
         }
+
         // Рекурсивно находит дочерний видимый элемент соответствующий типу T
         public static T FindVisualVisibleChild<T>(this UIElement element) where T : UIElement
         {
@@ -107,6 +146,7 @@ namespace CHI.Infrastructure
 
             return null;
         }
+
         /// <summary>
         /// Вызывает диалоговое окно модально
         /// </summary>
@@ -125,6 +165,7 @@ namespace CHI.Infrastructure
 
             return result.Result;
         }
+
         /// <summary>
         /// Возвращает массив байтов потока
         /// </summary>

@@ -22,7 +22,7 @@ namespace CHI.ViewModels
         public Indicator CurrentIndicator { get => currentIndicator; set => SetProperty(ref currentIndicator, value); }
         public Component CurrentComponent { get => currentComponent; set => SetProperty(ref currentComponent, value); }
         public ObservableCollection<Indicator> Indicators { get => indicators; set => SetProperty(ref indicators, value); }
-        public List<KeyValuePair<Enum, string>> IndicatorKinds { get; } = IndicatorKind.None.GetAllValuesAndDescriptions().ToList();
+        public List<KeyValuePair<Enum, string>> IndicatorKinds { get; } = Helpers.GetAllValuesAndDescriptions(typeof(IndicatorKind));
 
         public DelegateCommand AddCommand { get; }
         public DelegateCommand DeleteCommand { get; }

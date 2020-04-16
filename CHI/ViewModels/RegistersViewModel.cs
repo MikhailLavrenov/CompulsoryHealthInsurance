@@ -93,7 +93,7 @@ namespace CHI.ViewModels
                     {
                         var classifierId = dbContext.ServiceClassifiers
                             .ToList()
-                            .Where(x => ExtensionMethods.BetweenDates(x.ValidFrom, x.ValidTo, register.Month, register.Year))
+                            .Where(x => Helpers.BetweenDates(x.ValidFrom, x.ValidTo, register.Month, register.Year))
                             .FirstOrDefault()?.Id;
 
                         caseClosingCodes = classifierId == null ?
@@ -219,6 +219,8 @@ namespace CHI.ViewModels
                 casePair.mcase.AmountPaid = casePair.paidCase.AmountPaid;
                 casePair.mcase.AmountUnpaid = casePair.paidCase.AmountUnpaid;
             }
+
+            register.PaymentStateCasesCount = register.Cases.Count(x => x.PaidStatus != PaidKind.None);
 
             dbContext.SaveChanges();
 
