@@ -1,5 +1,4 @@
 ﻿using CHI.Models.Infrastructure;
-using CHI.Models.ServiceAccounting;
 using CHI.Views;
 using Prism.Services.Dialogs;
 using System;
@@ -45,7 +44,7 @@ namespace CHI.Infrastructure
             Attribute attribute = Attribute.GetCustomAttribute(fieldInfo, typeof(MultipleDescriptionAttribute), false);
             MultipleDescriptionAttribute descriptionAttribute = attribute as MultipleDescriptionAttribute;
 
-            return descriptionAttribute?.ShortDescription??string.Empty;
+            return descriptionAttribute?.ShortDescription ?? string.Empty;
         }
 
         /// <summary>
@@ -85,7 +84,7 @@ namespace CHI.Infrastructure
         {
             while (element != null)
             {
-                if (element.Name==foundName)
+                if (element.Name == foundName)
                     return element;
 
                 element = element.Parent as FrameworkElement;
@@ -148,22 +147,44 @@ namespace CHI.Infrastructure
         }
 
         /// <summary>
-        /// Вызывает диалоговое окно модально
+        /// Вызывает текстовое диалоговое окно модально
         /// </summary>
-        public static ButtonResult ShowDialog(this IDialogService dialogService, string title, string message)
+        public static ButtonResult ShowTextDialog(this IDialogService dialogService, string title, string message)
         {
             IDialogResult result = null;
             var dialogName = nameof(NotificationDialogView);
             var dialogParameters = new DialogParameters();
             dialogParameters.Add("title", title);
             dialogParameters.Add("message", message);
-            var dispatcher = System.Windows.Application.Current.Dispatcher;
 
-            var showDialog = (Action)(() => dialogService.ShowDialog(dialogName, dialogParameters, x => result = x));
-
-            dispatcher.BeginInvoke(showDialog).Task.GetAwaiter().GetResult();
+            Application.Current.Dispatcher.Invoke(() => dialogService.ShowDialog(dialogName, dialogParameters, x => result = x));
 
             return result.Result;
+        }
+
+        /// <summary>
+        /// Вызывает диалоговое окно выбора цвета модально
+        /// </summary>
+        public static string ShowColorDialog(this IDialogService dialogService, string title, string hexColor)
+        {
+            IDialogResult result = null;
+            var dialogName = nameof(ColorDialogView);
+
+            var color = (Color)ColorConverter.ConvertFromString(hexColor);
+            var dialogParameters = new DialogParameters();
+            dialogParameters.Add("title", title);
+            dialogParameters.Add("color", color);
+
+            Application.Current.Dispatcher.Invoke(() => dialogService.ShowDialog(dialogName, dialogParameters, x => result = x));
+
+            if (result.Result == ButtonResult.OK)
+            {
+                color = result.Parameters.GetValue<Color>("color");
+
+                return System.Drawing.ColorTranslator.ToHtml(GetDrawingColor(color));
+            }
+            else
+                return hexColor;
         }
 
         /// <summary>
@@ -186,7 +207,7 @@ namespace CHI.Infrastructure
             return result;
         }
 
-        public static List<T> ToListRecursive<T>(this T obj) where T: class, IOrderedHierarchical<T>
+        public static List<T> ToListRecursive<T>(this T obj) where T : class, IOrderedHierarchical<T>
         {
             var result = new List<T>();
 

@@ -95,48 +95,46 @@
         <Setter Property="materialDesign:ButtonAssist.CornerRadius"
                         Value="0" />
         <Setter Property="Template">
+
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ButtonBase}">
                     <Grid Background="{TemplateBinding Background}">
-
                         <materialDesign:Ripple Content="{TemplateBinding Content}"
                                                        ContentTemplate="{TemplateBinding ContentTemplate}"
                                                        Focusable="False"
                                                        HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
                                                        VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
                                                        Padding="{TemplateBinding Padding}"
-                                                       SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}">
-
-                        </materialDesign:Ripple>
-                        
-                        <Border Background="White"
-                                        Opacity="0"
-                                        x:Name="SelectionHue"
-                                        CornerRadius="{Binding Path=(materialDesign:ButtonAssist.CornerRadius), RelativeSource={RelativeSource TemplatedParent}}"
-                                        BorderThickness="0">
-                        </Border>
+                                                       SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                        <Border Background="White"                                        
+                                Opacity="0"                                       
+                                x:Name="SelectionHue"                                     
+                                CornerRadius="{Binding (materialDesign:ButtonAssist.CornerRadius), RelativeSource={RelativeSource TemplatedParent}}"                                  
+                                BorderThickness="0"/>
                     </Grid>
+
                     <ControlTemplate.Triggers>
+
+                        <Trigger Property="IsMouseOver"                     
+                                 Value="true">
+                            <Setter Property="Foreground"                       
+                                    Value="{DynamicResource PrimaryHueMidBrush}" />
+                            <Setter TargetName="SelectionHue"                                            
+                                    Property="Opacity"                                            
+                                    Value="0.15" />
+                        </Trigger>
+
+                        <Trigger Property="IsMouseOver"                  
+                                 Value="false">
+                            <Setter Property="Foreground"                       
+                                    Value="DimGray" />
+                        </Trigger>
 
                         <Trigger Property="IsEnabled"
                                          Value="false">
                             <Setter Property="Opacity"
                                             Value="0.23" />
                         </Trigger>
-                        <Trigger Property="IsMouseOver"
-                     Value="true">
-                            <Setter Property="Foreground"
-                        Value="{DynamicResource PrimaryHueMidBrush}" />
-                            <Setter TargetName="SelectionHue"
-                                            Property="Opacity"
-                                            Value="0.15" />
-                        </Trigger>
-                        <Trigger Property="IsMouseOver"
-                     Value="false">
-                            <Setter Property="Foreground"
-                        Value="DimGray" />
-                        </Trigger>
-
 
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -157,6 +155,19 @@
                 Value="21" />
         <Setter Property="materialDesign:ButtonAssist.CornerRadius"
                 Value="10.5" />
+    </Style>
+
+    <Style x:Key="DataGridColorButton"
+           TargetType="{x:Type Button}"
+           BasedOn="{StaticResource DataGridRowButton}">
+        <Setter Property="Margin"
+                Value="-7" />
+        <Setter Property="Height"
+                Value="26" />
+        <Setter Property="Width"
+                Value="26" />
+        <Setter Property="materialDesign:ButtonAssist.CornerRadius"
+                Value="15" />
     </Style>
 
     <!--TextBoxes-->

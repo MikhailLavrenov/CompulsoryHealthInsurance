@@ -77,8 +77,11 @@
                 <DataGridTemplateColumn Width="50">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Border Margin="0,-8,0,-8" 
-                                    Background="{Binding HexColor, Converter={i:HexToSolidColorBrushConverterExtension}}"/>
+                            <Button Style="{StaticResource DataGridColorButton}"
+                                    Background="{Binding HexColor, Converter={i:HexToSolidColorBrushConverterExtension}}"
+                                    Command="{Binding DataContext.SelectColorCommand, Source={x:Reference datagrid1}}">
+                            </Button>
+
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>

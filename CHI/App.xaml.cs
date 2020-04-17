@@ -52,6 +52,7 @@ namespace CHI
             containerRegistry.RegisterSingleton<ILicenseManager, LicenseManager>();
             containerRegistry.Register<IFileDialogService, FileDialogService>();
             containerRegistry.RegisterDialog<NotificationDialogView, NotificationDialogViewModel>();
+            containerRegistry.RegisterDialog<ColorDialogView, ColorDialogViewModel>();
 
             containerRegistry.RegisterForNavigation<NavigationMenuView>();
             containerRegistry.RegisterForNavigation<AttachedPatientsView>();

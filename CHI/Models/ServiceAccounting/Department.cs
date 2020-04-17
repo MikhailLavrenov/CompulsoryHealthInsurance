@@ -1,15 +1,18 @@
 ﻿using CHI.Models.Infrastructure;
+using Prism.Mvvm;
 using System.Collections.Generic;
 using System.Windows.Media;
 
 namespace CHI.Models.ServiceAccounting
 {
-    public class Department: IOrderedHierarchical<Department>
+    public class Department: BindableBase, IOrderedHierarchical<Department>
     {
+        string hexColor = "#FFFFFF";
+
         public int Id { get; set; }
         public string Name { get; set; }
         public int Order { get; set; }
-        public string HexColor { get; set; } = "#FFFFFF";
+        public string HexColor { get=> hexColor; set=>SetProperty(ref hexColor, value); }
         public List<Employee> Employees { get; set; }
         public List<Parameter> Parameters { get; set; }
         public bool IsRoot { get; set; }

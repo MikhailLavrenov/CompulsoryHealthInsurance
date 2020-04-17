@@ -13,14 +13,14 @@
 
     <Grid>
 
-        <Border Opacity="0.35"
-                Background="LightGray" />
-
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
+
+            <Border Opacity="0.35"
+                Background="LightGray" />
 
             <TextBlock Grid.Row="0"
                        Text="Ожидайте..."

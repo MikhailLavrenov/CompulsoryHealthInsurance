@@ -3,6 +3,7 @@ using Prism.Commands;
 using Prism.Regions;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows;
 
 namespace CHI.Infrastructure
 {
@@ -81,8 +82,7 @@ namespace CHI.Infrastructure
         }
         private void SwitchProgressBar()
         {
-
-            System.Windows.Application.Current.Dispatcher.Invoke(() =>
+            Application.Current.Dispatcher.Invoke(() =>
             {
                 if (IsBusy)
                     regionManager.RequestNavigate(RegionNames.ProgressBarRegion, nameof(ProgressBarView));

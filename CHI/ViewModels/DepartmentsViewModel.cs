@@ -3,6 +3,7 @@ using CHI.Models.ServiceAccounting;
 using Microsoft.EntityFrameworkCore;
 using Prism.Commands;
 using Prism.Regions;
+using Prism.Services.Dialogs;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -17,6 +18,7 @@ namespace CHI.ViewModels
         Department root;
         List<Department> parents;
         IMainRegionService mainRegionService;
+        IDialogService dialogService;
 
         public bool KeepAlive { get => false; }
         public Department CurrentDepartment { get => currentDepartment; set => SetProperty(ref currentDepartment, value); }
@@ -27,10 +29,13 @@ namespace CHI.ViewModels
         public DelegateCommand DeleteCommand { get; }
         public DelegateCommand MoveUpCommand { get; }
         public DelegateCommand MoveDownCommand { get; }
+        public DelegateCommand SelectColorCommand { get; }
 
-        public DepartmentsViewModel(IMainRegionService mainRegionService)
+        public DepartmentsViewModel(IMainRegionService mainRegionService, IDialogService dialogService)
         {
             this.mainRegionService = mainRegionService;
+            this.dialogService = dialogService;
+
             mainRegionService.Header = "Подразделения";
 
             dbContext = new ServiceAccountingDBContext();
@@ -44,6 +49,7 @@ namespace CHI.ViewModels
             DeleteCommand = new DelegateCommand(DeleteExecute, () => CurrentDepartment != null && !CurrentDepartment.IsRoot).ObservesProperty(() => CurrentDepartment);
             MoveUpCommand = new DelegateCommand(MoveUpExecute, MoveUpCanExecute).ObservesProperty(() => CurrentDepartment);
             MoveDownCommand = new DelegateCommand(MoveDownExecute, MoveDownCanExecute).ObservesProperty(() => CurrentDepartment);
+            SelectColorCommand = new DelegateCommand(SelectColorExecute);
 
             DeleteCommand.RaiseCanExecuteChanged();
         }
@@ -142,6 +148,11 @@ namespace CHI.ViewModels
 
             MoveDownCommand.RaiseCanExecuteChanged();
             MoveUpCommand.RaiseCanExecuteChanged();
+        }
+
+        private void SelectColorExecute()
+        {
+            CurrentDepartment.HexColor = Helpers.ShowColorDialog(dialogService, "Выбор цвета", CurrentDepartment.HexColor);
         }
 
         public void OnNavigatedTo(NavigationContext navigationContext)
