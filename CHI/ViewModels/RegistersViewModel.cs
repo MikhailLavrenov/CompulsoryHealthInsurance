@@ -26,6 +26,7 @@ namespace CHI.ViewModels
         public DelegateCommandAsync LoadRegisterCommand { get; }
         public DelegateCommandAsync LoadPaymentStateCommand { get; }
 
+
         public RegistersViewModel(IMainRegionService mainRegionService, IFileDialogService fileDialogService)
         {
             this.fileDialogService = fileDialogService;
@@ -36,7 +37,7 @@ namespace CHI.ViewModels
             Refresh();
 
             LoadRegisterCommand = new DelegateCommandAsync(LoadExecute);
-            LoadPaymentStateCommand = new DelegateCommandAsync(LoadPaymentStateExecute, () => CurrentRegister != null).ObservesProperty(() => CurrentRegister);
+            LoadPaymentStateCommand = new DelegateCommandAsync(LoadPaymentStateExecute);
         }
 
 
@@ -207,7 +208,7 @@ namespace CHI.ViewModels
             var register = dbContext.Registers.Where(x => x.Month == paidRegister.Month && x.Year == paidRegister.Year).Include(x=>x.Cases).FirstOrDefault();
 
             if (register == null)
-                mainRegionService.SetCompleteStatus("Период загружаемого реестра не соответствует выбранному");
+                mainRegionService.SetCompleteStatus($"Загрузка статусов оплаты отменена. Сначала загрузите реестр за период {paidRegister.Month} месяц {paidRegister.Year} год.");
 
             mainRegionService.SetBusyStatus("Запись статусов оплаты");
 

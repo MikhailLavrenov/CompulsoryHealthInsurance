@@ -107,7 +107,7 @@ namespace CHI.ViewModels
 
             var title = "Предупреждение";
             var message = "Информация о пациентах будет удалена из базы данных. Продолжить ?";
-            var result = dialogService.ShowDialog(title, message);
+            var result = dialogService.ShowTextDialog(title, message);
 
             if (result == ButtonResult.Cancel)
             {

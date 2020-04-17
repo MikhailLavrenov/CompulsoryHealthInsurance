@@ -3,6 +3,7 @@ using CHI.Models.ServiceAccounting;
 using Microsoft.EntityFrameworkCore;
 using Prism.Commands;
 using Prism.Regions;
+using Prism.Services.Dialogs;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -18,6 +19,7 @@ namespace CHI.ViewModels
         Component root;
         List<Component> parents;
         IMainRegionService mainRegionService;
+        IDialogService dialogService;
 
         public bool KeepAlive { get; set; }
         public Component CurrentComponent { get => currentComponent; set => SetProperty(ref currentComponent, value); }
@@ -29,10 +31,12 @@ namespace CHI.ViewModels
         public DelegateCommand MoveUpCommand { get; }
         public DelegateCommand MoveDownCommand { get; }
         public DelegateCommand<Type> NavigateCommand { get; }
+        public DelegateCommand SelectColorCommand { get; }
 
-        public ComponentsViewModel(IMainRegionService mainRegionService)
+        public ComponentsViewModel(IMainRegionService mainRegionService, IDialogService dialogService)
         {
-            this.mainRegionService = mainRegionService;          
+            this.mainRegionService = mainRegionService;
+            this.dialogService = dialogService;
 
             dbContext = new ServiceAccountingDBContext();
             dbContext.Components.Load();
@@ -46,6 +50,7 @@ namespace CHI.ViewModels
             MoveUpCommand = new DelegateCommand(MoveUpExecute, MoveUpCanExecute).ObservesProperty(() => CurrentComponent);
             MoveDownCommand = new DelegateCommand(MoveDownExecute, MoveDownCanExecute).ObservesProperty(() => CurrentComponent);
             NavigateCommand = new DelegateCommand<Type>(NavigateExecute);
+            SelectColorCommand = new DelegateCommand(SelectColorExecute);
 
             DeleteCommand.RaiseCanExecuteChanged();
         }
@@ -140,6 +145,11 @@ namespace CHI.ViewModels
             var navigationParameters = new NavigationParameters();
             navigationParameters.Add(nameof(Component), CurrentComponent);
             mainRegionService.RequestNavigate(view.Name, navigationParameters, true);
+        }
+
+        private void SelectColorExecute()
+        {
+            CurrentComponent.HexColor = Helpers.ShowColorDialog(dialogService, "Выбор цвета", CurrentComponent.HexColor);
         }
 
         public void OnNavigatedTo(NavigationContext navigationContext)

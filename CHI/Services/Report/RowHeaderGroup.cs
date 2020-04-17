@@ -83,7 +83,7 @@ namespace CHI.Services.Report
             IsRoot = false;
             Parent = parent;
             Level = parent.Level + 1;
-            Color = Parent.Childs.Count % 2 == 1 ? Colors.WhiteSmoke : Colors.Transparent;
+            Color = Parent.Childs.Count % 2 == 0 ? Colors.WhiteSmoke : Colors.Transparent;
             CanCollapse = false;
             IsCollapsed = null;
             IsVisible = true;
