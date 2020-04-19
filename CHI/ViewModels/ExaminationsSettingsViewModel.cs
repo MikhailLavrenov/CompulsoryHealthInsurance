@@ -46,21 +46,21 @@ namespace CHI.ViewModels
         private void SetDefaultExecute()
         {
             Settings.SetDefaultExaminations();
-            MainRegionService.SetCompleteStatus("Настройки установлены по умолчанию.");
+            MainRegionService.HideProgressBarWithhMessage("Настройки установлены по умолчанию.");
         }
         private void TestExecute()
         {
-            MainRegionService.SetBusyStatus("Проверка настроек.");
+            MainRegionService.ShowProgressBarWithMessage("Проверка настроек.");
             Settings.TestConnectionExaminations();
 
             if (Settings.ExaminationsConnectionIsValid)
-                MainRegionService.SetCompleteStatus("Настройки корректны.");
+                MainRegionService.HideProgressBarWithhMessage("Настройки корректны.");
             else if (Settings.ContainsErrorMessage(nameof(Settings.ProxyAddress),ErrorMessages.Connection))
-                MainRegionService.SetCompleteStatus("Прокси сервер не доступен.");
+                MainRegionService.HideProgressBarWithhMessage("Прокси сервер не доступен.");
             else if (Settings.ContainsErrorMessage(nameof(Settings.ExaminationsAddress), ErrorMessages.Connection))
-                MainRegionService.SetCompleteStatus("Портал диспансеризации не доступен.");
+                MainRegionService.HideProgressBarWithhMessage("Портал диспансеризации не доступен.");
             else
-                MainRegionService.SetCompleteStatus($"Не удалось авторизоваться под некоторыми учетными записями.");
+                MainRegionService.HideProgressBarWithhMessage($"Не удалось авторизоваться под некоторыми учетными записями.");
         }
         private void SwitchShowPasswordExecute()
         {

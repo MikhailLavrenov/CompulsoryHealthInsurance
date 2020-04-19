@@ -69,17 +69,6 @@
                         Value="White" />
             </Style>
 
-            <!--<Style x:Key="MenuButtonText"
-                   TargetType="TextBlock"
-                   BasedOn="{StaticResource {x:Type TextBlock}}">
-                <Setter Property="Margin"
-                        Value="0" />
-                <Setter Property="TextWrapping"
-                        Value="Wrap" />
-                <Setter Property="Width"
-                        Value="170" />
-            </Style>-->
-
             <Style x:Key="CloseButton"
                    TargetType="Button"
                    BasedOn="{StaticResource IconTransparentButton}">
@@ -176,10 +165,10 @@
         <StackPanel Margin="15,10,15,10"
                     Grid.Row="0"
                     Orientation="Horizontal"
-                    IsEnabled="{Binding MainRegionService.IsBusy, Converter={i:InvertBoolConverter}}">
+                    IsEnabled="{Binding MainRegionService.IsLocked, Converter={i:InvertBoolConverter}}">
 
             <Button Style="{StaticResource IconTransparentButton}"
-                    Width="35" 
+                    Width="35"
                     Height="35"
                     materialDesign:ButtonAssist.CornerRadius="17.5"
                     Command="{Binding NavigateBackCommand}"
@@ -192,7 +181,7 @@
             </Button>
 
             <Button Style="{StaticResource IconTransparentButton}"
-                    Width="40" 
+                    Width="40"
                     Height="40"
                     materialDesign:ButtonAssist.CornerRadius="20"
                     Command="{Binding NavigateCommand}"
@@ -216,21 +205,20 @@
         <Grid x:Name="MainRegionPanel"
               Grid.Row="1"
               Background="White"
-              IsEnabled="{Binding MainRegionService.IsBusy, Converter={i:InvertBoolConverter}}">
+              IsEnabled="{Binding MainRegionService.IsLocked, Converter={i:InvertBoolConverter}}">
 
-            <ContentControl prism:RegionManager.RegionName="{x:Static i:RegionNames.ProgressBarRegion}">
-                <ContentControl.Style>
-                    <Style>
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding  MainRegionService.IsBusy}"
-                                         Value="True">
-                                <Setter Property="Panel.ZIndex"
-                                        Value="1" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </ContentControl.Style>
-            </ContentControl>
+            <ContentControl Panel.ZIndex="3"
+                            prism:RegionManager.RegionName="{x:Static i:RegionNames.DialogRegion}"
+                            Visibility="{Binding MainRegionService.IsShowDialog, Converter={i:BoolToVisibleConverter}}" />
+
+            <ContentControl Panel.ZIndex="2"
+                            prism:RegionManager.RegionName="{x:Static i:RegionNames.ProgressBarRegion}"
+                            Visibility="{Binding MainRegionService.IsShowProgressBar, Converter={i:BoolToVisibleConverter}}" />
+
+            <Border Opacity="0.35"
+                    Background="LightGray"
+                    Panel.ZIndex="1"
+                    Visibility="{Binding MainRegionService.IsLocked, Converter={i:BoolToVisibleConverter}}" />
 
             <i:CustomContentControl Margin="15,15,15,40"
                                     Background="White"
@@ -246,7 +234,7 @@
                                      Opacity="0.9"
                                      HorizontalAlignment="Stretch"
                                      VerticalAlignment="Bottom"
-                                     IsActive="{Binding MainRegionService.ShowStatus}">
+                                     IsActive="{Binding MainRegionService.IsShowStatus}">
 
                 <materialDesign:SnackbarMessage ActionCommand="{Binding MainRegionService.CloseStatusCommand}">
 
@@ -261,7 +249,7 @@
                     </materialDesign:SnackbarMessage.ActionContent>
 
                     <materialDesign:SnackbarMessage.Content>
-                        <TextBlock Text="{Binding MainRegionService.Status}"
+                        <TextBlock Text="{Binding MainRegionService.Message}"
                                    HorizontalAlignment="Stretch"
                                    Margin="0"
                                    FontWeight="Regular"

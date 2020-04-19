@@ -59,11 +59,11 @@ namespace CHI.ViewModels
 
             var importFilePath = fileDialogService.FileName;
 
-            MainRegionService.SetBusyStatus("Открытие файла.");
+            MainRegionService.ShowProgressBarWithMessage("Открытие файла.");
 
             var newPatients = PatientsFileService.ReadImportPatientsFile(importFilePath);
 
-            MainRegionService.SetBusyStatus("Проверка значений.");
+            MainRegionService.ShowProgressBarWithMessage("Проверка значений.");
             var db = new Models.AttachedPatientsDBContext();
             db.Patients.Load();
 
@@ -74,17 +74,17 @@ namespace CHI.ViewModels
             .Select(x => x.First())
             .ToList();
 
-            MainRegionService.SetBusyStatus("Сохранение в локальную базу данных.");
+            MainRegionService.ShowProgressBarWithMessage("Сохранение в локальную базу данных.");
             db.Patients.AddRange(newUniqPatients);
             db.SaveChanges();
 
             PatientsCount = db.Patients.Count().ToString();
 
-            MainRegionService.SetCompleteStatus($"В файле найдено {newPatients.Count} человек(а). В БД добавлено {newUniqPatients.Count} новых человек(а).");
+            MainRegionService.HideProgressBarWithhMessage($"В файле найдено {newPatients.Count} человек(а). В БД добавлено {newUniqPatients.Count} новых человек(а).");
         }
         private void SaveExampleExecute()
         {
-            MainRegionService.SetBusyStatus("Выбор пути");
+            MainRegionService.ShowProgressBarWithMessage("Выбор пути");
 
             fileDialogService.DialogType = FileDialogType.Save;
             fileDialogService.FileName = "Пример для загрузки ФИО";
@@ -95,15 +95,15 @@ namespace CHI.ViewModels
 
             var saveExampleFilePath = fileDialogService.FileName;
 
-            MainRegionService.SetBusyStatus("Сохранение файла");
+            MainRegionService.ShowProgressBarWithMessage("Сохранение файла");
 
             PatientsFileService.SaveImportFileExample(saveExampleFilePath);
 
-            MainRegionService.SetCompleteStatus($"Файл сохранен: {saveExampleFilePath}");
+            MainRegionService.HideProgressBarWithhMessage($"Файл сохранен: {saveExampleFilePath}");
         }
         private void ClearDatabaseExecute()
         {
-            MainRegionService.SetBusyStatus("Очистка базы данных.");
+            MainRegionService.ShowProgressBarWithMessage("Очистка базы данных.");
 
             var title = "Предупреждение";
             var message = "Информация о пациентах будет удалена из базы данных. Продолжить ?";
@@ -111,7 +111,7 @@ namespace CHI.ViewModels
 
             if (result == ButtonResult.Cancel)
             {
-                MainRegionService.SetCompleteStatus("Очистка базы данных отменена.");
+                MainRegionService.HideProgressBarWithhMessage("Очистка базы данных отменена.");
                 return;
             }
 
@@ -120,7 +120,7 @@ namespace CHI.ViewModels
             db.Database.EnsureDeleted();
             db.Database.EnsureCreated();
             PatientsCount = db.Patients.Count().ToString();
-            MainRegionService.SetCompleteStatus("База данных очищена.");
+            MainRegionService.HideProgressBarWithhMessage("База данных очищена.");
         }
         #endregion
     }

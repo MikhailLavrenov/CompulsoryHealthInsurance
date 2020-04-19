@@ -67,7 +67,7 @@ namespace CHI.ViewModels
             if (Settings.Instance.FailedToDecrypt)
             {
                 var message = $"Нет прав на доступ к учетным записям. Создана резервная копия настроек: {Settings.Instance.BackupSettingsFile}. Заново задайте учетные данные.";
-                mainRegionService.SetCompleteStatus(message);
+                mainRegionService.HideProgressBarWithhMessage(message);
             }
         }
         private void CloseWindowExecute()

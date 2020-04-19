@@ -40,7 +40,7 @@ namespace CHI.ViewModels
         private void SetDefaultExecute()
         {
             Settings.SetDefaultAttachedPatientsFile();
-            MainRegionService.SetCompleteStatus("Настройки установлены по умолчанию.");
+            MainRegionService.HideProgressBarWithhMessage("Настройки установлены по умолчанию.");
         }
         #endregion
     }

@@ -43,7 +43,7 @@ namespace CHI.ViewModels
 
         private void LoadExecute()
         {
-            mainRegionService.SetBusyStatus("Выбор файлов");
+            mainRegionService.ShowProgressBarWithMessage("Выбор файлов");
 
             fileDialogService.DialogType = FileDialogType.Open;
             fileDialogService.Filter = "Archive files (*.zip)|*.zip|Xml files (*.xml)|*.xml";
@@ -51,11 +51,11 @@ namespace CHI.ViewModels
 
             if (fileDialogService.ShowDialog() != true)
             {
-                mainRegionService.SetCompleteStatus("Отменено");
+                mainRegionService.HideProgressBarWithhMessage("Отменено");
                 return;
             }
 
-            mainRegionService.SetBusyStatus("Загрузка xml-реестров");
+            mainRegionService.ShowProgressBarWithMessage("Загрузка xml-реестров");
 
             var registerService = new BillsRegisterService(fileDialogService.FileNames);
             registerService.FileNamesNotStartsWith = new string[] { "L" };
@@ -68,7 +68,7 @@ namespace CHI.ViewModels
             if (registerForSamePeriod != null)
                 localDbContext.Registers.Remove(registerForSamePeriod);
 
-            mainRegionService.SetBusyStatus("Сопоставление штатных единиц");
+            mainRegionService.ShowProgressBarWithMessage("Сопоставление штатных единиц");
 
             localDbContext.Employees.Load();
             localDbContext.Medics.Load();
@@ -130,7 +130,7 @@ namespace CHI.ViewModels
 
                 foreach (var mCase in casesGroup)
                 {
-                    mainRegionService.SetBusyStatus($"Сопоставление штатных единиц: {++progressCounter} из {register.Cases.Count}");
+                    mainRegionService.ShowProgressBarWithMessage($"Сопоставление штатных единиц: {++progressCounter} из {register.Cases.Count}");
 
                     mCase.Employee = employee;
 
@@ -144,14 +144,14 @@ namespace CHI.ViewModels
                 }
             }
 
-            mainRegionService.SetBusyStatus("Сохранение в базу данных");
+            mainRegionService.ShowProgressBarWithMessage("Сохранение в базу данных");
 
             localDbContext.Registers.Add(register);
             localDbContext.SaveChanges();
 
             Application.Current.Dispatcher.Invoke(() => Refresh());
 
-            mainRegionService.SetCompleteStatus("Успешно загружено");
+            mainRegionService.HideProgressBarWithhMessage("Успешно загружено");
         }
 
         private static Employee FindEmployeeInDbOrAdd(string medicFomsId, int specialtyFomsId, ServiceAccountingDBContext dbContext, Department defaultDepartment)
@@ -185,7 +185,7 @@ namespace CHI.ViewModels
 
         private void LoadPaymentStateExecute()
         {
-            mainRegionService.SetBusyStatus("Выбор файлов");
+            mainRegionService.ShowProgressBarWithMessage("Выбор файлов");
 
             fileDialogService.DialogType = FileDialogType.Open;
             fileDialogService.Filter = "Archive files (*.zip)|*.zip|Xml files (*.xml)|*.xml";
@@ -193,11 +193,11 @@ namespace CHI.ViewModels
 
             if (fileDialogService.ShowDialog() != true)
             {
-                mainRegionService.SetCompleteStatus("Отменено");
+                mainRegionService.HideProgressBarWithhMessage("Отменено");
                 return;
             }
 
-            mainRegionService.SetBusyStatus("Загрузка xml-реестров");
+            mainRegionService.ShowProgressBarWithMessage("Загрузка xml-реестров");
 
             var registerService = new BillsRegisterService(fileDialogService.FileNames);
             registerService.FileNamesNotStartsWith = new string[] { "L" };
@@ -208,9 +208,9 @@ namespace CHI.ViewModels
             var register = dbContext.Registers.Where(x => x.Month == paidRegister.Month && x.Year == paidRegister.Year).Include(x=>x.Cases).FirstOrDefault();
 
             if (register == null)
-                mainRegionService.SetCompleteStatus($"Загрузка статусов оплаты отменена. Сначала загрузите реестр за период {paidRegister.Month} месяц {paidRegister.Year} год.");
+                mainRegionService.HideProgressBarWithhMessage($"Загрузка статусов оплаты отменена. Сначала загрузите реестр за период {paidRegister.Month} месяц {paidRegister.Year} год.");
 
-            mainRegionService.SetBusyStatus("Запись статусов оплаты");
+            mainRegionService.ShowProgressBarWithMessage("Запись статусов оплаты");
 
             var casePairs = register.Cases.Join(paidRegister.Cases, mcase => mcase.IdCase, paidCase => paidCase.IdCase, (mcase, paidCase) => new { mcase, paidCase }).ToList();
 
@@ -227,7 +227,7 @@ namespace CHI.ViewModels
 
             Refresh();
 
-            mainRegionService.SetCompleteStatus($"Загрузка статусов оплаты завершена. В файле(ах) {paidRegister.Cases.Count} случая, загружено {casePairs.Count()}.");
+            mainRegionService.HideProgressBarWithhMessage($"Загрузка статусов оплаты завершена. В файле(ах) {paidRegister.Cases.Count} случая, загружено {casePairs.Count()}.");
         }
 
         private void Refresh()

@@ -96,18 +96,18 @@ namespace CHI.ViewModels
 
             if (!Settings.ExaminationsConnectionIsValid)
             {
-                MainRegionService.SetBusyStatus("Проверка настроек.");
+                MainRegionService.ShowProgressBarWithMessage("Проверка настроек.");
 
                 Settings.TestConnectionExaminations();
                 if (!Settings.ExaminationsConnectionIsValid)
                 {
-                    MainRegionService.SetCompleteStatus("Не удалось подключиться к web-сервису.");
+                    MainRegionService.HideProgressBarWithhMessage("Не удалось подключиться к web-сервису.");
                     return;
                 }
             }
             SleepMode.Deny();
 
-            MainRegionService.SetBusyStatus("Выбор файлов.");
+            MainRegionService.ShowProgressBarWithMessage("Выбор файлов.");
 
             fileDialogService.DialogType = FileDialogType.Open;
             fileDialogService.FileName = Settings.ExaminationsFileDirectory;
@@ -116,13 +116,13 @@ namespace CHI.ViewModels
 
             if (fileDialogService.ShowDialog() != true)
             {
-                MainRegionService.SetCompleteStatus("Отменено.");
+                MainRegionService.HideProgressBarWithhMessage("Отменено.");
                 return;
             }
 
             Settings.ExaminationsFileDirectory =Path.GetDirectoryName(fileDialogService.FileNames.FirstOrDefault());
 
-            MainRegionService.SetBusyStatus("Чтение файлов.");
+            MainRegionService.ShowProgressBarWithMessage("Чтение файлов.");
 
             var registers = new BillsRegisterService(fileDialogService.FileNames);
             var patientsFileNames = Settings.PatientFileNames.Split(',');
@@ -143,11 +143,11 @@ namespace CHI.ViewModels
 
             if (!(license.ExaminationsUnlimited || license.ExaminationsFomsCodeMO == Settings.FomsCodeMO || license.ExaminationsMaxDate > maxDate))
             {
-                MainRegionService.SetCompleteStatus("Отменено, ограничение лицензии.");
+                MainRegionService.HideProgressBarWithhMessage("Отменено, ограничение лицензии.");
                 return;
             }
 
-            MainRegionService.SetBusyStatus($"Загрузка осмотров. Всего пациентов: {patientsExaminations.Count}.");
+            MainRegionService.ShowProgressBarWithMessage($"Загрузка осмотров. Всего пациентов: {patientsExaminations.Count}.");
 
             Result = AddExaminationsParallel(patientsExaminations)
                 .OrderBy(x => x.Item2)
@@ -159,7 +159,7 @@ namespace CHI.ViewModels
                 ShowErrors = true;
 
             SleepMode.Allow();
-            MainRegionService.SetCompleteStatus("Завершено.");
+            MainRegionService.HideProgressBarWithhMessage("Завершено.");
         }
         /// <summary>
         /// Загружает осмотры на портал диспансеризации. В случае возникновения исключений при загрузке осмотра - предпринимает несколько попыток.
@@ -249,7 +249,7 @@ namespace CHI.ViewModels
 
                     result.Add(new Tuple<PatientExaminations, bool, string>(patientExaminations, isSuccessful, error));
                     Interlocked.Increment(ref counter);
-                    MainRegionService.SetBusyStatus($"Загрузка осмотров. Обработано пациентов: {counter} из {patientsExaminations.Count}.");
+                    MainRegionService.ShowProgressBarWithMessage($"Загрузка осмотров. Обработано пациентов: {counter} из {patientsExaminations.Count}.");
 
                     return service;
                 });
