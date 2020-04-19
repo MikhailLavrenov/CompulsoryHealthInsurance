@@ -14,7 +14,9 @@ namespace CHI.Infrastructure
     {
         string header;
         string status;
-        bool isBusy;
+        bool isLocked;
+        bool isShowProgressBar;
+        bool isShowDialog;
         bool showStatus;
         IRegionManager regionManager;
         string lastNavigatedView;
@@ -22,20 +24,23 @@ namespace CHI.Infrastructure
         bool canNavigateBack;
 
         public string Header { get => header; set => SetProperty(ref header, value); }
-        public string Status
+        public string Message
         {
             get => status;
             set
             {
                 SetProperty(ref status, value);
-                ShowStatus = !string.IsNullOrEmpty(value);
+                IsShowStatus = !string.IsNullOrEmpty(value);
             }
         }
-        public bool IsBusy { get => isBusy; set => SetProperty(ref isBusy, value, SwitchProgressBar); }
-        public bool ShowStatus { get => showStatus; private set => SetProperty(ref showStatus, value); }
+        public bool IsLocked { get => isLocked; set => SetProperty(ref isLocked, value); }
+        public bool IsShowProgressBar { get => isShowProgressBar; set => SetProperty(ref isShowProgressBar, value, SwitchProgressBar); }
+        public bool IsShowDialog { get => isShowDialog; set => SetProperty(ref isShowDialog, value); }
+        public bool IsShowStatus { get => showStatus; private set => SetProperty(ref showStatus, value); }
         public bool CanNavigateBack { get => canNavigateBack; private set => SetProperty(ref canNavigateBack, value); }
 
         public DelegateCommand CloseStatusCommand { get; }
+
 
         public MainRegionService(IRegionManager regionManager)
         {
@@ -43,18 +48,18 @@ namespace CHI.Infrastructure
 
             navigateBackCollection = new Stack<string>();
 
-            CloseStatusCommand = new DelegateCommand(()=> Status = string.Empty);
+            CloseStatusCommand = new DelegateCommand(() => Message = string.Empty);
         }
 
-        public void SetCompleteStatus(string statusMessage)
+        public void HideProgressBarWithhMessage(string statusMessage)
         {
-            Status = statusMessage;
-            IsBusy = false;
+            Message = statusMessage;
+            IsShowProgressBar = false;
         }
-        public void SetBusyStatus(string statusMessage)
+        public void ShowProgressBarWithMessage(string statusMessage)
         {
-            Status = $"{statusMessage}";
-            IsBusy = true;
+            Message = statusMessage;
+            IsShowProgressBar = true;
         }
         public void RequestNavigate(string targetName, bool canNavigateBack = false)
         {
@@ -68,8 +73,8 @@ namespace CHI.Infrastructure
                 CanNavigateBack = true;
             }
 
-            IsBusy = false;
-            Status = string.Empty;
+            IsLocked = false;
+            Message = string.Empty;
             regionManager.RequestNavigate(RegionNames.MainRegion, targetName, navigationParameters);
             lastNavigatedView = targetName;
         }
@@ -84,7 +89,7 @@ namespace CHI.Infrastructure
         {
             Application.Current.Dispatcher.Invoke(() =>
             {
-                if (IsBusy)
+                if (IsShowProgressBar)
                     regionManager.RequestNavigate(RegionNames.ProgressBarRegion, nameof(ProgressBarView));
                 else
                     regionManager.Regions[RegionNames.ProgressBarRegion].RemoveAll();
@@ -92,17 +97,17 @@ namespace CHI.Infrastructure
         }
 
         public void ClearNavigationBack()
-        {            
+        {
             CanNavigateBack = false;
 
             var views = regionManager.Regions[RegionNames.MainRegion].Views
-                .Where(x=> navigateBackCollection.Contains(x.GetType().Name))
+                .Where(x => navigateBackCollection.Contains(x.GetType().Name))
                 .ToList();
 
             foreach (var view in views)
                 regionManager.Regions[RegionNames.MainRegion].Remove(view);
-            
-           
+
+
             navigateBackCollection.Clear();
         }
     }

@@ -67,14 +67,14 @@ namespace CHI.ViewModels
         }
         private void ImportLicenseExecute()
         {
-            MainRegionService.SetBusyStatus("Импорт лицензии.");
+            MainRegionService.ShowProgressBarWithMessage("Импорт лицензии.");
 
             fileDialogService.DialogType = FileDialogType.Open;
             fileDialogService.Filter = "License file (*.lic)|*.lic";
 
             if (fileDialogService.ShowDialog() != true)
             {
-                MainRegionService.SetCompleteStatus("Отменено.");
+                MainRegionService.HideProgressBarWithhMessage("Отменено.");
                 return;
             }
 
@@ -90,7 +90,7 @@ namespace CHI.ViewModels
             licenseManager.Initialize();
             License = licenseManager.GetActiveLicenseInfo();
 
-            MainRegionService.SetCompleteStatus("Лицензия установлена.");
+            MainRegionService.HideProgressBarWithhMessage("Лицензия установлена.");
         }
         #endregion
 

@@ -12,52 +12,46 @@
              d:DesignWidth="850">
 
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
 
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
+        <TextBlock Grid.Row="0"
+                   Text="Ожидайте..."
+                   VerticalAlignment="Bottom"
+                   HorizontalAlignment="Center"
+                   Margin="10"
+                   FontSize="24"
+                   FontWeight="SemiBold">
 
-            <Border Opacity="0.35"
-                Background="LightGray" />
+            <TextBlock.Triggers>
+                <EventTrigger RoutedEvent="Loaded">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation Duration="00:00:01.5"
+                                             Storyboard.TargetProperty="Opacity"
+                                             From="0.9"
+                                             To="0.7"
+                                             RepeatBehavior="Forever"
+                                             AutoReverse="True" />
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+            </TextBlock.Triggers>
 
-            <TextBlock Grid.Row="0"
-                       Text="Ожидайте..."
-                       VerticalAlignment="Bottom"
-                       HorizontalAlignment="Center"
-                       Margin="10"
-                       FontSize="24"
-                       FontWeight="SemiBold">
+        </TextBlock>
 
-                <TextBlock.Triggers>
-                    <EventTrigger RoutedEvent="Loaded">
-                        <BeginStoryboard>
-                            <Storyboard>
-                                <DoubleAnimation Duration="00:00:01.5"
-                                                 Storyboard.TargetProperty="Opacity"
-                                                 From="0.9"
-                                                 To="0.7"
-                                                 RepeatBehavior="Forever"
-                                                 AutoReverse="True" />
-                            </Storyboard>
-                        </BeginStoryboard>
-                    </EventTrigger>
-                </TextBlock.Triggers>
+        <Canvas Grid.Row="1"
+                VerticalAlignment="Top">
 
-            </TextBlock>
+            <b:Interaction.Behaviors>
+                <i:ProgressBarBehavior />
+            </b:Interaction.Behaviors>
 
-            <Canvas Grid.Row="1"
-                    VerticalAlignment="Top">
-
-                <b:Interaction.Behaviors>
-                    <i:ProgressBarBehavior />
-                </b:Interaction.Behaviors>
-
-            </Canvas>
-
-        </Grid>
+        </Canvas>
 
     </Grid>
+
 
 </UserControl>

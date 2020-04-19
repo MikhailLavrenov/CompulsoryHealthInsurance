@@ -42,18 +42,18 @@ namespace CHI.ViewModels
 
         private void LoadExecute()
         {
-            mainRegionService.SetBusyStatus("Выбор файла");
+            mainRegionService.ShowProgressBarWithMessage("Выбор файла");
 
             fileDialogService.DialogType = FileDialogType.Open;
             fileDialogService.Filter = "Excel files (*.xlsx)|*.xlsx";
 
             if (fileDialogService.ShowDialog() != true)
             {
-                mainRegionService.SetCompleteStatus("Отменено");
+                mainRegionService.HideProgressBarWithhMessage("Отменено");
                 return;
             }
 
-            mainRegionService.SetBusyStatus("Загрузка файла");
+            mainRegionService.ShowProgressBarWithMessage("Загрузка файла");
 
             using var excel = new ExcelPackage(new FileInfo(fileDialogService.FileName));
             var sheet = excel.Workbook.Worksheets.First();
@@ -75,12 +75,12 @@ namespace CHI.ViewModels
             dbContext.Medics.Load();
             Medics = dbContext.Medics.Local.ToObservableCollection();
 
-            mainRegionService.SetCompleteStatus("Успешно загружено");
+            mainRegionService.HideProgressBarWithhMessage("Успешно загружено");
         }
 
         private void SaveExampleExecute()
         {
-            mainRegionService.SetBusyStatus("Выбор пути");
+            mainRegionService.ShowProgressBarWithMessage("Выбор пути");
 
             fileDialogService.DialogType = FileDialogType.Save;
             fileDialogService.FileName = "Пример для загрузки мед. персонала";
@@ -91,7 +91,7 @@ namespace CHI.ViewModels
 
             var saveExampleFilePath = fileDialogService.FileName;
 
-            mainRegionService.SetBusyStatus("Сохранение файла");
+            mainRegionService.ShowProgressBarWithMessage("Сохранение файла");
 
             using var excel = new ExcelPackage();
 
@@ -115,7 +115,7 @@ namespace CHI.ViewModels
 
             excel.SaveAs(new FileInfo(fileDialogService.FileName));
 
-            mainRegionService.SetCompleteStatus($"Файл сохранен: {saveExampleFilePath}");
+            mainRegionService.HideProgressBarWithhMessage($"Файл сохранен: {saveExampleFilePath}");
         }
 
         public void OnNavigatedTo(NavigationContext navigationContext)

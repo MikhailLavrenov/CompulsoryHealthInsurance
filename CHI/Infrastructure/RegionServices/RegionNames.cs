@@ -11,8 +11,9 @@ namespace CHI.Infrastructure
     /// </summary>
     public static class RegionNames
     {
-        public static string MainRegion { get; } = "MainRegion";
-        public static string ProgressBarRegion { get; } = "ProgressBarRegion";
-        public static string AttachedPatientsSettingsRegion { get; } = "AttachedPatientsSettingsRegion";
+        public static string MainRegion { get; } = nameof(MainRegion);
+        public static string ProgressBarRegion { get; } = nameof(ProgressBarRegion);
+        public static string DialogRegion { get; } = nameof(DialogRegion);
+        public static string AttachedPatientsSettingsRegion { get; } = nameof(AttachedPatientsSettingsRegion);
     }
 }

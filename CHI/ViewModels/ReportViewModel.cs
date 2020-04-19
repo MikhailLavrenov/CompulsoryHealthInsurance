@@ -86,7 +86,7 @@ namespace CHI.ViewModels
 
         private void SaveExcelExecute()
         {
-            mainRegionService.SetBusyStatus("Выбор пути");
+            mainRegionService.ShowProgressBarWithMessage("Выбор пути");
 
             fileDialogService.DialogType = FileDialogType.Save;
             fileDialogService.FileName = "Отчет по выполнению объемов";
@@ -97,11 +97,11 @@ namespace CHI.ViewModels
 
             var filePath = fileDialogService.FileName;
 
-            mainRegionService.SetBusyStatus("Сохранение файла");
+            mainRegionService.ShowProgressBarWithMessage("Сохранение файла");
 
             Report.SaveExcel(filePath);
 
-            mainRegionService.SetCompleteStatus($"Файл сохранен: {filePath}");
+            mainRegionService.HideProgressBarWithhMessage($"Файл сохранен: {filePath}");
         }
 
         public static bool PeriodsIntersects(DateTime? period1date1, DateTime? period1date2, int period2Month1, int period2Month2, int period2Year)
