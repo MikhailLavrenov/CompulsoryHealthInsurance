@@ -48,21 +48,21 @@ namespace CHI.ViewModels
         {
             Settings.SetDefaultSRZ();
 
-            MainRegionService.HideProgressBarWithhMessage("Настройки установлены по умолчанию.");
+            MainRegionService.HideProgressBar("Настройки установлены по умолчанию.");
         }
         private void TestExecute()
         {
-            MainRegionService.ShowProgressBarWithMessage("Проверка настроек.");
+            MainRegionService.ShowProgressBar("Проверка настроек.");
             Settings.TestConnectionSRZ();
 
             if (Settings.SrzConnectionIsValid)
-                MainRegionService.HideProgressBarWithhMessage("Настройки корректны.");
+                MainRegionService.HideProgressBar("Настройки корректны.");
             else if (Settings.ContainsErrorMessage(nameof(Settings.ProxyAddress),ErrorMessages.Connection))
-                MainRegionService.HideProgressBarWithhMessage("Прокси сервер не доступен.");
+                MainRegionService.HideProgressBar("Прокси сервер не доступен.");
             else if (Settings.ContainsErrorMessage(nameof(Settings.SrzAddress), ErrorMessages.Connection))
-                MainRegionService.HideProgressBarWithhMessage("Web-сайт СРЗ не доступен.");
+                MainRegionService.HideProgressBar("Web-сайт СРЗ не доступен.");
             else
-                MainRegionService.HideProgressBarWithhMessage($"Не удалось авторизоваться под некоторыми учетными записями.");
+                MainRegionService.HideProgressBar($"Не удалось авторизоваться под некоторыми учетными записями.");
         }
         private void SwitchShowPasswordExecute()
         {

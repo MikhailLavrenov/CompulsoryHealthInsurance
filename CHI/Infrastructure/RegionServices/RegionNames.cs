@@ -12,8 +12,7 @@ namespace CHI.Infrastructure
     public static class RegionNames
     {
         public static string MainRegion { get; } = nameof(MainRegion);
-        public static string ProgressBarRegion { get; } = nameof(ProgressBarRegion);
-        public static string DialogRegion { get; } = nameof(DialogRegion);
+        public static string MainRegionOverlay { get; } = nameof(MainRegionOverlay);
         public static string AttachedPatientsSettingsRegion { get; } = nameof(AttachedPatientsSettingsRegion);
     }
 }

@@ -2,6 +2,7 @@
 using CHI.Models;
 using CHI.Services.AttachedPatients;
 using Microsoft.EntityFrameworkCore;
+using Prism.Commands;
 using Prism.Regions;
 using Prism.Services.Dialogs;
 using System.Collections.Generic;
@@ -12,39 +13,38 @@ namespace CHI.ViewModels
 {
     public class AttachedPatientsStorageSettingsViewModel : DomainObject, IRegionMemberLifetime
     {
-        #region Поля
-        private Settings settings;
-        private IDialogService dialogService;
-        private readonly IFileDialogService fileDialogService;
-        private string patientsCount = "Вычисляется...";
-        #endregion
+        Settings settings;
+        IDialogService dialogService;
+        readonly IFileDialogService fileDialogService;
+        IMainRegionService mainRegionService;
+        string patientsCount = "Вычисляется...";
 
-        #region Свойства
+
         public string PatientsCount { get => patientsCount; set => SetProperty(ref patientsCount, value); }
-        public IMainRegionService MainRegionService { get; set; }
         public bool KeepAlive { get => false; }
         public Settings Settings { get => settings; set => SetProperty(ref settings, value); }
         public DelegateCommandAsync ImportPatientsCommand { get; }
         public DelegateCommandAsync SaveExampleCommand { get; }
-        public DelegateCommandAsync ClearDatabaseCommand { get; }
-        #endregion
+        public DelegateCommand ClearDatabaseCommand { get; }
+
+
 
         #region Конструкторы
         public AttachedPatientsStorageSettingsViewModel(IMainRegionService mainRegionService, IFileDialogService fileDialogService, IDialogService dialogService)
         {
             this.fileDialogService = fileDialogService;
             this.dialogService = dialogService;
-            MainRegionService = mainRegionService;
+            this.mainRegionService = mainRegionService;
 
             Settings = Settings.Instance;
 
-            MainRegionService.Header = "Настройки базы данных прикрепленных пациентов";
+            this.mainRegionService.Header = "Настройки базы данных прикрепленных пациентов";
 
             Task.Run(() => PatientsCount = new Models.AttachedPatientsDBContext().Patients.Count().ToString());
 
             ImportPatientsCommand = new DelegateCommandAsync(ImportPatientsExecute);
             SaveExampleCommand = new DelegateCommandAsync(SaveExampleExecute);
-            ClearDatabaseCommand = new DelegateCommandAsync(ClearDatabaseExecute);
+            ClearDatabaseCommand = new DelegateCommand(ClearDatabaseExecute);
         }
         #endregion
 
@@ -59,11 +59,11 @@ namespace CHI.ViewModels
 
             var importFilePath = fileDialogService.FileName;
 
-            MainRegionService.ShowProgressBarWithMessage("Открытие файла.");
+            mainRegionService.ShowProgressBar("Открытие файла.");
 
             var newPatients = PatientsFileService.ReadImportPatientsFile(importFilePath);
 
-            MainRegionService.ShowProgressBarWithMessage("Проверка значений.");
+            mainRegionService.ShowProgressBar("Проверка значений.");
             var db = new Models.AttachedPatientsDBContext();
             db.Patients.Load();
 
@@ -74,17 +74,17 @@ namespace CHI.ViewModels
             .Select(x => x.First())
             .ToList();
 
-            MainRegionService.ShowProgressBarWithMessage("Сохранение в локальную базу данных.");
+            mainRegionService.ShowProgressBar("Сохранение в локальную базу данных.");
             db.Patients.AddRange(newUniqPatients);
             db.SaveChanges();
 
             PatientsCount = db.Patients.Count().ToString();
 
-            MainRegionService.HideProgressBarWithhMessage($"В файле найдено {newPatients.Count} человек(а). В БД добавлено {newUniqPatients.Count} новых человек(а).");
+            mainRegionService.HideProgressBar($"В файле найдено {newPatients.Count} человек(а). В БД добавлено {newUniqPatients.Count} новых человек(а).");
         }
         private void SaveExampleExecute()
         {
-            MainRegionService.ShowProgressBarWithMessage("Выбор пути");
+            mainRegionService.ShowProgressBar("Выбор пути");
 
             fileDialogService.DialogType = FileDialogType.Save;
             fileDialogService.FileName = "Пример для загрузки ФИО";
@@ -95,32 +95,30 @@ namespace CHI.ViewModels
 
             var saveExampleFilePath = fileDialogService.FileName;
 
-            MainRegionService.ShowProgressBarWithMessage("Сохранение файла");
+            mainRegionService.ShowProgressBar("Сохранение файла");
 
             PatientsFileService.SaveImportFileExample(saveExampleFilePath);
 
-            MainRegionService.HideProgressBarWithhMessage($"Файл сохранен: {saveExampleFilePath}");
+            mainRegionService.HideProgressBar($"Файл сохранен: {saveExampleFilePath}");
         }
-        private void ClearDatabaseExecute()
+        private async void ClearDatabaseExecute()
         {
-            MainRegionService.ShowProgressBarWithMessage("Очистка базы данных.");
+            mainRegionService.ShowProgressBar("Очистка базы данных.");
 
-            var title = "Предупреждение";
             var message = "Информация о пациентах будет удалена из базы данных. Продолжить ?";
-            var result = dialogService.ShowTextDialog(title, message);
 
-            if (result == ButtonResult.Cancel)
+            if (! await mainRegionService.ShowNotificationDialog(message))
             {
-                MainRegionService.HideProgressBarWithhMessage("Очистка базы данных отменена.");
+                mainRegionService.HideProgressBar("Очистка базы данных отменена.");
                 return;
             }
 
-            var db = new Models.AttachedPatientsDBContext();
+            var db = new AttachedPatientsDBContext();
 
             db.Database.EnsureDeleted();
             db.Database.EnsureCreated();
             PatientsCount = db.Patients.Count().ToString();
-            MainRegionService.HideProgressBarWithhMessage("База данных очищена.");
+            mainRegionService.HideProgressBar("База данных очищена.");
         }
         #endregion
     }

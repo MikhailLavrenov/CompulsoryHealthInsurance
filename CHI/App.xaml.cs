@@ -51,8 +51,7 @@ namespace CHI
             containerRegistry.RegisterSingleton<IMainRegionService, MainRegionService>();
             containerRegistry.RegisterSingleton<ILicenseManager, LicenseManager>();
             containerRegistry.Register<IFileDialogService, FileDialogService>();
-            containerRegistry.RegisterDialog<NotificationDialogView, NotificationDialogViewModel>();
-            containerRegistry.RegisterDialog<ColorDialogView, ColorDialogViewModel>();
+
 
             containerRegistry.RegisterForNavigation<NavigationMenuView>();
             containerRegistry.RegisterForNavigation<AttachedPatientsView>();
@@ -77,7 +76,11 @@ namespace CHI
             containerRegistry.RegisterForNavigation<RatiosView>();
             containerRegistry.RegisterForNavigation<CaseFiltersView>();
             containerRegistry.RegisterForNavigation<ReportView>();
+            containerRegistry.RegisterForNavigation<NotificationDialogView>();
+            containerRegistry.RegisterForNavigation<ColorDialogView>();
+
         }
+
         private void LogUnhandledException(object sender, UnhandledExceptionEventArgs args)
         {
             logger.Error((Exception)args.ExceptionObject, "AppDomainException");

@@ -13,8 +13,11 @@
              mc:Ignorable="d"
              Width="300"
              MinHeight="140"
+             VerticalAlignment="Center"
+             HorizontalAlignment="Center"    
+             Background="White"
 
-             prism:ViewModelLocator.AutoWireViewModel=" True ">
+             prism:ViewModelLocator.AutoWireViewModel="True">
 
     <UserControl.Resources>
         <ResourceDictionary>
@@ -23,22 +26,6 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary >
     </UserControl.Resources>
-
-    <prism:Dialog.WindowStyle>
-        <Style TargetType="Window">
-            <Setter Property="prism:Dialog.WindowStartupLocation"
-                    Value="CenterOwner" />
-            <Setter Property="ResizeMode"
-                    Value="NoResize" />
-            <Setter Property="ShowInTaskbar"
-                    Value="False" />
-            <Setter Property="SizeToContent"
-                    Value="WidthAndHeight" />
-            <Setter Property="WindowStyle"
-                    Value="None" />
-
-        </Style>
-    </prism:Dialog.WindowStyle>
 
     <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="20,40,20,40" d:DataContext="{d:DesignInstance vm:NotificationDialogViewModel}">
 

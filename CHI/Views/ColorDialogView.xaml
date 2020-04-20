@@ -8,12 +8,13 @@
              xmlns:vm="clr-namespace:CHI.ViewModels"
              xmlns:prism="http://prismlibrary.com/"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-             xmlns:dialogs="http://prismlibrary.com/Services.Dialogs"
+             xmlns:dialogs="http://prismlibrary.com/Services.Dialogs"            
              
-             
-             MinHeight="350"
-             UseLayoutRounding="True"
+             MinHeight="350"   
              mc:Ignorable="d"
+             VerticalAlignment="Center"
+             HorizontalAlignment="Center"    
+             Background="White"             
              prism:ViewModelLocator.AutoWireViewModel=" True ">
 
     <UserControl.Resources>
@@ -24,21 +25,6 @@
         </ResourceDictionary >
     </UserControl.Resources>
 
-    <prism:Dialog.WindowStyle>
-        <Style TargetType="Window">
-            <Setter Property="prism:Dialog.WindowStartupLocation"
-                    Value="CenterOwner" />
-            <Setter Property="ResizeMode"
-                    Value="NoResize" />
-            <Setter Property="ShowInTaskbar"
-                    Value="False" />
-            <Setter Property="SizeToContent"
-                    Value="WidthAndHeight" />
-            <Setter Property="WindowStyle"
-                    Value="None" />
-
-        </Style>
-    </prism:Dialog.WindowStyle>
 
     <Grid d:DataContext="{d:DesignInstance vm:ColorDialogViewModel}" Margin="20,40,20,40" >
 

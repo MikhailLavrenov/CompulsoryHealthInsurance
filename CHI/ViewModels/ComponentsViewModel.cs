@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows.Media;
 
 namespace CHI.ViewModels
 {
@@ -147,9 +148,13 @@ namespace CHI.ViewModels
             mainRegionService.RequestNavigate(view.Name, navigationParameters, true);
         }
 
-        private void SelectColorExecute()
+        private async void SelectColorExecute()
         {
-            CurrentComponent.HexColor = Helpers.ShowColorDialog(dialogService, "Выбор цвета", CurrentComponent.HexColor);
+            var color = (Color)ColorConverter.ConvertFromString(CurrentComponent.HexColor);
+
+            color = await mainRegionService.ShowColorDialog(color);
+
+            CurrentComponent.HexColor = System.Drawing.ColorTranslator.ToHtml(Helpers.GetDrawingColor(color));
         }
 
         public void OnNavigatedTo(NavigationContext navigationContext)

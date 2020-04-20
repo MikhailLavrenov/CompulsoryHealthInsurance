@@ -49,19 +49,19 @@ namespace CHI.ViewModels
         #region Методы
         private void ProcessFileExecute()
         {
-            MainRegionService.ShowProgressBarWithMessage("Проверка подключения к СРЗ.");
+            MainRegionService.ShowProgressBar("Проверка подключения к СРЗ.");
 
             if (!Settings.SrzConnectionIsValid)
                 Settings.TestConnectionSRZ();
 
             if (!Settings.SrzConnectionIsValid && Settings.DownloadNewPatientsFile)
             {
-                MainRegionService.HideProgressBarWithhMessage("Не удалось подключиться к СРЗ, проверьте настройки и доступность сайта. Возможно только подставить ФИО из БД в существующий файл.");
+                MainRegionService.HideProgressBar("Не удалось подключиться к СРЗ, проверьте настройки и доступность сайта. Возможно только подставить ФИО из БД в существующий файл.");
                 return;
             }
 
             SleepMode.Deny();
-            MainRegionService.ShowProgressBarWithMessage("Выбор пути к файлу.");
+            MainRegionService.ShowProgressBar("Выбор пути к файлу.");
 
             fileDialogService.DialogType = settings.DownloadNewPatientsFile ? FileDialogType.Save : FileDialogType.Open;
             fileDialogService.FileName = settings.PatientsFilePath;
@@ -69,7 +69,7 @@ namespace CHI.ViewModels
 
             if (fileDialogService.ShowDialog() != true)
             {
-                MainRegionService.HideProgressBarWithhMessage("Отменено.");
+                MainRegionService.HideProgressBar("Отменено.");
                 return;
             }
 
@@ -84,7 +84,7 @@ namespace CHI.ViewModels
 
             if (Settings.DownloadNewPatientsFile)
             {
-                MainRegionService.ShowProgressBarWithMessage("Скачивание файла.");
+                MainRegionService.ShowProgressBar("Скачивание файла.");
 
                 var service = new SRZService(Settings.SrzAddress, Settings.UseProxy, Settings.ProxyAddress, Settings.ProxyPort);
 
@@ -93,7 +93,7 @@ namespace CHI.ViewModels
                 service.GetPatientsFile(Settings.PatientsFilePath, FileDate);
             }
 
-            MainRegionService.ShowProgressBarWithMessage("Подстановка ФИО в файл.");
+            MainRegionService.ShowProgressBar("Подстановка ФИО в файл.");
 
             var db = dbLoadingTask.ConfigureAwait(false).GetAwaiter().GetResult();
 
@@ -107,14 +107,14 @@ namespace CHI.ViewModels
             {
                 var unknownInsuaranceNumbers = file.GetUnknownInsuaranceNumbers(Settings.SrzRequestsLimit);
 
-                MainRegionService.ShowProgressBarWithMessage("Поиск ФИО в СРЗ.");
+                MainRegionService.ShowProgressBar("Поиск ФИО в СРЗ.");
                 var foundPatients = GetPatients(unknownInsuaranceNumbers);
 
                 resultReport.Append($"Запрошено пациентов в СРЗ: {foundPatients.Count()}, лимит {Settings.SrzRequestsLimit}. ");
-                MainRegionService.ShowProgressBarWithMessage("Подстановка ФИО в файл.");
+                MainRegionService.ShowProgressBar("Подстановка ФИО в файл.");
                 file.AddFullNames(foundPatients);
 
-                MainRegionService.ShowProgressBarWithMessage("Добавление ФИО в локальную базу данных.");
+                MainRegionService.ShowProgressBar("Добавление ФИО в локальную базу данных.");
                 var duplicateInsuranceNumbers = new HashSet<string>(foundPatients.Select(x => x.InsuranceNumber).ToList());
                 var duplicatePatients = db.Patients.Where(x => duplicateInsuranceNumbers.Contains(x.InsuranceNumber)).ToArray();
 
@@ -131,11 +131,11 @@ namespace CHI.ViewModels
 
             if (Settings.FormatPatientsFile && unknownPatients.Count == 0)
             {
-                MainRegionService.ShowProgressBarWithMessage("Форматирование файла.");
+                MainRegionService.ShowProgressBar("Форматирование файла.");
                 file.Format();
             }
 
-            MainRegionService.ShowProgressBarWithMessage("Сохранение файла.");
+            MainRegionService.ShowProgressBar("Сохранение файла.");
             file.Save();
 
             if (!Settings.SrzConnectionIsValid && unknownPatients.Count != 0)
@@ -147,7 +147,7 @@ namespace CHI.ViewModels
                 resultReport.Append($"Файл не готов, осталось найти {unknownPatients.Count} ФИО.");
 
             SleepMode.Deny();
-            MainRegionService.HideProgressBarWithhMessage(resultReport.ToString());
+            MainRegionService.HideProgressBar(resultReport.ToString());
         }
         //запускает многопоточно запросы к сайту для поиска пациентов
         private Patient[] GetPatients(List<string> insuranceNumbers)
@@ -184,7 +184,7 @@ namespace CHI.ViewModels
                     {
                         verifiedPatients.Add(patient);
                         Interlocked.Increment(ref counter);
-                        MainRegionService.ShowProgressBarWithMessage($"Запрошено ФИО в СРЗ: {verifiedPatients.Count()} из {insuranceNumbers.Count}.");
+                        MainRegionService.ShowProgressBar($"Запрошено ФИО в СРЗ: {verifiedPatients.Count()} из {insuranceNumbers.Count}.");
                     }
 
                     return service;

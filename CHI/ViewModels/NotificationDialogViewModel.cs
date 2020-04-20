@@ -1,51 +1,46 @@
 ﻿using CHI.Infrastructure;
 using Prism.Commands;
+using Prism.Regions;
 using Prism.Services.Dialogs;
 using System;
 
 namespace CHI.ViewModels
 {
-    class NotificationDialogViewModel : DomainObject, IDialogAware
+    class NotificationDialogViewModel : DomainObject, INavigationAware, IRegionMemberLifetime
     {
-        private string title;
         private string message;
+        Action<bool> onClose;
 
-        public string Title { get => title; set => SetProperty(ref title, value); }
+        public bool KeepAlive { get => false; }
         public string Message { get => message; set => SetProperty(ref message, value); }
 
-        public event Action<IDialogResult> RequestClose;
         public DelegateCommand<ButtonResult?> CloseDialogCommand { get; }
-
+        
 
         public NotificationDialogViewModel()
         {
             CloseDialogCommand = new DelegateCommand<ButtonResult?>(CloseDialogExecute);
         }
 
-
-        public void RaiseRequestClose(IDialogResult dialogResult)
+        protected void CloseDialogExecute(ButtonResult? buttonResult)
         {
-            RequestClose?.Invoke(dialogResult);
+            onClose(buttonResult.Value== ButtonResult.OK? true:false);
         }
 
-        public bool CanCloseDialog()
+        public void OnNavigatedTo(NavigationContext navigationContext)
+        {
+            Message = navigationContext.Parameters.GetValue<string>("content");
+            onClose = navigationContext.Parameters.GetValue<Action<bool>>("onClose");
+
+        }
+
+        public bool IsNavigationTarget(NavigationContext navigationContext)
         {
             return true;
         }
 
-        public void OnDialogClosed()
+        public void OnNavigatedFrom(NavigationContext navigationContext)
         {
-        }
-
-        public void OnDialogOpened(IDialogParameters parameters)
-        {
-            Title = parameters.GetValue<string>("title");
-            Message = parameters.GetValue<string>("message");
-        }
-
-        protected void CloseDialogExecute(ButtonResult? buttonResult)
-        {
-            RaiseRequestClose(new DialogResult(buttonResult.Value));
         }
     }
 }

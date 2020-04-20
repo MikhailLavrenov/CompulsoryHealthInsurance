@@ -7,6 +7,7 @@ using Prism.Services.Dialogs;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows.Media;
 
 namespace CHI.ViewModels
 {
@@ -150,9 +151,13 @@ namespace CHI.ViewModels
             MoveUpCommand.RaiseCanExecuteChanged();
         }
 
-        private void SelectColorExecute()
+        private async void SelectColorExecute()
         {
-            CurrentDepartment.HexColor = Helpers.ShowColorDialog(dialogService, "Выбор цвета", CurrentDepartment.HexColor);
+            var color = (Color)ColorConverter.ConvertFromString(CurrentDepartment.HexColor);
+
+            color = await mainRegionService.ShowColorDialog(color);
+
+            CurrentDepartment.HexColor = System.Drawing.ColorTranslator.ToHtml(Helpers.GetDrawingColor(color));
         }
 
         public void OnNavigatedTo(NavigationContext navigationContext)
