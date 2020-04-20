@@ -1,10 +1,10 @@
-﻿<UserControl x:Class="CHI.Views.NavigationMenuView" 
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+﻿<UserControl x:Class="CHI.Views.NavigationMenuView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:CHI.Views"
-             xmlns:i="clr-namespace:CHI.Infrastructure" 
+             xmlns:i="clr-namespace:CHI.Infrastructure"
              xmlns:v="clr-namespace:CHI.Views"
              xmlns:vm="clr-namespace:CHI.ViewModels"
              xmlns:prism="http://prismlibrary.com/"
@@ -20,171 +20,262 @@
                 <ResourceDictionary Source="/CHI;component/Views/Resources/WindowDefaultStyle.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
-            <Style x:Key="Caption" 
-                   TargetType="TextBlock" 
-                   BasedOn="{StaticResource {x:Type TextBlock}}">
 
-                <Setter Property="Margin" 
-                        Value="0" />
-                <Setter Property="FontWeight" 
-                        Value="Regular" />
-                <Setter Property="TextWrapping" 
-                        Value="Wrap" />
-            </Style>
-
-            <Style x:Key="MenuButtonText" 
+            <Style x:Key="Caption"
                    TargetType="TextBlock"
                    BasedOn="{StaticResource {x:Type TextBlock}}">
-
-                <Setter Property="Margin" 
-                        Value="0" />
+                <Setter Property="Margin"
+                        Value="20" />
+                <Setter Property="FontWeight"
+                        Value="Medium" />
                 <Setter Property="TextWrapping"
                         Value="Wrap" />
-                <Setter Property="Width" 
-                        Value="170" />
             </Style>
 
-        </ResourceDictionary >
+
+            <Style x:Key="ButtonText"
+                   TargetType="TextBlock"
+                   BasedOn="{StaticResource {x:Type TextBlock}}">
+                <Setter Property="Margin"
+                        Value="5" />
+                <Setter Property="TextWrapping"
+                        Value="Wrap" />
+                <Setter Property="FontWeight"
+                        Value="Medium" />
+            </Style>
+
+            <Style x:Key="ButtonDetailsText"
+                   TargetType="TextBlock"
+                   BasedOn="{StaticResource {x:Type TextBlock}}">
+                <Setter Property="Margin"
+                        Value="5" />
+                <Setter Property="TextWrapping"
+                        Value="Wrap" />
+                <Setter Property="FontWeight"
+                        Value="Normal" />
+                <Setter Property="DockPanel.Dock"
+                        Value="Bottom" />
+                <Setter Property="Foreground"
+                        Value="DarkSlateGray" />
+                <Setter Property="FontSize"
+                        Value="12" />
+            </Style>
+
+            <Style x:Key="MenuButton"
+                   TargetType="Button"
+                   BasedOn="{StaticResource MaterialDesignFlatButton}">
+                <Setter Property="Command"
+                        Value="{Binding SwitchViewCommand}" />
+                <Setter Property="Width"
+                        Value="180" />
+                <Setter Property="Height"
+                        Value="150" />
+                <Setter Property="Margin"
+                        Value="20" />
+                <Setter Property="materialDesign:ButtonAssist.CornerRadius"
+                        Value="0" />
+                <Setter Property="Padding"
+                        Value="0" />
+                <Setter Property="VerticalAlignment"
+                        Value="Top" />
+                <Setter Property="HorizontalContentAlignment"
+                        Value="Left" />
+                <Setter Property="VerticalContentAlignment"
+                        Value="Top" />
+            </Style>
+
+            <Style x:Key="ButtonIcon"
+                   TargetType="materialDesign:PackIcon">
+                <Setter Property="Width"
+                        Value="40" />
+                <Setter Property="Height"
+                        Value="40" />
+                <Setter Property="DockPanel.Dock"
+                        Value="Left" />
+                <Setter Property="VerticalAlignment"
+                        Value="Center" />
+
+            </Style>
+
+            <Style x:Key="popupBox"
+                   TargetType="materialDesign:PopupBox">
+                <Setter Property="Margin"
+                        Value="-10,10,10,10" />
+                <Setter Property="Foreground"
+                        Value="DarkSlateGray" />
+                <Setter Property="VerticalAlignment"
+                        Value="Top" />
+            </Style>
+            
+
+
+        </ResourceDictionary>
     </UserControl.Resources>
 
-    <Grid d:DataContext="{d:DesignInstance vm:NavigationMenuViewModel}">
 
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="auto"/>
-            <ColumnDefinition Width="auto"/>
-            <ColumnDefinition Width="auto"/>
-            <ColumnDefinition Width="auto"/>
-        </Grid.ColumnDefinitions>
+    <StackPanel Orientation="Vertical"
+        d:DataContext="{d:DesignInstance vm:NavigationMenuViewModel}">
 
-        <StackPanel Grid.Column="0" 
-                    Orientation="Vertical"  >
+        <materialDesign:Card Margin="1,1,10,10">
 
-            <TextBlock Text="Учет услуг" 
-                           Style="{StaticResource Caption}" />
+                <StackPanel Orientation="Horizontal">
 
-            <Button Command="{Binding SwitchViewCommand}"
-                    CommandParameter="{x:Type v:ReportView}">
-                <TextBlock Text="Отчет"
-                           Style="{StaticResource MenuButtonText}" />
-            </Button>
-            
-            <Button Command="{Binding SwitchViewCommand}"
-                    CommandParameter="{x:Type v:RegistersView}">
-                <TextBlock Text="Реестры"
-                           Style="{StaticResource MenuButtonText}" />
-            </Button>
+                    <Button Style="{StaticResource MenuButton}"
+                            CommandParameter="{x:Type v:ReportView}">
+                        <DockPanel>
+                            <TextBlock Style="{StaticResource ButtonDetailsText}"
+                                       Text="Построение отчета по объемам с детализацией по отделениям, персоналу и показателям" />
+                            <materialDesign:PackIcon Style="{StaticResource ButtonIcon}"
+                                                     Kind="FileChart" />
+                            <TextBlock Style="{StaticResource ButtonText}"
+                                       Text="Отчет по объемам" />
+                        </DockPanel>
+                    </Button>
 
-            <Button Command="{Binding SwitchViewCommand}" 
-                    CommandParameter="{x:Type v:MedicsView}">
-                <TextBlock Text="Медицинские работники"
-                           Style="{StaticResource MenuButtonText}" />
-            </Button>
+                    <Button Style="{StaticResource MenuButton}"
+                            CommandParameter="{x:Type v:ReportView}">
+                        <DockPanel>
+                            <TextBlock Style="{StaticResource ButtonDetailsText}"
+                                       Text="Ввод плана отделений и медицинского персонала за каждый месяц" />
+                            <materialDesign:PackIcon Style="{StaticResource ButtonIcon}"
+                                                     Kind="ViewGridAdd" />
+                            <TextBlock Style="{StaticResource ButtonText}"
+                                       Text="Планирование объемов" />
+                        </DockPanel>
+                    </Button>
 
-            <Button Command="{Binding SwitchViewCommand}"
-                    CommandParameter="{x:Type v:SpecialtiesView}">
-                <TextBlock Text="Специальности" 
-                           Style="{StaticResource MenuButtonText}" />
-            </Button>
+                    <Button Style="{StaticResource MenuButton}"
+                            CommandParameter="{x:Type v:RegistersView}">
+                        <DockPanel>
+                            <TextBlock Style="{StaticResource ButtonDetailsText}"
+                                       Text="Загрузка реестров-счетов и результатов проверки реестров страховыми компаниями, включащие санкции." />
+                            <materialDesign:PackIcon Style="{StaticResource ButtonIcon}"
+                                                     Kind="Files" />
+                            <TextBlock Style="{StaticResource ButtonText}"
+                                       Text="Реестры счетов" />
+                        </DockPanel>
+                    </Button>
 
-            <Button Command="{Binding SwitchViewCommand}"
-                    CommandParameter="{x:Type v:EmployeesView}">
-                <TextBlock Text="Штатные единицы"
-                           Style="{StaticResource MenuButtonText}" />
-            </Button>
+                <materialDesign:PopupBox Style="{StaticResource popupBox}">
+                    <StackPanel>
+                        <Button Command="{Binding SwitchViewCommand}"
+                                CommandParameter="{x:Type v:MedicsView}"
+                                Content="Мед. работники" />
+                        <Button Command="{Binding SwitchViewCommand}"
+                                CommandParameter="{x:Type v:SpecialtiesView}"
+                                Content="Специальности" />
+                        <Button Command="{Binding SwitchViewCommand}"
+                                CommandParameter="{x:Type v:EmployeesView}"
+                                Content="Штатные единицы" />
+                        <Button Command="{Binding SwitchViewCommand}"
+                                CommandParameter="{x:Type v:DepartmentsView}"
+                                Content="Подразделения" />
+                        <Button Command="{Binding SwitchViewCommand}"
+                                CommandParameter="{x:Type v:ServiceClassifiersView}"
+                                Content="Показатели" />
+                    </StackPanel>
+                </materialDesign:PopupBox>
 
-            <Button Command="{Binding SwitchViewCommand}"
-                    CommandParameter="{x:Type v:DepartmentsView}">
-                <TextBlock Text="Отделения"
-                           Style="{StaticResource MenuButtonText}" />
-            </Button>
+            </StackPanel>
 
-            <Button Command="{Binding SwitchViewCommand}" 
-                    CommandParameter="{x:Type v:ServiceClassifiersView}">
-                <TextBlock Text="Классификаторы услуг" 
-                           Style="{StaticResource MenuButtonText}" />
-            </Button>
+        </materialDesign:Card>
 
-            <Button Command="{Binding SwitchViewCommand}"
-                    CommandParameter="{x:Type v:ComponentsView}">
-                <TextBlock Text="Показатели"
-                           Style="{StaticResource MenuButtonText}" />
-            </Button>
+        <StackPanel Orientation="Horizontal">
+        
+        <materialDesign:Card Margin="1,1,10,10">
+
+            <StackPanel Orientation="Horizontal">
+
+                <Button Style="{StaticResource MenuButton}"
+                        CommandParameter="{x:Type v:ExaminationsView}">
+                    <DockPanel>
+                        <TextBlock Style="{StaticResource ButtonDetailsText}"
+                                   Text="Загрузка из реестров-счетов профосмотров и диспансеризации на портал Диспансеризации ХК ФОМС " />
+                        <materialDesign:PackIcon Style="{StaticResource ButtonIcon}"
+                                                 Kind="ClipboardVitals" />
+                        <TextBlock Style="{StaticResource ButtonText}"
+                                   Text="Портал диспансеризации" />
+                    </DockPanel>
+                </Button>
+
+                <materialDesign:PopupBox Style="{StaticResource popupBox}">
+                    <StackPanel>
+                        <Button Command="{Binding SwitchViewCommand}"
+                                CommandParameter="{x:Type v:ExaminationsSettingsView}"
+                                Content="Настройки" />
+                    </StackPanel>
+                </materialDesign:PopupBox>
+
+            </StackPanel>
+
+        </materialDesign:Card >
+
+        <materialDesign:Card Margin="1,1,10,10">
+
+            <StackPanel Orientation="Horizontal">
+
+                <Button Style="{StaticResource MenuButton}"
+                        CommandParameter="{x:Type v:AttachedPatientsView}">
+                    <DockPanel>
+                        <TextBlock Style="{StaticResource ButtonDetailsText}"
+                                   Text="Загрузка и форматирование файла прикрепленных пациентов, определение полных ФИО." />
+                        <materialDesign:PackIcon Style="{StaticResource ButtonIcon}"
+                                                 Kind="UsersAdd" />
+                        <TextBlock Style="{StaticResource ButtonText}"
+                                   Text="Прикрепленные пациенты" />
+                    </DockPanel>
+                </Button>
+
+                <materialDesign:PopupBox Style="{StaticResource popupBox}">
+                    <StackPanel>
+                        <Button Command="{Binding SwitchViewCommand}"
+                                CommandParameter="{x:Type v:SrzSettingsView}"
+                                Content="Подключение к СРЗ" />
+                        <Button Command="{Binding SwitchViewCommand}"
+                                CommandParameter="{x:Type v:AttachedPatientsStorageSettingsView}"
+                                Content="БД пациентов" />
+                        <Button Command="{Binding SwitchViewCommand}"
+                                CommandParameter="{x:Type v:AttachedPatientsFileSettingsView}"
+                                Content="Форматирование файла" />
+                    </StackPanel>
+                </materialDesign:PopupBox>
+
+            </StackPanel>
+
+        </materialDesign:Card>
+
+            <materialDesign:Card Margin="1,1,10,10">
+
+                <StackPanel Orientation="Horizontal">
+
+                    <Button Style="{StaticResource MenuButton}"
+                            CommandParameter="{x:Type v:OtherSettingsView}">
+                        <DockPanel>
+                            <TextBlock Style="{StaticResource ButtonDetailsText}"
+                                       Text="Различные настройки, влияющие на несколько подсистем одновременно." />
+                            <materialDesign:PackIcon Style="{StaticResource ButtonIcon}"
+                                                     Kind="Gear" />
+                            <TextBlock Style="{StaticResource ButtonText}"
+                                       Text="Прочие настройки" />
+                        </DockPanel>
+                    </Button>
+
+                    <materialDesign:PopupBox Style="{StaticResource popupBox}">
+                        <StackPanel>
+                            <Button Command="{Binding SwitchViewCommand}"
+                                    CommandParameter="{x:Type v:AboutView}"
+                                    Content="О программе" />
+                        </StackPanel>
+                    </materialDesign:PopupBox>
+
+                </StackPanel>
+
+            </materialDesign:Card>
 
         </StackPanel>
 
-        <StackPanel Grid.Column="1" 
-                    Orientation="Vertical"  >
-
-            <TextBlock Text="Портал диспансеризации" 
-                           Style="{StaticResource Caption}" />
+    </StackPanel>
 
 
-            <Button Command="{Binding SwitchViewCommand}"
-                    CommandParameter="{x:Type v:ExaminationsView}">
-                <TextBlock Text="Загрузка осмотров"
-                           Style="{StaticResource MenuButtonText}" />
-            </Button>
-
-            <Button Command="{Binding SwitchViewCommand}"                
-                    CommandParameter="{x:Type v:ExaminationsSettingsView}">
-                <TextBlock Text="Настройки"
-                           Style="{StaticResource MenuButtonText}" />
-            </Button>
-
-        </StackPanel>
-
-        <StackPanel Grid.Column="2" 
-                    Orientation="Vertical"  >
-
-            <TextBlock Text="Прикрепленные пациенты" 
-                           Style="{StaticResource Caption}" />
-
-            <Button Command="{Binding SwitchViewCommand}" 
-                    CommandParameter="{x:Type v:AttachedPatientsView}" >
-                <TextBlock Text="Загрузка прикрепленных пациентов"
-                           Style="{StaticResource MenuButtonText}" />
-            </Button>
-
-            <Button Command="{Binding SwitchViewCommand}" 
-                    CommandParameter="{x:Type v:SrzSettingsView}">
-                <TextBlock Text="Настройки Подключение к СРЗ" 
-                           Style="{StaticResource MenuButtonText}" />
-            </Button>
-
-            <Button Command="{Binding SwitchViewCommand}" 
-                    CommandParameter="{x:Type v:AttachedPatientsStorageSettingsView}">
-                <TextBlock Text="Настройки Локальная база данных" 
-                           Style="{StaticResource MenuButtonText}" />
-            </Button>
-
-            <Button Command="{Binding SwitchViewCommand}" 
-                    CommandParameter="{x:Type v:AttachedPatientsFileSettingsView}">
-                <TextBlock Text="Настройки Столбцы выгрузки" 
-                           Style="{StaticResource MenuButtonText}" />
-            </Button>
-
-        </StackPanel>
-
-        <StackPanel Grid.Column="3" 
-                    Orientation="Vertical"  >
-
-            <TextBlock Text="Прочее" 
-                           Style="{StaticResource Caption}" />
-
-            <Button Command="{Binding SwitchViewCommand}" 
-                    CommandParameter="{x:Type v:OtherSettingsView}">
-                <TextBlock Text="Настройки"
-                           Style="{StaticResource MenuButtonText}" />
-            </Button>
-
-            <Button Command="{Binding SwitchViewCommand}" 
-                    CommandParameter="{x:Type v:AboutView}">
-                <TextBlock Text="О программе" 
-                           Style="{StaticResource MenuButtonText}" />
-            </Button>
-
-        </StackPanel>
-
-    </Grid>
 
 </UserControl>
