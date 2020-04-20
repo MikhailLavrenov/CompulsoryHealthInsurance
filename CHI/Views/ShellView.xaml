@@ -204,25 +204,21 @@
 
         <Grid x:Name="MainRegionPanel"
               Grid.Row="1"
-              Background="White"
-              IsEnabled="{Binding MainRegionService.IsLocked, Converter={i:InvertBoolConverter}}">
+              Background="White">
 
-            <ContentControl Panel.ZIndex="3"
-                            prism:RegionManager.RegionName="{x:Static i:RegionNames.DialogRegion}"
-                            Visibility="{Binding MainRegionService.IsShowDialog, Converter={i:BoolToVisibleConverter}}" />
+            <ContentControl Panel.ZIndex="2"                            
+                            prism:RegionManager.RegionName="{x:Static i:RegionNames.MainRegionOverlay}"
+                            Visibility="{Binding MainRegionService.IsLocked, Converter={i:BoolToVisibleConverter}}"/>
 
-            <ContentControl Panel.ZIndex="2"
-                            prism:RegionManager.RegionName="{x:Static i:RegionNames.ProgressBarRegion}"
-                            Visibility="{Binding MainRegionService.IsShowProgressBar, Converter={i:BoolToVisibleConverter}}" />
-
-            <Border Opacity="0.35"
-                    Background="LightGray"
-                    Panel.ZIndex="1"
+            <Border Panel.ZIndex="1"
+                    Opacity="0.35"
+                    Background="LightGray"                    
                     Visibility="{Binding MainRegionService.IsLocked, Converter={i:BoolToVisibleConverter}}" />
 
             <i:CustomContentControl Margin="15,15,15,40"
                                     Background="White"
-                                    prism:RegionManager.RegionName="{x:Static i:RegionNames.MainRegion}">
+                                    prism:RegionManager.RegionName="{x:Static i:RegionNames.MainRegion}"
+                                    IsEnabled="{Binding MainRegionService.IsLocked, Converter={i:InvertBoolConverter}}">
 
                 <b:Interaction.Behaviors>
                     <i:CircleAnimationBaseBehavior AnimationParametersTarget="MainWindow" />

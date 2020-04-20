@@ -146,46 +146,46 @@ namespace CHI.Infrastructure
             return null;
         }
 
-        /// <summary>
-        /// Вызывает текстовое диалоговое окно модально
-        /// </summary>
-        public static ButtonResult ShowTextDialog(this IDialogService dialogService, string title, string message)
-        {
-            IDialogResult result = null;
-            var dialogName = nameof(NotificationDialogView);
-            var dialogParameters = new DialogParameters();
-            dialogParameters.Add("title", title);
-            dialogParameters.Add("message", message);
+        ///// <summary>
+        ///// Вызывает текстовое диалоговое окно модально
+        ///// </summary>
+        //public static ButtonResult ShowTextDialog(this IDialogService dialogService, string title, string message)
+        //{
+        //    IDialogResult result = null;
+        //    var dialogName = nameof(NotificationDialogView);
+        //    var dialogParameters = new DialogParameters();
+        //    dialogParameters.Add("title", title);
+        //    dialogParameters.Add("message", message);
 
-            Application.Current.Dispatcher.Invoke(() => dialogService.ShowDialog(dialogName, dialogParameters, x => result = x));
+        //    Application.Current.Dispatcher.Invoke(() => dialogService.ShowDialog(dialogName, dialogParameters, x => result = x));
 
-            return result.Result;
-        }
+        //    return result.Result;
+        //}
 
-        /// <summary>
-        /// Вызывает диалоговое окно выбора цвета модально
-        /// </summary>
-        public static string ShowColorDialog(this IDialogService dialogService, string title, string hexColor)
-        {
-            IDialogResult result = null;
-            var dialogName = nameof(ColorDialogView);
+        ///// <summary>
+        ///// Вызывает диалоговое окно выбора цвета модально
+        ///// </summary>
+        //public static string ShowColorDialog(this IDialogService dialogService, string title, string hexColor)
+        //{
+        //    IDialogResult result = null;
+        //    var dialogName = nameof(ColorDialogView);
 
-            var color = (Color)ColorConverter.ConvertFromString(hexColor);
-            var dialogParameters = new DialogParameters();
-            dialogParameters.Add("title", title);
-            dialogParameters.Add("color", color);
+        //    var color = (Color)ColorConverter.ConvertFromString(hexColor);
+        //    var dialogParameters = new DialogParameters();
+        //    dialogParameters.Add("title", title);
+        //    dialogParameters.Add("color", color);
 
-            Application.Current.Dispatcher.Invoke(() => dialogService.ShowDialog(dialogName, dialogParameters, x => result = x));
+        //    Application.Current.Dispatcher.Invoke(() => dialogService.ShowDialog(dialogName, dialogParameters, x => result = x));
 
-            if (result.Result == ButtonResult.OK)
-            {
-                color = result.Parameters.GetValue<Color>("color");
+        //    if (result.Result == ButtonResult.OK)
+        //    {
+        //        color = result.Parameters.GetValue<Color>("color");
 
-                return System.Drawing.ColorTranslator.ToHtml(GetDrawingColor(color));
-            }
-            else
-                return hexColor;
-        }
+        //        return System.Drawing.ColorTranslator.ToHtml(GetDrawingColor(color));
+        //    }
+        //    else
+        //        return hexColor;
+        //}
 
         /// <summary>
         /// Возвращает массив байтов потока

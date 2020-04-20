@@ -40,18 +40,18 @@ namespace CHI.ViewModels
         #region Методы
         private void TestExecute()
         {
-            MainRegionService.ShowProgressBarWithMessage("Проверка настроек.");
+            MainRegionService.ShowProgressBar("Проверка настроек.");
             Settings.TestConnectionProxy();
 
             if (Settings.ProxyConnectionIsValid)
-                MainRegionService.HideProgressBarWithhMessage("Настройки корректны.");
+                MainRegionService.HideProgressBar("Настройки корректны.");
             else
-                MainRegionService.HideProgressBarWithhMessage("Прокси сервер не доступен.");
+                MainRegionService.HideProgressBar("Прокси сервер не доступен.");
         }
         private void SetDefaultExecute()
         {
             Settings.SetDefaultOther();
-            MainRegionService.HideProgressBarWithhMessage("Настройки установлены по умолчанию.");
+            MainRegionService.HideProgressBar("Настройки установлены по умолчанию.");
         }
         #endregion
     }

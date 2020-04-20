@@ -64,18 +64,18 @@ namespace CHI.ViewModels
 
         private void LoadExecute()
         {
-            mainRegionService.ShowProgressBarWithMessage("Выбор файла");
+            mainRegionService.ShowProgressBar("Выбор файла");
 
             fileDialogService.DialogType = FileDialogType.Open;
             fileDialogService.Filter = "Excel files (*.xlsx)|*.xlsx";
 
             if (fileDialogService.ShowDialog() != true)
             {
-                mainRegionService.HideProgressBarWithhMessage("Отменено");
+                mainRegionService.HideProgressBar("Отменено");
                 return;
             }
 
-            mainRegionService.ShowProgressBarWithMessage("Загрузка классификатора услуг");
+            mainRegionService.ShowProgressBar("Загрузка классификатора услуг");
 
             using var excel = new ExcelPackage(new FileInfo(fileDialogService.FileName));
             var sheet = excel.Workbook.Worksheets.First();
@@ -105,12 +105,12 @@ namespace CHI.ViewModels
 
             Refresh();
 
-            mainRegionService.HideProgressBarWithhMessage("Успешно загружено");
+            mainRegionService.HideProgressBar("Успешно загружено");
         }
 
         private void SaveExampleExecute()
         {
-            mainRegionService.ShowProgressBarWithMessage("Выбор пути");
+            mainRegionService.ShowProgressBar("Выбор пути");
 
             fileDialogService.DialogType = FileDialogType.Save;
             fileDialogService.FileName = "Пример классификатора услуг";
@@ -121,7 +121,7 @@ namespace CHI.ViewModels
 
             var saveExampleFilePath = fileDialogService.FileName;
 
-            mainRegionService.ShowProgressBarWithMessage("Сохранение файла");
+            mainRegionService.ShowProgressBar("Сохранение файла");
 
             using var excel = new ExcelPackage();
 
@@ -158,7 +158,7 @@ namespace CHI.ViewModels
 
             excel.SaveAs(new FileInfo(fileDialogService.FileName));
 
-            mainRegionService.HideProgressBarWithhMessage($"Файл сохранен: {saveExampleFilePath}");
+            mainRegionService.HideProgressBar($"Файл сохранен: {saveExampleFilePath}");
         }
 
         private void Refresh()

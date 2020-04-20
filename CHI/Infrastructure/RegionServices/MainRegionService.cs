@@ -1,9 +1,13 @@
 ﻿using CHI.Views;
 using Prism.Commands;
 using Prism.Regions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media;
 
 namespace CHI.Infrastructure
 {
@@ -14,7 +18,6 @@ namespace CHI.Infrastructure
     {
         string header;
         string status;
-        bool isLocked;
         bool isShowProgressBar;
         bool isShowDialog;
         bool showStatus;
@@ -33,9 +36,29 @@ namespace CHI.Infrastructure
                 IsShowStatus = !string.IsNullOrEmpty(value);
             }
         }
-        public bool IsLocked { get => isLocked; set => SetProperty(ref isLocked, value); }
-        public bool IsShowProgressBar { get => isShowProgressBar; set => SetProperty(ref isShowProgressBar, value, SwitchProgressBar); }
-        public bool IsShowDialog { get => isShowDialog; set => SetProperty(ref isShowDialog, value); }
+        public bool IsLocked { get => IsShowProgressBar || IsShowDialog; }
+        public bool IsShowProgressBar
+        {
+            get => isShowProgressBar;
+            set
+            {
+                if (isShowProgressBar != value)
+                {
+                    SetProperty(ref isShowProgressBar, value);
+
+                    RaisePropertyChanged(nameof(IsLocked));
+
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        if (IsShowProgressBar)
+                            regionManager.RequestNavigate(RegionNames.MainRegionOverlay, nameof(ProgressBarView));
+                        else
+                            regionManager.Regions[RegionNames.MainRegionOverlay].RemoveAll();
+                    });
+                }
+            }
+        }
+        public bool IsShowDialog { get => isShowDialog; set => SetProperty(ref isShowDialog, value, () => RaisePropertyChanged(nameof(IsLocked))); }
         public bool IsShowStatus { get => showStatus; private set => SetProperty(ref showStatus, value); }
         public bool CanNavigateBack { get => canNavigateBack; private set => SetProperty(ref canNavigateBack, value); }
 
@@ -51,12 +74,13 @@ namespace CHI.Infrastructure
             CloseStatusCommand = new DelegateCommand(() => Message = string.Empty);
         }
 
-        public void HideProgressBarWithhMessage(string statusMessage)
+
+        public void HideProgressBar(string statusMessage)
         {
             Message = statusMessage;
             IsShowProgressBar = false;
         }
-        public void ShowProgressBarWithMessage(string statusMessage)
+        public void ShowProgressBar(string statusMessage)
         {
             Message = statusMessage;
             IsShowProgressBar = true;
@@ -73,7 +97,8 @@ namespace CHI.Infrastructure
                 CanNavigateBack = true;
             }
 
-            IsLocked = false;
+            IsShowDialog = false;
+            IsShowProgressBar = false;
             Message = string.Empty;
             regionManager.RequestNavigate(RegionNames.MainRegion, targetName, navigationParameters);
             lastNavigatedView = targetName;
@@ -85,17 +110,6 @@ namespace CHI.Infrastructure
 
             CanNavigateBack = navigateBackCollection.Count > 0;
         }
-        private void SwitchProgressBar()
-        {
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                if (IsShowProgressBar)
-                    regionManager.RequestNavigate(RegionNames.ProgressBarRegion, nameof(ProgressBarView));
-                else
-                    regionManager.Regions[RegionNames.ProgressBarRegion].RemoveAll();
-            });
-        }
-
         public void ClearNavigationBack()
         {
             CanNavigateBack = false;
@@ -109,6 +123,56 @@ namespace CHI.Infrastructure
 
 
             navigateBackCollection.Clear();
+        }
+
+
+        public async Task<Color> ShowColorDialog(Color defaultColor)
+        {
+            IsShowDialog = true;
+
+            var selectedColor = await ShowDialog<Color>(defaultColor, nameof(ColorDialogView));
+
+            IsShowDialog = false;
+
+            return (Color)selectedColor;
+        }
+
+        public async Task<bool> ShowNotificationDialog(string message)
+        {
+            IsShowDialog = true;
+
+            var selectedColor = await ShowDialog<bool>(message, nameof(NotificationDialogView));
+
+            IsShowDialog = false;
+
+            return (bool)selectedColor;
+        }
+
+        private async Task<object> ShowDialog<T>(object content, string viewName)
+        {
+            return await Task.Run(() =>
+            {
+                object result=null;
+
+                var autoResetEvent = new AutoResetEvent(false);
+
+                Action<T> callback = x =>
+                {
+                    result = x;
+                    autoResetEvent.Set();
+                };
+
+                var parameters = new NavigationParameters();
+
+                parameters.Add("onClose", callback);
+                parameters.Add("content", content);
+
+                Application.Current.Dispatcher.Invoke(() => regionManager.RequestNavigate(RegionNames.MainRegionOverlay, viewName, parameters));
+
+                autoResetEvent.WaitOne();
+
+                return result;
+            });
         }
     }
 }
