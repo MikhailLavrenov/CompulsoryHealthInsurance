@@ -52,13 +52,28 @@ namespace CHI.Infrastructure
                     {
                         if (IsShowProgressBar)
                             regionManager.RequestNavigate(RegionNames.MainRegionOverlay, nameof(ProgressBarView));
-                        else
+                        else if (!IsLocked)
                             regionManager.Regions[RegionNames.MainRegionOverlay].RemoveAll();
                     });
                 }
             }
         }
-        public bool IsShowDialog { get => isShowDialog; set => SetProperty(ref isShowDialog, value, () => RaisePropertyChanged(nameof(IsLocked))); }
+        public bool IsShowDialog
+        {
+            get => isShowDialog;
+            set
+            {
+                if (isShowDialog != value)
+                {
+                    SetProperty(ref isShowDialog, value);
+
+                    RaisePropertyChanged(nameof(IsLocked));
+
+                    if (!IsLocked)
+                        regionManager.Regions[RegionNames.MainRegionOverlay].RemoveAll();
+                }
+            }
+        }
         public bool IsShowStatus { get => showStatus; private set => SetProperty(ref showStatus, value); }
         public bool CanNavigateBack { get => canNavigateBack; private set => SetProperty(ref canNavigateBack, value); }
 
@@ -80,15 +95,18 @@ namespace CHI.Infrastructure
             Message = statusMessage;
             IsShowProgressBar = false;
         }
+
         public void ShowProgressBar(string statusMessage)
         {
             Message = statusMessage;
             IsShowProgressBar = true;
         }
+
         public void RequestNavigate(string targetName, bool canNavigateBack = false)
         {
             RequestNavigate(targetName, new NavigationParameters(), canNavigateBack);
         }
+
         public void RequestNavigate(string targetName, NavigationParameters navigationParameters, bool canNavigateBack = false)
         {
             if (canNavigateBack)
@@ -103,6 +121,7 @@ namespace CHI.Infrastructure
             regionManager.RequestNavigate(RegionNames.MainRegion, targetName, navigationParameters);
             lastNavigatedView = targetName;
         }
+
         public void RequestNavigateBack()
         {
             if (navigateBackCollection.Count > 0)
@@ -110,6 +129,7 @@ namespace CHI.Infrastructure
 
             CanNavigateBack = navigateBackCollection.Count > 0;
         }
+
         public void ClearNavigationBack()
         {
             CanNavigateBack = false;
@@ -124,7 +144,6 @@ namespace CHI.Infrastructure
 
             navigateBackCollection.Clear();
         }
-
 
         public async Task<Color> ShowColorDialog(Color defaultColor)
         {
@@ -152,7 +171,7 @@ namespace CHI.Infrastructure
         {
             return await Task.Run(() =>
             {
-                object result=null;
+                object result = null;
 
                 var autoResetEvent = new AutoResetEvent(false);
 

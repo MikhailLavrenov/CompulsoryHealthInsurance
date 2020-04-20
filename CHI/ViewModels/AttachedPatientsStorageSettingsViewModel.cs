@@ -38,7 +38,7 @@ namespace CHI.ViewModels
 
             Settings = Settings.Instance;
 
-            this.mainRegionService.Header = "Настройки базы данных прикрепленных пациентов";
+            this.mainRegionService.Header = "База данных прикрепленных пациентов";
 
             Task.Run(() => PatientsCount = new Models.AttachedPatientsDBContext().Patients.Count().ToString());
 
