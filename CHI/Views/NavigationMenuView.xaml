@@ -10,7 +10,7 @@
              xmlns:prism="http://prismlibrary.com/"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d"
-             d:DesignHeight="600"
+             d:DesignHeight="800"
              d:DesignWidth="800"
              prism:ViewModelLocator.AutoWireViewModel="True">
 
@@ -21,67 +21,27 @@
             </ResourceDictionary.MergedDictionaries>
 
 
-            <Style x:Key="Caption"
-                   TargetType="TextBlock"
-                   BasedOn="{StaticResource {x:Type TextBlock}}">
-                <Setter Property="Margin"
-                        Value="20" />
-                <Setter Property="FontWeight"
-                        Value="Medium" />
-                <Setter Property="TextWrapping"
-                        Value="Wrap" />
-            </Style>
-
-
-            <Style x:Key="ButtonText"
-                   TargetType="TextBlock"
-                   BasedOn="{StaticResource {x:Type TextBlock}}">
-                <Setter Property="Margin"
-                        Value="5" />
-                <Setter Property="TextWrapping"
-                        Value="Wrap" />
-                <Setter Property="FontWeight"
-                        Value="Medium" />
-            </Style>
-
-            <Style x:Key="ButtonDetailsText"
-                   TargetType="TextBlock"
-                   BasedOn="{StaticResource {x:Type TextBlock}}">
-                <Setter Property="Margin"
-                        Value="5" />
-                <Setter Property="TextWrapping"
-                        Value="Wrap" />
-                <Setter Property="FontWeight"
-                        Value="Normal" />
-                <Setter Property="DockPanel.Dock"
-                        Value="Bottom" />
-                <Setter Property="Foreground"
-                        Value="DarkSlateGray" />
-                <Setter Property="FontSize"
-                        Value="12" />
-            </Style>
-
             <Style x:Key="MenuButton"
                    TargetType="Button"
                    BasedOn="{StaticResource MaterialDesignFlatButton}">
                 <Setter Property="Command"
                         Value="{Binding SwitchViewCommand}" />
                 <Setter Property="Width"
-                        Value="180" />
+                        Value="190" />
                 <Setter Property="Height"
-                        Value="150" />
+                        Value="60" />
                 <Setter Property="Margin"
-                        Value="20,20,0,20" />
+                        Value="0,0,2,2" />
                 <Setter Property="materialDesign:ButtonAssist.CornerRadius"
                         Value="0" />
                 <Setter Property="Padding"
-                        Value="5" />
-                <Setter Property="VerticalAlignment"
-                        Value="Top" />
+                        Value="10" />
                 <Setter Property="HorizontalContentAlignment"
                         Value="Left" />
                 <Setter Property="VerticalContentAlignment"
-                        Value="Top" />
+                        Value="Center" />
+                <Setter Property="Foreground"
+                        Value="White" />
             </Style>
 
             <Style x:Key="ButtonIcon"
@@ -92,201 +52,238 @@
                         Value="40" />
                 <Setter Property="DockPanel.Dock"
                         Value="Left" />
+            </Style>
+
+            <Style x:Key="ButtonText"
+                   TargetType="TextBlock">
+                <Setter Property="Margin"
+                        Value="7,0,0,0" />
+                <Setter Property="TextWrapping"
+                        Value="Wrap" />
+                <Setter Property="FontWeight"
+                        Value="Normal" />
+                <Setter Property="FontSize"
+                        Value="14" />
                 <Setter Property="VerticalAlignment"
                         Value="Center" />
+                <Setter Property="DockPanel.Dock"
+                        Value="Right" />
             </Style>
-
-            <Style x:Key="popupBox"
-                   TargetType="materialDesign:PopupBox">
-                <Setter Property="Margin"
-                        Value="0,5,0,0" />
-                <Setter Property="Foreground"
-                        Value="DarkSlateGray" />
-                <Setter Property="VerticalAlignment"
-                        Value="Top" />
-            </Style>
-
-
 
         </ResourceDictionary>
     </UserControl.Resources>
 
 
-    <Grid 
-        d:DataContext="{d:DesignInstance vm:NavigationMenuViewModel}">
+    <Grid d:DataContext="{d:DesignInstance vm:NavigationMenuViewModel}">
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="auto"/>
-            <RowDefinition Height="auto"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="auto"/>
-            <ColumnDefinition Width="auto"/>
-            <ColumnDefinition Width="auto"/>
-            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="auto" />
+            <ColumnDefinition Width="auto" />
+            <ColumnDefinition Width="auto" />
+            <ColumnDefinition Width="auto" />
+            <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <materialDesign:Card Margin="1,1,10,10" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3">
+        <StackPanel Grid.Column="0"
+                    Orientation="Vertical">
 
-            <StackPanel Orientation="Horizontal">
+            <Button Style="{StaticResource MenuButton}"
+                    Background="#1565c0"
+                    CommandParameter="{x:Type v:ReportView}">
+                <DockPanel>
+                    <materialDesign:PackIcon Style="{StaticResource ButtonIcon}"
+                                             Kind="ChartAreaspline" />
+                    <TextBlock Style="{StaticResource ButtonText}"
+                               Text="Отчет по объемам" />
+                </DockPanel>
+            </Button>
 
-                <Button Style="{StaticResource MenuButton}"
-                            CommandParameter="{x:Type v:ReportView}">
-                    <DockPanel>
-                        <TextBlock Style="{StaticResource ButtonDetailsText}"                                       
-                                   Text="Построение отчета по объемам с детализацией по отделениям, персоналу и показателям" />
-                        <materialDesign:PackIcon Style="{StaticResource ButtonIcon}"                                                     
-                                                 Kind="FileChart" />
-                        <TextBlock Style="{StaticResource ButtonText}"                                       
-                                   Text="Отчет по объемам" />
-                    </DockPanel>
-                </Button>
+            <Button Style="{StaticResource MenuButton}"
+                    Background="#1976d2"
+                    CommandParameter="{x:Type v:ReportView}">
+                <DockPanel>
+                    <materialDesign:PackIcon Style="{StaticResource ButtonIcon}"
+                                             Kind="ClipboardList" />
+                    <TextBlock Style="{StaticResource ButtonText}"
+                               Text="Планирование объемов" />
+                </DockPanel>
+            </Button>
 
-                <FrameworkElement Width="50"/>
+            <Button Style="{StaticResource MenuButton}"
+                    Background="#1e88e5"
+                    CommandParameter="{x:Type v:RegistersView}">
+                <DockPanel>
+                    <materialDesign:PackIcon Style="{StaticResource ButtonIcon}"
+                                             Kind="FileDownload" />
+                    <TextBlock Style="{StaticResource ButtonText}"
+                               Text="Загрузка реестров" />
+                </DockPanel>
+            </Button>
 
-                <Button Style="{StaticResource MenuButton}"
-                            CommandParameter="{x:Type v:ReportView}">
-                    <DockPanel>
-                        <TextBlock Style="{StaticResource ButtonDetailsText}"
-                                       Text="Ввод плана отделений и медицинского персонала за каждый месяц" />
-                        <materialDesign:PackIcon Style="{StaticResource ButtonIcon}"
-                                                     Kind="ViewGridAdd" />
-                        <TextBlock Style="{StaticResource ButtonText}"
-                                       Text="Планирование объемов" />
-                    </DockPanel>
-                </Button>
+            <Button Style="{StaticResource MenuButton}"
+                    Background="#2196f3"
+                    CommandParameter="{x:Type v:MedicsView}">
+                <DockPanel>
+                    <materialDesign:PackIcon Style="{StaticResource ButtonIcon}"
+                                             Kind="Doctor" />
+                    <TextBlock Style="{StaticResource ButtonText}"
+                               Text="Мед. работники" />
+                </DockPanel>
+            </Button>
 
-                <FrameworkElement Width="50"/>
+            <Button Style="{StaticResource MenuButton}"
+                    Background="#42a5f5"
+                    CommandParameter="{x:Type v:SpecialtiesView}">
+                <DockPanel>
+                    <materialDesign:PackIcon Style="{StaticResource ButtonIcon}"
+                                             Kind="Diploma" />
+                    <TextBlock Style="{StaticResource ButtonText}"
+                               Text="Специальности" />
+                </DockPanel>
+            </Button>
 
-                <Button Style="{StaticResource MenuButton}"
-                            CommandParameter="{x:Type v:RegistersView}">
-                    <DockPanel>
-                        <TextBlock Style="{StaticResource ButtonDetailsText}"
-                                       Text="Загрузка реестров-счетов и результатов их проверки страховыми компаниями, включащие денежные санкции." />
-                        <materialDesign:PackIcon Style="{StaticResource ButtonIcon}"
-                                                     Kind="Files" />
-                        <TextBlock Style="{StaticResource ButtonText}"
-                                       Text="Реестры счетов" />
-                    </DockPanel>
-                </Button>
+            <Button Style="{StaticResource MenuButton}"
+                    Background="#64b5f6"
+                    CommandParameter="{x:Type v:EmployeesView}">
+                <DockPanel>
+                    <materialDesign:PackIcon Style="{StaticResource ButtonIcon}"
+                                             Kind="BadgeAccountHorizontal" />
+                    <TextBlock Style="{StaticResource ButtonText}"
+                               Text="Штатные единицы" />
+                </DockPanel>
+            </Button>
 
-                <materialDesign:PopupBox Style="{StaticResource popupBox}">
-                    <StackPanel>
-                        <Button Command="{Binding SwitchViewCommand}"
-                                CommandParameter="{x:Type v:MedicsView}"
-                                Content="Мед. работники" />
-                        <Button Command="{Binding SwitchViewCommand}"
-                                CommandParameter="{x:Type v:SpecialtiesView}"
-                                Content="Специальности" />
-                        <Button Command="{Binding SwitchViewCommand}"
-                                CommandParameter="{x:Type v:EmployeesView}"
-                                Content="Штатные единицы" />
-                        <Button Command="{Binding SwitchViewCommand}"
-                                CommandParameter="{x:Type v:DepartmentsView}"
-                                Content="Подразделения" />
-                        <Button Command="{Binding SwitchViewCommand}"
-                                CommandParameter="{x:Type v:ComponentsView}"
-                                Content="Показатели" />
-                    </StackPanel>
-                </materialDesign:PopupBox>
-
-            </StackPanel>
-
-        </materialDesign:Card>
+            <Button Style="{StaticResource MenuButton}"
+                    Background="#90caf9"
+                    CommandParameter="{x:Type v:DepartmentsView}">
+                <DockPanel>
+                    <materialDesign:PackIcon Style="{StaticResource ButtonIcon}"
+                                             Kind="UserGroup" />
+                    <TextBlock Style="{StaticResource ButtonText}"
+                               Text="Подразделения" />
+                </DockPanel>
+            </Button>
 
 
+            <Button Style="{StaticResource MenuButton}"
+                    Background="#bbdefb"
+                    CommandParameter="{x:Type v:ComponentsView}">
+                <DockPanel>
+                    <materialDesign:PackIcon Style="{StaticResource ButtonIcon}"
+                                             Kind="FileTree" />
+                    <TextBlock Style="{StaticResource ButtonText}"
+                               Text="Показатели" />
+                </DockPanel>
+            </Button>
 
-        <materialDesign:Card Grid.Row="1" Grid.Column="0" Margin="1,1,10,10">
+        </StackPanel>
 
-            <StackPanel Orientation="Horizontal">
+        <StackPanel Grid.Column="1" Orientation="Vertical">
 
-                <Button Style="{StaticResource MenuButton}"
-                        CommandParameter="{x:Type v:ExaminationsView}">
-                    <DockPanel>
-                        <TextBlock Style="{StaticResource ButtonDetailsText}"
-                                   Text="Загрузка из реестров-счетов профосмотров и диспансеризации на портал Диспансеризации ХК ФОМС " />
-                        <materialDesign:PackIcon Style="{StaticResource ButtonIcon}"
-                                                 Kind="ClipboardVitals" />
-                        <TextBlock Style="{StaticResource ButtonText}"
-                                   Text="Портал диспансеризации" />
-                    </DockPanel>
-                </Button>
+            <Button Style="{StaticResource MenuButton}"
+                    Background="#0277bd"
+                    CommandParameter="{x:Type v:ExaminationsView}">
+                <DockPanel>
+                    <materialDesign:PackIcon Style="{StaticResource ButtonIcon}"
+                                             Kind="ClipboardVitals" />
+                    <TextBlock Style="{StaticResource ButtonText}"
+                               Text="Портал диспансеризации" />
+                </DockPanel>
+            </Button>
 
-                <materialDesign:PopupBox Style="{StaticResource popupBox}">
-                    <StackPanel>
-                        <Button Command="{Binding SwitchViewCommand}"
-                                CommandParameter="{x:Type v:ExaminationsSettingsView}"
-                                Content="Настройки" />
-                    </StackPanel>
-                </materialDesign:PopupBox>
+            <Button Style="{StaticResource MenuButton}"
+                    Background="#0288d1"
+                    CommandParameter="{x:Type v:ExaminationsSettingsView}">
+                <DockPanel>
+                    <materialDesign:PackIcon Style="{StaticResource ButtonIcon}"
+                                             Kind="Gear" />
+                    <TextBlock Style="{StaticResource ButtonText}"
+                               Text="Настройки" />
+                </DockPanel>
+            </Button>
 
-            </StackPanel>
+        </StackPanel>
 
-        </materialDesign:Card >
+        <StackPanel Grid.Column="2"
+                    Orientation="Vertical">
 
-        <materialDesign:Card Grid.Row="1" Grid.Column="1"  Margin="1,1,10,10">
+            <Button Style="{StaticResource MenuButton}"
+                    Background="#00838f"
+                    CommandParameter="{x:Type v:AttachedPatientsView}">
+                <DockPanel>
+                    <materialDesign:PackIcon Style="{StaticResource ButtonIcon}"
+                                             Kind="UsersAdd" />
+                    <TextBlock Style="{StaticResource ButtonText}"
+                               Text="Прикрепленные пациенты" />
+                </DockPanel>
+            </Button>
 
-            <StackPanel Orientation="Horizontal">
+            <Button Style="{StaticResource MenuButton}"
+                    Background="#0097a7"
+                    CommandParameter="{x:Type v:SrzSettingsView}">
+                <DockPanel>
+                    <materialDesign:PackIcon Style="{StaticResource ButtonIcon}"
+                                             Kind="CableData" />
+                    <TextBlock Style="{StaticResource ButtonText}"
+                               Text="Подключение к СРЗ" />
+                </DockPanel>
+            </Button>
 
-                <Button Style="{StaticResource MenuButton}"
-                        CommandParameter="{x:Type v:AttachedPatientsView}">
-                    <DockPanel>
-                        <TextBlock Style="{StaticResource ButtonDetailsText}"
-                                   Text="Загрузка и форматирование файла прикрепленных пациентов, определение полных ФИО." />
-                        <materialDesign:PackIcon Style="{StaticResource ButtonIcon}"
-                                                 Kind="UsersAdd" />
-                        <TextBlock Style="{StaticResource ButtonText}"
-                                   Text="Прикрепленные пациенты" />
-                    </DockPanel>
-                </Button>
+            <Button Style="{StaticResource MenuButton}"
+                    Background="#00acc1"
+                    CommandParameter="{x:Type v:AttachedPatientsStorageSettingsView}">
+                <DockPanel>
+                    <materialDesign:PackIcon Style="{StaticResource ButtonIcon}"
+                                             Kind="DatabaseSettings" />
+                    <TextBlock Style="{StaticResource ButtonText}"
+                               Text="БД пациентов" />
+                </DockPanel>
+            </Button>
 
-                <materialDesign:PopupBox Style="{StaticResource popupBox}">
-                    <StackPanel>
-                        <Button Command="{Binding SwitchViewCommand}"
-                                CommandParameter="{x:Type v:SrzSettingsView}"
-                                Content="Подключение к СРЗ" />
-                        <Button Command="{Binding SwitchViewCommand}"
-                                CommandParameter="{x:Type v:AttachedPatientsStorageSettingsView}"
-                                Content="БД пациентов" />
-                        <Button Command="{Binding SwitchViewCommand}"
-                                CommandParameter="{x:Type v:AttachedPatientsFileSettingsView}"
-                                Content="Форматирование файла" />
-                    </StackPanel>
-                </materialDesign:PopupBox>
+            <Button Style="{StaticResource MenuButton}"
+                    Background="#00bcd4"
+                    CommandParameter="{x:Type v:AttachedPatientsFileSettingsView}">
+                <DockPanel>
+                    <materialDesign:PackIcon Style="{StaticResource ButtonIcon}"
+                                             Kind="FormatPaint" />
+                    <TextBlock Style="{StaticResource ButtonText}"
+                               Text="Форматирование файла" />
+                </DockPanel>
+            </Button>
 
-            </StackPanel>
+        </StackPanel>
 
-        </materialDesign:Card>
+        <StackPanel Grid.Column="3"
+                    Orientation="Vertical">
 
-        <materialDesign:Card Grid.Row="1" Grid.Column="2"  Margin="1,1,10,10">
+            <Button Style="{StaticResource MenuButton}"
+                    Background="#00695c"
+                    CommandParameter="{x:Type v:OtherSettingsView}">
+                <DockPanel>
+                    <materialDesign:PackIcon Style="{StaticResource ButtonIcon}"
+                                             Kind="Cogs" />
+                    <TextBlock Style="{StaticResource ButtonText}"
+                               Text="Прочие настройки" />
+                </DockPanel>
+            </Button>
 
-            <StackPanel Orientation="Horizontal">
+            <Button Style="{StaticResource MenuButton}"
+                    Background="#00796b"
+                    CommandParameter="{x:Type v:AboutView}">
+                <DockPanel>
+                    <materialDesign:PackIcon Style="{StaticResource ButtonIcon}"
+                                             Kind="InfoCircle" />
+                    <TextBlock Style="{StaticResource ButtonText}"
+                               Text="О программе" />
+                </DockPanel>
+            </Button>
 
-                <Button Style="{StaticResource MenuButton}"
-                            CommandParameter="{x:Type v:OtherSettingsView}">
-                    <DockPanel>
-                        <TextBlock Style="{StaticResource ButtonDetailsText}"
-                                       Text="Различные настройки, влияющие на несколько подсистем одновременно." />
-                        <materialDesign:PackIcon Style="{StaticResource ButtonIcon}"
-                                                     Kind="Gear" />
-                        <TextBlock Style="{StaticResource ButtonText}"
-                                       Text="Прочие настройки" />
-                    </DockPanel>
-                </Button>
-
-                <materialDesign:PopupBox Style="{StaticResource popupBox}">
-                    <StackPanel>
-                        <Button Command="{Binding SwitchViewCommand}"
-                                    CommandParameter="{x:Type v:AboutView}"
-                                    Content="О программе" />
-                    </StackPanel>
-                </materialDesign:PopupBox>
-
-            </StackPanel>
-
-        </materialDesign:Card>
+        </StackPanel>
 
     </Grid>
 
