@@ -32,7 +32,7 @@ namespace CHI.ViewModels
             MainRegionService = mainRegionService;
             Settings = Settings.Instance;
 
-            MainRegionService.Header = "Настройки загрузки периодических осмотров";
+            MainRegionService.Header = "Настройки загрузки на портал диспансеризации";
             ShowTextPassword = false;
             ShowProtectedPassword = !ShowTextPassword;
 

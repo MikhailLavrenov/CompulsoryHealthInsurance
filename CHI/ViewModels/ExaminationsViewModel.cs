@@ -46,7 +46,7 @@ namespace CHI.ViewModels
 
             ShowErrors = false;
             Settings = Settings.Instance;
-            MainRegionService.Header = "Загрузка периодических осмотров на портал";
+            MainRegionService.Header = "Загрузка осмотров на портал Диспансеризации";
 
             ExportExaminationsCommand = new DelegateCommandAsync(ExportExaminationsExecute);
 
