@@ -22,6 +22,22 @@
                 <ResourceDictionary Source="/CHI;component/Views/Resources/WindowDefaultStyle.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
+            <Style TargetType="{x:Type TextBox}"
+                   x:Key="Cell">
+                <Style.Triggers>
+                    <Trigger Property="IsFocused"
+                             Value="False">
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="{x:Type TextBox}">
+                                    <TextBlock Text="{TemplateBinding Text}" />
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+
             <Style TargetType="TextBlock"
                    x:Key="HeaderCell">
 
@@ -92,10 +108,12 @@
 
         <TextBlock Grid.Row="2"
                    Grid.Column="0"
-                   Text="Нарастающий" />
+                   Text="Нарастающий" 
+                   Visibility="{Binding IsPlanMode, Converter={i:InvertedBoolToVisibleConverter}}" />
         <CheckBox Grid.Row="2"
                   Grid.Column="2"
-                  IsChecked="{Binding IsGrowing}" />
+                  IsChecked="{Binding IsGrowing}"
+                  Visibility="{Binding IsPlanMode, Converter={i:InvertedBoolToVisibleConverter}}"/>
 
         <StackPanel Grid.Row="3"
                     Grid.Column="0"
@@ -173,8 +191,8 @@
                                                 Visibility="{Binding CanCollapse, Converter={i:BoolToVisibleHiddenConverter}}">
                                             <Viewbox Stretch="Uniform">
                                                 <StackPanel>
-                                                    <materialDesign:PackIcon Kind="ChevronDownCircleOutline" Visibility="{Binding IsCollapsed, Converter={i:BoolToVisibleConverter}}"/>
-                                                    <materialDesign:PackIcon Kind="ChevronRightCircleOutline"  Visibility="{Binding IsCollapsed, Converter={i:InvertedBoolToVisibleConverter}}"/>
+                                                    <materialDesign:PackIcon Kind="ExpandMore" Visibility="{Binding IsCollapsed, Converter={i:BoolToVisibleConverter}}"/>
+                                                    <materialDesign:PackIcon Kind="KeyboardArrowRight"  Visibility="{Binding IsCollapsed, Converter={i:InvertedBoolToVisibleConverter}}"/>
                                                 </StackPanel>
                                             </Viewbox>
                                         </Button>
@@ -249,8 +267,8 @@
                                                 Visibility="{Binding CanCollapse, Converter={i:BoolToVisibleHiddenConverter}}">
                                             <Viewbox Stretch="Uniform" >
                                                 <StackPanel>
-                                                    <materialDesign:PackIcon Kind="ChevronRightCircleOutline"  Visibility="{Binding IsCollapsed, Converter={i:BoolToVisibleConverter}}"/>
-                                                    <materialDesign:PackIcon Kind="ChevronDownCircleOutline" Visibility="{Binding IsCollapsed, Converter={i:InvertedBoolToVisibleConverter}}"/>
+                                                    <materialDesign:PackIcon Kind="KeyboardArrowRight"  Visibility="{Binding IsCollapsed, Converter={i:BoolToVisibleConverter}}"/>
+                                                    <materialDesign:PackIcon Kind="ExpandMore" Visibility="{Binding IsCollapsed, Converter={i:InvertedBoolToVisibleConverter}}"/>
                                                 </StackPanel>
                                             </Viewbox>
                                         </Button>
@@ -336,8 +354,10 @@
                                             <Border.Background>
                                                 <SolidColorBrush Color="{Binding Color}"/>
                                             </Border.Background>
-                                            <TextBlock Width="70"
-                                                       Text="{Binding Value}" />
+                                            <TextBox Width="70" Style="{StaticResource Cell}"
+                                                       Text="{Binding Value}">
+                                                
+                                            </TextBox>
                                         </Border>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>

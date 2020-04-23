@@ -22,6 +22,7 @@ namespace CHI.Models.ServiceAccounting
         public Department()
         {
             Employees = new List<Employee>();
+            Parameters = new List<Parameter>();
         }
 
         public Department(string name)

@@ -14,6 +14,11 @@ namespace CHI.Models.ServiceAccounting
         public int Order { get; set; }
         public List<Parameter> Parameters { get; set; }
 
+        public Employee()
+        {
+            Parameters = new List<Parameter>();
+        }
+
         /// <summary>
         /// Создает штатную единицу с заданными ФОМС кодами и неопределенными данными
         /// </summary>

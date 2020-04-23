@@ -105,7 +105,7 @@
 
             <Button Style="{StaticResource MenuButton}"
                     Background="#1565c0"
-                    CommandParameter="{x:Type v:ReportView}">
+                    CommandParameter="PlanReportView">
                 <DockPanel>
                     <materialDesign:PackIcon Style="{StaticResource ButtonIcon}"
                                              Kind="ClipboardList" />
