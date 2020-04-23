@@ -18,14 +18,16 @@ namespace CHI.ViewModels
         bool isGrowing;
         IMainRegionService mainRegionService;
         IFileDialogService fileDialogService;
+        ReportService report;
+        bool isPlanMode;
 
-
+        public bool IsPlanMode { get => isPlanMode; set => SetProperty(ref isPlanMode, value); }
         public bool KeepAlive { get => false; }
         public int Year { get => year; set => SetProperty(ref year, value); }
         public int Month { get => month; set => SetProperty(ref month, value); }
         public bool IsGrowing { get => isGrowing; set => SetProperty(ref isGrowing, value); }
         public Dictionary<int, string> Months { get; } = Enumerable.Range(1, 12).ToDictionary(x => x, x => CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(x));
-        public ReportService Report { get; set; }
+        public ReportService Report { get => report; set => SetProperty(ref report, value); }
 
         public DelegateCommandAsync BuildReportCommand { get; }
         public DelegateCommandAsync SaveExcelCommand { get; }
@@ -36,26 +38,6 @@ namespace CHI.ViewModels
             this.fileDialogService = fileDialogService;
 
             mainRegionService.Header = "Отчет";
-
-            dbContext = new ServiceAccountingDBContext();
-
-            dbContext.Employees
-                .Include(x => x.Medic)
-                .Include(x => x.Specialty)
-                .Include(x => x.Parameters)
-                .Load();
-
-            dbContext.Departments.Include(x => x.Parameters).Load();
-
-            dbContext.Components
-                .Include(x => x.Indicators).ThenInclude(x => x.Ratios)
-                .Include(x => x.CaseFilters)
-                .Load();
-
-            var rootDepartment = dbContext.Departments.Local.First(x => x.IsRoot);
-            var rootComponent = dbContext.Components.Local.First(x => x.IsRoot);
-
-            Report = new ReportService(rootDepartment, rootComponent);
 
             BuildReportCommand = new DelegateCommandAsync(BuildReportExecute);
             SaveExcelCommand = new DelegateCommandAsync(SaveExcelExecute);
@@ -68,7 +50,7 @@ namespace CHI.ViewModels
 
             var registers = dbContext.Registers
                 .Where(x => x.Year == Year && month1 <= x.Month && x.Month <= month2)
-                .Include(x => x.Cases).ThenInclude(x => x.Services)                
+                .Include(x => x.Cases).ThenInclude(x => x.Services)
                 .ToList();
 
             var plans = dbContext.Plans.Where(x => x.Year == Year && month1 <= x.Month && x.Month <= month2).ToList();
@@ -116,6 +98,32 @@ namespace CHI.ViewModels
 
         public void OnNavigatedTo(NavigationContext navigationContext)
         {
+            if (navigationContext.Parameters.ContainsKey(nameof(IsPlanMode)))
+                IsPlanMode = navigationContext.Parameters.GetValue<bool>(nameof(IsPlanMode));
+
+            dbContext = new ServiceAccountingDBContext();
+
+            if (IsPlanMode)
+                dbContext.Parameters.Where(x => x.Kind == ParameterKind.EmployeePlan || x.Kind == ParameterKind.DepartmentHandPlan).Load();
+            else
+                dbContext.Parameters.Load();
+
+            dbContext.Employees
+                .Include(x => x.Medic)
+                .Include(x => x.Specialty)
+                .Load();
+
+            dbContext.Departments.Load();
+
+            dbContext.Components
+                .Include(x => x.Indicators).ThenInclude(x => x.Ratios)
+                .Include(x => x.CaseFilters)
+                .Load();
+
+            var rootDepartment = dbContext.Departments.Local.First(x => x.IsRoot);
+            var rootComponent = dbContext.Components.Local.First(x => x.IsRoot);
+
+            Report = new ReportService(rootDepartment, rootComponent);
         }
 
         public bool IsNavigationTarget(NavigationContext navigationContext)

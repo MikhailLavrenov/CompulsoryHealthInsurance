@@ -15,7 +15,7 @@ namespace CHI.ViewModels
 
         public bool KeepAlive { get => false; }
 
-        public DelegateCommand<Type> SwitchViewCommand { get; }
+        public DelegateCommand<object> SwitchViewCommand { get; }
 
         public NavigationMenuViewModel(IMainRegionService mainRegionService)
         {
@@ -23,8 +23,32 @@ namespace CHI.ViewModels
 
             mainRegionService.Header = "Меню";
 
-            SwitchViewCommand = new DelegateCommand<Type>(x => mainRegionService.RequestNavigate(x.Name));
+            SwitchViewCommand = new DelegateCommand<object>(SwitchViewExecute);
         }
 
+        private void SwitchViewExecute(object view)
+        {
+            string name;
+
+            if (view is Type)
+                name = ((Type)view).Name;
+            else if (view is string)
+                name = (string)view;
+            else
+                name = string.Empty;
+
+
+            if (name == "PlanReportView")
+            {
+                name = "ReportView";
+                var parameters = new NavigationParameters();
+                parameters.Add("IsPlanMode", true);
+
+                mainRegionService.RequestNavigate(name, parameters);
+            }
+            else
+                mainRegionService.RequestNavigate(name);
+            
+        }
     }
 }
