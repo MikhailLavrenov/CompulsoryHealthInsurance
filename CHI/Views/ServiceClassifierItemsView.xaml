@@ -72,7 +72,7 @@
                                     MinWidth="80" />
 
                 <DataGridTextColumn Header="Стоимость"
-                                    Binding="{Binding Price}"
+                                    Binding="{Binding Price , StringFormat=N2}"
                                     MinWidth="100" />
 
                 <DataGridCheckBoxColumn Header="Закрывает случай"
