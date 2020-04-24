@@ -32,6 +32,8 @@
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
 
         <TextBlock Grid.Row="0"
@@ -70,8 +72,22 @@
                      Text="{Binding Settings.ProxyPort}" />
         </Grid>
 
+        <TextBlock Grid.Row="3"
+                   Grid.Column="0"
+                   Text="Имя домена AD" />
+        <TextBox Grid.Row="3"
+                  Grid.Column="1"
+                  Text="{Binding DomainName}" />
+
+        <TextBlock Grid.Row="4"
+                   Grid.Column="0"
+                   Text="Имя корневого OU AD" />
+        <TextBox Grid.Row="4"
+                 Grid.Column="1"
+                 Text="{Binding DomainUsersRootOU}" />
+        
         <StackPanel VerticalAlignment="Top"
-                    Grid.Row="3"
+                    Grid.Row="5"
                     Grid.Column="0"
                     Grid.ColumnSpan="2"
                     Margin="0,10,0,10"

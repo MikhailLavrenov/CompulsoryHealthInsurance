@@ -86,6 +86,7 @@
             <ColumnDefinition Width="auto" />
             <ColumnDefinition Width="auto" />
             <ColumnDefinition Width="auto" />
+            <ColumnDefinition Width="auto" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
@@ -93,7 +94,7 @@
                     Orientation="Vertical">
 
             <Button Style="{StaticResource MenuButton}"
-                    Background="#0d47a1"
+                    Background="#1976d2"
                     CommandParameter="{x:Type v:ReportView}">
                 <DockPanel>
                     <materialDesign:PackIcon Style="{StaticResource ButtonIcon}"
@@ -104,7 +105,7 @@
             </Button>
 
             <Button Style="{StaticResource MenuButton}"
-                    Background="#1565c0"
+                    Background="#1e88e5"
                     CommandParameter="PlanReportView">
                 <DockPanel>
                     <materialDesign:PackIcon Style="{StaticResource ButtonIcon}"
@@ -115,7 +116,7 @@
             </Button>
 
             <Button Style="{StaticResource MenuButton}"
-                    Background="#1976d2"
+                    Background="#2196f3"
                     CommandParameter="{x:Type v:RegistersView}">
                 <DockPanel>
                     <materialDesign:PackIcon Style="{StaticResource ButtonIcon}"
@@ -126,7 +127,7 @@
             </Button>
 
             <Button Style="{StaticResource MenuButton}"
-                    Background="#1e88e5"
+                    Background="#42a5f5"
                     CommandParameter="{x:Type v:MedicsView}">
                 <DockPanel>
                     <materialDesign:PackIcon Style="{StaticResource ButtonIcon}"
@@ -137,7 +138,7 @@
             </Button>
 
             <Button Style="{StaticResource MenuButton}"
-                    Background="#2196f3"
+                    Background="#64b5f6"
                     CommandParameter="{x:Type v:SpecialtiesView}">
                 <DockPanel>
                     <materialDesign:PackIcon Style="{StaticResource ButtonIcon}"
@@ -147,8 +148,13 @@
                 </DockPanel>
             </Button>
 
+        </StackPanel>
+
+        <StackPanel Grid.Column="1"
+                    Orientation="Vertical">
+
             <Button Style="{StaticResource MenuButton}"
-                    Background="#42a5f5"
+                    Background="#1565c0"
                     CommandParameter="{x:Type v:EmployeesView}">
                 <DockPanel>
                     <materialDesign:PackIcon Style="{StaticResource ButtonIcon}"
@@ -159,7 +165,7 @@
             </Button>
 
             <Button Style="{StaticResource MenuButton}"
-                    Background="#64b5f6"
+                    Background="#1976d2"
                     CommandParameter="{x:Type v:DepartmentsView}">
                 <DockPanel>
                     <materialDesign:PackIcon Style="{StaticResource ButtonIcon}"
@@ -170,7 +176,7 @@
             </Button>
 
             <Button Style="{StaticResource MenuButton}"
-                    Background="#90caf9"
+                    Background="#1e88e5"
                     CommandParameter="{x:Type v:ServiceClassifiersView}">
                 <DockPanel>
                     <materialDesign:PackIcon Style="{StaticResource ButtonIcon}"
@@ -182,7 +188,7 @@
 
 
             <Button Style="{StaticResource MenuButton}"
-                    Background="#bbdefb"
+                    Background="#2196f3"
                     CommandParameter="{x:Type v:ComponentsView}">
                 <DockPanel>
                     <materialDesign:PackIcon Style="{StaticResource ButtonIcon}"
@@ -192,9 +198,21 @@
                 </DockPanel>
             </Button>
 
+            <Button Style="{StaticResource MenuButton}"
+                    Background="#42a5f5"
+                    CommandParameter="{x:Type v:UsersView}">
+                <DockPanel>
+                    <materialDesign:PackIcon Style="{StaticResource ButtonIcon}"
+                                             Kind="ShieldKey" />
+                    <TextBlock Style="{StaticResource ButtonText}"
+                               Text="Права пользователей" />
+                </DockPanel>
+            </Button>
+
         </StackPanel>
 
-        <StackPanel Grid.Column="1" Orientation="Vertical">
+        <StackPanel Grid.Column="2"
+                    Orientation="Vertical">
 
             <Button Style="{StaticResource MenuButton}"
                     Background="#0277bd"
@@ -220,7 +238,7 @@
 
         </StackPanel>
 
-        <StackPanel Grid.Column="2"
+        <StackPanel Grid.Column="3"
                     Orientation="Vertical">
 
             <Button Style="{StaticResource MenuButton}"
@@ -269,7 +287,7 @@
 
         </StackPanel>
 
-        <StackPanel Grid.Column="3"
+        <StackPanel Grid.Column="4"
                     Orientation="Vertical">
 
             <Button Style="{StaticResource MenuButton}"

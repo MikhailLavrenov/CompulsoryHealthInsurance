@@ -21,7 +21,8 @@
                     Orientation="Horizontal">
 
             <Button Style="{StaticResource IconButton}"
-                    Command="{Binding AddCommand}">
+                    Command="{Binding AddCommand}"
+                    CommandParameter="{x:Type v:WindowsAccountsView}">
                 <Viewbox Stretch="Uniform">
                     <materialDesign:PackIcon Kind="FileOutline" />
                 </Viewbox>
@@ -36,24 +37,24 @@
 
         </StackPanel>
 
-        <i:CustomDataGrid x:Name="datagrid1"                              
+        <i:CustomDataGrid x:Name="datagrid1"
                           ItemsSource="{Binding Users}"
-                              CanUserAddRows="False"
-                              CanUserDeleteRows="False"
-                              SelectedItem="{Binding CurrentServiceClassifier, Mode=OneWayToSource}">
+                          CanUserAddRows="False"
+                          CanUserDeleteRows="False"
+                          SelectedItem="{Binding CurrentUser}">
 
             <DataGrid.Columns>
 
                 <DataGridTemplateColumn CellTemplate="{StaticResource DataGridDragColumn}"
-                                            IsReadOnly="True" />
+                                        IsReadOnly="True" />
 
                 <DataGridTextColumn Header="Sid"
-                                        Binding="{Binding Sid}"
-                                        MinWidth="200" />
+                                    Binding="{Binding Sid}"
+                                    MinWidth="250" />
 
                 <DataGridTextColumn Header="Логин"
-                                        Binding="{Binding Name}"
-                                        MinWidth="200" />
+                                    Binding="{Binding Name}"
+                                    MinWidth="200" />
 
 
                 <!--<DataGridTemplateColumn Header="Логин"
@@ -62,7 +63,7 @@
                         <DataTemplate>
                             <Button Style="{StaticResource DataGridRowButton}"
                                     Command="{Binding DataContext.NavigateCommand, Source={x:Reference datagrid1}}"
-                                        CommandParameter="{x:Type v:ServiceClassifierItemsView}">
+                                        CommandParameter="{x:Type v:WindowsAccountsView}">
                                 <Viewbox Stretch="Uniform">
                                     <materialDesign:PackIcon Kind="EllipsisHorizontalCircle" />
                                 </Viewbox>
