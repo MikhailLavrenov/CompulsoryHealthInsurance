@@ -17,8 +17,8 @@ namespace CHI.Models
     public class Settings : DomainObject
     {
         #region Общие
-        private static readonly int timeoutConnection = 3000;
-        private static readonly string settingsFileName = "Settings.xml";
+        static readonly int timeoutConnection = 3000;
+        static readonly string settingsFileName = "Settings.xml";
 
         public static Settings Instance { get; private set; }
         [XmlIgnore] public bool FailedToDecrypt { get; set; }
@@ -207,11 +207,13 @@ namespace CHI.Models
         #endregion
 
         #region Прочие
-        private bool useProxy;
-        private string proxyAddress;
-        private ushort proxyPort;
-        private bool proxyConnectionIsValid;
-        private CredentialScope credentialsScope;
+        bool useProxy;
+        string proxyAddress;
+        ushort proxyPort;
+        bool proxyConnectionIsValid;
+        CredentialScope credentialsScope;
+        string domainName;
+        string domainUsersRootOU;
 
         public bool UseProxy
         {
@@ -243,6 +245,8 @@ namespace CHI.Models
         }
         [XmlIgnore] public bool ProxyConnectionIsValid { get => proxyConnectionIsValid; set => SetProperty(ref proxyConnectionIsValid, value); }
         public CredentialScope CredentialsScope { get => credentialsScope; set => SetProperty(ref credentialsScope, value); }
+        public string DomainName { get=> domainName; set=>SetProperty(ref domainName,value); }
+        public string DomainUsersRootOU { get => domainUsersRootOU; set => SetProperty(ref domainUsersRootOU, value); }
 
         //проверяет настройки прокси-сервера, true-соединение установлено или прокси-сервер не используется, false-иначе
         public void TestConnectionProxy()
@@ -289,15 +293,15 @@ namespace CHI.Models
         #endregion
 
         #region Файл прикрепленных пациентов
-        private string srzAddress;
-        private byte srzThreadsLimit;
-        private uint srzRequestsLimit;
-        private ObservableCollection<Credential> srzCredentials;
-        private bool srzConnectionIsValid;
-        private bool downloadNewPatientsFile;
-        private string patientsFilePath;
-        private bool formatPatientsFile;
-        private ObservableCollection<ColumnProperty> columnProperties;
+        string srzAddress;
+        byte srzThreadsLimit;
+        uint srzRequestsLimit;
+        ObservableCollection<Credential> srzCredentials;
+        bool srzConnectionIsValid;
+        bool downloadNewPatientsFile;
+        string patientsFilePath;
+        bool formatPatientsFile;
+        ObservableCollection<ColumnProperty> columnProperties;
 
         public string SrzAddress { get => srzAddress; set => SetProperty(ref srzAddress, FixUrl(value)); }
         public byte SrzThreadsLimit { get => srzThreadsLimit; set => SetProperty(ref srzThreadsLimit, value); }
@@ -443,13 +447,13 @@ namespace CHI.Models
         #endregion
 
         #region Загрузка осмотров
-        private string examinationsAddress;
-        private byte examinationsThreadsLimit;
-        private string examinationsFileNames;
-        private string patientsFileNames;
-        private ObservableCollection<Credential> examinationsCredentials;
-        private string examinationsFileDirectory;
-        private bool examinationsConnectionIsValid;
+        string examinationsAddress;
+        byte examinationsThreadsLimit;
+        string examinationsFileNames;
+        string patientsFileNames;
+        ObservableCollection<Credential> examinationsCredentials;
+        string examinationsFileDirectory;
+        bool examinationsConnectionIsValid;
 
         public string ExaminationsAddress { get => examinationsAddress; set => SetProperty(ref examinationsAddress, FixUrl(value)); }
         public byte ExaminationsThreadsLimit { get => examinationsThreadsLimit; set => SetProperty(ref examinationsThreadsLimit, value); }

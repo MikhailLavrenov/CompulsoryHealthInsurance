@@ -79,6 +79,7 @@ namespace CHI
             containerRegistry.RegisterForNavigation<NotificationDialogView>();
             containerRegistry.RegisterForNavigation<ColorDialogView>();
             containerRegistry.RegisterForNavigation<UsersView>();
+            containerRegistry.RegisterForNavigation<WindowsAccountsView>();
         }
 
         private void LogUnhandledException(object sender, UnhandledExceptionEventArgs args)

@@ -1,5 +1,7 @@
 ﻿using CHI.Infrastructure;
+using CHI.Models;
 using CHI.Models.ServiceAccounting;
+using CHI.Services.WindowsAccounts;
 using Microsoft.EntityFrameworkCore;
 using Prism.Commands;
 using Prism.Regions;
@@ -19,7 +21,7 @@ namespace CHI.ViewModels
         public User CurrentUser { get => currentUser; set => SetProperty(ref currentUser, value); }
         public ObservableCollection<User> Users { get => serviceClassifiers; set => SetProperty(ref serviceClassifiers, value); }
 
-        public DelegateCommand AddCommand { get; }
+        public DelegateCommand<Type> AddCommand { get; }
         public DelegateCommand DeleteCommand { get; }
         public DelegateCommand<Type> NavigateCommand { get; }
 
@@ -33,18 +35,20 @@ namespace CHI.ViewModels
 
             Users = dbContext.Users.Local.ToObservableCollection();
 
-            AddCommand = new DelegateCommand(AddExecute);
+            AddCommand = new DelegateCommand<Type>(AddExecute);
             DeleteCommand = new DelegateCommand(DeleteExecute, () => CurrentUser != null).ObservesProperty(() => CurrentUser);
             NavigateCommand = new DelegateCommand<Type>(NavigateExecute);
-
-            //DeleteCommand.RaiseCanExecuteChanged();
         }
 
-        private void AddExecute()
+        private void AddExecute(Type view)
         {
             var newUser = new User();
 
             Users.Add(newUser);
+
+            CurrentUser = newUser;
+
+            NavigateExecute(view);
         }
 
         private void DeleteExecute()
