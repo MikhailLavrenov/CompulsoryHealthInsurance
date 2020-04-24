@@ -1,0 +1,80 @@
+﻿<UserControl x:Class="CHI.Views.UsersView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:CHI.Views"
+             xmlns:v="clr-namespace:CHI.Views"
+             xmlns:i="clr-namespace:CHI.Infrastructure"
+             xmlns:vm="clr-namespace:CHI.ViewModels"
+             xmlns:prism="http://prismlibrary.com/"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             mc:Ignorable="d"
+             d:DesignHeight="600"
+             d:DesignWidth="800"
+             prism:ViewModelLocator.AutoWireViewModel="True">
+
+    <DockPanel d:DataContext="{d:DesignInstance vm:UsersViewModel}"
+               HorizontalAlignment="Left">
+
+        <StackPanel DockPanel.Dock="Top"
+                    Orientation="Horizontal">
+
+            <Button Style="{StaticResource IconButton}"
+                    Command="{Binding AddCommand}">
+                <Viewbox Stretch="Uniform">
+                    <materialDesign:PackIcon Kind="FileOutline" />
+                </Viewbox>
+            </Button>
+
+            <Button Style="{StaticResource IconRedButton}"
+                    Command="{Binding DeleteCommand}">
+                <Viewbox Stretch="Uniform">
+                    <materialDesign:PackIcon Kind="GarbageOutline" />
+                </Viewbox>
+            </Button>
+
+        </StackPanel>
+
+        <i:CustomDataGrid x:Name="datagrid1"                              
+                          ItemsSource="{Binding Users}"
+                              CanUserAddRows="False"
+                              CanUserDeleteRows="False"
+                              SelectedItem="{Binding CurrentServiceClassifier, Mode=OneWayToSource}">
+
+            <DataGrid.Columns>
+
+                <DataGridTemplateColumn CellTemplate="{StaticResource DataGridDragColumn}"
+                                            IsReadOnly="True" />
+
+                <DataGridTextColumn Header="Sid"
+                                        Binding="{Binding Sid}"
+                                        MinWidth="200" />
+
+                <DataGridTextColumn Header="Логин"
+                                        Binding="{Binding Name}"
+                                        MinWidth="200" />
+
+
+                <!--<DataGridTemplateColumn Header="Логин"
+                                            MinWidth="150">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Style="{StaticResource DataGridRowButton}"
+                                    Command="{Binding DataContext.NavigateCommand, Source={x:Reference datagrid1}}"
+                                        CommandParameter="{x:Type v:ServiceClassifierItemsView}">
+                                <Viewbox Stretch="Uniform">
+                                    <materialDesign:PackIcon Kind="EllipsisHorizontalCircle" />
+                                </Viewbox>
+                            </Button>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>-->
+
+            </DataGrid.Columns>
+
+        </i:CustomDataGrid>
+
+    </DockPanel >
+</UserControl>
+

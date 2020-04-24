@@ -39,6 +39,7 @@
     <PackageReference Include="NLog.Schema" Version="4.7.0" />
     <PackageReference Include="Prism.DryIoc" Version="7.2.0.1422" />
     <PackageReference Include="Prism.Wpf" Version="7.2.0.1422" />
+    <PackageReference Include="System.DirectoryServices.AccountManagement" Version="4.7.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -119,6 +120,9 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Views\Resources\WindowDefaultStyle.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\UsersView.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Views\ShellView.xaml">
