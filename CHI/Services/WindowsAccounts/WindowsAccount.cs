@@ -5,12 +5,14 @@
     /// </summary>
     public class WindowsAccount
     {
-        public string Sid { get; set; }
         public string Name { get; set; }
-
-        public WindowsAccount(string sid, string name)
+        public string Login { get; set; }
+        public string Sid { get; set; }      
+        
+        public WindowsAccount(string name, string login,  string sid )
         {
             Sid = sid;
+            Login = login;
             Name = name;
         }
     }

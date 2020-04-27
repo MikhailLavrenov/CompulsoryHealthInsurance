@@ -54,11 +54,18 @@
 
                 <DataGridTextColumn Header="Имя"
                                     Binding="{Binding Name}"
-                                    MinWidth="100" />
-                
+                                    MinWidth="300" 
+                                    IsReadOnly="True"/>
+
+                <DataGridTextColumn Header="Логин"
+                                    Binding="{Binding Login}"
+                                    MinWidth="250" 
+                                    IsReadOnly="True"/>
+
                 <DataGridTextColumn Header="Sid"
                                     Binding="{Binding Sid}"
-                                    MinWidth="80" />
+                                    MinWidth="400" 
+                                    IsReadOnly="True"/>
 
             </DataGrid.Columns>
 

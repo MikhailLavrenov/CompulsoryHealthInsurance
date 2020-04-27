@@ -18,11 +18,14 @@ namespace CHI.Models.ServiceAccounting
         public bool IsRoot { get; set; }
         public Department Parent { get; set; }
         public List<Department> Childs { get; set; }
+        public List<UserDepartment> UserDepartments { get; set; }
 
         public Department()
         {
+            Parameters = new List<Parameter>();
             Employees = new List<Employee>();
             Parameters = new List<Parameter>();
+            UserDepartments = new List<UserDepartment>();
         }
 
         public Department(string name)
