@@ -5,6 +5,7 @@ using NLog;
 using OfficeOpenXml;
 using Prism.DryIoc;
 using Prism.Ioc;
+using Prism.Regions;
 using System;
 using System.Globalization;
 using System.Text;
@@ -34,6 +35,7 @@ namespace CHI
 
             return window;
         }
+
         protected override void OnInitialized()
         {
             base.OnInitialized();
@@ -45,10 +47,11 @@ namespace CHI
             AppDomain.CurrentDomain.UnhandledException += LogUnhandledException;
             DispatcherUnhandledException += LogDispatcherUnhandledException;
         }
+
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
             containerRegistry.RegisterInstance<ILogger>(LogManager.GetCurrentClassLogger());
-            containerRegistry.RegisterSingleton<IMainRegionService, MainRegionService>();
+            containerRegistry.RegisterSingleton<IMainRegionService,MainRegionService>();
             containerRegistry.RegisterSingleton<ILicenseManager, LicenseManager>();
             containerRegistry.Register<IFileDialogService, FileDialogService>();
 
@@ -87,6 +90,7 @@ namespace CHI
         {
             logger.Error((Exception)args.ExceptionObject, "AppDomainException");
         }
+
         private void LogDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs args)
         {
             logger.Error(args.Exception, "XamlDispatcherException");
