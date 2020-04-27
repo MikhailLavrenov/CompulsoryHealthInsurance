@@ -67,15 +67,15 @@ namespace CHI.Models.ServiceAccounting
                 .WithMany(x => x.Childs)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<UserDepartment>()   
+            modelBuilder.Entity<PlanningPermision>()   
                 .HasKey(bc => new { bc.UserId, bc.DepartmentId });
 
-            modelBuilder.Entity<UserDepartment>()   
+            modelBuilder.Entity<PlanningPermision>()   
                 .HasOne(x => x.User)   
                 .WithMany(x=>x.UserDepartments)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<UserDepartment>()
+            modelBuilder.Entity<PlanningPermision>()
                 .HasOne(x => x.Department)   
                 .WithMany(x => x.UserDepartments)   
                 .OnDelete(DeleteBehavior.Restrict);

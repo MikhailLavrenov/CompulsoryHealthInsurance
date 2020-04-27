@@ -16,7 +16,6 @@ namespace CHI.ViewModels
         public bool KeepAlive { get => false; }
         public Color Color { get => color; set => SetProperty(ref color, value); }
 
-        public event Action<IDialogResult> RequestClose;
         public DelegateCommand<ButtonResult?> CloseDialogCommand { get; }
 
 

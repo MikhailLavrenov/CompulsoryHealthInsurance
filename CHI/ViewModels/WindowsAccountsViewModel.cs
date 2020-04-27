@@ -75,6 +75,12 @@ namespace CHI.ViewModels
 
         public void OnNavigatedFrom(NavigationContext navigationContext)
         {
+            if (CurrentWindowsAccount != null)
+            {
+                CurrentUser.Sid = CurrentWindowsAccount.Sid;
+                CurrentUser.Name = CurrentWindowsAccount.Name;
+            }
+
             dbContext.SaveChanges();
         }
 

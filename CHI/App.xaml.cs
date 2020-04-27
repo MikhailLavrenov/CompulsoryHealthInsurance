@@ -80,6 +80,7 @@ namespace CHI
             containerRegistry.RegisterForNavigation<ColorDialogView>();
             containerRegistry.RegisterForNavigation<UsersView>();
             containerRegistry.RegisterForNavigation<WindowsAccountsView>();
+            containerRegistry.RegisterForNavigation<PlanPermisionsView>();
         }
 
         private void LogUnhandledException(object sender, UnhandledExceptionEventArgs args)
