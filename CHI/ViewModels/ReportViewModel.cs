@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Prism.Regions;
 using System;
 using System.Collections.Generic;
+using System.DirectoryServices.AccountManagement;
 using System.Globalization;
 using System.Linq;
 
@@ -103,6 +104,21 @@ namespace CHI.ViewModels
 
             dbContext = new ServiceAccountingDBContext();
 
+            dbContext.Departments.Load();
+
+            User user;
+
+            if (IsPlanMode)
+            {
+                var currentSid = UserPrincipal.Current.Sid.ToString();
+                user = dbContext.Users.FirstOrDefault(x => x.Sid.Equals(currentSid));
+
+                if (user == null)
+                    mainRegionService.RequestNavigateHome();
+            }
+
+
+
             if (IsPlanMode)
                 dbContext.Parameters.Where(x => x.Kind == ParameterKind.EmployeePlan || x.Kind == ParameterKind.DepartmentHandPlan).Load();
             else
@@ -113,7 +129,7 @@ namespace CHI.ViewModels
                 .Include(x => x.Specialty)
                 .Load();
 
-            dbContext.Departments.Load();
+
 
             dbContext.Components
                 .Include(x => x.Indicators).ThenInclude(x => x.Ratios)

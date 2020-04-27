@@ -92,8 +92,7 @@
 
     <b:Interaction.Triggers>
         <b:EventTrigger EventName="Loaded">
-            <b:InvokeCommandAction Command="{Binding NavigateCommand}"
-                                   CommandParameter="{x:Type v:NavigationMenuView}" />
+            <b:InvokeCommandAction Command="{Binding NavigateHomeCommand}" />
 
             <b:InvokeCommandAction Command="{Binding CheckSettingsCommand}" />
         </b:EventTrigger>
@@ -184,8 +183,7 @@
                     Width="40"
                     Height="40"
                     materialDesign:ButtonAssist.CornerRadius="20"
-                    Command="{Binding NavigateCommand}"
-                    CommandParameter="{x:Type v:NavigationMenuView}">
+                    Command="{Binding NavigateHomeCommand}">
                 <Viewbox Stretch="Uniform">
                     <materialDesign:PackIcon Kind="HouseCircleOutline"
                                              Foreground="White" />
@@ -206,13 +204,13 @@
               Grid.Row="1"
               Background="White">
 
-            <ContentControl Panel.ZIndex="2"                            
+            <ContentControl Panel.ZIndex="2"
                             prism:RegionManager.RegionName="{x:Static i:RegionNames.MainRegionOverlay}"
-                            Visibility="{Binding MainRegionService.IsLocked, Converter={i:BoolToVisibleConverter}}"/>
+                            Visibility="{Binding MainRegionService.IsLocked, Converter={i:BoolToVisibleConverter}}" />
 
             <Border Panel.ZIndex="1"
                     Opacity="0.35"
-                    Background="LightGray"                    
+                    Background="LightGray"
                     Visibility="{Binding MainRegionService.IsLocked, Converter={i:BoolToVisibleConverter}}" />
 
             <i:CustomContentControl Margin="15,15,15,40"

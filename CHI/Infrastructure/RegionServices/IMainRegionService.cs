@@ -25,7 +25,8 @@ namespace CHI.Infrastructure
         void ShowProgressBar(string statusMessage);
         void RequestNavigate(string targetName, bool canNavigateBack = false);
         void RequestNavigate(string targetName, NavigationParameters navigationParameters, bool canNavigateBack = false);
-        void RequestNavigateBack();
+        void RequestNavigateHome();
+        void RequestNavigateBack();        
         void ClearNavigationBack();
         Task<bool> ShowNotificationDialog(string message);
         Task<Color> ShowColorDialog(Color defaultColor);

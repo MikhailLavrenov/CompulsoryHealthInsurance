@@ -6,12 +6,14 @@ namespace CHI.Services.Report
     public class ValueItem : BindableBase
     {
         double? value;
-        bool isVisible;
+        bool isVisible=true;
+        bool isWritable=false;
 
         public RowHeaderItem RowHeader { get; set; }
         public ColumnHeaderItem ColumnHeader { get; set; }
         public double? Value { get => value; set => SetProperty(ref this.value, value); }
         public bool IsVisible { get => isVisible; set => SetProperty(ref isVisible, value); }
+        public bool IsWritable { get => isWritable; set => SetProperty(ref isWritable, value); }
         public Color Color { get; set; }
         public int RowIndex { get; set; }
         public int ColumnIndex { get; set; }
@@ -23,7 +25,6 @@ namespace CHI.Services.Report
             ColumnIndex = columnIndex;
             RowHeader = rowHeader;
             ColumnHeader = columnHeader;
-            IsVisible = true;
             Color = rowHeader.Group.Color;
             
             ColumnHeader.Group.IsVisibleChangedEvent += OnHeaderGroupVisibleChanged;

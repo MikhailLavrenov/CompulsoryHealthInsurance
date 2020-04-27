@@ -26,6 +26,8 @@ namespace CHI.Infrastructure
         Stack<string> navigateBackCollection;
         bool canNavigateBack;
 
+
+        
         public string Header { get => header; set => SetProperty(ref header, value); }
         public string Message
         {
@@ -145,6 +147,13 @@ namespace CHI.Infrastructure
             navigateBackCollection.Clear();
         }
 
+        public void RequestNavigateHome()
+        {
+            RequestNavigate(nameof(NavigationMenuView));
+
+            ClearNavigationBack();
+        }
+
         public async Task<Color> ShowColorDialog(Color defaultColor)
         {
             IsShowDialog = true;
@@ -193,5 +202,7 @@ namespace CHI.Infrastructure
                 return result;
             });
         }
+
+
     }
 }
