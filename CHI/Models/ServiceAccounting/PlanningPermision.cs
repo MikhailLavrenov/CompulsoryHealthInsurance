@@ -4,17 +4,17 @@ using System.Text;
 
 namespace CHI.Models.ServiceAccounting
 {
-    public class UserDepartment
+    public class PlanningPermision
     {
         public int UserId { get; set; }
         public User User { get; set; }
         public int DepartmentId { get; set; }
         public Department Department { get; set; }
 
-        public UserDepartment()
+        public PlanningPermision()
         {
         }
-        public UserDepartment(User user, Department department)
+        public PlanningPermision(User user, Department department)
         {
             User = user;
             Department = department;

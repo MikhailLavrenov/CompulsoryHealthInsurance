@@ -50,27 +50,28 @@
 
                 <DataGridTextColumn Header="Пользователь"
                                     Binding="{Binding Name}"
-                                    MinWidth="250" />
+                                    MinWidth="250" IsReadOnly="True"/>
                 
                 <DataGridTextColumn Header="Sid"
                                     Binding="{Binding Sid}"
-                                    MinWidth="400" />
+                                    MinWidth="400" 
+                                    IsReadOnly="True"/>
 
 
-                <!--<DataGridTemplateColumn Header="Логин"
-                                            MinWidth="150">
+                <DataGridTemplateColumn Header="Ввод плана"
+                                            MinWidth="100">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Button Style="{StaticResource DataGridRowButton}"
                                     Command="{Binding DataContext.NavigateCommand, Source={x:Reference datagrid1}}"
-                                        CommandParameter="{x:Type v:WindowsAccountsView}">
+                                        CommandParameter="{x:Type v:PlanPermisionsView}">
                                 <Viewbox Stretch="Uniform">
                                     <materialDesign:PackIcon Kind="EllipsisHorizontalCircle" />
                                 </Viewbox>
                             </Button>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>-->
+                </DataGridTemplateColumn>
 
             </DataGrid.Columns>
 

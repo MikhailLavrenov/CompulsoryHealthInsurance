@@ -61,7 +61,7 @@
     <Compile Update="Views\ExaminationsView.xaml.cs">
       <DependentUpon>ExaminationsView.xaml</DependentUpon>
     </Compile>
-    <Compile Update="Views\UserDepartmentsView.xaml.cs">
+    <Compile Update="Views\PlanPermisionsView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="Views\WindowsAccountsView.xaml.cs">
@@ -110,7 +110,7 @@
     <Page Update="Views\ColorDialogView.xaml">
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="Views\UserDepartmentsView.xaml">
+    <Page Update="Views\PlanPermisionsView.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Views\WindowsAccountsView.xaml">

@@ -16,9 +16,9 @@ namespace CHI.Views
     /// <summary>
     /// Логика взаимодействия для IndicatorView.xaml
     /// </summary>
-    public partial class UserDepartmentsView : UserControl
+    public partial class PlanPermisionsView : UserControl
     {
-        public UserDepartmentsView()
+        public PlanPermisionsView()
         {
             InitializeComponent();
         }
