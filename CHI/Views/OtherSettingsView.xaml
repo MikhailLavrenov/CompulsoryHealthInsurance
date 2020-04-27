@@ -77,14 +77,14 @@
                    Text="Имя домена AD" />
         <TextBox Grid.Row="3"
                   Grid.Column="1"
-                  Text="{Binding DomainName}" />
+                  Text="{Binding Settings.DomainName}" />
 
         <TextBlock Grid.Row="4"
                    Grid.Column="0"
                    Text="Имя корневого OU AD" />
         <TextBox Grid.Row="4"
                  Grid.Column="1"
-                 Text="{Binding DomainUsersRootOU}" />
+                 Text="{Binding Settings.DomainUsersRootOU}" />
         
         <StackPanel VerticalAlignment="Top"
                     Grid.Row="5"

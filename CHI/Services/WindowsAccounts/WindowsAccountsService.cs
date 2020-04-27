@@ -18,7 +18,7 @@ namespace CHI.Services.WindowsAccounts
         /// <summary>
         /// Список локальных пользователей
         /// </summary>
-        public List<WindowsAccount> Local { get;  }
+        public List<WindowsAccount> Local { get; }
         /// <summary>
         /// Список доменных пользователей
         /// </summary>
@@ -76,7 +76,7 @@ namespace CHI.Services.WindowsAccounts
             {
                 return searcher
                     .FindAll()
-                    .Select(x => new WindowsAccount(x.Sid.ToString(), $"{prefix}\\{x.SamAccountName}"))
+                    .Select(x => new WindowsAccount(x.Name, $"{prefix}\\{x.SamAccountName}", x.Sid.ToString()))
                     .OrderBy(x => x.Name)
                     .ToList();
             }

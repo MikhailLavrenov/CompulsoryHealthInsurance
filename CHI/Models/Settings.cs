@@ -245,7 +245,7 @@ namespace CHI.Models
         }
         [XmlIgnore] public bool ProxyConnectionIsValid { get => proxyConnectionIsValid; set => SetProperty(ref proxyConnectionIsValid, value); }
         public CredentialScope CredentialsScope { get => credentialsScope; set => SetProperty(ref credentialsScope, value); }
-        public string DomainName { get=> domainName; set=>SetProperty(ref domainName,value); }
+        public string DomainName { get => domainName; set => SetProperty(ref domainName, value); }
         public string DomainUsersRootOU { get => domainUsersRootOU; set => SetProperty(ref domainUsersRootOU, value); }
 
         //проверяет настройки прокси-сервера, true-соединение установлено или прокси-сервер не используется, false-иначе
