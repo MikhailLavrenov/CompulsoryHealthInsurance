@@ -107,36 +107,45 @@ namespace CHI.ViewModels
             dbContext.Departments.Load();
 
             User user;
+            Department rootDepartment;
 
             if (IsPlanMode)
             {
                 var currentSid = UserPrincipal.Current.Sid.ToString();
-                user = dbContext.Users.FirstOrDefault(x => x.Sid.Equals(currentSid));
+                user = dbContext.Users.Where(x => x.Sid.Equals(currentSid)).Include(x => x.PlanningPermisions).FirstOrDefault();
 
-                if (user == null)
+                if (user == null || user.PlanningPermisions.Count == 0)
+                {
                     mainRegionService.RequestNavigateHome();
+                    return;
+                }
+
+                rootDepartment = new Department();
+                rootDepartment.IsRoot = true;
+                rootDepartment.Childs = user.PlanningPermisions.Select(x => x.Department).ToList();
+                rootDepartment.Childs.ForEach(x => x.Parent = rootDepartment);
+                //rootDepartment.Childs.Select(x => dbContext.Entry(x)).ToList().ForEach(x => x.State = EntityState.Unchanged);
+
+                dbContext.Parameters.Where(x=>x.Kind== ParameterKind.EmployeePlan || x.Kind== ParameterKind.DepartmentHandPlan).Load();
             }
-
-
-
-            if (IsPlanMode)
-                dbContext.Parameters.Where(x => x.Kind == ParameterKind.EmployeePlan || x.Kind == ParameterKind.DepartmentHandPlan).Load();
             else
+            {
+                rootDepartment = dbContext.Departments.Local.First(x => x.IsRoot);
+
                 dbContext.Parameters.Load();
+            }
 
             dbContext.Employees
                 .Include(x => x.Medic)
                 .Include(x => x.Specialty)
                 .Load();
 
-
-
             dbContext.Components
                 .Include(x => x.Indicators).ThenInclude(x => x.Ratios)
                 .Include(x => x.CaseFilters)
                 .Load();
 
-            var rootDepartment = dbContext.Departments.Local.First(x => x.IsRoot);
+
             var rootComponent = dbContext.Components.Local.First(x => x.IsRoot);
 
             Report = new ReportService(rootDepartment, rootComponent);

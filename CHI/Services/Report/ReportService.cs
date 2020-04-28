@@ -20,10 +20,13 @@ namespace CHI.Services.Report
         public List<RowHeaderItem> RowItems { get; private set; }
         public List<ColumnHeaderItem> ColumnItems { get; private set; }
         public ValueItem[][] Values { get; private set; }
+        public bool IsPlannigMode { get; private set; }
 
 
-        public ReportService(Department rootDepartment, Component rootComponent)
+        public ReportService(Department rootDepartment, Component rootComponent, bool isPlanningMode = false)
         {
+            IsPlannigMode = isPlanningMode;
+
             rootComponent.OrderChildsRecursive();
             var components = rootComponent.ToListRecursive()
                 .Where(x => x.Indicators?.Any() ?? false)
@@ -82,7 +85,12 @@ namespace CHI.Services.Report
                 Values[row] = new ValueItem[indicators.Count];
 
                 for (int col = 0; col < ColumnItems.Count; col++)
-                    Values[row][col] = new ValueItem(row, col, RowItems[row], ColumnItems[col]);
+                {
+                    Values[row][col] = new ValueItem(row, col, RowItems[row], ColumnItems[col], !IsPlannigMode);
+
+                    if (!IsPlannigMode)
+                        Values[row][col].IsWritable = false;
+                }
             }
         }
 
@@ -101,18 +109,18 @@ namespace CHI.Services.Report
                     valueItem.Value = plans.Where(x => x.Parameter.Id == row.Parameter.Id && x.Indicator.Id == column.Indicator.Id).Sum(x => x.Value);
                 }
 
+            if (!IsPlannigMode)
+                for (int month = monthBegin; month <= monthEnd; month++)
+                {
+                    var cases = registers.FirstOrDefault(x => x.Month == month)?.Cases ?? new List<Case>();
+                    var classifier = classifiers.FirstOrDefault(x => Helpers.BetweenDates(x.ValidFrom, x.ValidTo, month, year))?.ServiceClassifierItems ?? new List<ServiceClassifierItem>();
 
-            for (int month = monthBegin; month <= monthEnd; month++)
-            {
-                var cases = registers.FirstOrDefault(x => x.Month == month)?.Cases ?? new List<Case>();
-                var classifier = classifiers.FirstOrDefault(x => Helpers.BetweenDates(x.ValidFrom, x.ValidTo, month, year))?.ServiceClassifierItems ?? new List<ServiceClassifierItem>();
+                    //заполняет факт
+                    SetValuesFromCases(month, year, cases, classifier, true);
 
-                //заполняет факт
-                SetValuesFromCases(month, year, cases, classifier, true);
-
-                //заполняет ошибки (снятия)
-                SetValuesFromCases(month, year, cases, classifier, false);
-            }
+                    //заполняет ошибки (снятия)
+                    SetValuesFromCases(month, year, cases, classifier, false);
+                }
 
 
             //суммирует строки

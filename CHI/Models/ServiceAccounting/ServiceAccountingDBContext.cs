@@ -19,7 +19,7 @@ namespace CHI.Models.ServiceAccounting
         public DbSet<CaseFilter> CaseFilters { get; set; }
         public DbSet<Plan> Plans { get; set; }
         public DbSet<User> Users { get; set; }
-        //public DbSet<UserDepartment> UsersDepartments { get; set; }
+
 
         public ServiceAccountingDBContext()
         {
@@ -72,12 +72,12 @@ namespace CHI.Models.ServiceAccounting
 
             modelBuilder.Entity<PlanningPermision>()   
                 .HasOne(x => x.User)   
-                .WithMany(x=>x.UserDepartments)
+                .WithMany(x=>x.PlanningPermisions)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<PlanningPermision>()
                 .HasOne(x => x.Department)   
-                .WithMany(x => x.UserDepartments)   
+                .WithMany(x => x.PlanningPermisions)   
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Component>()
