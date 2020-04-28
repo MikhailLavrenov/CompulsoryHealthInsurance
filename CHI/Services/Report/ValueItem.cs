@@ -6,8 +6,8 @@ namespace CHI.Services.Report
     public class ValueItem : BindableBase
     {
         double? value;
-        bool isVisible=true;
-        bool isWritable=false;
+        bool isVisible = true;
+        bool isWritable = false;
 
         public RowHeaderItem RowHeader { get; set; }
         public ColumnHeaderItem ColumnHeader { get; set; }
@@ -19,14 +19,14 @@ namespace CHI.Services.Report
         public int ColumnIndex { get; set; }
         public object ValueContext { get; set; }
 
-        public ValueItem(int rowIndex, int columnIndex, RowHeaderItem rowHeader, ColumnHeaderItem columnHeader)
+        public ValueItem(int rowIndex, int columnIndex, RowHeaderItem rowHeader, ColumnHeaderItem columnHeader, bool isReadOnly)
         {
             RowIndex = rowIndex;
             ColumnIndex = columnIndex;
             RowHeader = rowHeader;
             ColumnHeader = columnHeader;
             Color = rowHeader.Group.Color;
-            
+            isWritable = !isReadOnly && columnHeader.Group.Component.IsCanPlanning;
             ColumnHeader.Group.IsVisibleChangedEvent += OnHeaderGroupVisibleChanged;
             RowHeader.Group.IsVisibleChangedEvent += OnHeaderGroupVisibleChanged;
         }

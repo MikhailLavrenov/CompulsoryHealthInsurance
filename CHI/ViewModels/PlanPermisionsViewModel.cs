@@ -36,9 +36,9 @@ namespace CHI.ViewModels
             {
                 currentUser = navigationContext.Parameters.GetValue<User>(nameof(User));
 
-                currentUser = dbContext.Users.Where(x => x.Id == currentUser.Id).Include(x => x.UserDepartments).First();
+                currentUser = dbContext.Users.Where(x => x.Id == currentUser.Id).Include(x => x.PlanningPermisions).First();
 
-                Departments.Where(x => currentUser.UserDepartments.Any(y => y.DepartmentId == x.Object.Id)).ToList().ForEach(x => x.IsSelected = true);
+                Departments.Where(x => currentUser.PlanningPermisions.Any(y => y.DepartmentId == x.Object.Id)).ToList().ForEach(x => x.IsSelected = true);
             }
         }
 
@@ -51,9 +51,9 @@ namespace CHI.ViewModels
         {
             var selectedDepartments = Departments.Where(x => x.IsSelected).Select(x => x.Object).ToList();
 
-            var removeDepartments = currentUser.UserDepartments.Where(x => !selectedDepartments.Any(y => y.Id == x.DepartmentId)).ToList();
+            var removeDepartments = currentUser.PlanningPermisions.Where(x => !selectedDepartments.Any(y => y.Id == x.DepartmentId)).ToList();
             var addDepartments = selectedDepartments
-                .Where(x => !currentUser.UserDepartments.Any(y => y.DepartmentId == x.Id))
+                .Where(x => !currentUser.PlanningPermisions.Any(y => y.DepartmentId == x.Id))
                 .Select(x => new PlanningPermision(currentUser, x))
                 .ToList();
 

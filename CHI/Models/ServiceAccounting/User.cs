@@ -11,11 +11,11 @@ namespace CHI.Models.ServiceAccounting
         public int Id { get; set; }
         public string Sid { get; set; }
         public string Name { get; set; }
-        public List<PlanningPermision> UserDepartments { get; set; }
+        public List<PlanningPermision> PlanningPermisions { get; set; }
 
         public User()
         {
-            UserDepartments = new List<PlanningPermision>();
+            PlanningPermisions = new List<PlanningPermision>();
         }
     }
 }
