@@ -5,6 +5,7 @@ using Prism.Commands;
 using Prism.Regions;
 using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace CHI.ViewModels
 {
@@ -21,7 +22,9 @@ namespace CHI.ViewModels
 
         public DelegateCommand AddCommand { get; }
         public DelegateCommand DeleteCommand { get; }
+        public DelegateCommandAsync UpdateCasesCommand { get; }
         public DelegateCommand<Type> NavigateCommand { get; }
+
 
         public ServiceClassifiersViewModel(IMainRegionService mainRegionService)
         {
@@ -35,17 +38,22 @@ namespace CHI.ViewModels
 
             AddCommand = new DelegateCommand(AddExecute);
             DeleteCommand = new DelegateCommand(DeleteExecute, () => CurrentServiceClassifier != null).ObservesProperty(() => CurrentServiceClassifier);
+            UpdateCasesCommand = new DelegateCommandAsync(UpdateCasesExecute, () => CurrentServiceClassifier != null).ObservesProperty(() => CurrentServiceClassifier);
             NavigateCommand = new DelegateCommand<Type>(NavigateExecute);
 
             //DeleteCommand.RaiseCanExecuteChanged();
         }
 
+
         private void AddExecute()
         {
-            var newServiceClassifier = new ServiceClassifier();
+            var year = DateTime.Now.Year;
 
-            //newServiceClassifier.ValidFrom.Date.AddDays(-newServiceClassifier.ValidFrom.Date.Day + 1);
-            //newServiceClassifier.ValidTo.Date.AddDays(-newServiceClassifier.ValidFrom.Date.Day + 1);
+            var newServiceClassifier = new ServiceClassifier()
+            {
+                ValidFrom = new DateTime(year, 1, 1),
+                ValidTo = new DateTime(year, 12, 31)
+            };
 
             ServiceClassifiers.Add(newServiceClassifier);
         }
@@ -53,6 +61,34 @@ namespace CHI.ViewModels
         private void DeleteExecute()
         {
             ServiceClassifiers.Remove(CurrentServiceClassifier);
+        }
+
+        private void UpdateCasesExecute()
+        {
+            mainRegionService.ShowProgressBar("Пересчет стоимости");
+
+            var tempContext = new ServiceAccountingDBContext();
+
+            var classifierItems = tempContext.ServiceClassifiers
+                .Where(x => x.Id == CurrentServiceClassifier.Id)
+                .Include(x => x.ServiceClassifierItems)
+                .First()
+                .ServiceClassifierItems
+                .ToLookup(x => x.Code);
+
+            var cases = tempContext.Cases
+                 .Where(x => x.DateEnd >= CurrentServiceClassifier.ValidFrom && x.DateEnd <= CurrentServiceClassifier.ValidTo)
+                 .Include(x => x.Services)
+                 .ToList();
+
+            foreach (var mCase in cases)
+                mCase.Services.ForEach(x => x.ClassifierItem = classifierItems[x.Code].FirstOrDefault());
+
+            //cases.Where(x => x.PaidStatus == PaidKind.None).ToList().ForEach(x => x.AmountPaid = x.Services.Sum(y => y.ClassifierItem.Price));
+
+            tempContext.SaveChanges();
+
+            mainRegionService.ShowProgressBar($"Завершено. Обновлено {cases.Count} случая(ев)");
         }
 
         private void NavigateExecute(Type view)

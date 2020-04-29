@@ -9,5 +9,6 @@ namespace CHI.Models.ServiceAccounting
         public double Count { get; set; }
         public int Code { get; set; }
         public DateTime Date { get; set; }
+        public ServiceClassifierItem ClassifierItem { get; set; }
     }
 }

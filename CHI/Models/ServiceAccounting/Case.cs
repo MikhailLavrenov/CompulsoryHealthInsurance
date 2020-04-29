@@ -24,6 +24,10 @@ namespace CHI.Models.ServiceAccounting
         /// </summary>
         public int TreatmentPurpose { get; set; }
         /// <summary>
+        /// Дата окончания
+        /// </summary>
+        public DateTime DateEnd { get; set; }
+        /// <summary>
         /// Койко-дни
         /// </summary>
         public int BedDays { get; set; }

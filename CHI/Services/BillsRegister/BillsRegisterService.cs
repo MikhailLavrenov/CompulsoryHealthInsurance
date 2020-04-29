@@ -305,6 +305,7 @@ namespace CHI.Services.BillsRegister
                         Place = fomsCase.Z_SL.USL_OK,
                         VisitPurpose = fomsCase.Z_SL.SL.P_CEL,
                         TreatmentPurpose = fomsCase.Z_SL.SL.CEL,
+                        DateEnd = fomsCase.Z_SL.SL.DATE_2,
                         BedDays = fomsCase.Z_SL.SL.KD,
                         PaidStatus = (PaidKind)fomsCase.Z_SL.OPLATA,
                         AmountPaid = fomsCase.Z_SL.SUMP,
@@ -319,7 +320,7 @@ namespace CHI.Services.BillsRegister
                         {
                             Code = fomsServices.CODE_USL,
                             Count = fomsServices.KOL_USL,
-                            Date= fomsServices.DATE_OUT,
+                            Date = fomsServices.DATE_OUT,
                             Employee = Employee.CreateUnknown(fomsServices.CODE_MD, fomsServices.PRVS)
                         };
 
