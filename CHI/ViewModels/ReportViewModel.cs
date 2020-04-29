@@ -56,15 +56,7 @@ namespace CHI.ViewModels
 
             var plans = dbContext.Plans.Where(x => x.Year == Year && month1 <= x.Month && x.Month <= month2).ToList();
 
-            var classifierId = dbContext.ServiceClassifiers
-                .AsEnumerable()
-                .Where(x => PeriodsIntersects(x.ValidFrom, x.ValidTo, month1, month2, Year))
-                .Select(x => x.Id).ToList();
-
-            var classifiers = dbContext.ServiceClassifiers.Where(x => classifierId.Contains(x.Id)).Include(x => x.ServiceClassifierItems).ToList();
-
-
-            Report.Build(registers, plans, classifiers, month1, month2, Year);
+            Report.Build(registers, plans, month1, month2, Year);
         }
 
         private void SaveExcelExecute()

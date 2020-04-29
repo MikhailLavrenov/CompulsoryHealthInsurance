@@ -34,7 +34,16 @@
                 </Viewbox>
             </Button>
 
+            <Button Style="{StaticResource IconButton}"
+                    Command="{Binding UpdateCasesCommand}">
+                <Viewbox Stretch="Uniform">
+                    <materialDesign:PackIcon Kind="Calculator" />
+                </Viewbox>
+            </Button>
+
         </StackPanel>
+
+        <TextBlock  DockPanel.Dock="Top" TextWrapping="Wrap" Foreground="Red" Text="При любом изменении классификатора обязательно пересчитать случаи!!!" />
 
         <i:CustomDataGrid x:Name="datagrid1"                              
                           ItemsSource="{Binding ServiceClassifiers}"

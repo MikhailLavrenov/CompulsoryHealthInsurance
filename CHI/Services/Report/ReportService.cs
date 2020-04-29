@@ -94,7 +94,7 @@ namespace CHI.Services.Report
             }
         }
 
-        public void Build(List<Register> registers, List<Plan> plans, List<ServiceClassifier> classifiers, int monthBegin, int monthEnd, int year)
+        public void Build(List<Register> registers, List<Plan> plans, int monthBegin, int monthEnd, int year)
         {
             foreach (var valueItemsRow in Values)
                 foreach (var valueItem in valueItemsRow)
@@ -112,14 +112,16 @@ namespace CHI.Services.Report
             if (!IsPlannigMode)
                 for (int month = monthBegin; month <= monthEnd; month++)
                 {
-                    var cases = registers.FirstOrDefault(x => x.Month == month)?.Cases ?? new List<Case>();
-                    var classifier = classifiers.FirstOrDefault(x => Helpers.BetweenDates(x.ValidFrom, x.ValidTo, month, year))?.ServiceClassifierItems ?? new List<ServiceClassifierItem>();
+                    var cases = registers.FirstOrDefault(x => x.Month == month)?.Cases;
 
-                    //заполняет факт
-                    SetValuesFromCases(month, year, cases, classifier, true);
+                    if (cases != null)
+                    {
+                        //заполняет факт
+                        SetValuesFromCases(month, year, cases, true);
 
-                    //заполняет ошибки (снятия)
-                    SetValuesFromCases(month, year, cases, classifier, false);
+                        //заполняет ошибки (снятия)
+                        SetValuesFromCases(month, year, cases, false);
+                    }
                 }
 
 
@@ -218,7 +220,7 @@ namespace CHI.Services.Report
                 }
         }
 
-        private void SetValuesFromCases(int month, int year, IEnumerable<Case> cases, List<ServiceClassifierItem> classifierItems, bool isPaymentAccepted)
+        private void SetValuesFromCases(int month, int year, IEnumerable<Case> cases, bool isPaymentAccepted)
         {
             var filters = ColumnGroups.Select(x => new
             {
@@ -274,10 +276,7 @@ namespace CHI.Services.Report
                                 case IndicatorKind.LaborCost:
                                     valueItem.Value += selectedCases
                                         .SelectMany(x => x.Services)
-                                        .GroupBy(x => x.Code, (Code, Services) => new { Code, Count = Services.Sum(x => x.Count) })
-                                        .Join(classifierItems, service => service.Code, classifier => classifier.Code,
-                                        (service, classifier) => service.Count * classifier.LaborCost)
-                                        .Sum();
+                                        .Sum(x => x.Count * x.ClassifierItem.Price);
                                     break;
 
                                 case IndicatorKind.Cost:
@@ -285,10 +284,7 @@ namespace CHI.Services.Report
                                         valueItem.Value += selectedCases
                                             .Where(x => x.PaidStatus == PaidKind.None)
                                             .SelectMany(x => x.Services)
-                                            .GroupBy(x => x.Code, (Code, Services) => new { Code, Count = Services.Sum(x => x.Count) })
-                                            .Join(classifierItems, service => service.Code, classifier => classifier.Code,
-                                            (service, classifier) => service.Count * classifier.Price)
-                                            .Sum()
+                                            .Sum(x => x.Count * x.ClassifierItem.Price)
                                             + selectedCases
                                             .Where(x => x.PaidStatus == PaidKind.Full || x.PaidStatus == PaidKind.Partly)
                                             .Sum(x => x.AmountPaid);

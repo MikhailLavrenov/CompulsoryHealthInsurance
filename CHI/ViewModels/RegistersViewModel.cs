@@ -70,10 +70,9 @@ namespace CHI.ViewModels
 
             mainRegionService.ShowProgressBar("Сопоставление штатных единиц");
 
-            localDbContext.Employees.Load();
-            localDbContext.Medics.Load();
-            localDbContext.Specialties.Load();
+            localDbContext.Employees.Include(x => x.Medic).Include(x => x.Specialty).Load();
             localDbContext.Departments.Load();
+            localDbContext.ServiceClassifiers.Load();
 
             var defaultDepartment = localDbContext.Departments.Local.First(x => x.IsRoot);
 
@@ -92,22 +91,24 @@ namespace CHI.ViewModels
                 {
                     if (caseClosingCodes == null)
                     {
-                        var classifierId = dbContext.ServiceClassifiers
-                            .ToList()
+                        var classifier = localDbContext.ServiceClassifiers.Local
                             .Where(x => Helpers.BetweenDates(x.ValidFrom, x.ValidTo, register.Month, register.Year))
-                            .FirstOrDefault()?.Id;
+                            .FirstOrDefault();
 
-                        caseClosingCodes = classifierId == null ?
-                                new List<int>()
-                                :
-                                dbContext.ServiceClassifiers
-                                .Where(x => x.Id == classifierId)
-                                .Include(x => x.ServiceClassifierItems)
-                                .First()
-                                .ServiceClassifierItems
+                        if (classifier == null)
+                            caseClosingCodes = new List<int>();
+                        else
+                        {
+                            if (!(classifier.ServiceClassifierItems?.Any() ?? false))
+                                classifier = localDbContext.ServiceClassifiers
+                                    .Where(x => x.Id == classifier.Id)
+                                    .Include(x => x.ServiceClassifierItems).First();
+
+                            caseClosingCodes = classifier.ServiceClassifierItems
                                 .Where(x => x.IsCaseClosing)
                                 .Select(x => x.Code)
                                 .ToList();
+                        }
                     }
 
                     medicFomsIds = laterServices.Where(x => caseClosingCodes.Contains(x.Code)).Select(x => x.Employee.Medic.FomsId).Distinct().ToList();
@@ -119,7 +120,7 @@ namespace CHI.ViewModels
                 }
             }
 
-
+            //определение штатных единиц в случаях и услугах
             var casesGroups = register.Cases.GroupBy(x => new { MedicFomsId = x.Employee.Medic.FomsId, SpecialtyFomsId = x.Employee.Specialty.FomsId }).ToList();
 
             var progressCounter = 0;
@@ -142,6 +143,29 @@ namespace CHI.ViewModels
                             service.Employee = FindEmployeeInDbOrAdd(service.Employee.Medic.FomsId, service.Employee.Specialty.FomsId, localDbContext, defaultDepartment);
                     }
                 }
+            }
+
+            //определение классификации услуг
+
+            progressCounter = 0;
+
+            var services = register.Cases.SelectMany(x => x.Services).ToList();
+
+            foreach (var service in services)
+            {
+                mainRegionService.ShowProgressBar($"Сопоставление классификации услуг случаев: {++progressCounter} из {register.Cases.Count}");
+
+                var classifier = localDbContext.ServiceClassifiers.Local.FirstOrDefault(x => service.Date >= x.ValidFrom && service.Date <= x.ValidTo);
+
+                if (classifier == null)
+                    throw new InvalidOperationException($"Не найден классификатор соответствующий дате услуги {service.Date}");
+
+                if (!(classifier.ServiceClassifierItems?.Any() ?? false))
+                    classifier = localDbContext.ServiceClassifiers                       
+                        .Where(x => x.Id == classifier.Id)
+                        .Include(x => x.ServiceClassifierItems).First();
+
+                service.ClassifierItem=classifier.ServiceClassifierItems.FirstOrDefault(x => x.Code == service.Code);
             }
 
             mainRegionService.ShowProgressBar("Сохранение в базу данных");
@@ -205,7 +229,7 @@ namespace CHI.ViewModels
 
             var dbContext = new ServiceAccountingDBContext();
 
-            var register = dbContext.Registers.Where(x => x.Month == paidRegister.Month && x.Year == paidRegister.Year).Include(x=>x.Cases).FirstOrDefault();
+            var register = dbContext.Registers.Where(x => x.Month == paidRegister.Month && x.Year == paidRegister.Year).Include(x => x.Cases).FirstOrDefault();
 
             if (register == null)
                 mainRegionService.HideProgressBar($"Загрузка статусов оплаты отменена. Сначала загрузите реестр за период {paidRegister.Month} месяц {paidRegister.Year} год.");
@@ -222,7 +246,7 @@ namespace CHI.ViewModels
             }
 
             register.PaymentStateCasesCount = register.Cases.Count(x => x.PaidStatus != PaidKind.None);
-           
+
             dbContext.SaveChanges();
 
             Refresh();
