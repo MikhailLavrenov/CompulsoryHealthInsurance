@@ -72,7 +72,17 @@ namespace CHI.ViewModels
 
             localDbContext.Employees.Include(x => x.Medic).Include(x => x.Specialty).Load();
             localDbContext.Departments.Load();
-            localDbContext.ServiceClassifiers.Load();
+
+            var periods = register.Cases.GroupBy(x => new { x.DateEnd.Year, x.DateEnd.Month }).Select(x => x.Key).ToList();
+
+            var classifierIds = localDbContext.ServiceClassifiers
+                .AsNoTracking()
+                .AsEnumerable()
+                .Where(x => periods.Any(y => Helpers.BetweenDates(x.ValidFrom, x.ValidTo, y.Month, y.Year)))
+                .Select(x => x.Id)
+                .ToList();
+
+            localDbContext.ServiceClassifiers.Where(x => classifierIds.Contains(x.Id)).Include(x => x.ServiceClassifierItems).Load();
 
             var defaultDepartment = localDbContext.Departments.Local.First(x => x.IsRoot);
 
@@ -95,20 +105,12 @@ namespace CHI.ViewModels
                             .Where(x => Helpers.BetweenDates(x.ValidFrom, x.ValidTo, register.Month, register.Year))
                             .FirstOrDefault();
 
-                        if (classifier == null)
-                            caseClosingCodes = new List<int>();
-                        else
-                        {
-                            if (!(classifier.ServiceClassifierItems?.Any() ?? false))
-                                classifier = localDbContext.ServiceClassifiers
-                                    .Where(x => x.Id == classifier.Id)
-                                    .Include(x => x.ServiceClassifierItems).First();
-
-                            caseClosingCodes = classifier.ServiceClassifierItems
-                                .Where(x => x.IsCaseClosing)
-                                .Select(x => x.Code)
-                                .ToList();
-                        }
+                        caseClosingCodes = classifier == null ?
+                            new List<int>()
+                            : classifier.ServiceClassifierItems
+                            .Where(x => x.IsCaseClosing)
+                            .Select(x => x.Code)
+                            .ToList();
                     }
 
                     medicFomsIds = laterServices.Where(x => caseClosingCodes.Contains(x.Code)).Select(x => x.Employee.Medic.FomsId).Distinct().ToList();
@@ -120,7 +122,7 @@ namespace CHI.ViewModels
                 }
             }
 
-            //определение штатных единиц в случаях и услугах
+            //сопоставление штатных единиц в случаях и услугах
             var casesGroups = register.Cases.GroupBy(x => new { MedicFomsId = x.Employee.Medic.FomsId, SpecialtyFomsId = x.Employee.Specialty.FomsId }).ToList();
 
             var progressCounter = 0;
@@ -145,27 +147,24 @@ namespace CHI.ViewModels
                 }
             }
 
-            //определение классификации услуг
+            //сопоставление услуг с классификатором
 
             progressCounter = 0;
 
             var services = register.Cases.SelectMany(x => x.Services).ToList();
 
-            foreach (var service in services)
+            foreach (var periodGroup in register.Cases.GroupBy(x => new { x.DateEnd.Year, x.DateEnd.Month }))
             {
-                mainRegionService.ShowProgressBar($"Сопоставление классификации услуг случаев: {++progressCounter} из {register.Cases.Count}");
+                mainRegionService.ShowProgressBar($"Сопоставление услуг случаев с классификатором: {++progressCounter} из {register.Cases.Count}");
 
-                var classifier = localDbContext.ServiceClassifiers.Local.FirstOrDefault(x => service.Date >= x.ValidFrom && service.Date <= x.ValidTo);
+                var classifier = localDbContext.ServiceClassifiers.Local.FirstOrDefault(x => Helpers.BetweenDates(x.ValidFrom, x.ValidTo, periodGroup.Key.Month, periodGroup.Key.Year));
 
                 if (classifier == null)
-                    throw new InvalidOperationException($"Не найден классификатор соответствующий дате услуги {service.Date}");
+                    throw new InvalidOperationException($"Не найден классификатор соответствующий {periodGroup.Key.Month} месяцу {periodGroup.Key.Year} году");
 
-                if (!(classifier.ServiceClassifierItems?.Any() ?? false))
-                    classifier = localDbContext.ServiceClassifiers                       
-                        .Where(x => x.Id == classifier.Id)
-                        .Include(x => x.ServiceClassifierItems).First();
+                var classifierItems = classifier.ServiceClassifierItems.ToLookup(x => x.Code);
 
-                service.ClassifierItem=classifier.ServiceClassifierItems.FirstOrDefault(x => x.Code == service.Code);
+                periodGroup.SelectMany(x => x.Services).ToList().ForEach(x => x.ClassifierItem = classifierItems[x.Code].FirstOrDefault());
             }
 
             mainRegionService.ShowProgressBar("Сохранение в базу данных");
