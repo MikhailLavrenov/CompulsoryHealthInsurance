@@ -276,7 +276,8 @@ namespace CHI.Services.Report
                                 case IndicatorKind.LaborCost:
                                     valueItem.Value += selectedCases
                                         .SelectMany(x => x.Services)
-                                        .Sum(x => x.Count * x.ClassifierItem.Price);
+                                        .Where(x => x.ClassifierItem != null)
+                                        .Sum(x => x.Count * x.ClassifierItem.LaborCost);
                                     break;
 
                                 case IndicatorKind.Cost:
@@ -284,6 +285,7 @@ namespace CHI.Services.Report
                                         valueItem.Value += selectedCases
                                             .Where(x => x.PaidStatus == PaidKind.None)
                                             .SelectMany(x => x.Services)
+                                            .Where(x=>x.ClassifierItem!=null)
                                             .Sum(x => x.Count * x.ClassifierItem.Price)
                                             + selectedCases
                                             .Where(x => x.PaidStatus == PaidKind.Full || x.PaidStatus == PaidKind.Partly)

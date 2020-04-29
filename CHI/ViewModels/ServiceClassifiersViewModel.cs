@@ -76,19 +76,17 @@ namespace CHI.ViewModels
                 .ServiceClassifierItems
                 .ToLookup(x => x.Code);
 
-            var cases = tempContext.Cases
+            tempContext.Cases
                  .Where(x => x.DateEnd >= CurrentServiceClassifier.ValidFrom && x.DateEnd <= CurrentServiceClassifier.ValidTo)
                  .Include(x => x.Services)
-                 .ToList();
-
-            foreach (var mCase in cases)
-                mCase.Services.ForEach(x => x.ClassifierItem = classifierItems[x.Code].FirstOrDefault());
-
-            //cases.Where(x => x.PaidStatus == PaidKind.None).ToList().ForEach(x => x.AmountPaid = x.Services.Sum(y => y.ClassifierItem.Price));
+                 .AsEnumerable()
+                 .SelectMany(x => x.Services)
+                 .ToList()
+                 .ForEach(x => x.ClassifierItem = classifierItems[x.Code].FirstOrDefault());
 
             tempContext.SaveChanges();
 
-            mainRegionService.ShowProgressBar($"Завершено. Обновлено {cases.Count} случая(ев)");
+            mainRegionService.HideProgressBar($"Завершено. Обновлено {tempContext.Cases.Local.Count} случая(ев)");
         }
 
         private void NavigateExecute(Type view)

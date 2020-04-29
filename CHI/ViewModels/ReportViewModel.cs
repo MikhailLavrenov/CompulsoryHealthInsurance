@@ -51,7 +51,7 @@ namespace CHI.ViewModels
 
             var registers = dbContext.Registers
                 .Where(x => x.Year == Year && month1 <= x.Month && x.Month <= month2)
-                .Include(x => x.Cases).ThenInclude(x => x.Services)
+                .Include(x => x.Cases).ThenInclude(x => x.Services).ThenInclude(x=>x.ClassifierItem)
                 .ToList();
 
             var plans = dbContext.Plans.Where(x => x.Year == Year && month1 <= x.Month && x.Month <= month2).ToList();

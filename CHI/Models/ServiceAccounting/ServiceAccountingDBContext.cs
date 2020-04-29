@@ -67,17 +67,17 @@ namespace CHI.Models.ServiceAccounting
                 .WithMany(x => x.Childs)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<PlanningPermision>()   
+            modelBuilder.Entity<PlanningPermision>()
                 .HasKey(bc => new { bc.UserId, bc.DepartmentId });
 
-            modelBuilder.Entity<PlanningPermision>()   
-                .HasOne(x => x.User)   
-                .WithMany(x=>x.PlanningPermisions)
+            modelBuilder.Entity<PlanningPermision>()
+                .HasOne(x => x.User)
+                .WithMany(x => x.PlanningPermisions)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<PlanningPermision>()
-                .HasOne(x => x.Department)   
-                .WithMany(x => x.PlanningPermisions)   
+                .HasOne(x => x.Department)
+                .WithMany(x => x.PlanningPermisions)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Component>()
@@ -85,25 +85,32 @@ namespace CHI.Models.ServiceAccounting
                 .WithOne(x => x.Parent)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<Component>()   
-                .HasMany(x => x.CaseFilters)   
-                .WithOne()  
+            modelBuilder.Entity<Component>()
+                .HasMany(x => x.CaseFilters)
+                .WithOne()
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Component>()
                 .HasMany(x => x.Indicators)
                 .WithOne(x => x.Component)
-                .OnDelete(DeleteBehavior.Cascade);    
-            
+                .OnDelete(DeleteBehavior.Cascade);
+
             modelBuilder.Entity<Indicator>()
                 .HasMany(x => x.Ratios)
                 .WithOne()
                 .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<ServiceClassifier>()    
-                .HasMany(x => x.ServiceClassifierItems)  
-                .WithOne() 
+            modelBuilder.Entity<ServiceClassifier>()
+                .HasMany(x => x.ServiceClassifierItems)
+                .WithOne()
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Service>()
+                .HasOne(x => x.ClassifierItem)
+                .WithMany()
+                .OnDelete(DeleteBehavior.SetNull);
+
+
 
         }
     }
