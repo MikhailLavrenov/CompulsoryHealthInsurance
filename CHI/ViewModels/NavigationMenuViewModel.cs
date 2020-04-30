@@ -42,7 +42,7 @@ namespace CHI.ViewModels
             {
                 name = "ReportView";
                 var parameters = new NavigationParameters();
-                parameters.Add("IsPlanMode", true);
+                parameters.Add("IsPlanningMode", true);
 
                 mainRegionService.RequestNavigate(name, parameters);
             }
