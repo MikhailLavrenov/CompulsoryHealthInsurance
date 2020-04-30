@@ -25,34 +25,36 @@
             <Style TargetType="{x:Type TextBox}"
                    x:Key="Cell">
                 <Setter Property="Width"
-                        Value="70"/>
+                        Value="70" />
                 <Setter Property="Height"
                         Value="17" />
-                <Setter Property="Focusable"
-                        Value="{Binding DataContext.IsWritable}"/>
+                <Setter Property="VerticalContentAlignment"
+                        Value="Center" />
+                <Setter Property="HorizontalContentAlignment"
+                        Value="Center" />
+                <!--<Setter Property="Focusable"
+                        Value="{Binding DataContext.IsWritable, RelativeSource={RelativeSource Self}}"/>-->
                 <Style.Triggers>
-                    
-                    <MultiDataTrigger>
-                        <MultiDataTrigger.Conditions>
-                            <Condition Binding="{Binding DataContext.IsPlanMode, Mode=OneTime, Source={x:Reference proxyElement} }" Value="True"/>
-                        </MultiDataTrigger.Conditions>
-                        <Setter Property="Height" Value="34"/>
-                    </MultiDataTrigger>
 
-                    <MultiDataTrigger>
-                        <MultiDataTrigger.Conditions>
-                            <Condition  Binding="{Binding IsFocused, RelativeSource={RelativeSource Self}}" Value="False"/>
-                        </MultiDataTrigger.Conditions>
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate TargetType="{x:Type TextBox}">
-                                    <TextBlock Text="{TemplateBinding Text}" />
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
-                    </MultiDataTrigger>
+                    <DataTrigger Binding="{Binding IsWritable}"
+                                 Value="True">
+                        <Setter Property="Focusable"
+                                Value="True" />
+                    </DataTrigger>
 
-                    <!--<Trigger Property="IsFocused"
+                    <DataTrigger Binding="{Binding IsWritable}"
+                                 Value="False">
+                        <Setter Property="Focusable"
+                                Value="False" />
+                    </DataTrigger>
+
+                    <DataTrigger Binding="{Binding DataContext.IsPlanningMode, Mode=OneTime, Source={x:Reference proxyElement} }"
+                                 Value="True">
+                        <Setter Property="Height"
+                                Value="34" />
+                    </DataTrigger>
+
+                    <Trigger Property="IsFocused"
                              Value="False">
                         <Setter Property="Template">
                             <Setter.Value>
@@ -61,8 +63,7 @@
                                 </ControlTemplate>
                             </Setter.Value>
                         </Setter>
-                    </Trigger>-->
-
+                    </Trigger>
 
                 </Style.Triggers>
             </Style>
@@ -81,30 +82,26 @@
                         Value="17" />
 
                 <Style.Triggers>
-                    <MultiDataTrigger>
-                        <MultiDataTrigger.Conditions>
-                            <Condition Binding="{Binding DataContext.IsPlanMode, Mode=OneTime, Source={x:Reference proxyElement} }" Value="True"/>
-                        </MultiDataTrigger.Conditions>
-                        <Setter Property="Height" Value="34"/>
-                    </MultiDataTrigger>
+                    <DataTrigger Binding="{Binding DataContext.IsPlanningMode, Mode=OneTime, Source={x:Reference proxyElement} }"
+                                 Value="True">
+                        <Setter Property="Height"
+                                Value="34" />
+                    </DataTrigger>
                 </Style.Triggers>
 
             </Style>
 
             <SolidColorBrush x:Key="CellBorderBrush"
-                             Color="DarkGray"/>
+                             Color="DarkGray" />
 
             <Style TargetType="Border"
                    x:Key="BorderCellStyle">
-
                 <Setter Property="BorderThickness"
                         Value="0,0,1,1" />
                 <Setter Property="BorderBrush"
                         Value="{StaticResource CellBorderBrush}" />
                 <Setter Property="SnapsToDevicePixels"
                         Value="True" />
-
-
             </Style>
 
         </ResourceDictionary >
@@ -151,12 +148,12 @@
 
         <TextBlock Grid.Row="2"
                    Grid.Column="0"
-                   Text="Нарастающий" 
-                   Visibility="{Binding IsPlanMode, Converter={i:InvertedBoolToVisibleConverter}}" />
+                   Text="Нарастающий"
+                   Visibility="{Binding IsPlanningMode, Converter={i:InvertedBoolToVisibleConverter}}" />
         <CheckBox Grid.Row="2"
                   Grid.Column="2"
                   IsChecked="{Binding IsGrowing}"
-                  Visibility="{Binding IsPlanMode, Converter={i:InvertedBoolToVisibleConverter}}"/>
+                  Visibility="{Binding IsPlanningMode, Converter={i:InvertedBoolToVisibleConverter}}" />
 
         <StackPanel Grid.Row="3"
                     Grid.Column="0"
@@ -173,7 +170,8 @@
 
         <FrameworkElement Grid.Row="4"
                           Grid.Column="0"
-                          Style="{StaticResource Separator}" x:Name="proxyElement"  />
+                          Style="{StaticResource Separator}"
+                          x:Name="proxyElement" />
 
         <Grid Grid.Row="5"
               Grid.Column="0"
@@ -221,21 +219,24 @@
                                         Visibility="{Binding IsVisible, Converter={i:BoolToVisibleConverter}}">
 
                                 <StackPanel.Resources>
-                                    <SolidColorBrush x:Key="HeaderBrush"                     
-                                                     Color="{Binding Color}"                     
-                                                     po:Freeze="True"/>
+                                    <SolidColorBrush x:Key="HeaderBrush"
+                                                     Color="{Binding Color}"
+                                                     po:Freeze="True" />
                                 </StackPanel.Resources>
 
                                 <Border Style="{StaticResource BorderCellStyle}"
                                         Background="{StaticResource HeaderBrush}">
                                     <StackPanel Orientation="Vertical">
-                                        <Button Style="{StaticResource IconTransparentButton}" HorizontalAlignment="Left"
+                                        <Button Style="{StaticResource IconTransparentButton}"
+                                                HorizontalAlignment="Left"
                                                 Command="{Binding SwitchCollapseCommand}"
                                                 Visibility="{Binding CanCollapse, Converter={i:BoolToVisibleHiddenConverter}}">
                                             <Viewbox Stretch="Uniform">
                                                 <StackPanel>
-                                                    <materialDesign:PackIcon Kind="ExpandMore" Visibility="{Binding IsCollapsed, Converter={i:BoolToVisibleConverter}}"/>
-                                                    <materialDesign:PackIcon Kind="KeyboardArrowRight"  Visibility="{Binding IsCollapsed, Converter={i:InvertedBoolToVisibleConverter}}"/>
+                                                    <materialDesign:PackIcon Kind="ExpandMore"
+                                                                             Visibility="{Binding IsCollapsed, Converter={i:BoolToVisibleConverter}}" />
+                                                    <materialDesign:PackIcon Kind="KeyboardArrowRight"
+                                                                             Visibility="{Binding IsCollapsed, Converter={i:InvertedBoolToVisibleConverter}}" />
                                                 </StackPanel>
                                             </Viewbox>
                                         </Button>
@@ -296,26 +297,30 @@
                                         Visibility="{Binding IsVisible, Converter={i:BoolToVisibleConverter}}">
 
                                 <StackPanel.Resources>
-                                    <SolidColorBrush x:Key="HeaderBrush"                     
-                                                     Color="{Binding Color}"                     
-                                                     po:Freeze="True"/>
+                                    <SolidColorBrush x:Key="HeaderBrush"
+                                                     Color="{Binding Color}"
+                                                     po:Freeze="True" />
                                 </StackPanel.Resources>
 
                                 <Border Style="{StaticResource BorderCellStyle}"
                                         Background="{StaticResource HeaderBrush}">
                                     <StackPanel Orientation="Horizontal">
                                         <Button Style="{StaticResource IconTransparentButton}"
-                                                VerticalAlignment="Top" Width="20" Height="20" 
+                                                VerticalAlignment="Top"
+                                                Width="20"
+                                                Height="20"
                                                 Command="{Binding SwitchCollapseCommand}"
                                                 Visibility="{Binding CanCollapse, Converter={i:BoolToVisibleHiddenConverter}}">
-                                            <Viewbox Stretch="Uniform" >
+                                            <Viewbox Stretch="Uniform">
                                                 <StackPanel>
-                                                    <materialDesign:PackIcon Kind="KeyboardArrowRight"  Visibility="{Binding IsCollapsed, Converter={i:BoolToVisibleConverter}}"/>
-                                                    <materialDesign:PackIcon Kind="ExpandMore" Visibility="{Binding IsCollapsed, Converter={i:InvertedBoolToVisibleConverter}}"/>
+                                                    <materialDesign:PackIcon Kind="KeyboardArrowRight"
+                                                                             Visibility="{Binding IsCollapsed, Converter={i:BoolToVisibleConverter}}" />
+                                                    <materialDesign:PackIcon Kind="ExpandMore"
+                                                                             Visibility="{Binding IsCollapsed, Converter={i:InvertedBoolToVisibleConverter}}" />
                                                 </StackPanel>
                                             </Viewbox>
                                         </Button>
-                                        <StackPanel Orientation="Vertical" 
+                                        <StackPanel Orientation="Vertical"
                                                     Width="150">
                                             <TextBlock Style="{StaticResource HeaderCell}"
                                                        Text="{Binding Name}" />
@@ -339,7 +344,7 @@
                                             <Border Style="{StaticResource BorderCellStyle}"
                                                     Background="{StaticResource HeaderBrush}">
                                                 <TextBlock Style="{StaticResource RowHeaderItemCell}"
-                                                           Text="{Binding Name}"/>
+                                                           Text="{Binding Name}" />
                                             </Border>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
@@ -362,9 +367,9 @@
                           HorizontalScrollBarVisibility="Visible">
 
                 <b:Interaction.Behaviors>
-                    <i:ScrollViewerSyncScrollBehavior SyncTo="{Binding ElementName=rowHeadersScrollViewer}"
+                    <i:ScrollViewerSyncScrollBehavior SyncWith="{Binding ElementName=rowHeadersScrollViewer}"
                                                       SyncVertical="True" />
-                    <i:ScrollViewerSyncScrollBehavior SyncTo="{Binding ElementName=columnHeadersScrollViewer}"
+                    <i:ScrollViewerSyncScrollBehavior SyncWith="{Binding ElementName=columnHeadersScrollViewer}"
                                                       SyncHorizontal="True" />
                 </b:Interaction.Behaviors>
 
@@ -392,12 +397,14 @@
 
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <Border Style="{StaticResource BorderCellStyle}" Visibility="{Binding IsVisible, Converter={i:BoolToVisibleConverter}}">
+                                        <Border Style="{StaticResource BorderCellStyle}"
+                                                Visibility="{Binding IsVisible, Converter={i:BoolToVisibleConverter}}">
                                             <Border.Background>
-                                                <SolidColorBrush Color="{Binding Color}"/>
+                                                <SolidColorBrush Color="{Binding Color}" />
                                             </Border.Background>
-                                            <TextBox Width="70" Style="{StaticResource Cell}"
-                                                       Text="{Binding Value}">
+                                            <TextBox Width="70"
+                                                     Style="{StaticResource Cell}"
+                                                     Text="{Binding Value}">
 
                                             </TextBox>
                                         </Border>

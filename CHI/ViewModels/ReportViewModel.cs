@@ -20,9 +20,9 @@ namespace CHI.ViewModels
         IMainRegionService mainRegionService;
         IFileDialogService fileDialogService;
         ReportService report;
-        bool isPlanMode;
+        bool isPlanningMode;
 
-        public bool IsPlanMode { get => isPlanMode; set => SetProperty(ref isPlanMode, value); }
+        public bool IsPlanningMode { get => isPlanningMode; set => SetProperty(ref isPlanningMode, value); }
         public bool KeepAlive { get => false; }
         public int Year { get => year; set => SetProperty(ref year, value); }
         public int Month { get => month; set => SetProperty(ref month, value); }
@@ -91,8 +91,8 @@ namespace CHI.ViewModels
 
         public void OnNavigatedTo(NavigationContext navigationContext)
         {
-            if (navigationContext.Parameters.ContainsKey(nameof(IsPlanMode)))
-                IsPlanMode = navigationContext.Parameters.GetValue<bool>(nameof(IsPlanMode));
+            if (navigationContext.Parameters.ContainsKey(nameof(IsPlanningMode)))
+                IsPlanningMode = navigationContext.Parameters.GetValue<bool>(nameof(IsPlanningMode));
 
             dbContext = new ServiceAccountingDBContext();
 
@@ -101,7 +101,7 @@ namespace CHI.ViewModels
             User user;
             Department rootDepartment;
 
-            if (IsPlanMode)
+            if (IsPlanningMode)
             {
                 var currentSid = UserPrincipal.Current.Sid.ToString();
                 user = dbContext.Users.Where(x => x.Sid.Equals(currentSid)).Include(x => x.PlanningPermisions).FirstOrDefault();
@@ -140,7 +140,7 @@ namespace CHI.ViewModels
 
             var rootComponent = dbContext.Components.Local.First(x => x.IsRoot);
 
-            Report = new ReportService(rootDepartment, rootComponent);
+            Report = new ReportService(rootDepartment, rootComponent, IsPlanningMode);
         }
 
         public bool IsNavigationTarget(NavigationContext navigationContext)

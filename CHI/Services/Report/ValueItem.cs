@@ -26,7 +26,7 @@ namespace CHI.Services.Report
             RowHeader = rowHeader;
             ColumnHeader = columnHeader;
             Color = rowHeader.Group.Color;
-            isWritable = !isReadOnly && columnHeader.Group.Component.IsCanPlanning;
+            IsWritable = !isReadOnly && columnHeader.Group.Component.IsCanPlanning;
             ColumnHeader.Group.IsVisibleChangedEvent += OnHeaderGroupVisibleChanged;
             RowHeader.Group.IsVisibleChangedEvent += OnHeaderGroupVisibleChanged;
         }
