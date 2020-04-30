@@ -150,7 +150,7 @@ namespace CHI.ViewModels
 
         public void OnNavigatedFrom(NavigationContext navigationContext)
         {
-            dbContext.SaveChanges();
+            //dbContext.SaveChanges();
         }
     }
 }
