@@ -37,18 +37,7 @@ namespace CHI.ViewModels
             else
                 name = string.Empty;
 
-
-            if (name == "PlanReportView")
-            {
-                name = "ReportView";
-                var parameters = new NavigationParameters();
-                parameters.Add("IsPlanningMode", true);
-
-                mainRegionService.RequestNavigate(name, parameters);
-            }
-            else
-                mainRegionService.RequestNavigate(name);
-            
+                mainRegionService.RequestNavigate(name);            
         }
     }
 }

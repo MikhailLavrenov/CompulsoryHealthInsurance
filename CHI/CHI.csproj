@@ -64,6 +64,9 @@
     <Compile Update="Views\PlanPermisionsView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Views\PlanningView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Views\WindowsAccountsView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -111,6 +114,9 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Views\PlanPermisionsView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\PlanningView.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Views\WindowsAccountsView.xaml">
