@@ -5,12 +5,13 @@ using Microsoft.EntityFrameworkCore;
 using Prism.Regions;
 using System;
 using System.Collections.Generic;
+using System.DirectoryServices.AccountManagement;
 using System.Globalization;
 using System.Linq;
 
 namespace CHI.ViewModels
 {
-    class ReportViewModel : DomainObject, IRegionMemberLifetime, INavigationAware
+    class PlanningViewModel : DomainObject, IRegionMemberLifetime, INavigationAware
     {
         ServiceAccountingDBContext dbContext;
         int year = DateTime.Now.Year;
@@ -29,33 +30,33 @@ namespace CHI.ViewModels
 
         public DelegateCommandAsync BuildReportCommand { get; }
         public DelegateCommandAsync SaveExcelCommand { get; }
+        public DelegateCommandAsync UpdateCalculatedCellsCommand { get; }
+        public DelegateCommandAsync SavePlanCommand { get; }
 
-
-        public ReportViewModel(IMainRegionService mainRegionService, IFileDialogService fileDialogService)
+        public PlanningViewModel(IMainRegionService mainRegionService, IFileDialogService fileDialogService)
         {
             this.mainRegionService = mainRegionService;
             this.fileDialogService = fileDialogService;
 
-            mainRegionService.Header = "Отчет по объемам";
+            mainRegionService.Header = "Планирование объемов";
 
             BuildReportCommand = new DelegateCommandAsync(BuildReportExecute);
             SaveExcelCommand = new DelegateCommandAsync(SaveExcelExecute);
+            SavePlanCommand = new DelegateCommandAsync(SavePlanExecute);
+            UpdateCalculatedCellsCommand = new DelegateCommandAsync(() => report.UpdateCalculatedCells());
         }
 
 
         private void BuildReportExecute()
         {
-            var month1 = IsGrowing ? 1 : Month;
-            var month2 = Month;
-
             var registers = dbContext.Registers
-                .Where(x => x.Year == Year && month1 <= x.Month && x.Month <= month2)
+                .Where(x => x.Year == Year && x.Month == Month)
                 .Include(x => x.Cases).ThenInclude(x => x.Services).ThenInclude(x => x.ClassifierItem)
                 .ToList();
 
-            var plans = dbContext.Plans.Where(x => x.Year == Year && month1 <= x.Month && x.Month <= month2).ToList();
+            var plans = dbContext.Plans.Where(x => x.Year == Year && x.Month == Month).ToList();
 
-            Report.Build(registers, plans, month1, month2, Year);
+            Report.Build(registers, plans, Month, Month, Year);
         }
 
         private void SaveExcelExecute()
@@ -78,6 +79,41 @@ namespace CHI.ViewModels
             mainRegionService.HideProgressBar($"Файл сохранен: {filePath}");
         }
 
+        private void SavePlanExecute()
+        {
+            report.UpdateCalculatedCells();
+
+            var plans = dbContext.Plans.Local.Where(x => x.Month == Month && x.Year == Year).ToLookup(x => (x.Parameter.Id, x.Indicator.Id));
+
+            foreach (var valueItem in report.ValuesList.Where(x => x.IsWritable))
+            {
+                var planItem = plans.FirstOrDefault(x => x.Key == (valueItem.RowHeader.Parameter.Id, valueItem.ColumnHeader.Indicator.Id))?.FirstOrDefault();
+
+                if (planItem == null && valueItem.Value != null)
+                {
+                    planItem = new Plan()
+                    {
+                        Month = Month,
+                        Year = Year,
+                        Indicator = valueItem.ColumnHeader.Indicator,
+                        Parameter = valueItem.RowHeader.Parameter,
+                        Value = valueItem.Value.Value
+                    };
+
+                    dbContext.Add(planItem);
+                }
+                else if (planItem != null)
+                {
+                    if (valueItem.Value == null)
+                        dbContext.Remove(planItem);
+                    else
+                        planItem.Value = valueItem.Value.Value;
+                }
+            }
+
+            dbContext.SaveChanges();
+        }
+
         public static bool PeriodsIntersects(DateTime? period1date1, DateTime? period1date2, int period2Month1, int period2Month2, int period2Year)
         {
             var p1d1 = period1date1.HasValue ? period1date1.Value.Year * 100 + period1date1.Value.Month : 0;
@@ -96,9 +132,22 @@ namespace CHI.ViewModels
 
             dbContext.Departments.Load();
 
-            var rootDepartment = dbContext.Departments.Local.First(x => x.IsRoot);
+            var currentSid = UserPrincipal.Current.Sid.ToString();
+            var user = dbContext.Users.Where(x => x.Sid.Equals(currentSid)).Include(x => x.PlanningPermisions).FirstOrDefault();
 
-            dbContext.Parameters.Load();
+            if (user == null || user.PlanningPermisions.Count == 0)
+            {
+                mainRegionService.RequestNavigateHome();
+                return;
+            }
+
+            var rootDepartment = new Department();
+            rootDepartment.IsRoot = true;
+            rootDepartment.Childs = user.PlanningPermisions.Select(x => x.Department).ToList();
+            rootDepartment.Childs.ForEach(x => x.Parent = rootDepartment);
+
+            dbContext.Parameters.Where(x => x.Kind == ParameterKind.EmployeePlan || x.Kind == ParameterKind.DepartmentHandPlan).Load();
+
 
             dbContext.Employees
                 .Include(x => x.Medic)
@@ -110,9 +159,10 @@ namespace CHI.ViewModels
                 .Include(x => x.CaseFilters)
                 .Load();
 
+
             var rootComponent = dbContext.Components.Local.First(x => x.IsRoot);
 
-            Report = new ReportService(rootDepartment, rootComponent, false);
+            Report = new ReportService(rootDepartment, rootComponent, true);
 
             dbContext.ChangeTracker.AutoDetectChangesEnabled = true;
         }
@@ -128,3 +178,4 @@ namespace CHI.ViewModels
         }
     }
 }
+;

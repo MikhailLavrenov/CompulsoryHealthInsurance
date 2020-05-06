@@ -84,6 +84,7 @@ namespace CHI
             containerRegistry.RegisterForNavigation<UsersView>();
             containerRegistry.RegisterForNavigation<WindowsAccountsView>();
             containerRegistry.RegisterForNavigation<PlanPermisionsView>();
+            containerRegistry.RegisterForNavigation<PlanningView>();
         }
 
         private void LogUnhandledException(object sender, UnhandledExceptionEventArgs args)
