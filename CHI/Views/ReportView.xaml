@@ -24,6 +24,8 @@
 
             <Style TargetType="{x:Type TextBlock}"
                    x:Key="Cell">
+                <Setter Property="HorizontalAlignment"
+                        Value="Center" />
                 <Setter Property="Width"
                         Value="70" />
                 <Setter Property="Height"
@@ -65,68 +67,76 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
-            <RowDefinition Height="auto" />
-            <RowDefinition Height="auto" />
-            <RowDefinition Height="auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="auto" />
-            <ColumnDefinition Width="auto" />
-            <ColumnDefinition Width="Auto"
-                              MinWidth="200" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
-
-        <FrameworkElement Grid.Column="1"
-                          Style="{StaticResource Separator}" />
-
-        <TextBlock Grid.Row="0"
-                   Grid.Column="0"
-                   Text="Год" />
-        <TextBox Grid.Row="0"
-                 Grid.Column="2"
-                 Text="{Binding Year}" />
-
-        <TextBlock Grid.Row="1"
-                   Grid.Column="0"
-                   Text="Месяц" />
-        <ComboBox Grid.Row="1"
-                  Grid.Column="2"
-                  ItemsSource="{Binding Months}"
-                  SelectedValue="{Binding Month}"
-                  SelectedValuePath="Key"
-                  DisplayMemberPath="Value" />
-
-        <TextBlock Grid.Row="2"
-                   Grid.Column="0"
-                   Text="Нарастающий" />
-        <CheckBox Grid.Row="2"
-                  Grid.Column="2"
-                  IsChecked="{Binding IsGrowing}"/>
-
-        <StackPanel Grid.Row="3"
-                    Grid.Column="0"
-                    Grid.ColumnSpan="3"
+        <StackPanel Grid.Row="0"
                     Orientation="Horizontal">
 
-            <Button Content="Ок"
-                    Command="{Binding BuildReportCommand}" />
+            <Button Style="{StaticResource IconButton}"
+                    Command="{Binding BuildReportCommand}"
+                    Cursor="Hand">
+                <Viewbox Stretch="Uniform">
+                    <materialDesign:PackIcon Kind="Check" />
+                </Viewbox>
+            </Button>
 
-            <Button Content="В excel"
-                    Command="{Binding SaveExcelCommand}" />
+            <Button Style="{StaticResource IconButton}"
+                    Command="{Binding SaveExcelCommand}">
+                <Viewbox Stretch="Uniform">
+                    <materialDesign:PackIcon Kind="MicrosoftExcel" />
+                </Viewbox>
+            </Button>
 
         </StackPanel>
 
-        <FrameworkElement Grid.Row="4"
-                          Grid.Column="0"
+        <StackPanel Grid.Row="0"
+                    HorizontalAlignment="Center"
+                    Orientation="Horizontal">
+
+            <ComboBox Grid.Row="1"
+                      Grid.Column="2"
+                      Width="90"
+                      ItemsSource="{Binding Months}"
+                      SelectedValue="{Binding Month}"
+                      SelectedValuePath="Key"
+                      DisplayMemberPath="Value" />
+
+            <FrameworkElement Style="{StaticResource Separator}" />
+
+            <Button Style="{StaticResource IconTransparentButton}"
+                    Command="{Binding IncreaseYear}">
+                <Viewbox Stretch="Uniform">
+                    <materialDesign:PackIcon Kind="MenuLeft" />
+                </Viewbox>
+            </Button>
+
+            <TextBlock Text="{Binding Year}"
+                       FontWeight="Medium" />
+
+            <Button Style="{StaticResource IconTransparentButton}"
+                    Command="{Binding DecreaseYear}">
+                <Viewbox Stretch="Uniform">
+                    <materialDesign:PackIcon Kind="MenuRight" />
+                </Viewbox>
+            </Button>
+
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal"
+                    HorizontalAlignment="Right">
+
+            <TextBlock Text="Нарастающий" />
+            
+            <CheckBox IsChecked="{Binding IsGrowing}" />
+
+        </StackPanel>
+
+        <FrameworkElement Grid.Row="1"
                           Style="{StaticResource Separator}"
                           x:Name="proxyElement" />
 
-        <Grid Grid.Row="5"
-              Grid.Column="0"
-              Grid.ColumnSpan="4">
+        <Grid Grid.Row="2">
 
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto" />

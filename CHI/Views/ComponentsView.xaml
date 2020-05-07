@@ -21,7 +21,8 @@
                     Orientation="Horizontal">
 
             <Button Style="{StaticResource IconButton}"
-                    Command="{Binding AddCommand}">
+                    Command="{Binding AddCommand}"
+                    Cursor="Hand">
                 <Viewbox Stretch="Uniform">
                     <materialDesign:PackIcon Kind="FileOutline" />
                 </Viewbox>
