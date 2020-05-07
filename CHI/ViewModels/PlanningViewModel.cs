@@ -49,14 +49,12 @@ namespace CHI.ViewModels
 
         private void BuildReportExecute()
         {
-            var registers = dbContext.Registers
-                .Where(x => x.Year == Year && x.Month == Month)
-                .Include(x => x.Cases).ThenInclude(x => x.Services).ThenInclude(x => x.ClassifierItem)
-                .ToList();
+            if (!dbContext.Plans.Local.Where(x => x.Year == Year && x.Month == Month).Any())
+                dbContext.Plans.Where(x => x.Year == Year && x.Month == Month).Load();
 
-            var plans = dbContext.Plans.Where(x => x.Year == Year && x.Month == Month).ToList();
+            var plans = dbContext.Plans.Local.Where(x => x.Year == Year && x.Month == Month).ToList();
 
-            Report.Build(registers, plans, Month, Month, Year);
+            Report.Build(null, plans, Month, Month, Year);
         }
 
         private void SaveExcelExecute()
@@ -111,7 +109,13 @@ namespace CHI.ViewModels
                 }
             }
 
-            dbContext.SaveChanges();
+
+
+            //skipSavingObjects.ForEach(x => dbContext.Entry(x.Entity).State = EntityState.Detached);
+
+            //dbContext.SaveChanges();
+
+            //skipSavingObjects.ForEach();
         }
 
         public static bool PeriodsIntersects(DateTime? period1date1, DateTime? period1date2, int period2Month1, int period2Month2, int period2Year)
@@ -127,8 +131,6 @@ namespace CHI.ViewModels
         public void OnNavigatedTo(NavigationContext navigationContext)
         {
             dbContext = new ServiceAccountingDBContext();
-
-            dbContext.ChangeTracker.AutoDetectChangesEnabled = false;
 
             dbContext.Departments.Load();
 
@@ -163,8 +165,6 @@ namespace CHI.ViewModels
             var rootComponent = dbContext.Components.Local.First(x => x.IsRoot);
 
             Report = new ReportService(rootDepartment, rootComponent, true);
-
-            dbContext.ChangeTracker.AutoDetectChangesEnabled = true;
         }
 
         public bool IsNavigationTarget(NavigationContext navigationContext)
@@ -174,8 +174,13 @@ namespace CHI.ViewModels
 
         public void OnNavigatedFrom(NavigationContext navigationContext)
         {
-            //dbContext.SaveChanges();
+            dbContext.ChangeTracker
+                .Entries()
+                .Where(x => x.State != EntityState.Unchanged && x.Entity.GetType() != typeof(Plan))
+                .ToList()
+                .ForEach(x => dbContext.Entry(x.Entity).State = EntityState.Detached);
+
+            dbContext.SaveChanges();
         }
     }
 }
-;
