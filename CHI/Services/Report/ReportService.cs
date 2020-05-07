@@ -113,7 +113,7 @@ namespace CHI.Services.Report
                     valueItem.Value = plans.Where(x => x.Parameter.Id == row.Parameter.Id && x.Indicator.Id == column.Indicator.Id).Sum(x => x.Value);
                 }
 
-            if (!IsPlannigMode)
+            if (!IsPlannigMode && registers != null)
                 for (int month = monthBegin; month <= monthEnd; month++)
                 {
                     var cases = registers.FirstOrDefault(x => x.Month == month)?.Cases;
