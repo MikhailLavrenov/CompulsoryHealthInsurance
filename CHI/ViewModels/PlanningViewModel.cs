@@ -2,6 +2,7 @@
 using CHI.Models.ServiceAccounting;
 using CHI.Services.Report;
 using Microsoft.EntityFrameworkCore;
+using Prism.Commands;
 using Prism.Regions;
 using System;
 using System.Collections.Generic;
@@ -22,16 +23,45 @@ namespace CHI.ViewModels
         ReportService report;
 
         public bool KeepAlive { get => false; }
-        public int Year { get => year; set => SetProperty(ref year, value); }
-        public int Month { get => month; set => SetProperty(ref month, value); }
+        public int Year
+        {
+            get => year;
+            set
+            {
+                if (year == value)
+                    return;
+
+                SavePlanForPeriod();
+
+                SetProperty(ref year, value);
+
+                BuildReport();
+            }
+        }
+        public int Month
+        {
+            get => month;
+            set
+            {
+                if (month == value)
+                    return;
+
+                SavePlanForPeriod();
+
+                SetProperty(ref month, value);
+
+                BuildReport();
+            }
+        }
         public bool IsGrowing { get => isGrowing; set => SetProperty(ref isGrowing, value); }
         public Dictionary<int, string> Months { get; } = Enumerable.Range(1, 12).ToDictionary(x => x, x => CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(x));
         public ReportService Report { get => report; set => SetProperty(ref report, value); }
 
-        public DelegateCommandAsync BuildReportCommand { get; }
+        public DelegateCommand IncreaseYear { get; }
+        public DelegateCommand DecreaseYear { get; }
         public DelegateCommandAsync SaveExcelCommand { get; }
         public DelegateCommandAsync UpdateCalculatedCellsCommand { get; }
-        public DelegateCommandAsync SavePlanCommand { get; }
+
 
         public PlanningViewModel(IMainRegionService mainRegionService, IFileDialogService fileDialogService)
         {
@@ -40,14 +70,14 @@ namespace CHI.ViewModels
 
             mainRegionService.Header = "Планирование объемов";
 
-            BuildReportCommand = new DelegateCommandAsync(BuildReportExecute);
+            IncreaseYear = new DelegateCommand(() => ++Year);
+            DecreaseYear = new DelegateCommand(() => --Year);
             SaveExcelCommand = new DelegateCommandAsync(SaveExcelExecute);
-            SavePlanCommand = new DelegateCommandAsync(SavePlanExecute);
-            UpdateCalculatedCellsCommand = new DelegateCommandAsync(() => report.UpdateCalculatedCells());
+            UpdateCalculatedCellsCommand = new DelegateCommandAsync(() => Report.UpdateCalculatedCells());
         }
 
 
-        private void BuildReportExecute()
+        private void BuildReport()
         {
             if (!dbContext.Plans.Local.Where(x => x.Year == Year && x.Month == Month).Any())
                 dbContext.Plans.Where(x => x.Year == Year && x.Month == Month).Load();
@@ -77,13 +107,13 @@ namespace CHI.ViewModels
             mainRegionService.HideProgressBar($"Файл сохранен: {filePath}");
         }
 
-        private void SavePlanExecute()
+        private void SavePlanForPeriod()
         {
-            report.UpdateCalculatedCells();
+            Report.UpdateCalculatedCells();
 
             var plans = dbContext.Plans.Local.Where(x => x.Month == Month && x.Year == Year).ToLookup(x => (x.Parameter.Id, x.Indicator.Id));
 
-            foreach (var valueItem in report.ValuesList.Where(x => x.IsWritable))
+            foreach (var valueItem in Report.ValuesList.Where(x => x.IsWritable))
             {
                 var planItem = plans.FirstOrDefault(x => x.Key == (valueItem.RowHeader.Parameter.Id, valueItem.ColumnHeader.Indicator.Id))?.FirstOrDefault();
 
@@ -108,14 +138,6 @@ namespace CHI.ViewModels
                         planItem.Value = valueItem.Value.Value;
                 }
             }
-
-
-
-            //skipSavingObjects.ForEach(x => dbContext.Entry(x.Entity).State = EntityState.Detached);
-
-            //dbContext.SaveChanges();
-
-            //skipSavingObjects.ForEach();
         }
 
         public static bool PeriodsIntersects(DateTime? period1date1, DateTime? period1date2, int period2Month1, int period2Month2, int period2Year)
@@ -165,6 +187,8 @@ namespace CHI.ViewModels
             var rootComponent = dbContext.Components.Local.First(x => x.IsRoot);
 
             Report = new ReportService(rootDepartment, rootComponent, true);
+
+            BuildReport();
         }
 
         public bool IsNavigationTarget(NavigationContext navigationContext)
@@ -174,6 +198,8 @@ namespace CHI.ViewModels
 
         public void OnNavigatedFrom(NavigationContext navigationContext)
         {
+            SavePlanForPeriod();
+
             dbContext.ChangeTracker
                 .Entries()
                 .Where(x => x.State != EntityState.Unchanged && x.Entity.GetType() != typeof(Plan))

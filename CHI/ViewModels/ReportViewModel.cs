@@ -2,6 +2,7 @@
 using CHI.Models.ServiceAccounting;
 using CHI.Services.Report;
 using Microsoft.EntityFrameworkCore;
+using Prism.Commands;
 using Prism.Regions;
 using System;
 using System.Collections.Generic;
@@ -27,6 +28,8 @@ namespace CHI.ViewModels
         public Dictionary<int, string> Months { get; } = Enumerable.Range(1, 12).ToDictionary(x => x, x => CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(x));
         public ReportService Report { get => report; set => SetProperty(ref report, value); }
 
+        public DelegateCommand IncreaseYear { get; }
+        public DelegateCommand DecreaseYear { get; }
         public DelegateCommandAsync BuildReportCommand { get; }
         public DelegateCommandAsync SaveExcelCommand { get; }
 
@@ -38,6 +41,8 @@ namespace CHI.ViewModels
 
             mainRegionService.Header = "Отчет по объемам";
 
+            IncreaseYear = new DelegateCommand(() => ++Year);
+            DecreaseYear = new DelegateCommand(() => --Year);
             BuildReportCommand = new DelegateCommandAsync(BuildReportExecute);
             SaveExcelCommand = new DelegateCommandAsync(SaveExcelExecute);
         }
