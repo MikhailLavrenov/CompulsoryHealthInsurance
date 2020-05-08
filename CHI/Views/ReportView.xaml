@@ -285,7 +285,7 @@
                                                     Width="150">
                                             <TextBlock Style="{StaticResource HeaderCell}"
                                                        Text="{Binding Name}" />
-                                            <TextBlock Style="{StaticResource HeaderCell}"
+                                            <TextBlock Style="{StaticResource HeaderCell}" FontWeight="Light"
                                                        Text="{Binding SubName}" />
                                         </StackPanel>
                                     </StackPanel>
