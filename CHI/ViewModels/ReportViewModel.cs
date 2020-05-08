@@ -20,6 +20,9 @@ namespace CHI.ViewModels
         IMainRegionService mainRegionService;
         IFileDialogService fileDialogService;
         ReportService report;
+        int reportMonth;
+        int reportYear;
+        bool reportIsGrowing;
 
         public bool KeepAlive { get => false; }
         public int Year { get => year; set => SetProperty(ref year, value); }
@@ -50,6 +53,12 @@ namespace CHI.ViewModels
 
         private void BuildReportExecute()
         {
+            mainRegionService.ShowProgressBar("Построение отчета");
+
+            reportMonth = Month;
+            reportYear = Year;
+            reportIsGrowing = IsGrowing;
+
             var month1 = IsGrowing ? 1 : Month;
             var month2 = Month;
 
@@ -60,7 +69,9 @@ namespace CHI.ViewModels
 
             var plans = dbContext.Plans.Where(x => x.Year == Year && month1 <= x.Month && x.Month <= month2).ToList();
 
-            Report.Build(registers, plans, month1, month2, Year);
+            Report.Build(registers, plans, Month, Year, IsGrowing);
+
+            mainRegionService.HideProgressBar("Отчет построен");
         }
 
         private void SaveExcelExecute()
@@ -72,13 +83,21 @@ namespace CHI.ViewModels
             fileDialogService.Filter = "Excel files (*.xslx)|*.xlsx";
 
             if (fileDialogService.ShowDialog() != true)
+            {
+                mainRegionService.HideProgressBar("Отменено");
                 return;
+            }
 
             var filePath = fileDialogService.FileName;
 
+            var sheetName = reportYear != 0 ? Months[reportMonth].Substring(0, 3) : "Макет";
+
+            if (reportYear != 0 && reportIsGrowing)
+                sheetName = $"Σ {sheetName}";
+
             mainRegionService.ShowProgressBar("Сохранение файла");
 
-            Report.SaveExcel(filePath);
+            Report.SaveExcel(filePath, sheetName);
 
             mainRegionService.HideProgressBar($"Файл сохранен: {filePath}");
         }

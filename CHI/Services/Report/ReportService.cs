@@ -4,6 +4,7 @@ using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 
@@ -22,6 +23,9 @@ namespace CHI.Services.Report
         public ValueItem[][] Values { get; private set; }
         public List<ValueItem> ValuesList { get; set; }
         public bool IsPlannigMode { get; private set; }
+        public int Month { get; private set; }
+        public int Year { get; private set; }
+        public bool IsGrowing { get; private set; }
 
 
         public ReportService(Department rootDepartment, Component rootComponent, bool isPlanningMode = false)
@@ -98,8 +102,12 @@ namespace CHI.Services.Report
         }
 
 
-        public void Build(List<Register> registers, List<Plan> plans, int monthBegin, int monthEnd, int year)
+        public void Build(List<Register> registers, List<Plan> plans, int month, int year, bool isGrowing = false)
         {
+            Month = month;
+            Year = year;
+            IsGrowing = isGrowing;
+
             foreach (var valueItemsRow in Values)
                 foreach (var valueItem in valueItemsRow)
                     valueItem.Value = 0;
@@ -114,18 +122,18 @@ namespace CHI.Services.Report
                 }
 
             if (!IsPlannigMode && registers != null)
-                for (int month = monthBegin; month <= monthEnd; month++)
+                for (var currentMonth = isGrowing ? 1 : month; currentMonth <= month; currentMonth++)
                 {
-                    var cases = registers.FirstOrDefault(x => x.Month == month)?.Cases;
+                    var cases = registers.FirstOrDefault(x => x.Month == currentMonth)?.Cases;
 
-                    if (cases != null)
-                    {
-                        //заполняет факт
-                        SetValuesFromCases(month, year, cases, true);
+                    if (cases == null)
+                        continue;
 
-                        //заполняет ошибки (снятия)
-                        SetValuesFromCases(month, year, cases, false);
-                    }
+                    //заполняет факт
+                    SetValuesFromCases(currentMonth, year, cases, true);
+
+                    //заполняет ошибки (снятия)
+                    SetValuesFromCases(currentMonth, year, cases, false);
                 }
 
             SumRows();
@@ -222,7 +230,7 @@ namespace CHI.Services.Report
                 }
         }
 
-        //округляет значения
+        //округляет значения и убирает нули
         private void RoundValues()
         {
             foreach (var row in RowItems)
@@ -334,28 +342,54 @@ namespace CHI.Services.Report
 
         }
 
-        public void SaveExcel(string path)
+        public void SaveExcel(string path, string sheetName)
         {
-            using var excel = new ExcelPackage();
+            using var excel = new ExcelPackage(new FileInfo(path));
 
-            var sheet = excel.Workbook.Worksheets.Add("Лист1");
+            var deleteSheet = excel.Workbook.Worksheets.FirstOrDefault(x => x.Name.Equals(sheetName, StringComparison.OrdinalIgnoreCase));
+
+            //в книге должен оставаться хотя бы 1 лист, иначе возникнет исключение
+            if (deleteSheet != null)
+                deleteSheet.Name += " list for delete";
+
+            var sheet = excel.Workbook.Worksheets.Add(sheetName);
+
+            if (deleteSheet != null)
+                excel.Workbook.Worksheets.Delete(deleteSheet);
+
+            var header = IsPlannigMode ? "Планирование объемов" : "Отчет по выполнению объемов";
+
+            if (Month != 0)
+            {
+                header += $" за {CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(Month)} {Year}";
+
+                if (IsGrowing)
+                    header += " нарастающий";
+            }
+
+            var subHeader = $"Построен {DateTime.Now.ToString("dd.MM.yyyy hh:mm")}";
+
+            sheet.Cells[1, 1].Value = header;
+            sheet.Cells[2, 1].Value = subHeader;
+
+            var rowsOffset = 3;
 
             //вставляет в excel заголовки столбцов
             for (int i = 0; i < ColumnItems.Count; i++)
             {
                 if ((i > 0 && ColumnItems[i - 1].Group != ColumnItems[i].Group) || i == 0)
                 {
-                    sheet.Cells[1, i + 3, 1, i + 3 + ColumnItems[i].Group.HeaderItems.Count - 1].Merge = true;
+                    sheet.Cells[1 + rowsOffset, i + 3, 1 + rowsOffset, i + 3 + ColumnItems[i].Group.HeaderItems.Count - 1].Merge = true;
 
-                    sheet.Cells[1, i + 3].Value = ColumnItems[i].Group.Name;
+                    sheet.Cells[1 + rowsOffset, i + 3].Value = ColumnItems[i].Group.Name;
                     var drawingColor = Helpers.GetDrawingColor(ColumnItems[i].Group.Color);
-                    sheet.Cells[1, i + 3].Style.Fill.SetBackground(drawingColor);
+                    sheet.Cells[1 + rowsOffset, i + 3].Style.Fill.SetBackground(drawingColor);
                 }
 
-                sheet.Cells[2, i + 3].Value = ColumnItems[i].Name;
+                sheet.Cells[2 + rowsOffset, i + 3].Value = ColumnItems[i].Name;
 
                 var drawingColor2 = Helpers.GetDrawingColor(ColumnItems[i].Group.Color);
-                sheet.Cells[2, i + 3].Style.Fill.SetBackground(drawingColor2);
+                sheet.Cells[2 + rowsOffset, i + 3].Style.Fill.SetBackground(drawingColor2);
             }
 
             //вставляет в excel заголовки строк
@@ -363,49 +397,63 @@ namespace CHI.Services.Report
             {
                 if ((i > 0 && RowItems[i - 1].Group != RowItems[i].Group) || i == 0)
                 {
-                    sheet.Cells[i + 3, 1, i + 3 + RowItems[i].Group.HeaderItems.Count - 1, 1].Merge = true;
+                    sheet.Cells[i + 3 + rowsOffset, 1, i + 3 + rowsOffset + RowItems[i].Group.HeaderItems.Count - 1, 1].Merge = true;
 
-                    sheet.Cells[i + 3, 1].Style.WrapText = true;
-                    sheet.Cells[i + 3, 1].Value = $"{RowItems[i].Group.Name}{Environment.NewLine}{RowItems[i].Group.SubName}";
+                    sheet.Cells[i + 3 + rowsOffset, 1].Style.WrapText = true;
+                    sheet.Cells[i + 3 + rowsOffset, 1].Value = $"{RowItems[i].Group.Name}{Environment.NewLine}{RowItems[i].Group.SubName}";
                     var drawingColor = Helpers.GetDrawingColor(RowItems[i].Group.Color);
-                    sheet.Cells[i + 3, 1].Style.Fill.SetBackground(drawingColor);
+                    sheet.Cells[i + 3 + rowsOffset, 1].Style.Fill.SetBackground(drawingColor);
                 }
 
-                sheet.Cells[i + 3, 2].Value = RowItems[i].Name;
+                sheet.Cells[i + 3 + rowsOffset, 2].Value = RowItems[i].Name;
 
                 System.Drawing.Color drawingColor2 = new System.Drawing.Color();
                 drawingColor2 = Helpers.GetDrawingColor(RowItems[i].Group.Color);
-                sheet.Cells[i + 3, 2].Style.Fill.SetBackground(drawingColor2);
+                sheet.Cells[i + 3 + rowsOffset, 2].Style.Fill.SetBackground(drawingColor2);
             }
 
             //вставляет в excel значения отчета
             foreach (var rowValues in Values)
                 foreach (var valueItem in rowValues)
                 {
-                    sheet.Cells[valueItem.RowIndex + 3, valueItem.ColumnIndex + 3].Value = valueItem.Value;
+                    sheet.Cells[valueItem.RowIndex + 3 + rowsOffset, valueItem.ColumnIndex + 3].Value = valueItem.Value;
 
                     var drawingColor = Helpers.GetDrawingColor(valueItem.Color);
-                    sheet.Cells[valueItem.RowIndex + 3, valueItem.ColumnIndex + 3].Style.Fill.SetBackground(drawingColor);
+                    sheet.Cells[valueItem.RowIndex + 3 + rowsOffset, valueItem.ColumnIndex + 3].Style.Fill.SetBackground(drawingColor);
                 }
 
 
             //форматирование
-            sheet.Cells.Style.VerticalAlignment = ExcelVerticalAlignment.Top;
-            sheet.Row(1).Style.Font.Bold = true;
-            sheet.Row(2).Style.Font.Bold = true;
-            sheet.Column(1).Style.Font.Bold = true;
-            sheet.Column(2).Style.Font.Bold = true;
-            sheet.Cells[1, 1, 2, 2].Merge = true;
+            sheet.PrinterSettings.Orientation = eOrientation.Landscape;
+            sheet.PrinterSettings.PaperSize = ePaperSize.A4;
+            sheet.PrinterSettings.LeftMargin = 0.2m;
+            sheet.PrinterSettings.RightMargin = 0.2m;
+            sheet.PrinterSettings.TopMargin = 0.2m;
+            sheet.PrinterSettings.BottomMargin = 0.2m;
+            sheet.PrinterSettings.HeaderMargin = 0;
+            sheet.PrinterSettings.FooterMargin = 0;
+            sheet.PrinterSettings.Scale = 60;
             sheet.DefaultColWidth = 9;
             sheet.Column(1).Width = 20;
-            sheet.Column(2).Width = 9;
+            if (IsPlannigMode)
+                Enumerable.Range(rowsOffset + 3, sheet.Dimension.Rows).ToList().ForEach(x => sheet.Row(x).Height = 30);
+            Enumerable.Range(1, rowsOffset).ToList().ForEach(x => sheet.Cells[x, 1, x, sheet.Dimension.Columns].Merge = true);
+            sheet.Cells[1 + rowsOffset, 1, 2 + rowsOffset, 2].Merge = true;
+            sheet.Cells.Style.VerticalAlignment = ExcelVerticalAlignment.Top;
+            sheet.Cells.Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+            sheet.Column(1).Style.Font.Bold = true;
+            sheet.Column(2).Style.Font.Bold = true;
+            sheet.Row(1).Style.Font.Bold = true;
+            sheet.Row(2).Style.Font.Bold = false;
+            sheet.Row(1 + rowsOffset).Style.Font.Bold = true;
+            sheet.Row(2 + rowsOffset).Style.Font.Bold = true;
 
-            var range = sheet.Cells[1, 1, sheet.Dimension.Rows, sheet.Dimension.Columns];
+            var range = sheet.Cells[1 + rowsOffset, 1, sheet.Dimension.Rows, sheet.Dimension.Columns];
 
             range.Style.Border.Left.Style = ExcelBorderStyle.Hair;
             range.Style.Border.Top.Style = ExcelBorderStyle.Hair;
             range.Style.Border.Right.Style = ExcelBorderStyle.Hair;
-            range.Style.Border.Bottom.Style = ExcelBorderStyle.Hair;
+            range.Style.Border.Bottom.Style = ExcelBorderStyle.Hair;           
 
             sheet.OutLineSummaryRight = false;
             sheet.OutLineSummaryBelow = false;
@@ -416,11 +464,11 @@ namespace CHI.Services.Report
 
             foreach (var rowItems in RowItems.Where(x => x.Group.Level > 0))
                 for (int i = 1; i <= rowItems.Group.Level; i++)
-                    sheet.Row(rowItems.Index + 3).OutlineLevel = i;
+                    sheet.Row(rowItems.Index + 3 + rowsOffset).OutlineLevel = i;
 
-            sheet.View.FreezePanes(3, 3);
+            sheet.View.FreezePanes(3 + rowsOffset, 3);
 
-            excel.SaveAs(new FileInfo(path));
+            excel.Save();
         }
     }
 }

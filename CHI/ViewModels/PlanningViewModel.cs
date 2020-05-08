@@ -79,12 +79,16 @@ namespace CHI.ViewModels
 
         private void BuildReport()
         {
+            mainRegionService.ShowProgressBar("Построение плана");
+
             if (!dbContext.Plans.Local.Where(x => x.Year == Year && x.Month == Month).Any())
                 dbContext.Plans.Where(x => x.Year == Year && x.Month == Month).Load();
 
             var plans = dbContext.Plans.Local.Where(x => x.Year == Year && x.Month == Month).ToList();
 
-            Report.Build(null, plans, Month, Month, Year);
+            Report.Build(null, plans, Month, Year);
+
+            mainRegionService.HideProgressBar("План построен");
         }
 
         private void SaveExcelExecute()
@@ -92,17 +96,22 @@ namespace CHI.ViewModels
             mainRegionService.ShowProgressBar("Выбор пути");
 
             fileDialogService.DialogType = FileDialogType.Save;
-            fileDialogService.FileName = "Отчет по выполнению объемов";
+            fileDialogService.FileName = "Планирование объемов";
             fileDialogService.Filter = "Excel files (*.xslx)|*.xlsx";
 
             if (fileDialogService.ShowDialog() != true)
+            {
+                mainRegionService.HideProgressBar("Отменено");
                 return;
+            }
 
             var filePath = fileDialogService.FileName;
 
+            var sheetName = Months[Month].Substring(0, 3);
+
             mainRegionService.ShowProgressBar("Сохранение файла");
 
-            Report.SaveExcel(filePath);
+            Report.SaveExcel(filePath, sheetName);
 
             mainRegionService.HideProgressBar($"Файл сохранен: {filePath}");
         }
