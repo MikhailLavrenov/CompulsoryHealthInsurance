@@ -1,4 +1,6 @@
-﻿using Prism.Mvvm;
+﻿using CHI.Models.ServiceAccounting;
+using Prism.Mvvm;
+using System.Linq;
 using System.Windows.Media;
 
 namespace CHI.Services.Report
@@ -26,7 +28,11 @@ namespace CHI.Services.Report
             RowHeader = rowHeader;
             ColumnHeader = columnHeader;
             Color = rowHeader.Group.Color;
-            IsWritable = !isReadOnly && columnHeader.Group.Component.IsCanPlanning;
+
+            IsWritable = !isReadOnly && columnHeader.Group.Component.IsCanPlanning 
+                && (RowHeader.Parameter.Kind == ParameterKind.EmployeePlan || RowHeader.Parameter.Kind == ParameterKind.DepartmentHandPlan)
+                && !(RowHeader.Group.Department?.Childs.Any()??false);
+
             ColumnHeader.Group.IsVisibleChangedEvent += OnHeaderGroupVisibleChanged;
             RowHeader.Group.IsVisibleChangedEvent += OnHeaderGroupVisibleChanged;
         }

@@ -116,8 +116,6 @@ namespace CHI.ViewModels
         {
             dbContext = new ServiceAccountingDBContext();
 
-            dbContext.ChangeTracker.AutoDetectChangesEnabled = false;
-
             dbContext.Departments.Load();
 
             var rootDepartment = dbContext.Departments.Local.First(x => x.IsRoot);
@@ -137,8 +135,6 @@ namespace CHI.ViewModels
             var rootComponent = dbContext.Components.Local.First(x => x.IsRoot);
 
             Report = new ReportService(rootDepartment, rootComponent, false);
-
-            dbContext.ChangeTracker.AutoDetectChangesEnabled = true;
         }
 
         public bool IsNavigationTarget(NavigationContext navigationContext)

@@ -179,7 +179,7 @@ namespace CHI.ViewModels
             rootDepartment.Childs = user.PlanningPermisions.Select(x => x.Department).ToList();
             rootDepartment.Childs.ForEach(x => x.Parent = rootDepartment);
 
-            dbContext.Parameters.Where(x => x.Kind == ParameterKind.EmployeePlan || x.Kind == ParameterKind.DepartmentHandPlan).Load();
+            dbContext.Parameters.Where(x => x.Kind == ParameterKind.EmployeePlan || x.Kind == ParameterKind.DepartmentHandPlan|| x.Kind == ParameterKind.DepartmentCalculatedPlan).Load();
 
 
             dbContext.Employees

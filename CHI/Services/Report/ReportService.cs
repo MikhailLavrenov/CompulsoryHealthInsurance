@@ -177,33 +177,26 @@ namespace CHI.Services.Report
         //суммирует строки
         private void SumRows()
         {
-            foreach (var row in RowItems
-                .Where(x => x.Parameter.Kind == ParameterKind.DepartmentCalculatedPlan || x.Parameter.Kind == ParameterKind.DepartmentFact || x.Parameter.Kind == ParameterKind.DepartmentRejectedFact)
-                .OrderByDescending(x => x.Priority))
+            foreach (var row in RowItems.OrderByDescending(x => x.Priority))
+            {
+                ParameterKind eqEmployeeKind;
+
+                eqEmployeeKind = row.Parameter.Kind switch
+                {
+                    ParameterKind.DepartmentCalculatedPlan => ParameterKind.EmployeePlan,
+                    ParameterKind.DepartmentHandPlan when row.Group.Department.Childs.Any() => ParameterKind.DepartmentHandPlan,
+                    ParameterKind.DepartmentFact => ParameterKind.EmployeeFact,
+                    ParameterKind.DepartmentRejectedFact => ParameterKind.EmployeeRejectedFact,
+                    _ => ParameterKind.None,
+                };
+
+                if (eqEmployeeKind == ParameterKind.None)
+                    continue;
+
                 foreach (var column in ColumnItems.Where(x => x.Group.Component.CaseFilters.First().Kind != CaseFilterKind.Total))
                 {
                     var valueItem = Values[row.Index][column.Index];
-
-                    ParameterKind eqEmployeeKind;
-
-                    switch (row.Parameter.Kind)
-                    {
-                        case ParameterKind.DepartmentCalculatedPlan:
-                            eqEmployeeKind = ParameterKind.EmployeePlan;
-                            break;
-
-                        case ParameterKind.DepartmentFact:
-                            eqEmployeeKind = ParameterKind.EmployeeFact;
-                            break;
-
-                        case ParameterKind.DepartmentRejectedFact:
-                            eqEmployeeKind = ParameterKind.EmployeeRejectedFact;
-                            break;
-
-                        default:
-                            eqEmployeeKind = ParameterKind.None;
-                            break;
-                    }
+                    valueItem.Value = 0;
 
                     row.Group.Childs
                         .SelectMany(x => x.HeaderItems)
@@ -211,6 +204,7 @@ namespace CHI.Services.Report
                         .ToList()
                         .ForEach(x => valueItem.Value += Values[x.Index][column.Index].Value ?? 0);
                 }
+            }
         }
 
         //суммирует столбцы
@@ -453,7 +447,7 @@ namespace CHI.Services.Report
             range.Style.Border.Left.Style = ExcelBorderStyle.Hair;
             range.Style.Border.Top.Style = ExcelBorderStyle.Hair;
             range.Style.Border.Right.Style = ExcelBorderStyle.Hair;
-            range.Style.Border.Bottom.Style = ExcelBorderStyle.Hair;           
+            range.Style.Border.Bottom.Style = ExcelBorderStyle.Hair;
 
             sheet.OutLineSummaryRight = false;
             sheet.OutLineSummaryBelow = false;
