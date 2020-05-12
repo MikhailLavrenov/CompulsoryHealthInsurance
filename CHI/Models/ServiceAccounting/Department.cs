@@ -24,11 +24,12 @@ namespace CHI.Models.ServiceAccounting
         {
             Parameters = new List<Parameter>();
             Employees = new List<Employee>();
-            Parameters = new List<Parameter>();
             PlanningPermisions = new List<PlanningPermision>();
+            Childs = new List<Department>();
         }
 
         public Department(string name)
+            :this()
         {
             Name = name;
         }
