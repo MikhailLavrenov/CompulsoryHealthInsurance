@@ -28,7 +28,7 @@
                     <materialDesign:PackIcon Kind="Reload" />
                 </Viewbox>
             </Button>
-            
+
             <Button Style="{StaticResource IconButton}"
                     Command="{Binding MoveUpCommand}"
                     Cursor="Hand">
@@ -64,15 +64,20 @@
                                                        ItemsSource="{Binding DataContext.Departments, Source={x:Reference proxyElement}}"
                                                        DisplayMemberPath="Name"
                                                        MinWidth="200" />
-                
+
                 <DataGridTextColumn Header="Мед. работник"
-                                    Binding="{Binding Medic.FullName}" IsReadOnly="True"
+                                    Binding="{Binding Medic.FullName}"
+                                    IsReadOnly="True"
                                     MinWidth="150" />
 
                 <DataGridTextColumn Header="Специальность"
                                     Binding="{Binding Specialty.Name}"
                                     IsReadOnly="True"
                                     MinWidth="150" />
+
+                <DataGridCheckBoxColumn Header="Архивный"
+                                        Binding="{Binding IsArchive}"
+                                        MinWidth="80" />
 
             </DataGrid.Columns>
 

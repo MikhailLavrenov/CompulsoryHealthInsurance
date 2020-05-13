@@ -28,23 +28,21 @@ namespace CHI.Services.Report
             get => isVisible;
             set
             {
-                if (isVisible != value)
-                {
-                    SetProperty(ref isVisible, value);
+                if (isVisible == value)
+                    return;
 
-                    if (!isVisible && IsCollapsed == false)
-                        SwitchCollapseExecute();
+                SetProperty(ref isVisible, value);
 
-                    IsVisibleChangedEvent(this, new EventArgs());
-                }
+                if (!isVisible && IsCollapsed == false)
+                    SwitchCollapseExecute();
+
+                IsVisibleChangedEvent(this, new EventArgs());
             }
         }
-
         public Department Department { get; set; }
         public Employee Employee { get; set; }
         public List<RowHeaderItem> HeaderItems { get; set; }
         public List<Case> FactCases { get; set; }
-
         public RowHeaderGroup Parent { get; set; }
         public List<RowHeaderGroup> Childs { get; set; }
 
@@ -97,8 +95,7 @@ namespace CHI.Services.Report
             SwitchCollapseCommand = new DelegateCommand(SwitchCollapseExecute, () => CanCollapse);
         }
 
-
-
+        
         public static RowHeaderGroup CreateHeadersRecursive(RowHeaderGroup parent, Department department)
         {
             var header = new RowHeaderGroup(department, parent);

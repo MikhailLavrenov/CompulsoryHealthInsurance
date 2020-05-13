@@ -17,6 +17,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Migrations\20200513090609_MyFirstMigration.cs" />
+    <Compile Remove="Migrations\20200513090609_MyFirstMigration.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="licensing.pkey" />
   </ItemGroup>
 
@@ -25,12 +30,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="EPPlus" Version="5.1.0" />
-    <PackageReference Include="MaterialDesignColors" Version="1.2.3" />
-    <PackageReference Include="MaterialDesignThemes" Version="3.1.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.3" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="3.1.3" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Core" Version="3.1.3" />
+    <PackageReference Include="EPPlus" Version="5.1.1" />
+    <PackageReference Include="MaterialDesignColors" Version="1.2.4" />
+    <PackageReference Include="MaterialDesignThemes" Version="3.1.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.4" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="3.1.4" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Core" Version="3.1.4" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.4">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.19" />
     <PackageReference Include="NDbfReader" Version="2.3.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />

@@ -7,6 +7,8 @@
         public int Id { get; set; }
         public string FomsId { get => fomsId; set => fomsId = value?.ToUpper(); }
         public string FullName { get; set; }
+        public bool IsArchive { get; set; }
+
 
         public static Medic CreateUnknown(string fomsId)
         {
