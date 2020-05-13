@@ -55,15 +55,10 @@ namespace CHI.Services.Report
 
                 if (canVisible != IsVisible)
                 {
-                    if (canVisible)
-                    {
-
-                    }
-                    else
+                    if (canVisible && Parent.IsCollapsed == false)
+                        IsVisible = true;
+                    else if (!canVisible)
                         IsVisible = false;
-
-                
-                
                 }
             }
         }
