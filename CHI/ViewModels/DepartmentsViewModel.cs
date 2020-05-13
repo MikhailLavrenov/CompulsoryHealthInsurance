@@ -40,9 +40,16 @@ namespace CHI.ViewModels
             mainRegionService.Header = "Подразделения";
 
             dbContext = new ServiceAccountingDBContext();
-            dbContext.Departments.Include(x=>x.Employees).Load();
+            dbContext.Departments.Include(x => x.Employees).Load();
 
-            root = dbContext.Departments.Local.Where(x => x.IsRoot).First();
+            root = dbContext.Departments.Local.Where(x => x.IsRoot).FirstOrDefault();
+
+            if (root == null)
+            {
+                root = new Department { IsRoot = true };
+                dbContext.Add(root);
+                dbContext.SaveChanges();
+            }
 
             RefreshDepartments();
 
@@ -67,7 +74,7 @@ namespace CHI.ViewModels
             if (CurrentDepartment == null)
                 return false;
 
-            return CurrentDepartment.IsRoot || !(CurrentDepartment.Employees?.Any()??false);
+            return CurrentDepartment.IsRoot || !(CurrentDepartment.Employees?.Any() ?? false);
         }
 
         private void AddExecute()
@@ -82,15 +89,15 @@ namespace CHI.ViewModels
             {
                 Parent = CurrentDepartment,
                 Name = "Новый компонент",
-                Order = nextOrder,                            
-                Parameters = new List<Parameter> 
+                Order = nextOrder,
+                Parameters = new List<Parameter>
                 {
                     new Parameter (0,ParameterKind.DepartmentCalculatedPlan),
                     new Parameter (1,ParameterKind.DepartmentHandPlan),
                     new Parameter (2,ParameterKind.DepartmentFact),
                     new Parameter (3,ParameterKind.DepartmentRejectedFact),
-                    new Parameter (4,ParameterKind.DepartmentPercent),            
-                }        
+                    new Parameter (4,ParameterKind.DepartmentPercent),
+                }
             };
 
             Departments.Insert(insertIndex, newDepartment);
