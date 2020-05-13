@@ -5,6 +5,8 @@
         public int Id { get; set; }
         public int FomsId { get; set; }
         public string Name { get; set; }
+        public bool IsArchive { get; set; }
+
 
         public static Specialty CreateUnknown(int fomsId)
         {

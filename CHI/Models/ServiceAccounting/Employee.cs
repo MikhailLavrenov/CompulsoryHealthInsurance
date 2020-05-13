@@ -11,8 +11,10 @@ namespace CHI.Models.ServiceAccounting
         public Medic Medic { get; set; }
         public Specialty Specialty { get; set; }
         public Department Department { get => department; set => SetProperty(ref department, value); }
+        public bool IsArchive { get; set; }
         public int Order { get; set; }
         public List<Parameter> Parameters { get; set; }
+
 
         public Employee()
         {

@@ -53,6 +53,10 @@
                                     Binding="{Binding Name}"
                                     MinWidth="300" />
 
+                <DataGridCheckBoxColumn Header="Архивный"
+                                        Binding="{Binding IsArchive}"
+                                        MinWidth="80" />
+
             </DataGrid.Columns>
 
         </i:CustomDataGrid>

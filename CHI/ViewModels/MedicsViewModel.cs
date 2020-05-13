@@ -129,6 +129,8 @@ namespace CHI.ViewModels
 
         public void OnNavigatedFrom(NavigationContext navigationContext)
         {
+            dbContext.Employees.AsEnumerable().Where(x => x.Medic.IsArchive && !x.IsArchive).ToList().ForEach(x => x.IsArchive = true);
+
             dbContext.SaveChanges();
         }
     }

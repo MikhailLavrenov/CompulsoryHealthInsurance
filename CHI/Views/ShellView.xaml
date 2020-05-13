@@ -233,13 +233,10 @@
                 <materialDesign:SnackbarMessage ActionCommand="{Binding MainRegionService.CloseStatusCommand}">
 
                     <materialDesign:SnackbarMessage.ActionContent>
-                        <Viewbox  Stretch="UniformToFill"
-                                  Height="25"
-                                  Margin="0"
-                                  HorizontalAlignment="Center">
-                            <materialDesign:PackIcon Kind="ChevronDown"
-                                                     Foreground="White" />
-                        </Viewbox>
+                        <materialDesign:PackIcon Width="25"
+                                                 Height="25"
+                                                 Kind="ChevronDown"
+                                                 Foreground="White" />
                     </materialDesign:SnackbarMessage.ActionContent>
 
                     <materialDesign:SnackbarMessage.Content>
