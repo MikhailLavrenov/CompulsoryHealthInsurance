@@ -42,7 +42,14 @@ namespace CHI.ViewModels
             dbContext = new ServiceAccountingDBContext();
             dbContext.Components.Load();
 
-            root = dbContext.Components.Local.Where(x => x.IsRoot).First();
+            root = dbContext.Components.Local.Where(x => x.IsRoot).FirstOrDefault();
+
+            if (root==null)
+            {
+                root = new Component { IsRoot = true };
+                dbContext.Add(root);
+                dbContext.SaveChanges();
+            }
 
             Refresh();
 

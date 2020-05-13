@@ -13,6 +13,7 @@ namespace CHI.Services.Report
     {
         bool? isCollapsed;
         bool isVisible = true;
+        bool canVisible = true;
 
         public string Name { get; set; }
         public string SubName { get; set; }
@@ -28,6 +29,9 @@ namespace CHI.Services.Report
             get => isVisible;
             set
             {
+                if (!CanVisible && value)
+                    value = false;
+
                 if (isVisible == value)
                     return;
 
@@ -37,6 +41,30 @@ namespace CHI.Services.Report
                     SwitchCollapseExecute();
 
                 IsVisibleChangedEvent(this, new EventArgs());
+            }
+        }
+        public bool CanVisible
+        {
+            get => canVisible;
+            set
+            {
+                if (canVisible == value)
+                    return;
+
+                canVisible = value;
+
+                if (canVisible != IsVisible)
+                {
+                    if (canVisible)
+                    {
+
+                    }
+                    else
+                        IsVisible = false;
+
+                
+                
+                }
             }
         }
         public Department Department { get; set; }
@@ -95,7 +123,7 @@ namespace CHI.Services.Report
             SwitchCollapseCommand = new DelegateCommand(SwitchCollapseExecute, () => CanCollapse);
         }
 
-        
+
         public static RowHeaderGroup CreateHeadersRecursive(RowHeaderGroup parent, Department department)
         {
             var header = new RowHeaderGroup(department, parent);
