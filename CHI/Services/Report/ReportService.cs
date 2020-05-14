@@ -22,15 +22,16 @@ namespace CHI.Services.Report
         public List<ColumnHeaderItem> ColumnItems { get; private set; }
         public ValueItem[][] Values { get; private set; }
         public List<ValueItem> ValuesList { get; set; }
-        public bool IsPlannigMode { get; private set; }
+        public bool IsPlanningMode { get; private set; }
         public int Month { get; private set; }
         public int Year { get; private set; }
         public bool IsGrowing { get; private set; }
+        public string ApprovedBy { get; set; }
 
 
         public ReportService(Department rootDepartment, Component rootComponent, bool isPlanningMode = false)
         {
-            IsPlannigMode = isPlanningMode;
+            IsPlanningMode = isPlanningMode;
 
             rootComponent.OrderChildsRecursive();
             var components = rootComponent.ToListRecursive()
@@ -91,9 +92,9 @@ namespace CHI.Services.Report
 
                 for (int col = 0; col < ColumnItems.Count; col++)
                 {
-                    Values[row][col] = new ValueItem(row, col, RowItems[row], ColumnItems[col], !IsPlannigMode);
+                    Values[row][col] = new ValueItem(row, col, RowItems[row], ColumnItems[col], !IsPlanningMode);
 
-                    if (!IsPlannigMode)
+                    if (!IsPlanningMode)
                         Values[row][col].IsWritable = false;
                 }
             }
@@ -121,7 +122,7 @@ namespace CHI.Services.Report
                     valueItem.Value = plans.Where(x => x.Parameter.Id == row.Parameter.Id && x.Indicator.Id == column.Indicator.Id).Sum(x => x.Value);
                 }
 
-            if (!IsPlannigMode && registers != null)
+            if (!IsPlanningMode && registers != null)
                 for (var currentMonth = isGrowing ? 1 : month; currentMonth <= month; currentMonth++)
                 {
                     var cases = registers.FirstOrDefault(x => x.Month == currentMonth)?.Cases;
@@ -162,7 +163,23 @@ namespace CHI.Services.Report
                         Values[row.Index][column.Index].Value = dividend / divider;
                 }
 
-            RoundValues();
+            DropZeroAndRoundValues();
+
+            //скрывает пустые строки
+            foreach (var rowGroup in RowGroups)
+            {
+                bool canVisible = IsPlanningMode ? !(rowGroup.Employee?.IsArchive ?? false) : false;
+
+                if (!IsPlanningMode || !canVisible)
+                    foreach (var headerItem in rowGroup.HeaderItems)
+                        if (Values[headerItem.Index].Any(x => x.Value.HasValue))
+                        {
+                            canVisible = true;
+                            break;
+                        }
+
+                rowGroup.CanVisible = canVisible;
+            }
         }
 
         public void UpdateCalculatedCells()
@@ -171,7 +188,7 @@ namespace CHI.Services.Report
 
             SumColumns();
 
-            RoundValues();
+            DropZeroAndRoundValues();
         }
 
         //суммирует строки
@@ -225,7 +242,7 @@ namespace CHI.Services.Report
         }
 
         //округляет значения и убирает нули
-        private void RoundValues()
+        private void DropZeroAndRoundValues()
         {
             foreach (var row in RowItems)
                 foreach (var column in ColumnItems)
@@ -351,7 +368,7 @@ namespace CHI.Services.Report
             if (deleteSheet != null)
                 excel.Workbook.Worksheets.Delete(deleteSheet);
 
-            var header = IsPlannigMode ? "Планирование объемов" : "Отчет по выполнению объемов";
+            var header = IsPlanningMode ? "Планирование объемов" : "Отчет по выполнению объемов";
 
             if (Month != 0)
             {
@@ -363,10 +380,20 @@ namespace CHI.Services.Report
 
             var subHeader = $"Построен {DateTime.Now.ToString("dd.MM.yyyy hh:mm")}";
 
-            sheet.Cells[1, 1].Value = header;
-            sheet.Cells[2, 1].Value = subHeader;
+            var exRowIndex = 1;
 
-            var rowsOffset = 3;
+            if (IsPlanningMode)
+            {
+                sheet.Cells[exRowIndex, 1].Value = ApprovedBy;
+                sheet.Cells[exRowIndex, 1].Style.WrapText = true;
+
+                exRowIndex += 2;
+            }
+
+            sheet.Cells[exRowIndex++, 1].Value = header;
+            sheet.Cells[exRowIndex++, 1].Value = subHeader;
+
+            var rowsOffset = IsPlanningMode ? 5 : 3;
 
             //вставляет в excel заголовки столбцов
             for (int i = 0; i < ColumnItems.Count; i++)
@@ -394,7 +421,14 @@ namespace CHI.Services.Report
                     sheet.Cells[i + 3 + rowsOffset, 1, i + 3 + rowsOffset + RowItems[i].Group.HeaderItems.Count - 1, 1].Merge = true;
 
                     sheet.Cells[i + 3 + rowsOffset, 1].Style.WrapText = true;
-                    sheet.Cells[i + 3 + rowsOffset, 1].Value = $"{RowItems[i].Group.Name}{Environment.NewLine}{RowItems[i].Group.SubName}";
+
+                    sheet.Cells[i + 3 + rowsOffset, 1].Value = IsPlanningMode switch
+                    {
+                        false => $"{RowItems[i].Group.Name}{Environment.NewLine}{RowItems[i].Group.SubName}",
+                        true when !string.IsNullOrEmpty(RowItems[i].Group.SubName) => $"{RowItems[i].Group.Name}   ({RowItems[i].Group.SubName})",
+                        _ => RowItems[i].Group.Name
+                    };
+
                     var drawingColor = Helpers.GetDrawingColor(RowItems[i].Group.Color);
                     sheet.Cells[i + 3 + rowsOffset, 1].Style.Fill.SetBackground(drawingColor);
                 }
@@ -428,13 +462,17 @@ namespace CHI.Services.Report
             sheet.PrinterSettings.FooterMargin = 0;
             sheet.PrinterSettings.Scale = 60;
             sheet.DefaultColWidth = 9;
-            sheet.Column(1).Width = 20;
-            if (IsPlannigMode)
-                Enumerable.Range(rowsOffset + 3, sheet.Dimension.Rows).ToList().ForEach(x => sheet.Row(x).Height = 30);
+            sheet.Column(1).Width = IsPlanningMode ? 35 : 20;
+            if (IsPlanningMode)
+            {
+                sheet.Row(1).Height = 80;
+                //Enumerable.Range(rowsOffset + 3, sheet.Dimension.Rows).ToList().ForEach(x => sheet.Row(x).Height = 30);
+            }
             Enumerable.Range(1, rowsOffset).ToList().ForEach(x => sheet.Cells[x, 1, x, sheet.Dimension.Columns].Merge = true);
             sheet.Cells[1 + rowsOffset, 1, 2 + rowsOffset, 2].Merge = true;
             sheet.Cells.Style.VerticalAlignment = ExcelVerticalAlignment.Top;
             sheet.Cells.Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+            sheet.Row(1).Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
             sheet.Column(1).Style.Font.Bold = true;
             sheet.Column(2).Style.Font.Bold = true;
             sheet.Row(1).Style.Font.Bold = true;

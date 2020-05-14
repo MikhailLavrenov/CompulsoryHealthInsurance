@@ -214,6 +214,7 @@ namespace CHI.Models
         CredentialScope credentialsScope;
         string domainName;
         string domainUsersRootOU;
+        string approvedBy;
 
         public bool UseProxy
         {
@@ -247,6 +248,7 @@ namespace CHI.Models
         public CredentialScope CredentialsScope { get => credentialsScope; set => SetProperty(ref credentialsScope, value); }
         public string DomainName { get => domainName; set => SetProperty(ref domainName, value); }
         public string DomainUsersRootOU { get => domainUsersRootOU; set => SetProperty(ref domainUsersRootOU, value); }
+        public string  ApprovedBy { get => approvedBy; set => SetProperty(ref approvedBy, value); }
 
         //проверяет настройки прокси-сервера, true-соединение установлено или прокси-сервер не используется, false-иначе
         public void TestConnectionProxy()

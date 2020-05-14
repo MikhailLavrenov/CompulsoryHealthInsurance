@@ -21,29 +21,29 @@ namespace CHI.Models.ServiceAccounting
         public DbSet<User> Users { get; set; }
 
 
-        //public ServiceAccountingDBContext()
-        //{
-        //    //Database.EnsureDeleted();
+        public ServiceAccountingDBContext()
+        {
+            //Database.EnsureDeleted();
 
-        //    if (Database.EnsureCreated())
-        //    {
-        //        var rootComponent = new Component()
-        //        {
-        //            IsRoot = true,
-        //        };
+            if (Database.EnsureCreated())
+            {
+                var rootComponent = new Component()
+                {
+                    IsRoot = true,
+                };
 
-        //        Add(rootComponent);
+                Add(rootComponent);
 
-        //        var rootDepartment = new Department()
-        //        {
-        //            IsRoot = true,
-        //        };
+                var rootDepartment = new Department()
+                {
+                    IsRoot = true,
+                };
 
-        //        Add(rootDepartment);
+                Add(rootDepartment);
 
-        //        SaveChanges();
-        //    }
-        //}
+                SaveChanges();
+            }
+        }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
