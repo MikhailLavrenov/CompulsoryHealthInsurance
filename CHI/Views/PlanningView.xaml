@@ -316,12 +316,12 @@
                                             </Viewbox>
                                         </Button>
                                         
-                                        <TextBlock Style="{StaticResource HeaderCell}"
+                                        <TextBlock Style="{StaticResource HeaderCell}" 
                                                    Text="{Binding Name}" />
 
                                         <TextBlock Style="{StaticResource HeaderCell}"
                                                    FontWeight="Light"
-                                                   Margin="10,0,0,0"
+                                                   Margin="15,0,0,0"
                                                    Text="{Binding SubName}" />
                                     </StackPanel>
                                 </Border>

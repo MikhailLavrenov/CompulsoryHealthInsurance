@@ -40,7 +40,7 @@ namespace CHI.Services.Report
                 if (!isVisible && IsCollapsed == false)
                     SwitchCollapseExecute();
 
-                IsVisibleChangedEvent(this, new EventArgs());
+                IsVisibleChangedEvent?.Invoke(this, new EventArgs());
             }
         }
         public bool CanVisible

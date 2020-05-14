@@ -1,4 +1,5 @@
 ﻿using CHI.Infrastructure;
+using CHI.Models;
 using CHI.Models.ServiceAccounting;
 using CHI.Services.Report;
 using Microsoft.EntityFrameworkCore;
@@ -196,6 +197,8 @@ namespace CHI.ViewModels
             var rootComponent = dbContext.Components.Local.First(x => x.IsRoot);
 
             Report = new ReportService(rootDepartment, rootComponent, true);
+
+            Report.ApprovedBy = Settings.Instance.ApprovedBy;
 
             BuildReport();
         }
