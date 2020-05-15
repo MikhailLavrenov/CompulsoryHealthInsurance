@@ -180,6 +180,18 @@ namespace CHI.Services.Report
 
                 rowGroup.CanVisible = canVisible;
             }
+
+            //обновляет чередующийся цвет, тк при сокрытии пустых строк чередование цвета может сбиться
+            foreach (var rowGroup in RowGroups.Where(x => x.Childs.FirstOrDefault()?.Employee != null))
+            {
+                var alter = true;
+
+                foreach (var item in rowGroup.Childs.Where(x=>x.CanVisible))
+                {
+                    item.Color = alter ? RowHeaderGroup.AlternationColor1 : RowHeaderGroup.AlternationColor2;
+                    alter = !alter;
+                }
+            }                       
         }
 
         public void UpdateCalculatedCells()
