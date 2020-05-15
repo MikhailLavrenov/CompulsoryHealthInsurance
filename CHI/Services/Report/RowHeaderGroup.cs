@@ -14,6 +14,7 @@ namespace CHI.Services.Report
         bool? isCollapsed;
         bool isVisible = true;
         bool canVisible = true;
+        Color color;
 
         public string Name { get; set; }
         public string SubName { get; set; }
@@ -21,7 +22,7 @@ namespace CHI.Services.Report
         public int Order { get; set; }
         public int Level { get; set; }
         public int Index { get; set; }
-        public Color Color { get; set; }
+        public Color Color { get => color; set => SetProperty(ref color, value, () => ColorChangedEvent?.Invoke(this, new EventArgs())); }
         public bool CanCollapse { get; private set; }
         public bool? IsCollapsed { get => isCollapsed; private set => SetProperty(ref isCollapsed, value); }
         public bool IsVisible
@@ -69,10 +70,13 @@ namespace CHI.Services.Report
         public RowHeaderGroup Parent { get; set; }
         public List<RowHeaderGroup> Childs { get; set; }
 
+        public static Color AlternationColor1 { get; } = Colors.WhiteSmoke;
+        public static Color AlternationColor2 { get; } = Colors.Transparent;
+
         public DelegateCommand SwitchCollapseCommand { get; }
 
         public event EventHandler IsVisibleChangedEvent;
-
+        public event EventHandler ColorChangedEvent;
 
         public RowHeaderGroup(Department department, RowHeaderGroup parent)
         {
@@ -104,7 +108,7 @@ namespace CHI.Services.Report
             IsRoot = false;
             Parent = parent;
             Level = parent.Level + 1;
-            Color = Parent.Childs.Count % 2 == 0 ? Colors.WhiteSmoke : Colors.Transparent;
+            Color = Parent.Childs.Count % 2 == 0 ? AlternationColor1 : AlternationColor2;
             CanCollapse = false;
             IsCollapsed = null;
             IsVisible = true;
