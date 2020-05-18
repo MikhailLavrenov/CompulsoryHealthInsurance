@@ -1,6 +1,7 @@
 ﻿using CHI.Infrastructure;
 using CHI.Models;
 using CHI.Models.ServiceAccounting;
+using Microsoft.EntityFrameworkCore;
 using Prism.Commands;
 using Prism.Regions;
 using Prism.Services.Dialogs;
@@ -18,6 +19,7 @@ namespace CHI.ViewModels
         public Settings Settings { get => settings; set => SetProperty(ref settings, value); }
         public DelegateCommandAsync TestCommand { get; }
         public DelegateCommand SetDefaultCommand { get; }
+        public DelegateCommandAsync MigrateDBCommand { get; }
 
 
         public OtherSettingsViewModel(IMainRegionService mainRegionService, IFileDialogService fileDialogService, IDialogService dialogService)
@@ -31,6 +33,7 @@ namespace CHI.ViewModels
 
             TestCommand = new DelegateCommandAsync(TestExecute);
             SetDefaultCommand = new DelegateCommand(SetDefaultExecute);
+            MigrateDBCommand = new DelegateCommandAsync(MigrateDBExecute);
         }
 
 
@@ -49,6 +52,14 @@ namespace CHI.ViewModels
         {
             Settings.SetDefaultOther();
             MainRegionService.HideProgressBar("Настройки установлены по умолчанию.");
+        }
+
+        private void MigrateDBExecute()
+        {
+            MainRegionService.ShowProgressBar("Обновление структуры базы данных.");
+            var dbContext = new ServiceAccountingDBContext();
+            dbContext.Database.Migrate();
+            MainRegionService.HideProgressBar("Обновление структуры базы данных успешно завершено.");
         }
     }
 }

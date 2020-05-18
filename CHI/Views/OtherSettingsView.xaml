@@ -35,6 +35,7 @@
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
 
         <TextBlock Grid.Row="0"
@@ -97,8 +98,16 @@
                  AcceptsReturn="True"
                  Text="{Binding Settings.ApprovedBy}" />
 
+        <TextBlock Grid.Row="6"
+                   Grid.Column="0"
+                   Text="Обновление БД учета услуг" />
+        <Button Grid.Row="6"
+                   Grid.Column="1" 
+                Content="Применить"
+                    Command="{Binding MigrateDBCommand}" />
+
         <StackPanel VerticalAlignment="Top"
-                    Grid.Row="6"
+                    Grid.Row="7"
                     Grid.Column="0"
                     Grid.ColumnSpan="2"
                     Margin="0,10,0,10"
