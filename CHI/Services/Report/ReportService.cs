@@ -186,12 +186,12 @@ namespace CHI.Services.Report
             {
                 var alter = true;
 
-                foreach (var item in rowGroup.Childs.Where(x=>x.CanVisible))
+                foreach (var item in rowGroup.Childs.Where(x => x.CanVisible))
                 {
                     item.Color = alter ? RowHeaderGroup.AlternationColor1 : RowHeaderGroup.AlternationColor2;
                     alter = !alter;
                 }
-            }                       
+            }
         }
 
         public void UpdateCalculatedCells()
@@ -408,33 +408,39 @@ namespace CHI.Services.Report
             var rowsOffset = IsPlanningMode ? 5 : 3;
 
             //вставляет в excel заголовки столбцов
+            var exCol = 3;
+
             for (int i = 0; i < ColumnItems.Count; i++)
             {
                 if ((i > 0 && ColumnItems[i - 1].Group != ColumnItems[i].Group) || i == 0)
                 {
-                    sheet.Cells[1 + rowsOffset, i + 3, 1 + rowsOffset, i + 3 + ColumnItems[i].Group.HeaderItems.Count - 1].Merge = true;
+                    sheet.Cells[1 + rowsOffset, exCol, 1 + rowsOffset, exCol + ColumnItems[i].Group.HeaderItems.Count - 1].Merge = true;
 
-                    sheet.Cells[1 + rowsOffset, i + 3].Value = ColumnItems[i].Group.Name;
+                    sheet.Cells[1 + rowsOffset, exCol].Value = ColumnItems[i].Group.Name;
                     var drawingColor = Helpers.GetDrawingColor(ColumnItems[i].Group.Color);
-                    sheet.Cells[1 + rowsOffset, i + 3].Style.Fill.SetBackground(drawingColor);
+                    sheet.Cells[1 + rowsOffset, exCol].Style.Fill.SetBackground(drawingColor);
                 }
 
-                sheet.Cells[2 + rowsOffset, i + 3].Value = ColumnItems[i].Name;
+                sheet.Cells[2 + rowsOffset, exCol].Value = ColumnItems[i].Name;
 
                 var drawingColor2 = Helpers.GetDrawingColor(ColumnItems[i].Group.Color);
-                sheet.Cells[2 + rowsOffset, i + 3].Style.Fill.SetBackground(drawingColor2);
+                sheet.Cells[2 + rowsOffset, exCol].Style.Fill.SetBackground(drawingColor2);
+
+                exCol++;
             }
 
             //вставляет в excel заголовки строк
+            var exRow = 3 + rowsOffset;
+
             for (int i = 0; i < RowItems.Count; i++)
             {
                 if ((i > 0 && RowItems[i - 1].Group != RowItems[i].Group) || i == 0)
                 {
-                    sheet.Cells[i + 3 + rowsOffset, 1, i + 3 + rowsOffset + RowItems[i].Group.HeaderItems.Count - 1, 1].Merge = true;
+                    sheet.Cells[exRow, 1, exRow + RowItems[i].Group.HeaderItems.Count - 1, 1].Merge = true;
 
-                    sheet.Cells[i + 3 + rowsOffset, 1].Style.WrapText = true;
+                    sheet.Cells[exRow, 1].Style.WrapText = true;
 
-                    sheet.Cells[i + 3 + rowsOffset, 1].Value = IsPlanningMode switch
+                    sheet.Cells[exRow, 1].Value = IsPlanningMode switch
                     {
                         false => $"{RowItems[i].Group.Name}{Environment.NewLine}{RowItems[i].Group.SubName}",
                         true when !string.IsNullOrEmpty(RowItems[i].Group.SubName) => $"{RowItems[i].Group.Name}   ({RowItems[i].Group.SubName})",
@@ -442,25 +448,32 @@ namespace CHI.Services.Report
                     };
 
                     var drawingColor = Helpers.GetDrawingColor(RowItems[i].Group.Color);
-                    sheet.Cells[i + 3 + rowsOffset, 1].Style.Fill.SetBackground(drawingColor);
+                    sheet.Cells[exRow, 1].Style.Fill.SetBackground(drawingColor);
                 }
 
-                sheet.Cells[i + 3 + rowsOffset, 2].Value = RowItems[i].Name;
+                sheet.Cells[exRow, 2].Value = RowItems[i].Name;
 
                 System.Drawing.Color drawingColor2 = new System.Drawing.Color();
                 drawingColor2 = Helpers.GetDrawingColor(RowItems[i].Group.Color);
-                sheet.Cells[i + 3 + rowsOffset, 2].Style.Fill.SetBackground(drawingColor2);
+                sheet.Cells[exRow, 2].Style.Fill.SetBackground(drawingColor2);
+
+                exRow++;
             }
 
             //вставляет в excel значения отчета
+            exRow = 3 + rowsOffset;
             foreach (var rowValues in Values)
+            {
                 foreach (var valueItem in rowValues)
                 {
-                    sheet.Cells[valueItem.RowIndex + 3 + rowsOffset, valueItem.ColumnIndex + 3].Value = valueItem.Value;
+                    sheet.Cells[exRow, valueItem.ColumnIndex + 3].Value = valueItem.Value;
 
                     var drawingColor = Helpers.GetDrawingColor(valueItem.Color);
-                    sheet.Cells[valueItem.RowIndex + 3 + rowsOffset, valueItem.ColumnIndex + 3].Style.Fill.SetBackground(drawingColor);
+                    sheet.Cells[exRow, valueItem.ColumnIndex + 3].Style.Fill.SetBackground(drawingColor);
                 }
+
+                exRow++;
+            }
 
 
             //форматирование
@@ -476,15 +489,13 @@ namespace CHI.Services.Report
             sheet.DefaultColWidth = 9;
             sheet.Column(1).Width = IsPlanningMode ? 35 : 20;
             if (IsPlanningMode)
-            {
                 sheet.Row(1).Height = 80;
-                //Enumerable.Range(rowsOffset + 3, sheet.Dimension.Rows).ToList().ForEach(x => sheet.Row(x).Height = 30);
-            }
             Enumerable.Range(1, rowsOffset).ToList().ForEach(x => sheet.Cells[x, 1, x, sheet.Dimension.Columns].Merge = true);
             sheet.Cells[1 + rowsOffset, 1, 2 + rowsOffset, 2].Merge = true;
             sheet.Cells.Style.VerticalAlignment = ExcelVerticalAlignment.Top;
             sheet.Cells.Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
-            sheet.Row(1).Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
+            if (IsPlanningMode)
+                sheet.Row(1).Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
             sheet.Column(1).Style.Font.Bold = true;
             sheet.Column(2).Style.Font.Bold = true;
             sheet.Row(1).Style.Font.Bold = true;
@@ -506,11 +517,21 @@ namespace CHI.Services.Report
                 for (int i = 1; i <= columnItem.Group.Level; i++)
                     sheet.Column(columnItem.Index + 3).OutlineLevel = i;
 
-            foreach (var rowItems in RowItems.Where(x => x.Group.Level > 0))
-                for (int i = 1; i <= rowItems.Group.Level; i++)
-                    sheet.Row(rowItems.Index + 3 + rowsOffset).OutlineLevel = i;
+            foreach (var rowItem in RowItems.Where(x => x.Group.Level > 0))
+                for (int i = 1; i <= rowItem.Group.Level; i++)
+                    sheet.Row(rowItem.Index + 3 + rowsOffset).OutlineLevel = i;
 
             sheet.View.FreezePanes(3 + rowsOffset, 3);
+
+            //удаляет скрытые строки
+            var deletedCount = 0;
+            foreach (var rowItem in RowItems.Where(x => !x.Group.CanVisible))
+            {
+                //sheet.Row().Style.Hidden = true;
+                sheet.DeleteRow(3 + rowsOffset + rowItem.Index - deletedCount);
+
+                deletedCount++;
+            }
 
             excel.Save();
         }

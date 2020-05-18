@@ -12,6 +12,13 @@ namespace CHI.Models.ServiceAccounting
         public string Sid { get; set; }
         public string Name { get; set; }
         public List<PlanningPermision> PlanningPermisions { get; set; }
+        public bool RegistersPermision { get; set; }
+        public bool ReferencesPerimision { get; set; }
+        public bool UsersPerimision { get; set; }
+        public bool SettingsPermision { get; set; }
+        public bool AttachedPatientsPermision { get; set; }
+        public bool MedicalExaminationsPermision { get; set; }
+
 
         public User()
         {
