@@ -58,8 +58,8 @@
                                     IsReadOnly="True"/>
 
 
-                <DataGridTemplateColumn Header="Ввод плана"
-                                            MinWidth="100">
+                <DataGridTemplateColumn Header="Ввод плана учета услуг"
+                                            MinWidth="120">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Button Style="{StaticResource DataGridRowButton}"
@@ -72,6 +72,30 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
+
+                <DataGridCheckBoxColumn Header="Реестры учета услуг"
+                                        Binding="{Binding RegistersPermision}"
+                                    MinWidth="120" />
+
+                <DataGridCheckBoxColumn Header="Справочники учета услуг"
+                                        Binding="{Binding ReferencesPerimision}"
+                                        MinWidth="120" />
+
+                <DataGridCheckBoxColumn Header="Прикрепленные пациенты"
+                                        Binding="{Binding AttachedPatientsPermision}"
+                                        MinWidth="120" />
+
+                <DataGridCheckBoxColumn Header="Портал диспансеризации"
+                                        Binding="{Binding MedicalExaminationsPermision}"
+                                        MinWidth="120" />
+
+                <DataGridCheckBoxColumn Header="Настройки"
+                                        Binding="{Binding SettingsPermision}"
+                                        MinWidth="120" />
+
+                <DataGridCheckBoxColumn Header="Пользователи"
+                                        Binding="{Binding UsersPerimision}"
+                                        MinWidth="120" />
 
             </DataGrid.Columns>
 
