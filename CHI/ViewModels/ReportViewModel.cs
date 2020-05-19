@@ -1,4 +1,5 @@
 ﻿using CHI.Infrastructure;
+using CHI.Models;
 using CHI.Models.ServiceAccounting;
 using CHI.Services.Report;
 using Microsoft.EntityFrameworkCore;
@@ -13,7 +14,7 @@ namespace CHI.ViewModels
 {
     class ReportViewModel : DomainObject, IRegionMemberLifetime, INavigationAware
     {
-        ServiceAccountingDBContext dbContext;
+        AppDBContext dbContext;
         int year = DateTime.Now.Year;
         int month = DateTime.Now.Month;
         bool isGrowing;
@@ -114,7 +115,7 @@ namespace CHI.ViewModels
 
         public void OnNavigatedTo(NavigationContext navigationContext)
         {
-            dbContext = new ServiceAccountingDBContext();
+            dbContext = new AppDBContext();
 
             dbContext.Departments.Load();
 

@@ -1,4 +1,5 @@
 ﻿using CHI.Infrastructure;
+using CHI.Models;
 using CHI.Models.ServiceAccounting;
 using Microsoft.EntityFrameworkCore;
 using Prism.Regions;
@@ -9,7 +10,7 @@ namespace CHI.ViewModels
 {
     public class PlanPermisionsViewModel : DomainObject, IRegionMemberLifetime, INavigationAware
     {
-        ServiceAccountingDBContext dbContext;
+        AppDBContext dbContext;
         IMainRegionService mainRegionService;
         User currentUser;
 
@@ -24,7 +25,7 @@ namespace CHI.ViewModels
 
             mainRegionService.Header = "Отделения пользователя";
 
-            dbContext = new ServiceAccountingDBContext();
+            dbContext = new AppDBContext();
 
             Departments=dbContext.Departments.Where(x=>!x.IsRoot).AsEnumerable().Select(x => new SelectedObject<Department>(false, x)).ToList();
         }

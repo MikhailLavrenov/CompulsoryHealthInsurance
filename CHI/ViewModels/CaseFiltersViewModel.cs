@@ -1,4 +1,5 @@
 ﻿using CHI.Infrastructure;
+using CHI.Models;
 using CHI.Models.ServiceAccounting;
 using Microsoft.EntityFrameworkCore;
 using Prism.Commands;
@@ -12,7 +13,7 @@ namespace CHI.ViewModels
 {
     public class CaseFiltersViewModel : DomainObject, IRegionMemberLifetime, INavigationAware
     {
-        ServiceAccountingDBContext dbContext;
+        AppDBContext dbContext;
         ObservableCollection<CaseFilter> caseFilters;
         Component currentComponent;
         CaseFilter currentCaseFilter;
@@ -33,7 +34,7 @@ namespace CHI.ViewModels
         {
             this.mainRegionService = mainRegionService;
 
-            dbContext = new ServiceAccountingDBContext();
+            dbContext = new AppDBContext();
 
             AddCommand = new DelegateCommand(AddExecute);
             DeleteCommand = new DelegateCommand(DeleteExecute, () => CurrentCaseFilter != null).ObservesProperty(() => CurrentCaseFilter);

@@ -100,7 +100,7 @@
 
         <TextBlock Grid.Row="6"
                    Grid.Column="0"
-                   Text="Обновление БД учета услуг" />
+                   Text="Обновить структуру БД" />
         <Button Grid.Row="6"
                    Grid.Column="1" 
                 Content="Применить"

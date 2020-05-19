@@ -70,6 +70,22 @@ namespace CHI.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Patients",
+                columns: table => new
+                {
+                    InsuranceNumber = table.Column<string>(nullable: false),
+                    Initials = table.Column<string>(nullable: true),
+                    Surname = table.Column<string>(nullable: true),
+                    Name = table.Column<string>(nullable: true),
+                    Patronymic = table.Column<string>(nullable: true),
+                    FullNameExist = table.Column<bool>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Patients", x => x.InsuranceNumber);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Registers",
                 columns: table => new
                 {
@@ -123,7 +139,14 @@ namespace CHI.Migrations
                     Id = table.Column<int>(nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Sid = table.Column<string>(nullable: true),
-                    Name = table.Column<string>(nullable: true)
+                    Name = table.Column<string>(nullable: true),
+                    ReportPermision = table.Column<bool>(nullable: false),
+                    RegistersPermision = table.Column<bool>(nullable: false),
+                    ReferencesPerimision = table.Column<bool>(nullable: false),
+                    UsersPerimision = table.Column<bool>(nullable: false),
+                    SettingsPermision = table.Column<bool>(nullable: false),
+                    AttachedPatientsPermision = table.Column<bool>(nullable: false),
+                    MedicalExaminationsPermision = table.Column<bool>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -508,6 +531,9 @@ namespace CHI.Migrations
         {
             migrationBuilder.DropTable(
                 name: "CaseFilters");
+
+            migrationBuilder.DropTable(
+                name: "Patients");
 
             migrationBuilder.DropTable(
                 name: "PlanningPermision");

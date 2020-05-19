@@ -1,4 +1,5 @@
 ﻿using CHI.Infrastructure;
+using CHI.Models;
 using CHI.Models.ServiceAccounting;
 using Microsoft.EntityFrameworkCore;
 using Prism.Commands;
@@ -13,7 +14,7 @@ namespace CHI.ViewModels
 {
     public class DepartmentsViewModel : DomainObject, IRegionMemberLifetime, INavigationAware
     {
-        ServiceAccountingDBContext dbContext;
+        AppDBContext dbContext;
         ObservableCollection<Department> departments;
         Department currentDepartment;
         Department root;
@@ -39,7 +40,7 @@ namespace CHI.ViewModels
 
             mainRegionService.Header = "Подразделения";
 
-            dbContext = new ServiceAccountingDBContext();
+            dbContext = new AppDBContext();
             dbContext.Departments.Include(x => x.Employees).Load();
 
             root = dbContext.Departments.Local.Where(x => x.IsRoot).FirstOrDefault();

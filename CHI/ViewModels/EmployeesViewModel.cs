@@ -1,4 +1,5 @@
 ﻿using CHI.Infrastructure;
+using CHI.Models;
 using CHI.Models.ServiceAccounting;
 using Microsoft.EntityFrameworkCore;
 using Prism.Commands;
@@ -11,7 +12,7 @@ namespace CHI.ViewModels
 {
     public class EmployeesViewModel : DomainObject, IRegionMemberLifetime, INavigationAware
     {
-        ServiceAccountingDBContext dbContext;
+        AppDBContext dbContext;
         Employee currentEmployee;
         ObservableCollection<Employee> employees;
 
@@ -43,7 +44,7 @@ namespace CHI.ViewModels
         {
             mainRegionService.Header = "Штатные единицы";
 
-            dbContext = new ServiceAccountingDBContext();
+            dbContext = new AppDBContext();
 
             dbContext.Employees.Load();
             Medics = dbContext.Medics.ToList();

@@ -17,11 +17,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Migrations\20200513090609_MyFirstMigration.cs" />
-    <Compile Remove="Migrations\20200513090609_MyFirstMigration.Designer.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Remove="licensing.pkey" />
   </ItemGroup>
 

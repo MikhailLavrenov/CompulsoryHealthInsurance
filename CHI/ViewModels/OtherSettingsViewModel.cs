@@ -57,7 +57,7 @@ namespace CHI.ViewModels
         private void MigrateDBExecute()
         {
             MainRegionService.ShowProgressBar("Обновление структуры базы данных.");
-            var dbContext = new ServiceAccountingDBContext();
+            var dbContext = new AppDBContext();
             dbContext.Database.Migrate();
             MainRegionService.HideProgressBar("Обновление структуры базы данных успешно завершено.");
         }

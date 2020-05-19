@@ -1,6 +1,8 @@
 ﻿using CHI.Infrastructure;
+using CHI.Models;
 using CHI.Models.ServiceAccounting;
 using CHI.Views;
+using Microsoft.EntityFrameworkCore;
 using NLog;
 using OfficeOpenXml;
 using Prism.DryIoc;
@@ -51,7 +53,7 @@ namespace CHI
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
-
+            containerRegistry.RegisterInstance(GetCurrentUser());
             containerRegistry.RegisterInstance<ILogger>(LogManager.GetCurrentClassLogger());
             containerRegistry.RegisterSingleton<IMainRegionService, MainRegionService>();
             containerRegistry.RegisterSingleton<ILicenseManager, LicenseManager>();
@@ -91,31 +93,53 @@ namespace CHI
 
         private User GetCurrentUser()
         {
-            var dbContext = new ServiceAccountingDBContext();
-
-            //подставляем текущего пользователя и домен
             using var curentWindowsUser = UserPrincipal.Current;
 
             string sid = curentWindowsUser.Sid.ToString();
 
-           var currentUser= dbContext.Users.FirstOrDefault(x => x.Sid == sid);
+            AppDBContext dbContext = null;
+            User currentUser = null;
 
-            if (currentUser == null)
+            try
             {
-                currentUser = new dbtUser();
-                currentUser.Login = curentWindowsUser.UserPrincipalName;
-                currentUser.Sid = sid;
+                dbContext = new AppDBContext();
+                currentUser = dbContext.Users.Where(x => x.Sid == sid).Include(x=>x.PlanningPermisions).FirstOrDefault();
+            }
+            catch (Exception)
+            { }
+
+            if (currentUser != null)
+                return currentUser;
+
+            currentUser = new User()
+            {
+                Name = curentWindowsUser.UserPrincipalName,
+                Sid = sid
+            };
+
+            bool noUsers = true;
+
+            try
+            {
+                noUsers = !dbContext.Users.Any();
+            }
+            catch (Exception)
+            { }
+
+
+            if (noUsers)
+            {
+                currentUser.ReportPermision = true;
+                currentUser.AttachedPatientsPermision = true;
+                currentUser.MedicalExaminationsPermision = true;
+                currentUser.UsersPerimision = true;
+                currentUser.ReferencesPerimision = true;
+                currentUser.RegistersPermision = true;
+                currentUser.SettingsPermision = true;
+                currentUser.RegistersPermision = true;
             }
 
-            CurrentUserName = curentWindowsUser.Name;
-            string server = DomainName = curentWindowsUser.Context.ConnectedServer;
-            if (curentWindowsUser.ContextType != ContextType.Domain)
-                DomainName = "";
-            else
-                DomainName = server.Substring(server.IndexOf('.') + 1).ToLower();
-
             return currentUser;
-            
         }
 
         private void LogUnhandledException(object sender, UnhandledExceptionEventArgs args)

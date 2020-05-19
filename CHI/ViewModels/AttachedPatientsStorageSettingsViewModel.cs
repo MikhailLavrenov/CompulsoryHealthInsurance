@@ -40,7 +40,7 @@ namespace CHI.ViewModels
 
             this.mainRegionService.Header = "База данных прикрепленных пациентов";
 
-            Task.Run(() => PatientsCount = new Models.AttachedPatientsDBContext().Patients.Count().ToString());
+            Task.Run(() => PatientsCount = new Models.AppDBContext().Patients.Count().ToString());
 
             ImportPatientsCommand = new DelegateCommandAsync(ImportPatientsExecute);
             SaveExampleCommand = new DelegateCommandAsync(SaveExampleExecute);
@@ -64,7 +64,7 @@ namespace CHI.ViewModels
             var newPatients = PatientsFileService.ReadImportPatientsFile(importFilePath);
 
             mainRegionService.ShowProgressBar("Проверка значений.");
-            var db = new Models.AttachedPatientsDBContext();
+            var db = new AppDBContext();
             db.Patients.Load();
 
             var existenInsuaranceNumbers = new HashSet<string>(db.Patients.Select(x => x.InsuranceNumber));
@@ -107,13 +107,13 @@ namespace CHI.ViewModels
 
             var message = "Информация о пациентах будет удалена из базы данных. Продолжить ?";
 
-            if (! await mainRegionService.ShowNotificationDialog(message))
+            if (!await mainRegionService.ShowNotificationDialog(message))
             {
                 mainRegionService.HideProgressBar("Очистка базы данных отменена.");
                 return;
             }
 
-            var db = new AttachedPatientsDBContext();
+            var db = new AppDBContext();
 
             db.Database.EnsureDeleted();
             db.Database.EnsureCreated();
