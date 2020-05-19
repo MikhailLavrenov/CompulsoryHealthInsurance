@@ -1,4 +1,5 @@
 ﻿using CHI.Infrastructure;
+using CHI.Models;
 using CHI.Models.ServiceAccounting;
 using Microsoft.EntityFrameworkCore;
 using Prism.Commands;
@@ -11,7 +12,7 @@ namespace CHI.ViewModels
 {
     public class ServiceClassifiersViewModel : DomainObject, IRegionMemberLifetime, INavigationAware
     {
-        ServiceAccountingDBContext dbContext;
+        AppDBContext dbContext;
         ObservableCollection<ServiceClassifier> serviceClassifiers;
         ServiceClassifier currentServiceClassifier;
         IMainRegionService mainRegionService;
@@ -30,7 +31,7 @@ namespace CHI.ViewModels
         {
             this.mainRegionService = mainRegionService;
 
-            dbContext = new ServiceAccountingDBContext();
+            dbContext = new AppDBContext();
 
             dbContext.ServiceClassifiers.Load();
 
@@ -67,7 +68,7 @@ namespace CHI.ViewModels
         {
             mainRegionService.ShowProgressBar("Пересчет стоимости");
 
-            var tempContext = new ServiceAccountingDBContext();
+            var tempContext = new AppDBContext();
 
             var classifierItems = tempContext.ServiceClassifiers
                 .Where(x => x.Id == CurrentServiceClassifier.Id)

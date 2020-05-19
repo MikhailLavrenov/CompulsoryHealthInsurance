@@ -1,4 +1,5 @@
 ﻿using CHI.Infrastructure;
+using CHI.Models;
 using CHI.Models.ServiceAccounting;
 using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml;
@@ -13,7 +14,7 @@ namespace CHI.ViewModels
 {
     public class MedicsViewModel : DomainObject, IRegionMemberLifetime, INavigationAware
     {
-        ServiceAccountingDBContext dbContext;
+        AppDBContext dbContext;
         ObservableCollection<Medic> medics;
         IMainRegionService mainRegionService;
         IFileDialogService fileDialogService;
@@ -31,7 +32,7 @@ namespace CHI.ViewModels
 
             mainRegionService.Header = "Медицинские работники";
 
-            dbContext = new ServiceAccountingDBContext();
+            dbContext = new AppDBContext();
             dbContext.Medics.Load();
             Medics = dbContext.Medics.Local.ToObservableCollection();
 
@@ -71,7 +72,7 @@ namespace CHI.ViewModels
 
             dbContext.SaveChanges();
 
-            dbContext = new ServiceAccountingDBContext();
+            dbContext = new AppDBContext();
             dbContext.Medics.Load();
             Medics = dbContext.Medics.Local.ToObservableCollection();
 

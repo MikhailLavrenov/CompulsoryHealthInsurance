@@ -1,4 +1,5 @@
 ﻿using CHI.Infrastructure;
+using CHI.Models;
 using CHI.Models.ServiceAccounting;
 using Microsoft.EntityFrameworkCore;
 using Prism.Commands;
@@ -11,7 +12,7 @@ namespace CHI.ViewModels
 {
     public class RatiosViewModel : DomainObject, IRegionMemberLifetime, INavigationAware
     {
-        ServiceAccountingDBContext dbContext;
+        AppDBContext dbContext;
         ObservableCollection<Ratio> ratios;
         Indicator currentIndicator;
         Ratio currentRatio;
@@ -30,7 +31,7 @@ namespace CHI.ViewModels
         {
             this.mainRegionService = mainRegionService;
 
-            dbContext = new ServiceAccountingDBContext();
+            dbContext = new AppDBContext();
 
             AddCommand = new DelegateCommand(AddExecute);
             DeleteCommand = new DelegateCommand(DeleteExecute, () => CurrentRatio != null).ObservesProperty(() => CurrentRatio);

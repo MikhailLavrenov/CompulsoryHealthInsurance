@@ -1,9 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using CHI.Models.ServiceAccounting;
+using CHI.Services.AttachedPatients;
+using Microsoft.EntityFrameworkCore;
+using System;
 
-namespace CHI.Models.ServiceAccounting
+namespace CHI.Models
 {
-    public class ServiceAccountingDBContext : DbContext
+    public class AppDBContext : DbContext
     {
+        public DbSet<Patient> Patients { get; set; }
         public DbSet<Register> Registers { get; set; }
         public DbSet<Case> Cases { get; set; }
         public DbSet<Service> Services { get; set; }
@@ -21,13 +25,14 @@ namespace CHI.Models.ServiceAccounting
         public DbSet<User> Users { get; set; }
 
 
-        public ServiceAccountingDBContext()
+
+        public AppDBContext()
         {
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite(@"Data Source=ServiceAccounting.db");
+            optionsBuilder.UseSqlite(@$"Data Source=Database.db");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

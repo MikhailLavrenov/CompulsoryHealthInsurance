@@ -77,7 +77,7 @@ namespace CHI.ViewModels
 
             var dbLoadingTask = Task.Run(() =>
             {
-                var dbContext = new Models.AttachedPatientsDBContext();
+                var dbContext = new AppDBContext();
                 dbContext.Patients.Load();
                 return dbContext;
             });

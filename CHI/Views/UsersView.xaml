@@ -57,6 +57,9 @@
                                     MinWidth="400" 
                                     IsReadOnly="True"/>
 
+                <DataGridCheckBoxColumn Header="Отчет учета услуг"
+                                        Binding="{Binding ReportPermision}"
+                                        MinWidth="120" />
 
                 <DataGridTemplateColumn Header="Ввод плана учета услуг"
                                             MinWidth="120">

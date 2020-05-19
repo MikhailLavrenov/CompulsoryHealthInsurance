@@ -1,4 +1,5 @@
 ﻿using CHI.Infrastructure;
+using CHI.Models;
 using CHI.Models.ServiceAccounting;
 using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml;
@@ -15,7 +16,7 @@ namespace CHI.ViewModels
 {
     public class ServiceClassifierItemsViewModel : DomainObject, IRegionMemberLifetime, INavigationAware
     {
-        ServiceAccountingDBContext dbContext;
+        AppDBContext dbContext;
         ObservableCollection<ServiceClassifierItem> serviceClassifierItems;
         ServiceClassifier currentServiceClassifier;
         ServiceClassifierItem currentServiceClassifierItem;
@@ -163,7 +164,7 @@ namespace CHI.ViewModels
 
         private void Refresh()
         {
-            dbContext = new ServiceAccountingDBContext();
+            dbContext = new AppDBContext();
 
             CurrentServiceClassifier = dbContext.ServiceClassifiers.Where(x => x.Id == CurrentServiceClassifier.Id).Include(x => x.ServiceClassifierItems).First();
 

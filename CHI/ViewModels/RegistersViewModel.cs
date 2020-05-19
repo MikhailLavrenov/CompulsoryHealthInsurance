@@ -1,4 +1,5 @@
 ﻿using CHI.Infrastructure;
+using CHI.Models;
 using CHI.Models.ServiceAccounting;
 using CHI.Services.BillsRegister;
 using Microsoft.EntityFrameworkCore;
@@ -13,7 +14,7 @@ namespace CHI.ViewModels
 {
     public class RegistersViewModel : DomainObject, IRegionMemberLifetime, INavigationAware
     {
-        ServiceAccountingDBContext dbContext;
+        AppDBContext dbContext;
         Register currentRegister;
         ObservableCollection<Register> registers;
         IFileDialogService fileDialogService;
@@ -61,7 +62,7 @@ namespace CHI.ViewModels
             registerService.FileNamesNotStartsWith = new string[] { "L" };
             var register = registerService.GetRegister(false);
 
-            using var localDbContext = new ServiceAccountingDBContext();
+            using var localDbContext = new AppDBContext();
 
             var registerForSamePeriod = localDbContext.Registers.FirstOrDefault(x => x.Month == register.Month && x.Year == register.Year);
 
@@ -177,7 +178,7 @@ namespace CHI.ViewModels
             mainRegionService.HideProgressBar("Успешно загружено");
         }
 
-        private static Employee FindEmployeeInDbOrAdd(string medicFomsId, int specialtyFomsId, ServiceAccountingDBContext dbContext, Department defaultDepartment)
+        private static Employee FindEmployeeInDbOrAdd(string medicFomsId, int specialtyFomsId, AppDBContext dbContext, Department defaultDepartment)
         {
             var employee = dbContext.Employees.Local.FirstOrDefault(x => x.Specialty.FomsId == specialtyFomsId && string.Equals(x.Medic.FomsId, medicFomsId, StringComparison.Ordinal));
 
@@ -226,7 +227,7 @@ namespace CHI.ViewModels
             registerService.FileNamesNotStartsWith = new string[] { "L" };
             var paidRegister = registerService.GetRegister(true);
 
-            var dbContext = new ServiceAccountingDBContext();
+            var dbContext = new AppDBContext();
 
             var register = dbContext.Registers.Where(x => x.Month == paidRegister.Month && x.Year == paidRegister.Year).Include(x => x.Cases).FirstOrDefault();
 
@@ -255,7 +256,7 @@ namespace CHI.ViewModels
 
         private void Refresh()
         {
-            dbContext = new ServiceAccountingDBContext();
+            dbContext = new AppDBContext();
             dbContext.Registers.Load();
             Registers = dbContext.Registers.Local.ToObservableCollection();
         }

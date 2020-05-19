@@ -10,7 +10,7 @@ namespace CHI.ViewModels
 {
     public class WindowsAccountsViewModel : DomainObject, IRegionMemberLifetime, INavigationAware
     {
-        ServiceAccountingDBContext dbContext;
+        AppDBContext dbContext;
         ObservableCollection<WindowsAccount> windowsAccount;
         User currentUser;
         WindowsAccount currentWindowsAccount;
@@ -33,7 +33,7 @@ namespace CHI.ViewModels
 
             mainRegionService.Header = "Учетные записи Windows";
 
-            dbContext = new ServiceAccountingDBContext();
+            dbContext = new AppDBContext();
 
             var settings = Settings.Instance;
 

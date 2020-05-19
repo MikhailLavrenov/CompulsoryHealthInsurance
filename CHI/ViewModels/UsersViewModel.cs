@@ -2,20 +2,24 @@
 using CHI.Models;
 using CHI.Models.ServiceAccounting;
 using CHI.Services.WindowsAccounts;
+using DryIoc;
 using Microsoft.EntityFrameworkCore;
 using Prism.Commands;
 using Prism.Regions;
 using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace CHI.ViewModels
 {
     public class UsersViewModel : DomainObject, IRegionMemberLifetime, INavigationAware
     {
-        ServiceAccountingDBContext dbContext;
+        AppDBContext dbContext;
         ObservableCollection<User> serviceClassifiers;
         User currentUser;
         IMainRegionService mainRegionService;
+        User currentAppUser;
+        IContainer container;
 
         public bool KeepAlive { get; set; }
         public User CurrentUser { get => currentUser; set => SetProperty(ref currentUser, value); }
@@ -25,11 +29,13 @@ namespace CHI.ViewModels
         public DelegateCommand DeleteCommand { get; }
         public DelegateCommand<Type> NavigateCommand { get; }
 
-        public UsersViewModel(IMainRegionService mainRegionService)
+        public UsersViewModel(IMainRegionService mainRegionService, User currentUser,IContainer container)
         {
             this.mainRegionService = mainRegionService;
+            this.container = container;
+            currentAppUser = currentUser;
 
-            dbContext = new ServiceAccountingDBContext();
+            dbContext = new AppDBContext();
 
             dbContext.Users.Load();
 
@@ -80,6 +86,11 @@ namespace CHI.ViewModels
         public void OnNavigatedFrom(NavigationContext navigationContext)
         {
             dbContext.SaveChanges();
+
+            var usr = dbContext.Users.Where(x => x.Sid == currentAppUser.Sid).Include(x => x.PlanningPermisions).FirstOrDefault();
+
+            if (usr != null)
+                container.UseInstance(usr);
         }
     }
 }

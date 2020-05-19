@@ -1,4 +1,5 @@
 ﻿using CHI.Infrastructure;
+using CHI.Models;
 using CHI.Models.ServiceAccounting;
 using Microsoft.EntityFrameworkCore;
 using Prism.Commands;
@@ -14,7 +15,7 @@ namespace CHI.ViewModels
 {
     public class ComponentsViewModel : DomainObject, IRegionMemberLifetime, INavigationAware
     {
-        ServiceAccountingDBContext dbContext;
+        AppDBContext dbContext;
         ObservableCollection<Component> components;
         Component currentComponent;
         Component root;
@@ -39,7 +40,7 @@ namespace CHI.ViewModels
             this.mainRegionService = mainRegionService;
             this.dialogService = dialogService;
 
-            dbContext = new ServiceAccountingDBContext();
+            dbContext = new AppDBContext();
             dbContext.Components.Load();
 
             root = dbContext.Components.Local.Where(x => x.IsRoot).FirstOrDefault();
