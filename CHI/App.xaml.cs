@@ -1,13 +1,14 @@
 ﻿using CHI.Infrastructure;
-using CHI.ViewModels;
+using CHI.Models.ServiceAccounting;
 using CHI.Views;
 using NLog;
 using OfficeOpenXml;
 using Prism.DryIoc;
 using Prism.Ioc;
-using Prism.Regions;
 using System;
+using System.DirectoryServices.AccountManagement;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Markup;
@@ -50,8 +51,9 @@ namespace CHI
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
+
             containerRegistry.RegisterInstance<ILogger>(LogManager.GetCurrentClassLogger());
-            containerRegistry.RegisterSingleton<IMainRegionService,MainRegionService>();
+            containerRegistry.RegisterSingleton<IMainRegionService, MainRegionService>();
             containerRegistry.RegisterSingleton<ILicenseManager, LicenseManager>();
             containerRegistry.Register<IFileDialogService, FileDialogService>();
 
@@ -85,6 +87,35 @@ namespace CHI
             containerRegistry.RegisterForNavigation<WindowsAccountsView>();
             containerRegistry.RegisterForNavigation<PlanPermisionsView>();
             containerRegistry.RegisterForNavigation<PlanningView>();
+        }
+
+        private User GetCurrentUser()
+        {
+            var dbContext = new ServiceAccountingDBContext();
+
+            //подставляем текущего пользователя и домен
+            using var curentWindowsUser = UserPrincipal.Current;
+
+            string sid = curentWindowsUser.Sid.ToString();
+
+           var currentUser= dbContext.Users.FirstOrDefault(x => x.Sid == sid);
+
+            if (currentUser == null)
+            {
+                currentUser = new dbtUser();
+                currentUser.Login = curentWindowsUser.UserPrincipalName;
+                currentUser.Sid = sid;
+            }
+
+            CurrentUserName = curentWindowsUser.Name;
+            string server = DomainName = curentWindowsUser.Context.ConnectedServer;
+            if (curentWindowsUser.ContextType != ContextType.Domain)
+                DomainName = "";
+            else
+                DomainName = server.Substring(server.IndexOf('.') + 1).ToLower();
+
+            return currentUser;
+            
         }
 
         private void LogUnhandledException(object sender, UnhandledExceptionEventArgs args)
