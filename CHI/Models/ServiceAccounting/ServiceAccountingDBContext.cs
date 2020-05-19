@@ -23,27 +23,6 @@ namespace CHI.Models.ServiceAccounting
 
         public ServiceAccountingDBContext()
         {
-            
-            //Database.EnsureDeleted();
-
-            //if (Database.EnsureCreated())
-            //{
-            //    var rootComponent = new Component()
-            //    {
-            //        IsRoot = true,
-            //    };
-
-            //    Add(rootComponent);
-
-            //    var rootDepartment = new Department()
-            //    {
-            //        IsRoot = true,
-            //    };
-
-            //    Add(rootDepartment);
-
-            //    SaveChanges();
-            //}
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

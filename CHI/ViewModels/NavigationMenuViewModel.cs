@@ -17,6 +17,7 @@ namespace CHI.ViewModels
 
         public DelegateCommand<object> SwitchViewCommand { get; }
 
+
         public NavigationMenuViewModel(IMainRegionService mainRegionService)
         {
             this.mainRegionService = mainRegionService;
@@ -25,6 +26,7 @@ namespace CHI.ViewModels
 
             SwitchViewCommand = new DelegateCommand<object>(SwitchViewExecute);
         }
+
 
         private void SwitchViewExecute(object view)
         {

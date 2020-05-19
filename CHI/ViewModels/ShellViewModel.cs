@@ -9,12 +9,9 @@ namespace CHI.ViewModels
 {
     public class ShellViewModel : DomainObject
     {
-        #region Поля
         private bool isMaximizedWindow;
         private IMainRegionService mainRegionService;
-        #endregion
 
-        #region Свойства 
         public IMainRegionService MainRegionService { get; set; }
         public string ApplicationTitle { get; }
         public bool ShowLicenseManager { get; }
@@ -28,9 +25,8 @@ namespace CHI.ViewModels
         public DelegateCommand MinimizeWindowCommand { get; }
         public DelegateCommand NavigateHomeCommand { get; }
         public DelegateCommand NavigateBackCommand { get; }
-        #endregion
 
-        #region Конструкторы
+
         public ShellViewModel(IMainRegionService mainRegionService)
         {
             this.mainRegionService = mainRegionService;
@@ -48,9 +44,8 @@ namespace CHI.ViewModels
             MaximizeWindowCommand = new DelegateCommand(MaximizeWindowExecute);
             MinimizeWindowCommand = new DelegateCommand(() => System.Windows.Application.Current.MainWindow.WindowState = WindowState.Minimized);
         }
-        #endregion
 
-        #region Методы
+
         private void RestoreWindowExecute()
         {
             System.Windows.Application.Current.MainWindow.WindowState = WindowState.Normal;
@@ -75,6 +70,5 @@ namespace CHI.ViewModels
             MainRegionService.RequestNavigate(string.Empty);
             System.Windows.Application.Current.Shutdown();
         }
-        #endregion
     }
 }
