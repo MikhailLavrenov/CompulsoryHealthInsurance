@@ -1,5 +1,6 @@
 ﻿using CHI.Infrastructure;
 using CHI.Models;
+using CHI.Services;
 using CHI.Services.AttachedPatients;
 using Microsoft.EntityFrameworkCore;
 using Prism.Commands;
@@ -40,7 +41,7 @@ namespace CHI.ViewModels
 
             this.mainRegionService.Header = "База данных прикрепленных пациентов";
 
-            Task.Run(() => PatientsCount = new Models.AppDBContext().Patients.Count().ToString());
+            Task.Run(() => PatientsCount = new AppDBContext().Patients.Count().ToString());
 
             ImportPatientsCommand = new DelegateCommandAsync(ImportPatientsExecute);
             SaveExampleCommand = new DelegateCommandAsync(SaveExampleExecute);

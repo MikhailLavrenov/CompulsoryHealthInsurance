@@ -36,6 +36,11 @@
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
         <TextBlock Grid.Row="0"
@@ -90,27 +95,53 @@
 
         <TextBlock Grid.Row="5"
                    Grid.Column="0"
+                   Text="Использовать MS SQL сервер" />
+        <CheckBox Grid.Row="5"
+                 Grid.Column="1" 
+                 IsChecked="{Binding Settings.UseSQLServer}" />
+
+        <TextBlock Grid.Row="6"
+                   Grid.Column="0"
+                   Text="Имя SQL сервера" 
+                   Visibility="{Binding Settings.UseSQLServer, Converter={i:BoolToVisibleConverter}}"/>
+        <TextBox Grid.Row="6"
+                 Grid.Column="1" 
+                 Text="{Binding Settings.SQLServerName}"                   
+                 Visibility="{Binding Settings.UseSQLServer, Converter={i:BoolToVisibleConverter}}"/>
+
+        <TextBlock Grid.Row="7"
+                   Grid.Column="0"
+                   Text="Имя SQL базы данных"                       
+                   Visibility="{Binding Settings.UseSQLServer, Converter={i:BoolToVisibleConverter}}"/>
+        <TextBox Grid.Row="7"
+                 Grid.Column="1" 
+                 Text="{Binding Settings.SQLServerDBName}"                   
+                 Visibility="{Binding Settings.UseSQLServer, Converter={i:BoolToVisibleConverter}}"/>
+
+        <TextBlock Grid.Row="8"
+                   Grid.Column="0"
+                   Text="База данных" />
+        <Button Grid.Row="8"                   
+                Grid.Column="1" 
+                Content="Обновить структуру"
+                Command="{Binding MigrateDBCommand}" />
+
+        <TextBlock Grid.Row="9"
+                   Grid.Column="0"
                    Text="Шаблон утверждено" />
-        <TextBox Grid.Row="5"
+        <TextBox Grid.Row="9"
                  Grid.Column="1" 
                  MinLines="5"
                  TextWrapping="Wrap"
                  AcceptsReturn="True"
                  Text="{Binding Settings.ApprovedBy}" />
 
-        <TextBlock Grid.Row="6"
-                   Grid.Column="0"
-                   Text="Обновить структуру БД" />
-        <Button Grid.Row="6"
-                   Grid.Column="1" 
-                Content="Применить"
-                    Command="{Binding MigrateDBCommand}" />
+        <FrameworkElement Grid.Row="10" Style="{StaticResource Separator}"/>
 
         <StackPanel VerticalAlignment="Top"
-                    Grid.Row="7"
+                    Grid.Row="11"
                     Grid.Column="0"
                     Grid.ColumnSpan="2"
-                    Margin="0,10,0,10"
                     Orientation="Horizontal">
 
             <Button Content="Проверить"

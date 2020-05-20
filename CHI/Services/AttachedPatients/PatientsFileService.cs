@@ -1,4 +1,5 @@
-﻿using OfficeOpenXml;
+﻿using CHI.Models;
+using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using System;
 using System.Collections.Generic;

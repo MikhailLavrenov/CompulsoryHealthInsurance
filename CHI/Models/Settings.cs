@@ -215,6 +215,9 @@ namespace CHI.Models
         string domainName;
         string domainUsersRootOU;
         string approvedBy;
+        bool useSQLServer;
+        string sqlServerName;
+        string sqlServerDBName;
 
         public bool UseProxy
         {
@@ -249,6 +252,9 @@ namespace CHI.Models
         public string DomainName { get => domainName; set => SetProperty(ref domainName, value); }
         public string DomainUsersRootOU { get => domainUsersRootOU; set => SetProperty(ref domainUsersRootOU, value); }
         public string  ApprovedBy { get => approvedBy; set => SetProperty(ref approvedBy, value); }
+        public bool UseSQLServer { get=> useSQLServer; set=>SetProperty(ref useSQLServer, value); }
+        public string SQLServerName { get=> sqlServerName; set=>SetProperty(ref sqlServerName, value); }
+        public string SQLServerDBName { get => sqlServerDBName; set => SetProperty(ref sqlServerDBName, value); }
 
         //проверяет настройки прокси-сервера, true-соединение установлено или прокси-сервер не используется, false-иначе
         public void TestConnectionProxy()
