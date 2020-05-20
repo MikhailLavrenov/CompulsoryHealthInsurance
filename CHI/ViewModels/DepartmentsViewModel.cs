@@ -1,6 +1,7 @@
 ﻿using CHI.Infrastructure;
 using CHI.Models;
 using CHI.Models.ServiceAccounting;
+using CHI.Services;
 using Microsoft.EntityFrameworkCore;
 using Prism.Commands;
 using Prism.Regions;
@@ -44,13 +45,6 @@ namespace CHI.ViewModels
             dbContext.Departments.Include(x => x.Employees).Load();
 
             root = dbContext.Departments.Local.Where(x => x.IsRoot).FirstOrDefault();
-
-            if (root == null)
-            {
-                root = new Department { IsRoot = true };
-                dbContext.Add(root);
-                dbContext.SaveChanges();
-            }
 
             RefreshDepartments();
 

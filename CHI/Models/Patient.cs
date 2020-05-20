@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
-namespace CHI.Services.AttachedPatients
+namespace CHI.Models
 {
     /// <summary>
     /// Представляет сведения о прикрепленном пациенте
@@ -18,7 +18,7 @@ namespace CHI.Services.AttachedPatients
         /// <summary>
         /// Серия и/или номер полиса
         /// </summary>
-        [Key]
+        public int Id { get; set; }
         public string InsuranceNumber { get=> insuranceNumber; set=> insuranceNumber=value.ToUpper(); }
         /// <summary>
         /// Инициалы ФИО

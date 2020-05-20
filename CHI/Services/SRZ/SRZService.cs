@@ -1,4 +1,5 @@
-﻿using CHI.Services.AttachedPatients;
+﻿using CHI.Models;
+using CHI.Services.AttachedPatients;
 using CHI.Services.Common;
 using OfficeOpenXml;
 using System;

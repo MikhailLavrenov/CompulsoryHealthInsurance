@@ -12,7 +12,7 @@ namespace CHI.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(nullable: true),
                     Order = table.Column<int>(nullable: false),
                     HexColor = table.Column<string>(nullable: true),
@@ -27,8 +27,7 @@ namespace CHI.Migrations
                         name: "FK_Components_Components_ParentId",
                         column: x => x.ParentId,
                         principalTable: "Components",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -36,7 +35,7 @@ namespace CHI.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(nullable: true),
                     Order = table.Column<int>(nullable: false),
                     HexColor = table.Column<string>(nullable: true),
@@ -59,7 +58,7 @@ namespace CHI.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     FomsId = table.Column<string>(nullable: true),
                     FullName = table.Column<string>(nullable: true),
                     IsArchive = table.Column<bool>(nullable: false)
@@ -73,7 +72,9 @@ namespace CHI.Migrations
                 name: "Patients",
                 columns: table => new
                 {
-                    InsuranceNumber = table.Column<string>(nullable: false),
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    InsuranceNumber = table.Column<string>(nullable: true),
                     Initials = table.Column<string>(nullable: true),
                     Surname = table.Column<string>(nullable: true),
                     Name = table.Column<string>(nullable: true),
@@ -82,7 +83,7 @@ namespace CHI.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Patients", x => x.InsuranceNumber);
+                    table.PrimaryKey("PK_Patients", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -90,7 +91,7 @@ namespace CHI.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     Month = table.Column<int>(nullable: false),
                     Year = table.Column<int>(nullable: false),
                     BuildDate = table.Column<DateTime>(nullable: false),
@@ -108,7 +109,7 @@ namespace CHI.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     ValidFrom = table.Column<DateTime>(nullable: false),
                     ValidTo = table.Column<DateTime>(nullable: false)
                 },
@@ -122,7 +123,7 @@ namespace CHI.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     FomsId = table.Column<int>(nullable: false),
                     Name = table.Column<string>(nullable: true),
                     IsArchive = table.Column<bool>(nullable: false)
@@ -137,7 +138,7 @@ namespace CHI.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     Sid = table.Column<string>(nullable: true),
                     Name = table.Column<string>(nullable: true),
                     ReportPermision = table.Column<bool>(nullable: false),
@@ -158,7 +159,7 @@ namespace CHI.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     Kind = table.Column<int>(nullable: false),
                     Code = table.Column<double>(nullable: false),
                     ValidFrom = table.Column<DateTime>(nullable: true),
@@ -181,7 +182,7 @@ namespace CHI.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     Order = table.Column<int>(nullable: false),
                     FacadeKind = table.Column<int>(nullable: false),
                     ValueKind = table.Column<int>(nullable: false),
@@ -203,7 +204,7 @@ namespace CHI.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     Code = table.Column<int>(nullable: false),
                     LaborCost = table.Column<double>(nullable: false),
                     Price = table.Column<double>(nullable: false),
@@ -226,7 +227,7 @@ namespace CHI.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     MedicId = table.Column<int>(nullable: true),
                     SpecialtyId = table.Column<int>(nullable: true),
                     DepartmentId = table.Column<int>(nullable: true),
@@ -285,7 +286,7 @@ namespace CHI.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     Multiplier = table.Column<double>(nullable: false),
                     Divider = table.Column<double>(nullable: false),
                     ValidFrom = table.Column<DateTime>(nullable: true),
@@ -308,7 +309,7 @@ namespace CHI.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     IdCase = table.Column<string>(nullable: true),
                     Place = table.Column<int>(nullable: false),
                     VisitPurpose = table.Column<double>(nullable: false),
@@ -343,7 +344,7 @@ namespace CHI.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     Kind = table.Column<int>(nullable: false),
                     Order = table.Column<int>(nullable: false),
                     DepartmentId = table.Column<int>(nullable: true),
@@ -371,7 +372,7 @@ namespace CHI.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     EmployeeId = table.Column<int>(nullable: true),
                     Count = table.Column<double>(nullable: false),
                     Code = table.Column<int>(nullable: false),
@@ -407,7 +408,7 @@ namespace CHI.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     Month = table.Column<int>(nullable: false),
                     Year = table.Column<int>(nullable: false),
                     IndicatorId = table.Column<int>(nullable: true),

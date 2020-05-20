@@ -1,9 +1,8 @@
-﻿using CHI.Models.ServiceAccounting;
-using CHI.Services.AttachedPatients;
+﻿using CHI.Models;
+using CHI.Models.ServiceAccounting;
 using Microsoft.EntityFrameworkCore;
-using System;
 
-namespace CHI.Models
+namespace CHI.Services
 {
     public class AppDBContext : DbContext
     {
@@ -25,14 +24,12 @@ namespace CHI.Models
         public DbSet<User> Users { get; set; }
 
 
-
-        public AppDBContext()
-        {
-        }
-
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite(@$"Data Source=Database.db");
+            if (Settings.Instance.UseSQLServer)
+                optionsBuilder.UseSqlServer(@$"Server={Settings.Instance.SQLServerName};Database={Settings.Instance.SQLServerDBName};Trusted_Connection=True;");
+            else
+                optionsBuilder.UseSqlite(@$"Data Source=Database.db");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -68,7 +65,7 @@ namespace CHI.Models
             modelBuilder.Entity<Component>()
                 .HasMany(x => x.Childs)
                 .WithOne(x => x.Parent)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<Component>()
                 .HasMany(x => x.CaseFilters)
