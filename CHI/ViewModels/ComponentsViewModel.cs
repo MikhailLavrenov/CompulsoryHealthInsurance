@@ -93,10 +93,12 @@ namespace CHI.ViewModels
             var parentDetails = CurrentComponent.Parent.Childs;
             var offset = parentDetails.IndexOf(CurrentComponent);
 
-            parentDetails.Remove(CurrentComponent);
+            dbContext.RemoveRange(CurrentComponent.ToListRecursive());
+
+            parentDetails.Remove(CurrentComponent);            
 
             for (int i = offset; i < parentDetails.Count; i++)
-                parentDetails[i].Order--;
+                parentDetails[i].Order--;            
 
             Refresh();
         }
