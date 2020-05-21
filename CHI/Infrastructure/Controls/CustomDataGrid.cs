@@ -10,6 +10,9 @@ namespace CHI.Infrastructure
     /// </summary>
     public class CustomDataGrid : DataGrid
     {
+        UIElement lastCell;
+
+
         // Возникает перед редактированием ячейки
         protected override void OnPreparingCellForEdit(DataGridPreparingCellForEditEventArgs e)
         {
@@ -42,11 +45,18 @@ namespace CHI.Infrastructure
             var clickedElement = mbe.OriginalSource as UIElement;
             var cell = clickedElement.FindVisualParent<DataGridCell>();
 
+            if (lastCell != null && lastCell != cell && (cell?.IsEditing ?? true))
+                CommitEdit( DataGridEditingUnit.Row, true);
+
             if (cell == null || cell.IsEditing || cell.IsReadOnly)
                 return;
 
             if (cell.IsFocused == false)
                 cell.Focus();
+
+            lastCell = cell;
+
+
 
             // Условие обязательно, тупо выделять ячейку нельзя, может возникнуть исключение
             if (SelectionUnit == DataGridSelectionUnit.FullRow)
