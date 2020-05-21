@@ -85,6 +85,8 @@ namespace CHI.ViewModels
 
             CurrentComponent.Childs.Add(newComponent);
 
+            dbContext.Add(newComponent);
+
             Refresh();
         }
 
