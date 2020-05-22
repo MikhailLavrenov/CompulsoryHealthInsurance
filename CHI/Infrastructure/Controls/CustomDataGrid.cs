@@ -1,5 +1,4 @@
-﻿using System.Windows;
-using System.Windows.Controls;
+﻿using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 
@@ -10,7 +9,7 @@ namespace CHI.Infrastructure
     /// </summary>
     public class CustomDataGrid : DataGrid
     {
-        UIElement lastCell;
+        DataGridCell lastCell;
 
 
         // Возникает перед редактированием ячейки
@@ -36,17 +35,17 @@ namespace CHI.Infrastructure
                     textBox.CaretIndex = textBox.Text.Length;
             }
         }
+
         // Редактирование стандартных ячеек одним кликом (устанавливает фокус на ячейку и IsSelected)
         protected override void OnPreviewMouseLeftButtonDown(MouseButtonEventArgs e)
         {
             base.OnPreviewMouseLeftButtonDown(e);
 
-            var mbe = e as MouseButtonEventArgs;
-            var clickedElement = mbe.OriginalSource as UIElement;
+            var clickedElement = e.OriginalSource as Visual;
             var cell = clickedElement.FindVisualParent<DataGridCell>();
 
-            if (lastCell != null && lastCell != cell && (cell?.IsEditing ?? true))
-                CommitEdit( DataGridEditingUnit.Row, true);
+            if (lastCell != null && cell != null && lastCell.IsEditing && lastCell != cell)
+                CommitEdit(DataGridEditingUnit.Row, true);
 
             if (cell == null || cell.IsEditing || cell.IsReadOnly)
                 return;
@@ -55,8 +54,6 @@ namespace CHI.Infrastructure
                 cell.Focus();
 
             lastCell = cell;
-
-
 
             // Условие обязательно, тупо выделять ячейку нельзя, может возникнуть исключение
             if (SelectionUnit == DataGridSelectionUnit.FullRow)

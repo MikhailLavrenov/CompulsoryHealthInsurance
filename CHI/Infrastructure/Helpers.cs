@@ -108,14 +108,14 @@ namespace CHI.Infrastructure
         }
 
         // Находит в визульном дереве родительский элемент соответствующий типу T
-        public static T FindVisualParent<T>(this UIElement element) where T : UIElement
+        public static T FindVisualParent<T>(this Visual element) where T : UIElement
         {
             while (element != null)
             {
                 if (element is T correctlyTyped)
                     return correctlyTyped;
 
-                element = VisualTreeHelper.GetParent(element) as UIElement;
+                element = VisualTreeHelper.GetParent(element) as Visual;
             }
 
             return null;

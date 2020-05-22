@@ -74,7 +74,7 @@
                                                        ItemsSource="{Binding DataContext.IndicatorKinds, Source={x:Reference proxyElement}, Mode=OneTime}"
                                                        SelectedValuePath="Key"
                                                        DisplayMemberPath="Value"
-                                                       SelectedValueBinding="{Binding FacadeKind}"
+                                                       SelectedValueBinding="{Binding FacadeKind, UpdateSourceTrigger=PropertyChanged}"
                                                        MinWidth="200" />
 
                 <materialDesign:DataGridComboBoxColumn Header="Вид значения"
