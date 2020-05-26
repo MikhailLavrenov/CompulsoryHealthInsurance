@@ -73,7 +73,7 @@ namespace CHI.ViewModels
 
             Report.Build(registers, plans, Month, Year, IsGrowing);
 
-            mainRegionService.HideProgressBar("Отчет построен");
+            mainRegionService.HideProgressBar($"Отчет за {Months[Month]} {Year} построен");
         }
 
         private void SaveExcelExecute()
