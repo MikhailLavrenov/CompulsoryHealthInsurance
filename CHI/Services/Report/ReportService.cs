@@ -317,22 +317,24 @@ namespace CHI.Services.Report
                         {
                             var valueItem = Values[rowItem.Index][columnItem.Index];
 
+                            double value = 0;
+
                             switch (valueItem.ColumnHeader.Indicator.ValueKind)
                             {
                                 case IndicatorKind.Cases:
-                                    valueItem.Value += selectedCases.Count();
+                                    value = selectedCases.Count();
                                     break;
 
                                 case IndicatorKind.Services:
-                                    valueItem.Value += selectedCases.Select(x => x.Services.Count == 0 ? 0 : x.Services.Count - 1).Sum();
+                                    value = selectedCases.Select(x => x.Services.Count == 0 ? 0 : x.Services.Count - 1).Sum();
                                     break;
 
                                 case IndicatorKind.BedDays:
-                                    valueItem.Value += selectedCases.Sum(x => x.BedDays);
+                                    value = selectedCases.Sum(x => x.BedDays);
                                     break;
 
                                 case IndicatorKind.LaborCost:
-                                    valueItem.Value += selectedCases
+                                    value = selectedCases
                                         .SelectMany(x => x.Services)
                                         .Where(x => x.ClassifierItem != null)
                                         .Sum(x => x.Count * x.ClassifierItem.LaborCost);
@@ -340,7 +342,7 @@ namespace CHI.Services.Report
 
                                 case IndicatorKind.Cost:
                                     if (isPaymentAccepted)
-                                        valueItem.Value += selectedCases
+                                        value = selectedCases
                                             .Where(x => x.PaidStatus == PaidKind.None)
                                             .SelectMany(x => x.Services)
                                             .Where(x => x.ClassifierItem != null)
@@ -349,7 +351,7 @@ namespace CHI.Services.Report
                                             .Where(x => x.PaidStatus == PaidKind.Full || x.PaidStatus == PaidKind.Partly)
                                             .Sum(x => x.AmountPaid);
                                     else
-                                        valueItem.Value += selectedCases
+                                        value = selectedCases
                                             .Where(x => x.PaidStatus == PaidKind.Refuse || x.PaidStatus == PaidKind.Partly)
                                             .Sum(x => x.AmountUnpaid);
                                     break;
@@ -357,8 +359,11 @@ namespace CHI.Services.Report
 
                             var ratio = columnItem.Indicator.Ratios.FirstOrDefault(x => Helpers.BetweenDates(x.ValidFrom, x.ValidTo, month, year));
 
-                            if (ratio != null)
-                                valueItem.Value = valueItem.Value * ratio.Multiplier / ratio.Divider;
+                            if (ratio != null && value != 0)
+                                valueItem.Value += value * ratio.Multiplier / ratio.Divider;
+                            else
+                                valueItem.Value += value;
+
                         }
                 }
             }
@@ -384,7 +389,7 @@ namespace CHI.Services.Report
 
             if (Month != 0)
             {
-                header += $" за {CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(Month)} {Year}";
+                header += $" за {CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(Month).ToLower()} {Year}";
 
                 if (IsGrowing)
                     header += " нарастающий";
