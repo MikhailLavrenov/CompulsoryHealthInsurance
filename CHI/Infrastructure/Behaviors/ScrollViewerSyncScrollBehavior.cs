@@ -9,6 +9,7 @@ namespace CHI.Infrastructure
         ScrollViewer scrollViewer;
 
         public static DependencyProperty SyncWithProperty { get; set; }
+
         public ScrollViewer SyncWith { get => (ScrollViewer)GetValue(SyncWithProperty); set => SetValue(SyncWithProperty, value); }
         public bool SyncVertical { get; set; }
         public bool SyncHorizontal { get; set; }
@@ -32,12 +33,15 @@ namespace CHI.Infrastructure
 
         private void OnScrollChanged(object sender, ScrollChangedEventArgs e)
         {
-            var sw = (ScrollViewer)sender == scrollViewer ? SyncWith : scrollViewer;
+            if (e.HorizontalChange == 0 && e.VerticalChange == 0)
+                return;
+
+            var associatedScrollViewer = (ScrollViewer)sender == scrollViewer ? SyncWith : scrollViewer;
 
             if (SyncHorizontal)
-                sw.ScrollToHorizontalOffset(e.HorizontalOffset);
+                associatedScrollViewer.ScrollToHorizontalOffset(e.HorizontalOffset);
             if (SyncVertical)
-                sw.ScrollToVerticalOffset(e.VerticalOffset);
+                associatedScrollViewer.ScrollToVerticalOffset(e.VerticalOffset);
         }
 
         protected override void OnDetaching()
