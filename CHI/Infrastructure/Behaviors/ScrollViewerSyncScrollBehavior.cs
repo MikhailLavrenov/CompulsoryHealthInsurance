@@ -38,9 +38,9 @@ namespace CHI.Infrastructure
 
             var associatedScrollViewer = (ScrollViewer)sender == scrollViewer ? SyncWith : scrollViewer;
 
-            if (SyncHorizontal)
+            if (SyncHorizontal && e.HorizontalChange != 0)
                 associatedScrollViewer.ScrollToHorizontalOffset(e.HorizontalOffset);
-            if (SyncVertical)
+            if (SyncVertical && e.VerticalChange != 0)
                 associatedScrollViewer.ScrollToVerticalOffset(e.VerticalOffset);
         }
 
