@@ -54,6 +54,7 @@ namespace CHI
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
+            containerRegistry.RegisterInstance(containerRegistry.GetContainer());
             containerRegistry.RegisterInstance(GetCurrentUser());
             containerRegistry.RegisterInstance<ILogger>(LogManager.GetCurrentClassLogger());
             containerRegistry.RegisterSingleton<IMainRegionService, MainRegionService>();
