@@ -92,6 +92,13 @@
                 </Viewbox>
             </Button>
 
+            <Button Style="{StaticResource IconButton}"
+                    Command="{Binding BuildAndSaveExcelCommand}">
+                <Viewbox Stretch="Uniform">
+                    <materialDesign:PackIcon Kind="ShareAllOutline" />
+                </Viewbox>
+            </Button>
+
         </StackPanel>
 
         <StackPanel Grid.Row="0"
@@ -109,7 +116,7 @@
             <FrameworkElement Style="{StaticResource Separator}" />
 
             <Button Style="{StaticResource IconTransparentButton}"
-                    Command="{Binding IncreaseYear}">
+                    Command="{Binding DecreaseYear}">
                 <Viewbox Stretch="Uniform">
                     <materialDesign:PackIcon Kind="MenuLeft" />
                 </Viewbox>
@@ -119,7 +126,7 @@
                        FontWeight="Medium" />
 
             <Button Style="{StaticResource IconTransparentButton}"
-                    Command="{Binding DecreaseYear}">
+                    Command="{Binding IncreaseYear}">
                 <Viewbox Stretch="Uniform">
                     <materialDesign:PackIcon Kind="MenuRight" />
                 </Viewbox>

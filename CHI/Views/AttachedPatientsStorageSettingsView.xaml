@@ -21,7 +21,7 @@
         </ResourceDictionary >
     </UserControl.Resources>
 
-    <Grid d:DataContext="{d:DesignInstance vm:OtherSettingsViewModel}">
+    <Grid d:DataContext="{d:DesignInstance vm:CommonSettingsViewModel}">
 
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>

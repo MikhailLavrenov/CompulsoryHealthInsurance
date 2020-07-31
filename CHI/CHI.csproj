@@ -81,8 +81,8 @@
     <Compile Update="Views\NotificationDialogView.xaml.cs">
       <DependentUpon>NotificationDialogView.xaml</DependentUpon>
     </Compile>
-    <Compile Update="Views\OtherSettingsView.xaml.cs">
-      <DependentUpon>OtherSettingsView.xaml</DependentUpon>
+    <Compile Update="Views\CommonSettingsView.xaml.cs">
+      <DependentUpon>CommonSettingsView.xaml</DependentUpon>
     </Compile>
     <Compile Update="Views\ProgressBarView.xaml.cs">
       <DependentUpon>ProgressBarView.xaml</DependentUpon>
@@ -133,7 +133,7 @@
     <Page Update="Views\NotificationDialogView.xaml">
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="Views\OtherSettingsView.xaml">
+    <Page Update="Views\CommonSettingsView.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Views\ProgressBarView.xaml">

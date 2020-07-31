@@ -11,9 +11,9 @@ namespace CHI.ViewModels
     class SrzSettingsViewModel : DomainObject, IRegionMemberLifetime
     {
         #region Поля
-        private Settings settings;
-        private bool showTextPassword;
-        private bool showProtectedPassword;
+        Settings settings;
+        bool showTextPassword;
+        bool showProtectedPassword;
         #endregion
 
         #region Свойства

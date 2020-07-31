@@ -209,6 +209,17 @@
                 </DockPanel>
             </Button>
 
+            <Button Style="{StaticResource MenuButton}"
+                    Background="#64b5f6"
+                    CommandParameter="{x:Type v:ServiceAccountingSettingsView}">
+                <DockPanel>
+                    <materialDesign:PackIcon Style="{StaticResource ButtonIcon}"
+                                             Kind="Gear" />
+                    <TextBlock Style="{StaticResource ButtonText}"
+                               Text="Настройки" />
+                </DockPanel>
+            </Button>
+
         </StackPanel>
 
         <StackPanel Grid.Column="2"
@@ -292,12 +303,12 @@
 
             <Button Style="{StaticResource MenuButton}"
                     Background="#00695c"
-                    CommandParameter="{x:Type v:OtherSettingsView}">
+                    CommandParameter="{x:Type v:CommonSettingsView}">
                 <DockPanel>
                     <materialDesign:PackIcon Style="{StaticResource ButtonIcon}"
                                              Kind="Cogs" />
                     <TextBlock Style="{StaticResource ButtonText}"
-                               Text="Прочие настройки" />
+                               Text="Общие настройки" />
                 </DockPanel>
             </Button>
 

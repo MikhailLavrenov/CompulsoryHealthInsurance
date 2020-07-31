@@ -109,6 +109,12 @@ namespace CHI.ViewModels
 
             var filePath = fileDialogService.FileName;
 
+            if (Helpers.IsFileLocked(filePath))
+            {
+                mainRegionService.HideProgressBar("Отменено. Файл занят другим пользователем, поэтому не может быть изменен");
+                return;
+            }
+
             var sheetName = Months[Month].Substring(0, 3);
 
             mainRegionService.ShowProgressBar("Сохранение файла");

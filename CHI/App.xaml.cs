@@ -70,7 +70,7 @@ namespace CHI
             containerRegistry.RegisterForNavigation<ExaminationsView>();
             containerRegistry.RegisterForNavigation<ExaminationsSettingsView>();
             containerRegistry.RegisterForNavigation<SrzSettingsView>();
-            containerRegistry.RegisterForNavigation<OtherSettingsView>();
+            containerRegistry.RegisterForNavigation<CommonSettingsView>();
             containerRegistry.RegisterForNavigation<AboutView>();
             containerRegistry.RegisterForNavigation<ProgressBarView>();
             containerRegistry.RegisterForNavigation<DepartmentsView>();
@@ -91,6 +91,7 @@ namespace CHI
             containerRegistry.RegisterForNavigation<WindowsAccountsView>();
             containerRegistry.RegisterForNavigation<PlanPermisionsView>();
             containerRegistry.RegisterForNavigation<PlanningView>();
+            containerRegistry.RegisterForNavigation<ServiceAccountingSettingsView>();
         }
 
         private User GetCurrentUser()

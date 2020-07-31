@@ -147,7 +147,7 @@
             <FrameworkElement Style="{StaticResource Separator}" />
 
             <Button Style="{StaticResource IconTransparentButton}"
-                    Command="{Binding IncreaseYear}">
+                    Command="{Binding DecreaseYear}">
                 <Viewbox Stretch="Uniform">
                     <materialDesign:PackIcon Kind="MenuLeft" />
                 </Viewbox>
@@ -157,7 +157,7 @@
                        FontWeight="Medium" />
 
             <Button Style="{StaticResource IconTransparentButton}"
-                    Command="{Binding DecreaseYear}">
+                    Command="{Binding IncreaseYear}">
                 <Viewbox Stretch="Uniform">
                     <materialDesign:PackIcon Kind="MenuRight" />
                 </Viewbox>

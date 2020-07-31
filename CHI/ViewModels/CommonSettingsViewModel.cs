@@ -10,7 +10,7 @@ using System.Linq;
 
 namespace CHI.ViewModels
 {
-    public class OtherSettingsViewModel : DomainObject, IRegionMemberLifetime
+    public class CommonSettingsViewModel : DomainObject, IRegionMemberLifetime
     {
         private Settings settings;
         private IDialogService dialogService;
@@ -24,14 +24,14 @@ namespace CHI.ViewModels
         public DelegateCommandAsync MigrateDBCommand { get; }
 
 
-        public OtherSettingsViewModel(IMainRegionService mainRegionService, IFileDialogService fileDialogService, IDialogService dialogService)
+        public CommonSettingsViewModel(IMainRegionService mainRegionService, IFileDialogService fileDialogService, IDialogService dialogService)
         {
             this.fileDialogService = fileDialogService;
             this.dialogService = dialogService;
             MainRegionService = mainRegionService;
 
             Settings = Settings.Instance;
-            MainRegionService.Header = "Прочие настройки";
+            MainRegionService.Header = "Общие настройки";
 
             TestCommand = new DelegateCommandAsync(TestExecute);
             SetDefaultCommand = new DelegateCommand(SetDefaultExecute);

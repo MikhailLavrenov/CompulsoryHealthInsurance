@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="CHI.Views.OtherSettingsView"
+﻿<UserControl x:Class="CHI.Views.CommonSettingsView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -21,16 +21,13 @@
         </ResourceDictionary >
     </UserControl.Resources>
 
-    <Grid d:DataContext="{d:DesignInstance vm:OtherSettingsViewModel }">
+    <Grid d:DataContext="{d:DesignInstance vm:CommonSettingsViewModel }">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="220" />
             <ColumnDefinition Width="300" />
         </Grid.ColumnDefinitions>
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="auto" />
-            <RowDefinition Height="auto" />
-            <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
@@ -81,65 +78,41 @@
 
         <TextBlock Grid.Row="3"
                    Grid.Column="0"
-                   Text="Имя домена AD" />
-        <TextBox Grid.Row="3"
-                  Grid.Column="1"
-                  Text="{Binding Settings.DomainName}" />
-
-        <TextBlock Grid.Row="4"
-                   Grid.Column="0"
-                   Text="Имя корневого OU AD" />
-        <TextBox Grid.Row="4"
-                 Grid.Column="1"
-                 Text="{Binding Settings.DomainUsersRootOU}" />
-
-        <TextBlock Grid.Row="5"
-                   Grid.Column="0"
                    Text="Использовать MS SQL сервер" />
-        <CheckBox Grid.Row="5"
+        <CheckBox Grid.Row="3"
                  Grid.Column="1" 
                  IsChecked="{Binding Settings.UseSQLServer}" />
 
-        <TextBlock Grid.Row="6"
+        <TextBlock Grid.Row="4"
                    Grid.Column="0"
                    Text="Имя SQL сервера" 
                    Visibility="{Binding Settings.UseSQLServer, Converter={i:BoolToVisibleConverter}}"/>
-        <TextBox Grid.Row="6"
+        <TextBox Grid.Row="4"
                  Grid.Column="1" 
                  Text="{Binding Settings.SQLServerName}"                   
                  Visibility="{Binding Settings.UseSQLServer, Converter={i:BoolToVisibleConverter}}"/>
 
-        <TextBlock Grid.Row="7"
+        <TextBlock Grid.Row="5"
                    Grid.Column="0"
                    Text="Имя SQL базы данных"                       
                    Visibility="{Binding Settings.UseSQLServer, Converter={i:BoolToVisibleConverter}}"/>
-        <TextBox Grid.Row="7"
+        <TextBox Grid.Row="5"
                  Grid.Column="1" 
                  Text="{Binding Settings.SQLServerDBName}"                   
                  Visibility="{Binding Settings.UseSQLServer, Converter={i:BoolToVisibleConverter}}"/>
 
-        <TextBlock Grid.Row="8"
+        <TextBlock Grid.Row="6"
                    Grid.Column="0"
                    Text="База данных" />
-        <Button Grid.Row="8"                   
+        <Button Grid.Row="6"                   
                 Grid.Column="1" 
                 Content="Обновить структуру"
                 Command="{Binding MigrateDBCommand}" />
 
-        <TextBlock Grid.Row="9"
-                   Grid.Column="0"
-                   Text="Шаблон утверждено" />
-        <TextBox Grid.Row="9"
-                 Grid.Column="1" 
-                 MinLines="5"
-                 TextWrapping="Wrap"
-                 AcceptsReturn="True"
-                 Text="{Binding Settings.ApprovedBy}" />
-
-        <FrameworkElement Grid.Row="10" Style="{StaticResource Separator}"/>
+               <FrameworkElement Grid.Row="7" Style="{StaticResource Separator}"/>
 
         <StackPanel VerticalAlignment="Top"
-                    Grid.Row="11"
+                    Grid.Row="8"
                     Grid.Column="0"
                     Grid.ColumnSpan="2"
                     Orientation="Horizontal">
@@ -153,4 +126,5 @@
 
 
     </Grid>
+
 </UserControl>

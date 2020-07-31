@@ -218,6 +218,7 @@ namespace CHI.Models
         bool useSQLServer;
         string sqlServerName;
         string sqlServerDBName;
+        string serviceAccountingReportPath;
 
         public bool UseProxy
         {
@@ -255,6 +256,7 @@ namespace CHI.Models
         public bool UseSQLServer { get=> useSQLServer; set=>SetProperty(ref useSQLServer, value); }
         public string SQLServerName { get=> sqlServerName; set=>SetProperty(ref sqlServerName, value); }
         public string SQLServerDBName { get => sqlServerDBName; set => SetProperty(ref sqlServerDBName, value); }
+        public string ServiceAccountingReportPath { get => serviceAccountingReportPath; set => SetProperty(ref serviceAccountingReportPath, value); }
 
         //проверяет настройки прокси-сервера, true-соединение установлено или прокси-сервер не используется, false-иначе
         public void TestConnectionProxy()
