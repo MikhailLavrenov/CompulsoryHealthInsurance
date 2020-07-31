@@ -54,7 +54,7 @@ namespace CHI.ViewModels
             DecreaseYear = new DelegateCommand(() => --Year);
             BuildReportCommand = new DelegateCommandAsync(BuildReportExecute);
             SaveExcelCommand = new DelegateCommandAsync(SaveExcelExecute);
-            BuildAndSaveExcelCommand = new DelegateCommandAsync(BuildAndSaveExcelExecute);
+            BuildAndSaveExcelCommand = new DelegateCommandAsync(BuildAndSaveExcelExecute, () => !string.IsNullOrEmpty(settings.ServiceAccountingReportPath));
         }
 
 
@@ -107,14 +107,9 @@ namespace CHI.ViewModels
                 return;
             }
 
-            var sheetName = reportYear != 0 ? Months[reportMonth].Substring(0, 3) : "Макет";
-
-            if (reportYear != 0 && reportIsGrowing)
-                sheetName = $"Σ {sheetName}";
-
             mainRegionService.ShowProgressBar("Сохранение файла");
 
-            Report.SaveExcel(filePath, sheetName);
+            Report.SaveExcel(filePath);
 
             mainRegionService.HideProgressBar($"Файл сохранен: {filePath}");
         }
@@ -140,11 +135,10 @@ namespace CHI.ViewModels
             var report = new ReportService(rootDepartment, rootComponent, false);
 
             BuilderReportInternal(report, false);
-            var sheetName = Months[Month].Substring(0, 3);
-            report.SaveExcel(settings.ServiceAccountingReportPath, sheetName);
+            report.SaveExcel(settings.ServiceAccountingReportPath);
 
             BuilderReportInternal(report, true);
-            report.SaveExcel(settings.ServiceAccountingReportPath, $"Σ {sheetName}");
+            report.SaveExcel(settings.ServiceAccountingReportPath);
 
             mainRegionService.HideProgressBar($"Отчет за месяц и нарастающий успешно построены и сохранены в excel файл");
         }

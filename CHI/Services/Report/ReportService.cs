@@ -370,9 +370,14 @@ namespace CHI.Services.Report
 
         }
 
-        public void SaveExcel(string path, string sheetName)
+        public void SaveExcel(string path)
         {
             using var excel = new ExcelPackage(new FileInfo(path));
+
+            var sheetName = Year == 0 ?  "Макет": CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(Month).Substring(3);
+
+            if (IsGrowing)
+                sheetName = $"Σ {sheetName}";
 
             var deleteSheet = excel.Workbook.Worksheets.FirstOrDefault(x => x.Name.Equals(sheetName, StringComparison.OrdinalIgnoreCase));
 
@@ -395,7 +400,7 @@ namespace CHI.Services.Report
                     header += " нарастающий";
             }
 
-            var subHeader = $"Построен {DateTime.Now.ToString("dd.MM.yyyy hh:mm")}";
+            var subHeader = $"Построен {DateTime.Now.ToString("dd.MM.yyyy HH:mm")}";
 
             var exRowIndex = 1;
 

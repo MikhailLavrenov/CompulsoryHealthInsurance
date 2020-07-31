@@ -115,11 +115,9 @@ namespace CHI.ViewModels
                 return;
             }
 
-            var sheetName = Months[Month].Substring(0, 3);
-
             mainRegionService.ShowProgressBar("Сохранение файла");
 
-            Report.SaveExcel(filePath, sheetName);
+            Report.SaveExcel(filePath);
 
             mainRegionService.HideProgressBar($"Файл сохранен: {filePath}");
         }
