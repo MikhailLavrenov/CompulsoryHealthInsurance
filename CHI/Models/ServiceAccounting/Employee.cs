@@ -1,9 +1,11 @@
 ﻿using Prism.Mvvm;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CHI.Models.ServiceAccounting
 {
-    public class Employee : BindableBase
+    public class Employee : BindableBase, ICloneable
     {
         Department department;
 
@@ -11,6 +13,7 @@ namespace CHI.Models.ServiceAccounting
         public Medic Medic { get; set; }
         public Specialty Specialty { get; set; }
         public Department Department { get => department; set => SetProperty(ref department, value); }
+        public AgeKind AgeKind { get; set; }
         public bool IsArchive { get; set; }
         public int Order { get; set; }
         public List<Parameter> Parameters { get; set; }
@@ -33,6 +36,18 @@ namespace CHI.Models.ServiceAccounting
                 Medic = Medic.CreateUnknown(medicFomsId),
                 Specialty = Specialty.CreateUnknown(specialtyFomsId)
             };
+        }
+
+        public object Clone()
+        {
+            var clone = (Employee)MemberwiseClone();
+            clone.Id = 0;
+            clone.Parameters = new List<Parameter>();
+
+            foreach (var parameter in Parameters)
+                clone.Parameters.Add((Parameter)parameter.Clone());
+
+            return clone;
         }
     }
 }

@@ -38,12 +38,12 @@ namespace CHI.ViewModels
 
             Refresh();
 
-            LoadRegisterCommand = new DelegateCommandAsync(LoadExecute);
+            LoadRegisterCommand = new DelegateCommandAsync(LoadRegisterExecute);
             LoadPaymentStateCommand = new DelegateCommandAsync(LoadPaymentStateExecute);
         }
 
 
-        private void LoadExecute()
+        private void LoadRegisterExecute()
         {
             mainRegionService.ShowProgressBar("Выбор файлов");
 
@@ -60,7 +60,6 @@ namespace CHI.ViewModels
             mainRegionService.ShowProgressBar("Загрузка xml-реестров");
 
             var registerService = new BillsRegisterService(fileDialogService.FileNames);
-            registerService.FileNamesNotStartsWith = new string[] { "L" };
             var register = registerService.GetRegister(false);
 
             using var localDbContext = new AppDBContext();
@@ -125,13 +124,13 @@ namespace CHI.ViewModels
             }
 
             //сопоставление штатных единиц в случаях и услугах
-            var casesGroups = register.Cases.GroupBy(x => new { MedicFomsId = x.Employee.Medic.FomsId, SpecialtyFomsId = x.Employee.Specialty.FomsId }).ToList();
+            var casesGroups = register.Cases.GroupBy(x => new { MedicFomsId = x.Employee.Medic.FomsId, SpecialtyFomsId = x.Employee.Specialty.FomsId, x.AgeKind }).ToList();
 
             var progressCounter = 0;
 
             foreach (var casesGroup in casesGroups)
             {
-                var employee = FindEmployeeInDbOrAdd(casesGroup.Key.MedicFomsId, casesGroup.Key.SpecialtyFomsId, localDbContext, defaultDepartment);
+                var employee = FindEmployeeInDbOrCreateNew(casesGroup.Key.MedicFomsId, casesGroup.Key.SpecialtyFomsId, casesGroup.Key.AgeKind, localDbContext, defaultDepartment);
 
                 foreach (var mCase in casesGroup)
                 {
@@ -144,7 +143,7 @@ namespace CHI.ViewModels
                         if (mCase.Employee.Specialty.FomsId == service.Employee.Specialty.FomsId && mCase.Employee.Medic.FomsId.Equals(service.Employee.Medic.FomsId))
                             service.Employee = mCase.Employee;
                         else
-                            service.Employee = FindEmployeeInDbOrAdd(service.Employee.Medic.FomsId, service.Employee.Specialty.FomsId, localDbContext, defaultDepartment);
+                            service.Employee = FindEmployeeInDbOrCreateNew(service.Employee.Medic.FomsId, service.Employee.Specialty.FomsId, casesGroup.Key.AgeKind, localDbContext, defaultDepartment);
                     }
                 }
             }
@@ -179,9 +178,9 @@ namespace CHI.ViewModels
             mainRegionService.HideProgressBar("Успешно загружено");
         }
 
-        private static Employee FindEmployeeInDbOrAdd(string medicFomsId, int specialtyFomsId, AppDBContext dbContext, Department defaultDepartment)
+        private static Employee FindEmployeeInDbOrCreateNew(string medicFomsId, int specialtyFomsId, AgeKind ageKind, AppDBContext dbContext, Department defaultDepartment)
         {
-            var employee = dbContext.Employees.Local.FirstOrDefault(x => x.Specialty.FomsId == specialtyFomsId && string.Equals(x.Medic.FomsId, medicFomsId, StringComparison.Ordinal));
+            var employee = dbContext.Employees.Local.FirstOrDefault(x => x.Specialty.FomsId == specialtyFomsId && string.Equals(x.Medic.FomsId, medicFomsId, StringComparison.Ordinal) && (x.AgeKind==AgeKind.Any || x.AgeKind==ageKind));
 
             if (employee != null)
                 return employee;
@@ -225,7 +224,6 @@ namespace CHI.ViewModels
             mainRegionService.ShowProgressBar("Загрузка xml-реестров");
 
             var registerService = new BillsRegisterService(fileDialogService.FileNames);
-            registerService.FileNamesNotStartsWith = new string[] { "L" };
             var paidRegister = registerService.GetRegister(true);
 
             var dbContext = new AppDBContext();

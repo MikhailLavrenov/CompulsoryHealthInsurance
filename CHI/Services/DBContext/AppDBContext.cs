@@ -92,6 +92,11 @@ namespace CHI.Services
                 .WithMany()
                 .OnDelete(DeleteBehavior.SetNull);
 
+            modelBuilder.Entity<Employee>()
+                .HasMany(x => x.Parameters)
+                .WithOne(x => x.Employee)
+                .OnDelete(DeleteBehavior.Cascade);
+
 
 
         }

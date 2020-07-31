@@ -17,7 +17,6 @@ namespace CHI.Services.BillsRegister
         private static readonly StringComparison comparer = StringComparison.OrdinalIgnoreCase;
         private List<string> filePaths;
 
-        public IEnumerable<string> FileNamesNotStartsWith { get; set; }
 
         /// <summary>
         /// Конструктор
@@ -36,13 +35,14 @@ namespace CHI.Services.BillsRegister
             filePaths = new List<string>() { filePath };
         }
 
+
         /// <summary>
         /// Получает счет-реестр за один период (отчетный месяц года)
         /// </summary>
         /// <returns></returns>
         public Register GetRegister(bool casePaymentOnly)
         {
-            var fomsRegistersFiles = GetFiles();
+            var fomsRegistersFiles = GetFiles(fileNamesNotStartsWith: new List<string> { "L" });
 
             if (casePaymentOnly)
             {
@@ -55,12 +55,19 @@ namespace CHI.Services.BillsRegister
             }
             else
             {
-                var fomsRegisters = DeserializeCollection<ZL_LIST>(fomsRegistersFiles);
+                var patientsFiles = GetFiles(fileNamesStartsWith: new List<string> { "L" });
+                var patientsRegisters = DeserializeCollection<PERS_LIST>(patientsFiles);
 
-                foreach (var fomsRegistersFile in fomsRegistersFiles)
-                    fomsRegistersFile.Dispose();
+                foreach (var file in patientsFiles)
+                    file.Dispose();
 
-                return ConvertToRegister(fomsRegisters);
+                var examinationsFiles = GetFiles(fileNamesNotStartsWith: new List<string> { "L" });
+                var examinationsRegisters = DeserializeCollection<ZL_LIST>(examinationsFiles);
+
+                foreach (var file in examinationsFiles)
+                    file.Dispose();
+
+                return ConvertToRegister(examinationsRegisters, patientsRegisters);
             }
         }
 
@@ -92,12 +99,12 @@ namespace CHI.Services.BillsRegister
         /// </summary>
         /// <param name="fileNamesStartsWith">Коллекция начала имен файлов.</param>
         /// <returns>Список потоков файлов.</returns>
-        private List<Stream> GetFiles(IEnumerable<string> fileNamesStartsWith = null)
+        private List<Stream> GetFiles(IEnumerable<string> fileNamesStartsWith = null, IEnumerable<string> fileNamesNotStartsWith = null)
         {
             var files = new List<Stream>();
 
             foreach (var filePath in filePaths)
-                files.AddRange(GetFilesRecursive(filePath, fileNamesStartsWith));
+                files.AddRange(GetFilesRecursive(filePath, fileNamesStartsWith, fileNamesNotStartsWith));
 
             return files;
         }
@@ -108,7 +115,7 @@ namespace CHI.Services.BillsRegister
         /// <param name="path">Путь к файлу.</param>
         /// <param name="fileNamesStartsWith">Коллекция начала имен файлов.</param>
         /// <returns>Список потоков файлов.</returns>
-        private List<Stream> GetFilesRecursive(string path, IEnumerable<string> fileNamesStartsWith = null)
+        private List<Stream> GetFilesRecursive(string path, IEnumerable<string> fileNamesStartsWith = null, IEnumerable<string> fileNamesNotStartsWith = null)
         {
             var result = new List<Stream>();
             var isDirectory = new FileInfo(path).Attributes.HasFlag(FileAttributes.Directory);
@@ -125,8 +132,8 @@ namespace CHI.Services.BillsRegister
                 var extension = Path.GetExtension(path);
 
                 if (extension.Equals(".xml", comparer)
-                    && !FileNamesNotStartsWith.Any(x => Path.GetFileName(path).StartsWith(x, comparer))
-                    && (fileNamesStartsWith == null || fileNamesStartsWith.Any(x => Path.GetFileName(path).StartsWith(x, comparer))))
+                    && !(fileNamesNotStartsWith?.Any(x => Path.GetFileName(path).StartsWith(x, comparer)) ?? false)
+                    && (fileNamesStartsWith?.Any(x => Path.GetFileName(path).StartsWith(x, comparer)) ?? true))
                     result.Add(new FileStream(path, FileMode.Open));
 
 
@@ -134,7 +141,7 @@ namespace CHI.Services.BillsRegister
                     using (var archive = ZipFile.OpenRead(path))
                     {
                         foreach (var entry in archive.Entries)
-                            result.AddRange(ArchiveEntryGetFilesRecursive(entry, fileNamesStartsWith));
+                            result.AddRange(ArchiveEntryGetFilesRecursive(entry, fileNamesStartsWith, fileNamesNotStartsWith));
                     }
             }
 
@@ -147,7 +154,7 @@ namespace CHI.Services.BillsRegister
         /// <param name="archiveEntry">Файл внутри zip архива.</param>
         /// <param name="fileNamesStartsWith">Коллекция начала имен файлов.</param>
         /// <returns>Список потоков файлов.</returns>
-        private List<Stream> ArchiveEntryGetFilesRecursive(ZipArchiveEntry archiveEntry, IEnumerable<string> fileNamesStartsWith)
+        private List<Stream> ArchiveEntryGetFilesRecursive(ZipArchiveEntry archiveEntry, IEnumerable<string> fileNamesStartsWith, IEnumerable<string> fileNamesNotStartsWith = null)
         {
             var result = new List<Stream>();
 
@@ -157,8 +164,8 @@ namespace CHI.Services.BillsRegister
             var extension = Path.GetExtension(archiveEntry.Name);
 
             if (extension.Equals(".xml", comparer)
-                && !FileNamesNotStartsWith.Any(x => archiveEntry.Name.StartsWith(x, comparer))
-                && (fileNamesStartsWith == null || fileNamesStartsWith.Any(x => archiveEntry.Name.StartsWith(x, comparer))))
+                && !(fileNamesNotStartsWith?.Any(x => archiveEntry.Name.StartsWith(x, comparer)) ?? false)
+                && (fileNamesStartsWith?.Any(x => archiveEntry.Name.StartsWith(x, comparer)) ?? true))
             {
                 var extractedEntry = new MemoryStream();
                 archiveEntry.Open().CopyTo(extractedEntry);
@@ -172,7 +179,7 @@ namespace CHI.Services.BillsRegister
                 using (var archive = new ZipArchive(extractedEntry))
                 {
                     foreach (var entry in archive.Entries)
-                        result.AddRange(ArchiveEntryGetFilesRecursive(entry, fileNamesStartsWith));
+                        result.AddRange(ArchiveEntryGetFilesRecursive(entry, fileNamesStartsWith, fileNamesNotStartsWith));
                 }
             }
 
@@ -278,27 +285,43 @@ namespace CHI.Services.BillsRegister
         /// <summary>
         /// Конвертирует типы xml реестров-счетов в Register.
         /// </summary>
-        private static Register ConvertToRegister(IEnumerable<ZL_LIST> fomsRegisters)
+        private static Register ConvertToRegister(IEnumerable<ZL_LIST> casesRegisters, IEnumerable<PERS_LIST> patientsRegisters)
         {
-            foreach (var item in fomsRegisters)
-                if (fomsRegisters.First().SCHET.MONTH != item.SCHET.MONTH || fomsRegisters.First().SCHET.YEAR != item.SCHET.YEAR)
+            foreach (var item in casesRegisters)
+                if (casesRegisters.First().SCHET.MONTH != item.SCHET.MONTH || casesRegisters.First().SCHET.YEAR != item.SCHET.YEAR)
                     throw new InvalidOperationException("Реестры должны принадлежать одному периоду");
 
-            var titleIndex = fomsRegisters.First().ZGLV.FILENAME.IndexOfAny("0123456789".ToCharArray());
+            var result = new List<PatientExaminations>();
+
+            var patients = new List<PERS>();
+
+            foreach (var patientsRegister in patientsRegisters)
+                patients.AddRange(patientsRegister?.PERS);
+
+            patients = patients.Distinct().ToList();
+
+            var titleIndex = casesRegisters.First().ZGLV.FILENAME.IndexOfAny("0123456789".ToCharArray());
 
             var register = new Register()
             {
-                Month = fomsRegisters.First().SCHET.MONTH,
-                Year = fomsRegisters.First().SCHET.YEAR,
-                BuildDate = fomsRegisters.First().ZGLV.DATA,
-                Title = fomsRegisters.First().ZGLV.FILENAME.Substring(titleIndex),
+                Month = casesRegisters.First().SCHET.MONTH,
+                Year = casesRegisters.First().SCHET.YEAR,
+                BuildDate = casesRegisters.First().ZGLV.DATA,
+                Title = casesRegisters.First().ZGLV.FILENAME.Substring(titleIndex),
                 Cases = new List<Case>()
 
             };
 
-            foreach (var fomsRegister in fomsRegisters)
+            foreach (var fomsRegister in casesRegisters)
                 foreach (var fomsCase in fomsRegister.ZAP)
                 {
+                    var foundPatient = patients.FirstOrDefault(x => x.ID_PAC == fomsCase.PACIENT.ID_PAC);
+
+                    if (foundPatient == default)
+                        throw new InvalidOperationException($"В xml реестре не найдена информация о пациенте ID_PAC={fomsCase.PACIENT.ID_PAC}, которому были оказаны услуги.");
+
+                    var ageYears = (DateTime.MinValue + (fomsCase.Z_SL.SL.DATE_2 - foundPatient.DR)).Year - 1;
+
                     var mCase = new Case()
                     {
                         IdCase = fomsCase.Z_SL.SL.SL_ID,
@@ -306,6 +329,7 @@ namespace CHI.Services.BillsRegister
                         VisitPurpose = fomsCase.Z_SL.SL.P_CEL,
                         TreatmentPurpose = fomsCase.Z_SL.SL.CEL,
                         DateEnd = fomsCase.Z_SL.SL.DATE_2,
+                        AgeKind = ageYears < 18 ? AgeKind.Сhildren : AgeKind.Adults,
                         BedDays = fomsCase.Z_SL.SL.KD,
                         PaidStatus = (PaidKind)fomsCase.Z_SL.OPLATA,
                         AmountPaid = fomsCase.Z_SL.SUMP,

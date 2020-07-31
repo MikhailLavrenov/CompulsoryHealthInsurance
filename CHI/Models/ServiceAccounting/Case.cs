@@ -28,6 +28,10 @@ namespace CHI.Models.ServiceAccounting
         /// </summary>
         public DateTime DateEnd { get; set; }
         /// <summary>
+        /// Тип возраста
+        /// </summary>
+        public AgeKind AgeKind { get; set; }
+        /// <summary>
         /// Койко-дни
         /// </summary>
         public int BedDays { get; set; }

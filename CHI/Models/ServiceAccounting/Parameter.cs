@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Text;
 
 namespace CHI.Models.ServiceAccounting
 {
-    public class Parameter
+    public class Parameter : ICloneable
     {
         public int Id { get; set; }
         public ParameterKind Kind { get; set; }
@@ -22,6 +19,14 @@ namespace CHI.Models.ServiceAccounting
         {
             Order = order;
             Kind = kind;
+        }
+
+        public object Clone()
+        {
+            var copy= (Parameter)MemberwiseClone();
+            copy.Id = 0;
+
+            return copy;
         }
     }
 }

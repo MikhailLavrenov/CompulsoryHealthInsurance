@@ -22,16 +22,28 @@
 
 
             <Button Style="{StaticResource IconButton}"
-                    Command="{Binding RefreshCommand}"
-                    Cursor="Hand">
+                    Command="{Binding RefreshCommand}">
                 <Viewbox Stretch="Uniform">
                     <materialDesign:PackIcon Kind="Reload" />
                 </Viewbox>
             </Button>
 
             <Button Style="{StaticResource IconButton}"
-                    Command="{Binding MoveUpCommand}"
-                    Cursor="Hand">
+                    Command="{Binding SplitAgesCommand}">
+                <Viewbox Stretch="Uniform">
+                    <materialDesign:PackIcon Kind="CallSplit" />
+                </Viewbox>
+            </Button>
+
+            <Button Style="{StaticResource IconButton}"
+                    Command="{Binding MergeAgesCommand}">
+                <Viewbox Stretch="Uniform">
+                    <materialDesign:PackIcon Kind="MergeType" />
+                </Viewbox>
+            </Button>
+
+            <Button Style="{StaticResource IconButton}"
+                    Command="{Binding MoveUpCommand}">
                 <Viewbox Stretch="Uniform">
                     <materialDesign:PackIcon Kind="ArrowUpward" />
                 </Viewbox>
@@ -73,7 +85,12 @@
                 <DataGridTextColumn Header="Специальность"
                                     Binding="{Binding Specialty.Name}"
                                     IsReadOnly="True"
-                                    MinWidth="150" />
+                                    MinWidth="200" />
+
+                <DataGridTextColumn Header="Возраст"
+                                    Binding="{Binding AgeKind, Converter={i:EnumToDescriptionConverter}}"
+                                    IsReadOnly="True"
+                                    MinWidth="100" />
 
                 <DataGridCheckBoxColumn Header="Архивный"
                                         Binding="{Binding IsArchive}"
