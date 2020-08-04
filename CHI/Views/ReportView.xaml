@@ -22,6 +22,13 @@
                 <ResourceDictionary Source="/CHI;component/Views/Resources/WindowDefaultStyle.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
+            <Style TargetType="{x:Type materialDesign:PackIcon}">
+                <Setter Property="Width" 
+                        Value="20"/>
+                <Setter Property="Height" 
+                        Value="20"/>
+            </Style>
+
             <Style TargetType="{x:Type TextBlock}"
                    x:Key="Cell">
                 <Setter Property="HorizontalAlignment"
@@ -78,8 +85,7 @@
                     Orientation="Horizontal">
 
             <Button Style="{StaticResource IconButton}"
-                    Command="{Binding BuildReportCommand}"
-                    Cursor="Hand">
+                    Command="{Binding BuildReportCommand}">
                 <Viewbox Stretch="Uniform">
                     <materialDesign:PackIcon Kind="Check" />
                 </Viewbox>
@@ -138,7 +144,7 @@
                     HorizontalAlignment="Right">
 
             <TextBlock Text="Нарастающий" />
-            
+
             <CheckBox IsChecked="{Binding IsGrowing}" />
 
         </StackPanel>
@@ -203,14 +209,12 @@
                                                 HorizontalAlignment="Left"
                                                 Command="{Binding SwitchCollapseCommand}"
                                                 Visibility="{Binding CanCollapse, Converter={i:BoolToVisibleHiddenConverter}}">
-                                            <Viewbox Stretch="Uniform">
-                                                <StackPanel>
-                                                    <materialDesign:PackIcon Kind="ExpandMore"
+                                            <StackPanel>
+                                                <materialDesign:PackIcon Kind="ExpandMore"
                                                                              Visibility="{Binding IsCollapsed, Converter={i:BoolToVisibleConverter}}" />
-                                                    <materialDesign:PackIcon Kind="KeyboardArrowRight"
+                                                <materialDesign:PackIcon Kind="KeyboardArrowRight"
                                                                              Visibility="{Binding IsCollapsed, Converter={i:InvertedBoolToVisibleConverter}}" />
-                                                </StackPanel>
-                                            </Viewbox>
+                                            </StackPanel>
                                         </Button>
                                         <TextBlock Style="{StaticResource HeaderCell}"
                                                    Text="{Binding Name}" />
@@ -279,24 +283,21 @@
                                     <StackPanel Orientation="Horizontal">
                                         <Button Style="{StaticResource IconTransparentButton}"
                                                 VerticalAlignment="Top"
-                                                Width="20"
-                                                Height="20"
                                                 Command="{Binding SwitchCollapseCommand}"
                                                 Visibility="{Binding CanCollapse, Converter={i:BoolToVisibleHiddenConverter}}">
-                                            <Viewbox Stretch="Uniform">
-                                                <StackPanel>
-                                                    <materialDesign:PackIcon Kind="KeyboardArrowRight"
+                                            <StackPanel>
+                                                <materialDesign:PackIcon Kind="KeyboardArrowRight" Canvas.Left="0" Canvas.Top="0"
                                                                              Visibility="{Binding IsCollapsed, Converter={i:BoolToVisibleConverter}}" />
-                                                    <materialDesign:PackIcon Kind="ExpandMore"
+                                                <materialDesign:PackIcon Kind="ExpandMore"
                                                                              Visibility="{Binding IsCollapsed, Converter={i:InvertedBoolToVisibleConverter}}" />
-                                                </StackPanel>
-                                            </Viewbox>
+                                            </StackPanel>
                                         </Button>
                                         <StackPanel Orientation="Vertical"
                                                     Width="150">
                                             <TextBlock Style="{StaticResource HeaderCell}"
                                                        Text="{Binding Name}" />
-                                            <TextBlock Style="{StaticResource HeaderCell}" FontWeight="Light"
+                                            <TextBlock Style="{StaticResource HeaderCell}" 
+                                                       FontWeight="Light"
                                                        Text="{Binding SubName}" />
                                         </StackPanel>
                                     </StackPanel>
@@ -375,9 +376,7 @@
                                                 <SolidColorBrush Color="{Binding Color}" />
                                             </Border.Background>
                                             <TextBlock Style="{StaticResource Cell}"
-                                                       Text="{Binding Value}">
-
-                                            </TextBlock>
+                                                       Text="{Binding Value}"/>
                                         </Border>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
@@ -390,7 +389,6 @@
                 </ItemsControl>
 
             </ScrollViewer>
-
 
         </Grid>
 

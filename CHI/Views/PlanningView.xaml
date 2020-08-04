@@ -22,6 +22,13 @@
                 <ResourceDictionary Source="/CHI;component/Views/Resources/WindowDefaultStyle.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
+            <Style TargetType="{x:Type materialDesign:PackIcon}">
+                <Setter Property="Width"
+                        Value="20" />
+                <Setter Property="Height"
+                        Value="20" />
+            </Style>
+
             <Style TargetType="{x:Type TextBox}"
                    x:Key="Cell">
                 <Setter Property="Width"
@@ -225,14 +232,12 @@
                                                 HorizontalAlignment="Left"
                                                 Command="{Binding SwitchCollapseCommand}"
                                                 Visibility="{Binding CanCollapse, Converter={i:BoolToVisibleHiddenConverter}}">
-                                            <Viewbox Stretch="Uniform">
                                                 <StackPanel>
                                                     <materialDesign:PackIcon Kind="ExpandMore"
                                                                              Visibility="{Binding IsCollapsed, Converter={i:BoolToVisibleConverter}}" />
                                                     <materialDesign:PackIcon Kind="KeyboardArrowRight"
                                                                              Visibility="{Binding IsCollapsed, Converter={i:InvertedBoolToVisibleConverter}}" />
                                                 </StackPanel>
-                                            </Viewbox>
                                         </Button>
                                         <TextBlock Style="{StaticResource HeaderCell}"
                                                    Text="{Binding Name}" />
@@ -300,20 +305,16 @@
                                         Background="{StaticResource HeaderBrush}">
                                     <StackPanel Orientation="Horizontal" Width="300">
                                         <Button Style="{StaticResource IconTransparentButton}"
-                                                Width="20"
-                                                Height="20"
                                                 Margin="0,-2,0,-2"
                                                 VerticalAlignment="Center"
                                                 Command="{Binding SwitchCollapseCommand}"
                                                 Visibility="{Binding CanCollapse, Converter={i:BoolToVisibleHiddenConverter}}">
-                                            <Viewbox Stretch="Uniform">
                                                 <StackPanel>
                                                     <materialDesign:PackIcon Kind="KeyboardArrowRight"
                                                                              Visibility="{Binding IsCollapsed, Converter={i:BoolToVisibleConverter}}" />
                                                     <materialDesign:PackIcon Kind="ExpandMore"
                                                                              Visibility="{Binding IsCollapsed, Converter={i:InvertedBoolToVisibleConverter}}" />
                                                 </StackPanel>
-                                            </Viewbox>
                                         </Button>
                                         
                                         <TextBlock Style="{StaticResource HeaderCell}" 
@@ -400,9 +401,7 @@
                                                 <SolidColorBrush Color="{Binding Color}" />
                                             </Border.Background>
                                             <TextBox Style="{StaticResource Cell}"
-                                                     Text="{Binding Value}">
-
-                                            </TextBox>
+                                                     Text="{Binding Value}"/>
                                         </Border>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
@@ -415,7 +414,6 @@
                 </ItemsControl>
 
             </ScrollViewer>
-
 
         </Grid>
 

@@ -374,7 +374,7 @@ namespace CHI.Services.Report
         {
             using var excel = new ExcelPackage(new FileInfo(path));
 
-            var sheetName = Year == 0 ?  "Макет": CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(Month).Substring(3);
+            var sheetName = Year == 0 ?  "Макет": CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(Month).Substring(0,3);
 
             if (IsGrowing)
                 sheetName = $"Σ {sheetName}";
