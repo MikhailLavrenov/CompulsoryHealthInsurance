@@ -28,20 +28,32 @@ namespace CHI.Infrastructure
 
             scrollViewer.ScrollChanged += OnScrollChanged;
 
-            SyncWith.ScrollChanged+= OnScrollChanged;
+            SyncWith.ScrollChanged += OnScrollChanged;
         }
 
         private void OnScrollChanged(object sender, ScrollChangedEventArgs e)
         {
-            if (e.HorizontalChange == 0 && e.VerticalChange == 0)
+            //Свойства VerticalChange и HorizontalChange ScrollChangedEventArgs не всегда верно показывают значение сдвига,
+            //поэтому используются только текущие значения ScrollViewer
+
+            var scrolledSV = (ScrollViewer)sender;
+            var associatedSV = scrolledSV == scrollViewer ? SyncWith : scrollViewer;
+
+            var isHorizontalChanged = SyncHorizontal ? scrolledSV.HorizontalOffset != associatedSV.HorizontalOffset : false;
+            var isVerticalChanged = SyncVertical ? scrolledSV.VerticalOffset != associatedSV.VerticalOffset : false;
+
+            if (!isHorizontalChanged && !isVerticalChanged)
                 return;
 
-            var associatedScrollViewer = (ScrollViewer)sender == scrollViewer ? SyncWith : scrollViewer;
+            associatedSV.ScrollChanged -= OnScrollChanged;
 
-            if (SyncHorizontal && e.HorizontalChange != 0)
-                associatedScrollViewer.ScrollToHorizontalOffset(e.HorizontalOffset);
-            if (SyncVertical && e.VerticalChange != 0)
-                associatedScrollViewer.ScrollToVerticalOffset(e.VerticalOffset);
+            if (isHorizontalChanged)
+                associatedSV.ScrollToHorizontalOffset(scrolledSV.HorizontalOffset);
+
+            if (isVerticalChanged)
+                associatedSV.ScrollToVerticalOffset(scrolledSV.VerticalOffset);
+
+            associatedSV.ScrollChanged += OnScrollChanged;
         }
 
         protected override void OnDetaching()
