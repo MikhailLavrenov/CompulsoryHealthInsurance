@@ -23,9 +23,9 @@ namespace CHI.ViewModels
         IMainRegionService mainRegionService;
         IFileDialogService fileDialogService;
         ReportService report;
-        int reportMonth;
-        int reportYear;
-        bool reportIsGrowing;
+        //int reportMonth;
+        //int reportYear;
+        //bool reportIsGrowing;
 
         public bool KeepAlive { get => false; }
         public int Year { get => year; set => SetProperty(ref year, value); }
@@ -62,9 +62,9 @@ namespace CHI.ViewModels
         {
             mainRegionService.ShowProgressBar("Построение отчета");
 
-            reportMonth = Month;
-            reportYear = Year;
-            reportIsGrowing = IsGrowing;
+            //reportMonth = Month;
+            //reportYear = Year;
+            //reportIsGrowing = IsGrowing;
 
             BuilderReportInternal(Report, IsGrowing);
 
@@ -143,15 +143,15 @@ namespace CHI.ViewModels
             mainRegionService.HideProgressBar($"Отчет за месяц и нарастающий успешно построены и сохранены в excel файл");
         }
 
-        public static bool PeriodsIntersects(DateTime? period1date1, DateTime? period1date2, int period2Month1, int period2Month2, int period2Year)
-        {
-            var p1d1 = period1date1.HasValue ? period1date1.Value.Year * 100 + period1date1.Value.Month : 0;
-            var p1d2 = period1date2.HasValue ? period1date2.Value.Year * 100 + period1date2.Value.Month : int.MaxValue;
-            var p2d1 = period2Year * 100 + period2Month1;
-            var p2d2 = period2Year * 100 + period2Month2;
+        //private static bool PeriodsIntersects(DateTime? period1date1, DateTime? period1date2, int period2Month1, int period2Month2, int period2Year)
+        //{
+        //    var p1d1 = period1date1.HasValue ? period1date1.Value.Year * 100 + period1date1.Value.Month : 0;
+        //    var p1d2 = period1date2.HasValue ? period1date2.Value.Year * 100 + period1date2.Value.Month : int.MaxValue;
+        //    var p2d1 = period2Year * 100 + period2Month1;
+        //    var p2d2 = period2Year * 100 + period2Month2;
 
-            return !(p2d2 < p1d1 || p1d2 < p2d1);
-        }
+        //    return !(p2d2 < p1d1 || p1d2 < p2d1);
+        //}
 
         public void OnNavigatedTo(NavigationContext navigationContext)
         {
