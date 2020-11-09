@@ -54,6 +54,7 @@ namespace CHI.Services.Report
 
         public event EventHandler IsVisibleChangedEvent;
 
+
         public ColumnHeaderGroup(Component component, ColumnHeaderGroup parent)
         {
             Component = component;
