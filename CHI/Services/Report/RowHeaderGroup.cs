@@ -16,6 +16,9 @@ namespace CHI.Services.Report
         bool canVisible = true;
         Color color;
 
+        public static Color AlternationColor1 { get; } = Colors.WhiteSmoke;
+        public static Color AlternationColor2 { get; } = Colors.Transparent;
+
         public string Name { get; set; }
         public string SubName { get; set; }
         public bool IsRoot { get; set; }
@@ -70,13 +73,11 @@ namespace CHI.Services.Report
         public RowHeaderGroup Parent { get; set; }
         public List<RowHeaderGroup> Childs { get; set; }
 
-        public static Color AlternationColor1 { get; } = Colors.WhiteSmoke;
-        public static Color AlternationColor2 { get; } = Colors.Transparent;
-
         public DelegateCommand SwitchCollapseCommand { get; }
 
         public event EventHandler IsVisibleChangedEvent;
         public event EventHandler ColorChangedEvent;
+
 
         public RowHeaderGroup(Department department, RowHeaderGroup parent)
         {

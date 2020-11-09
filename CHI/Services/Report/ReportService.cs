@@ -14,14 +14,14 @@ namespace CHI.Services.Report
     {
         RowHeaderGroup rootRow;
         ColumnHeaderGroup rootColumn;
+        List<RowHeaderItem> RowItems;
+        List<ColumnHeaderItem> ColumnItems;
 
         public int MoneyRoundDigits { get; set; }
         public List<RowHeaderGroup> RowGroups { get; set; }
         public List<ColumnHeaderGroup> ColumnGroups { get; set; }
-        public List<RowHeaderItem> RowItems { get; private set; }
-        public List<ColumnHeaderItem> ColumnItems { get; private set; }
         public ValueItem[][] Values { get; private set; }
-        public List<ValueItem> ValuesList { get; set; }
+        public List<ValueItem> ValuesList { get; private set; }
         public bool IsPlanningMode { get; private set; }
         public int Month { get; private set; }
         public int Year { get; private set; }
@@ -94,8 +94,8 @@ namespace CHI.Services.Report
                 {
                     Values[row][col] = new ValueItem(row, col, RowItems[row], ColumnItems[col], !IsPlanningMode);
 
-                    if (!IsPlanningMode)
-                        Values[row][col].IsWritable = false;
+                    //if (!IsPlanningMode)
+                    //    Values[row][col].IsWritable = false;
                 }
             }
 
@@ -109,9 +109,8 @@ namespace CHI.Services.Report
             Year = year;
             IsGrowing = isGrowing;
 
-            foreach (var valueItemsRow in Values)
-                foreach (var valueItem in valueItemsRow)
-                    valueItem.Value = 0;
+            foreach (var valueItem in ValuesList)
+                valueItem.Value = 0;
 
             //заполняет план
             foreach (var row in RowItems.Where(x => x.Parameter.Kind == ParameterKind.EmployeePlan || x.Parameter.Kind == ParameterKind.DepartmentHandPlan))
@@ -374,7 +373,7 @@ namespace CHI.Services.Report
         {
             using var excel = new ExcelPackage(new FileInfo(path));
 
-            var sheetName = Year == 0 ?  "Макет": CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(Month).Substring(0,3);
+            var sheetName = Year == 0 ? "Макет" : CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(Month).Substring(0, 3);
 
             if (IsGrowing)
                 sheetName = $"Σ {sheetName}";
