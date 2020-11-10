@@ -4,7 +4,9 @@ using System.Text;
 
 namespace CHI.Infrastructure.Controls._2DDataGrid
 {
-    class Header
+    public class HeaderSubItem
     {
+        public string Name { get; set; }
+        public HeaderItem HeaderItem { get; set; }
     }
 }
