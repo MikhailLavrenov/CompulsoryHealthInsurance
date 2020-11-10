@@ -1,9 +1,7 @@
-﻿using CHI.Models.Infrastructure;
-using Prism.Mvvm;
+﻿using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Windows.Media;
 
 namespace CHI.Infrastructure.Controls._2DDataGrid
@@ -33,10 +31,7 @@ namespace CHI.Infrastructure.Controls._2DDataGrid
 
                 alwaysHidden = value;
 
-                if (alwaysHidden)
-                    IsVisible = false;
-                else if (Parent.IsCollapsed == false)
-                    IsVisible = true;
+                UpdateVisibility();
             }
         }
         public bool IsVisible
@@ -44,18 +39,14 @@ namespace CHI.Infrastructure.Controls._2DDataGrid
             get => isVisible;
             set
             {
-                if (alwaysHidden)
-                    value = false;
-
                 if (isVisible == value)
                     return;
 
                 SetProperty(ref isVisible, value);
 
-                if (!isVisible && IsCollapsed == false)
-                    SwitchCollapseExecute();
-
                 IsVisibleChangedEvent?.Invoke(this, new EventArgs());
+
+                UpdateChildrenVisibility();
             }
         }
 
@@ -74,17 +65,33 @@ namespace CHI.Infrastructure.Controls._2DDataGrid
             Color = color;
             AlwaysHidden = alwaysHidden;
             Parent = parent;
-            Parent.Childs.Add(this);
+            Parent?.Childs.Add(this);
             SubItems = subItems ?? new List<HeaderSubItem>();
+            Childs = new List<HeaderItem>();
         }
 
-
-        private void SwitchCollapseExecute()
+        private void UpdateVisibility()
         {
+            if (alwaysHidden || !Parent.IsVisible)
+                IsVisible = false;
+            else if (Parent.IsCollapsed == false)
+                IsVisible = true;
+        }
+
+        private void UpdateChildrenVisibility()
+        {
+            foreach (var child in Childs)
+                child.UpdateVisibility();
+        }
+
+        private void SwitchCollapse()
+        {
+            if (!CanCollapse)
+                return;
+
             IsCollapsed = !IsCollapsed;
 
-            foreach (var child in Childs)
-                child.IsVisible = !IsCollapsed.Value;
+            UpdateChildrenVisibility();
         }
 
     }
