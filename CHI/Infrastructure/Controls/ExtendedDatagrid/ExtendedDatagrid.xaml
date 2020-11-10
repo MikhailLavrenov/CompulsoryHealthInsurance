@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="CHI.Infrastructure.Controls.Hierarchical2DDatagrid"
+﻿<UserControl x:Class="CHI.Infrastructure.Controls.ExtendedDatagrid"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -100,7 +100,7 @@
                           HorizontalScrollBarVisibility="Hidden"
                           Margin="0,0,17,0">
 
-            <ItemsControl ItemsSource="{Binding Report.ColumnGroups}">
+            <ItemsControl ItemsSource="{Binding  ColumnHeaderItems}">
 
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
@@ -127,10 +127,10 @@
                                                 Command="{Binding SwitchCollapseCommand}"
                                                 Visibility="{Binding CanCollapse, Converter={i:BoolToVisibleHiddenConverter}}">
                                         <StackPanel>
-                                            <materialDesign:PackIcon Kind="ExpandMore"
-                                                                             Visibility="{Binding IsCollapsed, Converter={i:BoolToVisibleConverter}}" />
-                                            <materialDesign:PackIcon Kind="KeyboardArrowRight"
-                                                                             Visibility="{Binding IsCollapsed, Converter={i:InvertedBoolToVisibleConverter}}" />
+                                            <materialDesign:PackIcon Kind="ExpandMore"                                                                             
+                                                                     Visibility="{Binding IsCollapsed, Converter={i:BoolToVisibleConverter}}" />
+                                            <materialDesign:PackIcon Kind="KeyboardArrowRight"                                                                             
+                                                                     Visibility="{Binding IsCollapsed, Converter={i:InvertedBoolToVisibleConverter}}" />
                                         </StackPanel>
                                     </Button>
                                     <TextBlock Style="{StaticResource HeaderCell}"
@@ -138,7 +138,7 @@
                                 </StackPanel>
                             </Border>
                             <!--Элементы HeaderItems столбца заголовка-->
-                            <ItemsControl ItemsSource="{Binding HeaderItems}">
+                            <ItemsControl ItemsSource="{Binding SubItems}">
 
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
@@ -175,7 +175,7 @@
                           HorizontalScrollBarVisibility="Hidden"
                           Margin="0,0,0,17">
 
-            <ItemsControl ItemsSource="{Binding Report.RowGroups}">
+            <ItemsControl ItemsSource="{Binding RowHeaderItems}">
 
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
@@ -203,10 +203,10 @@
                                                 Command="{Binding SwitchCollapseCommand}"
                                                 Visibility="{Binding CanCollapse, Converter={i:BoolToVisibleHiddenConverter}}">
                                         <StackPanel>
-                                            <materialDesign:PackIcon Kind="KeyboardArrowRight" Canvas.Left="0" Canvas.Top="0"
-                                                                             Visibility="{Binding IsCollapsed, Converter={i:BoolToVisibleConverter}}" />
-                                            <materialDesign:PackIcon Kind="ExpandMore"
-                                                                             Visibility="{Binding IsCollapsed, Converter={i:InvertedBoolToVisibleConverter}}" />
+                                            <materialDesign:PackIcon Kind="KeyboardArrowRight" Canvas.Left="0" Canvas.Top="0"                                                                             
+                                                                     Visibility="{Binding IsCollapsed, Converter={i:BoolToVisibleConverter}}" />
+                                            <materialDesign:PackIcon Kind="ExpandMore"                                                                             
+                                                                     Visibility="{Binding IsCollapsed, Converter={i:InvertedBoolToVisibleConverter}}" />
                                         </StackPanel>
                                     </Button>
                                     <StackPanel Orientation="Vertical"
@@ -221,7 +221,7 @@
                             </Border>
 
                             <!--HeaderItems строки заголовка-->
-                            <ItemsControl ItemsSource="{Binding HeaderItems}">
+                            <ItemsControl ItemsSource="{Binding SubItems}">
 
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
@@ -264,7 +264,7 @@
             </b:Interaction.Behaviors>
 
             <ItemsControl SelectiveScrollingGrid.SelectiveScrollingOrientation="Both"
-                              ItemsSource="{Binding Report.Values}">
+                              ItemsSource="{Binding GridItems}">
 
                 <!--Строки-->
                 <ItemsControl.ItemsPanel>
