@@ -176,16 +176,17 @@ namespace CHI.Services.Report
                 if (eqEmployeeKind == ParameterKind.None)
                     continue;
 
-                foreach (var column in indicators.Where(x => x.Group.Component.CaseFilters.First().Kind != CaseFilterKind.Total))
+                foreach (var indicator in indicators.Where(x => x.Component.CaseFilters.First().Kind != CaseFilterKind.Total))
                 {
-                    var valueItem = Values[row.Index][column.Index];
-                    valueItem.Value = 0;
+                    double sum = 0;
 
-                    row.Group.Childs
-                        .SelectMany(x => x.HeaderItems)
-                        .Where(x => x.Parameter.Kind == row.Parameter.Kind || x.Parameter.Kind == eqEmployeeKind)
+                    parameter.Department.Childs
+                        .SelectMany(x => x.Parameters).Concat(parameter.Department.Employees.SelectMany(y => y.Parameters))
+                        .Where(x => x.Kind == parameter.Kind || x.Kind == eqEmployeeKind)
                         .ToList()
-                        .ForEach(x => valueItem.Value += Values[x.Index][column.Index].Value ?? 0);
+                        .ForEach(x => sum += Results[(x, indicator)] ?? 0);
+
+                    Results[(parameter, indicator)] = sum;
                 }
             }
         }
@@ -193,43 +194,44 @@ namespace CHI.Services.Report
         //суммирует столбцы
         private void SumColumns()
         {
-            foreach (var row in RowItems)
-                foreach (var column in ColumnItems.Where(x => x.Group.Component.CaseFilters.First().Kind == CaseFilterKind.Total).OrderByDescending(x => x.Priority))
+            foreach (var parameter in parameters)
+                foreach (var indicator in indicators.Where(x => x.Component.CaseFilters.First().Kind == CaseFilterKind.Total).Reverse())
                 {
-                    var valueItem = Values[row.Index][column.Index];
-                    valueItem.Value = 0;
+                    double sum = 0;
 
-                    column.Group.Childs
-                        .SelectMany(x => x.HeaderItems)
-                        .Where(x => x.Indicator.FacadeKind == column.Indicator.ValueKind)
+                    indicator.Component.Childs
+                        .SelectMany(x => x.Indicators)
+                        .Where(x => x.FacadeKind == indicator.ValueKind)
                         .ToList()
-                        .ForEach(x => valueItem.Value += Values[row.Index][x.Index].Value ?? 0);
+                        .ForEach(x => sum += Results[(parameter, x)] ?? 0);
+
+                    Results[(parameter, indicator)] = sum;
                 }
         }
 
         //округляет значения и убирает нули
         private void DropZeroAndRoundValues()
         {
-            foreach (var row in RowItems)
-                foreach (var column in ColumnItems)
-                {
-                    var valueItem = Values[row.Index][column.Index];
+            foreach (var key in Results.Keys)
+            {
+                var result = Results[key];
 
-                    if (valueItem.Value == null)
-                        continue;
+                if (result == null)
+                    continue;
 
-                    if (valueItem.Value == 0)
-                        valueItem.Value = null;
+                if (result == 0)
+                    result = null;
+                else if (key.Item1.Kind == ParameterKind.DepartmentPercent)
+                    result = Math.Round(result.Value, 1, MidpointRounding.AwayFromZero);
 
-                    else if (row.Parameter.Kind == ParameterKind.DepartmentPercent)
-                        valueItem.Value = Math.Round(valueItem.Value.Value, 1, MidpointRounding.AwayFromZero);
+                else if (key.Item2.FacadeKind == IndicatorKind.Cost)
+                    result = Math.Round(result.Value, MoneyRoundDigits, MidpointRounding.AwayFromZero);
 
-                    else if (column.Indicator.FacadeKind == IndicatorKind.Cost)
-                        valueItem.Value = Math.Round(valueItem.Value.Value, MoneyRoundDigits, MidpointRounding.AwayFromZero);
+                else
+                    result = Math.Round(result.Value, 0, MidpointRounding.AwayFromZero);
 
-                    else
-                        valueItem.Value = Math.Round(valueItem.Value.Value, 0, MidpointRounding.AwayFromZero);
-                }
+                Results[key] = result;
+            }
         }
 
         private void SetValuesFromCases(int month, int year, IEnumerable<Case> cases, bool isPaymentAccepted)
