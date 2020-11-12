@@ -2,7 +2,7 @@
 using System;
 using System.Windows.Media;
 
-namespace CHI.Infrastructure.Controls._2DDataGrid
+namespace CHI.Infrastructure
 {
     public class GridItem : BindableBase
     {

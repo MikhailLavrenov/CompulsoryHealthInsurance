@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace CHI.Infrastructure.Controls._2DDataGrid
+namespace CHI.Infrastructure
 {
     public class HeaderSubItem
     {

@@ -13,7 +13,7 @@ using System.Linq;
 
 namespace CHI.ViewModels
 {
-    class ReportViewModel : DomainObject, IRegionMemberLifetime, INavigationAware
+    class ReportViewModelOld : DomainObject, IRegionMemberLifetime, INavigationAware
     {
         AppDBContext dbContext;
         Settings settings;
@@ -22,17 +22,15 @@ namespace CHI.ViewModels
         bool isGrowing;
         IMainRegionService mainRegionService;
         IFileDialogService fileDialogService;
-        ReportService reportService;
+        OldReportService report;
 
         public bool KeepAlive { get => false; }
         public int Year { get => year; set => SetProperty(ref year, value); }
         public int Month { get => month; set => SetProperty(ref month, value); }
         public bool IsGrowing { get => isGrowing; set => SetProperty(ref isGrowing, value); }
         public Dictionary<int, string> Months { get; } = Enumerable.Range(1, 12).ToDictionary(x => x, x => CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(x));
+        public OldReportService Report { get => report; set => SetProperty(ref report, value); }
 
-        public List<HeaderItem> RowHeaders { get; set; }
-        public List<HeaderItem> ColumnHeaders { get; set; }
-        public GridItem[][] GridItems { get; set; }
         public DelegateCommand IncreaseYear { get; }
         public DelegateCommand DecreaseYear { get; }
         public DelegateCommandAsync BuildReportCommand { get; }
@@ -40,7 +38,7 @@ namespace CHI.ViewModels
         public DelegateCommandAsync BuildAndSaveExcelCommand { get; }
 
 
-        public ReportViewModel(IMainRegionService mainRegionService, IFileDialogService fileDialogService)
+        public ReportViewModelOld(IMainRegionService mainRegionService, IFileDialogService fileDialogService)
         {
             settings = Settings.Instance;
 
@@ -61,12 +59,12 @@ namespace CHI.ViewModels
         {
             mainRegionService.ShowProgressBar("Построение отчета");
 
-            BuildReportInternal(reportService, IsGrowing);
+            BuilderReportInternal(Report, IsGrowing);
 
             mainRegionService.HideProgressBar($"Отчет за {Months[Month]} {Year} построен");
         }
 
-        private void BuildReportInternal(ReportService report, bool isGrowing)
+        private void BuilderReportInternal(OldReportService report, bool isGrowing)
         {
             var monthBegin = isGrowing ? 1 : Month;
 
@@ -104,7 +102,7 @@ namespace CHI.ViewModels
 
             mainRegionService.ShowProgressBar("Сохранение файла");
 
-            //Report.SaveExcel(filePath);
+            Report.SaveExcel(filePath);
 
             mainRegionService.HideProgressBar($"Файл сохранен: {filePath}");
         }
@@ -127,13 +125,13 @@ namespace CHI.ViewModels
 
             var rootDepartment = dbContext.Departments.Local.First(x => x.IsRoot);
             var rootComponent = dbContext.Components.Local.First(x => x.IsRoot);
-            var report = new ReportService(rootDepartment, rootComponent);
+            var report = new OldReportService(rootDepartment, rootComponent, false);
 
-            BuildReportInternal(report, false);
-            //report.SaveExcel(settings.ServiceAccountingReportPath);
+            BuilderReportInternal(report, false);
+            report.SaveExcel(settings.ServiceAccountingReportPath);
 
-            BuildReportInternal(report, true);
-            //report.SaveExcel(settings.ServiceAccountingReportPath);
+            BuilderReportInternal(report, true);
+            report.SaveExcel(settings.ServiceAccountingReportPath);
 
             mainRegionService.HideProgressBar($"Отчет за месяц и нарастающий успешно построены и сохранены в excel файл");
         }
@@ -160,7 +158,7 @@ namespace CHI.ViewModels
 
             var rootComponent = dbContext.Components.Local.First(x => x.IsRoot);
 
-            reportService = new ReportService(rootDepartment, rootComponent);
+            Report = new OldReportService(rootDepartment, rootComponent, false);
         }
 
         public bool IsNavigationTarget(NavigationContext navigationContext)

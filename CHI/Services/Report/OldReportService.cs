@@ -10,21 +10,12 @@ using System.Linq;
 
 namespace CHI.Services.Report
 {
-    public class NewReportService
+    public class OldReportService
     {
         RowHeaderGroup rootRow;
         ColumnHeaderGroup rootColumn;
         List<RowHeaderItem> RowItems;
         List<ColumnHeaderItem> ColumnItems;
-
-        List<Parameter> parameters;
-        List<Indicator> indicators;
-        List<Department> departments;
-        List<Employee> employees;
-        List<Component> components;
-        Department rootDepartment;
-        Component rootComponent;
-        public Dictionary<(Parameter, Indicator), double?> Results { get; set; }
 
         public int MoneyRoundDigits { get; set; }
         public List<RowHeaderGroup> RowGroups { get; set; }
@@ -38,20 +29,77 @@ namespace CHI.Services.Report
         public string ApprovedBy { get; set; }
 
 
-        public NewReportService(Department rootDepartment, Component rootComponent, bool isPlanningMode = false)
+        public OldReportService(Department rootDepartment, Component rootComponent, bool isPlanningMode = false)
         {
             IsPlanningMode = isPlanningMode;
 
-            this.rootDepartment = rootDepartment;
-            this.rootComponent = rootComponent;
+            rootComponent.OrderChildsRecursive();
+            var components = rootComponent.ToListRecursive()
+                .Where(x => x.Indicators?.Any() ?? false)
+                .ToList();
 
-            departments = rootDepartment.ToListRecursive();
-            employees = departments.SelectMany(x => x.Employees).ToList();
-            components = rootComponent.ToListRecursive();
-            parameters = departments.SelectMany(x => x.Parameters).ToList().Concat(employees.SelectMany(x => x.Parameters).ToList()).ToList();
-            indicators = components.SelectMany(x => x.Indicators).ToList();
+            var indicators = new List<Indicator>();
 
-            Results = parameters.SelectMany(x => indicators, (x, y) => (x, y)).ToDictionary(x => x, x => (double?)null);
+            foreach (var component in components)
+            {
+                component.Indicators = component.Indicators.OrderBy(x => x.Order).ToList();
+
+                indicators.AddRange(component.Indicators);
+            }
+
+            rootColumn = ColumnHeaderGroup.CreateHeadersRecursive(null, rootComponent);
+
+            ColumnGroups = rootColumn.ToListRecursive().Skip(1).ToList();
+            ColumnItems = ColumnGroups.SelectMany(x => x.HeaderItems).ToList();
+
+            Enumerable.Range(0, ColumnItems.Count).ToList().ForEach(x => ColumnItems[x].Index = x);
+            Enumerable.Range(0, ColumnGroups.Count).ToList().ForEach(x => ColumnGroups[x].Index = x);
+
+
+            rootDepartment.OrderChildsRecursive();
+            var departments = rootDepartment.ToListRecursive()
+                .Where(x => x.Employees?.Any() ?? false)
+                .ToList();
+
+            var parameters = new List<Parameter>();
+
+            foreach (var department in departments)
+            {
+                department.Employees = department.Employees.OrderBy(x => x.Order).ToList();
+                department.Parameters = department.Parameters.OrderBy(x => x.Order).ToList();
+
+                foreach (var employee in department.Employees)
+                {
+                    employee.Parameters = employee.Parameters.OrderBy(x => x.Order).ToList();
+
+                    parameters.AddRange(employee.Parameters);
+                }
+            }
+
+            rootRow = RowHeaderGroup.CreateHeadersRecursive(null, rootDepartment);
+
+            RowGroups = rootRow.ToListRecursive().Skip(1).ToList();
+            RowItems = RowGroups.SelectMany(x => x.HeaderItems).ToList();
+
+            Enumerable.Range(0, RowItems.Count).ToList().ForEach(x => RowItems[x].Index = x);
+            Enumerable.Range(0, RowGroups.Count).ToList().ForEach(x => RowGroups[x].Index = x);
+
+            Values = new ValueItem[RowItems.Count][];
+
+            for (int row = 0; row < RowItems.Count; row++)
+            {
+                Values[row] = new ValueItem[indicators.Count];
+
+                for (int col = 0; col < ColumnItems.Count; col++)
+                {
+                    Values[row][col] = new ValueItem(row, col, RowItems[row], ColumnItems[col], !IsPlanningMode);
+
+                    //if (!IsPlanningMode)
+                    //    Values[row][col].IsWritable = false;
+                }
+            }
+
+            ValuesList = Values.SelectMany(x => x).ToList();
         }
 
 
@@ -61,14 +109,17 @@ namespace CHI.Services.Report
             Year = year;
             IsGrowing = isGrowing;
 
-            foreach (var key in Results.Keys)
-                Results[key] = 0;
+            foreach (var valueItem in ValuesList)
+                valueItem.Value = 0;
 
             //заполняет план
-            foreach (var parameter in parameters.Where(x => x.Kind == ParameterKind.EmployeePlan || x.Kind == ParameterKind.DepartmentHandPlan))
-                foreach (var indicator in indicators.Where(x => x.Component.IsCanPlanning))
-                    Results[(parameter, indicator)] = plans.Where(x => x.Parameter.Id == parameter.Id && x.Indicator.Id == indicator.Id).Sum(x => x.Value);
+            foreach (var row in RowItems.Where(x => x.Parameter.Kind == ParameterKind.EmployeePlan || x.Parameter.Kind == ParameterKind.DepartmentHandPlan))
+                foreach (var column in ColumnItems.Where(x => x.Group.Component.IsCanPlanning))
+                {
+                    var valueItem = Values[row.Index][column.Index];
 
+                    valueItem.Value = plans.Where(x => x.Parameter.Id == row.Parameter.Id && x.Indicator.Id == column.Indicator.Id).Sum(x => x.Value);
+                }
 
             if (!IsPlanningMode && registers != null)
                 for (var currentMonth = isGrowing ? 1 : month; currentMonth <= month; currentMonth++)
@@ -90,64 +141,56 @@ namespace CHI.Services.Report
             SumColumns();
 
             //вычисляет проценты в штатных единицах
-            foreach (var employee in employees)
-            {
-                var percentParamenter = employee.Parameters.Where(x => x.Kind == ParameterKind.EmployeePercent).First();
-                var dividendParameter = employee.Parameters.Where(x => x.Kind == ParameterKind.EmployeePlan).First();
-                var dividerParameter = employee.Parameters.Where(x => x.Kind == ParameterKind.EmployeeFact).First();
-
-                foreach (var indicator in indicators)
+            foreach (var row in RowItems.Where(x => x.Parameter.Kind == ParameterKind.EmployeePercent))
+                foreach (var column in ColumnItems)
                 {
-                    var dividend = Results[(dividendParameter, indicator)];
-                    var divider = Results[(dividerParameter, indicator)];
-                    Results[(percentParamenter, indicator)] = divider == 0 ? 0 : dividend / divider;
+                    var dividend = Values[row.Group.HeaderItems.First(x => x.Parameter.Kind == ParameterKind.EmployeePlan).Index][column.Index].Value;
+                    var divider = Values[row.Group.HeaderItems.First(x => x.Parameter.Kind == ParameterKind.EmployeeFact).Index][column.Index].Value;
+
+                    if (divider != 0)
+                        Values[row.Index][column.Index].Value = dividend / divider;
                 }
-            }
 
             //вычисляет проценты в подразделениях
-            foreach (var department in departments)
-            {
-                var percentParamenter = department.Parameters.Where(x => x.Kind == ParameterKind.DepartmentPercent).First();
-                var dividendParameter = department.Parameters.Where(x => x.Kind == ParameterKind.DepartmentHandPlan).First();
-                var dividerParameter = department.Parameters.Where(x => x.Kind == ParameterKind.DepartmentFact).First();
-
-                foreach (var indicator in indicators)
+            foreach (var row in RowItems.Where(x => x.Parameter.Kind == ParameterKind.DepartmentPercent))
+                foreach (var column in ColumnItems)
                 {
-                    var dividend = Results[(dividendParameter, indicator)];
-                    var divider = Results[(dividerParameter, indicator)];
-                    Results[(percentParamenter, indicator)] = divider == 0 ? 0 : dividend / divider;
+                    var dividend = Values[row.Group.HeaderItems.First(x => x.Parameter.Kind == ParameterKind.DepartmentHandPlan).Index][column.Index].Value;
+                    var divider = Values[row.Group.HeaderItems.First(x => x.Parameter.Kind == ParameterKind.DepartmentFact).Index][column.Index].Value;
+
+                    if (divider != 0)
+                        Values[row.Index][column.Index].Value = dividend / divider;
                 }
-            }
 
             DropZeroAndRoundValues();
 
-            ////скрывает пустые строки
-            //foreach (var rowGroup in RowGroups)
-            //{
-            //    bool canVisible = IsPlanningMode ? !(rowGroup.Employee?.IsArchive ?? false) : false;
+            //скрывает пустые строки
+            foreach (var rowGroup in RowGroups)
+            {
+                bool canVisible = IsPlanningMode ? !(rowGroup.Employee?.IsArchive ?? false) : false;
 
-            //    if (!IsPlanningMode || !canVisible)
-            //        foreach (var headerItem in rowGroup.HeaderItems)
-            //            if (Values[headerItem.Index].Any(x => x.Value.HasValue))
-            //            {
-            //                canVisible = true;
-            //                break;
-            //            }
+                if (!IsPlanningMode || !canVisible)
+                    foreach (var headerItem in rowGroup.HeaderItems)
+                        if (Values[headerItem.Index].Any(x => x.Value.HasValue))
+                        {
+                            canVisible = true;
+                            break;
+                        }
 
-            //    rowGroup.CanVisible = canVisible;
-            //}
+                rowGroup.CanVisible = canVisible;
+            }
 
-            ////обновляет чередующийся цвет, тк при сокрытии пустых строк чередование цвета может сбиться
-            //foreach (var rowGroup in RowGroups.Where(x => x.Childs.FirstOrDefault()?.Employee != null))
-            //{
-            //    var alter = true;
+            //обновляет чередующийся цвет, тк при сокрытии пустых строк чередование цвета может сбиться
+            foreach (var rowGroup in RowGroups.Where(x => x.Childs.FirstOrDefault()?.Employee != null))
+            {
+                var alter = true;
 
-            //    foreach (var item in rowGroup.Childs.Where(x => x.CanVisible))
-            //    {
-            //        item.Color = alter ? RowHeaderGroup.AlternationColor1 : RowHeaderGroup.AlternationColor2;
-            //        alter = !alter;
-            //    }
-            //}
+                foreach (var item in rowGroup.Childs.Where(x => x.CanVisible))
+                {
+                    item.Color = alter ? RowHeaderGroup.AlternationColor1 : RowHeaderGroup.AlternationColor2;
+                    alter = !alter;
+                }
+            }
         }
 
         public void UpdateCalculatedCells()
@@ -162,12 +205,14 @@ namespace CHI.Services.Report
         //суммирует строки
         private void SumRows()
         {
-            foreach (var parameter in parameters.Where(x => x.Department != null).Reverse())
+            foreach (var row in RowItems.OrderByDescending(x => x.Priority))
             {
-                ParameterKind eqEmployeeKind = parameter.Kind switch
+                ParameterKind eqEmployeeKind;
+
+                eqEmployeeKind = row.Parameter.Kind switch
                 {
                     ParameterKind.DepartmentCalculatedPlan => ParameterKind.EmployeePlan,
-                    ParameterKind.DepartmentHandPlan when parameter.Department.Childs.Any() => ParameterKind.DepartmentHandPlan,
+                    ParameterKind.DepartmentHandPlan when row.Group.Department.Childs.Any() => ParameterKind.DepartmentHandPlan,
                     ParameterKind.DepartmentFact => ParameterKind.EmployeeFact,
                     ParameterKind.DepartmentRejectedFact => ParameterKind.EmployeeRejectedFact,
                     _ => ParameterKind.None,
@@ -176,17 +221,16 @@ namespace CHI.Services.Report
                 if (eqEmployeeKind == ParameterKind.None)
                     continue;
 
-                foreach (var indicator in indicators.Where(x => x.Component.CaseFilters.First().Kind != CaseFilterKind.Total))
+                foreach (var column in ColumnItems.Where(x => x.Group.Component.CaseFilters.First().Kind != CaseFilterKind.Total))
                 {
-                    double sum = 0;
+                    var valueItem = Values[row.Index][column.Index];
+                    valueItem.Value = 0;
 
-                    parameter.Department.Childs
-                        .SelectMany(x => x.Parameters).Concat(parameter.Department.Employees.SelectMany(y => y.Parameters))
-                        .Where(x => x.Kind == parameter.Kind || x.Kind == eqEmployeeKind)
+                    row.Group.Childs
+                        .SelectMany(x => x.HeaderItems)
+                        .Where(x => x.Parameter.Kind == row.Parameter.Kind || x.Parameter.Kind == eqEmployeeKind)
                         .ToList()
-                        .ForEach(x => sum += Results[(x, indicator)] ?? 0);
-
-                    Results[(parameter, indicator)] = sum;
+                        .ForEach(x => valueItem.Value += Values[x.Index][column.Index].Value ?? 0);
                 }
             }
         }
@@ -194,44 +238,43 @@ namespace CHI.Services.Report
         //суммирует столбцы
         private void SumColumns()
         {
-            foreach (var parameter in parameters)
-                foreach (var indicator in indicators.Where(x => x.Component.CaseFilters.First().Kind == CaseFilterKind.Total).Reverse())
+            foreach (var row in RowItems)
+                foreach (var column in ColumnItems.Where(x => x.Group.Component.CaseFilters.First().Kind == CaseFilterKind.Total).OrderByDescending(x => x.Priority))
                 {
-                    double sum = 0;
+                    var valueItem = Values[row.Index][column.Index];
+                    valueItem.Value = 0;
 
-                    indicator.Component.Childs
-                        .SelectMany(x => x.Indicators)
-                        .Where(x => x.FacadeKind == indicator.ValueKind)
+                    column.Group.Childs
+                        .SelectMany(x => x.HeaderItems)
+                        .Where(x => x.Indicator.FacadeKind == column.Indicator.ValueKind)
                         .ToList()
-                        .ForEach(x => sum += Results[(parameter, x)] ?? 0);
-
-                    Results[(parameter, indicator)] = sum;
+                        .ForEach(x => valueItem.Value += Values[row.Index][x.Index].Value ?? 0);
                 }
         }
 
         //округляет значения и убирает нули
         private void DropZeroAndRoundValues()
         {
-            foreach (var key in Results.Keys)
-            {
-                var result = Results[key];
+            foreach (var row in RowItems)
+                foreach (var column in ColumnItems)
+                {
+                    var valueItem = Values[row.Index][column.Index];
 
-                if (result == null)
-                    continue;
+                    if (valueItem.Value == null)
+                        continue;
 
-                if (result == 0)
-                    result = null;
-                else if (key.Item1.Kind == ParameterKind.DepartmentPercent)
-                    result = Math.Round(result.Value, 1, MidpointRounding.AwayFromZero);
+                    if (valueItem.Value == 0)
+                        valueItem.Value = null;
 
-                else if (key.Item2.FacadeKind == IndicatorKind.Cost)
-                    result = Math.Round(result.Value, MoneyRoundDigits, MidpointRounding.AwayFromZero);
+                    else if (row.Parameter.Kind == ParameterKind.DepartmentPercent)
+                        valueItem.Value = Math.Round(valueItem.Value.Value, 1, MidpointRounding.AwayFromZero);
 
-                else
-                    result = Math.Round(result.Value, 0, MidpointRounding.AwayFromZero);
+                    else if (column.Indicator.FacadeKind == IndicatorKind.Cost)
+                        valueItem.Value = Math.Round(valueItem.Value.Value, MoneyRoundDigits, MidpointRounding.AwayFromZero);
 
-                Results[key] = result;
-            }
+                    else
+                        valueItem.Value = Math.Round(valueItem.Value.Value, 0, MidpointRounding.AwayFromZero);
+                }
         }
 
         private void SetValuesFromCases(int month, int year, IEnumerable<Case> cases, bool isPaymentAccepted)
