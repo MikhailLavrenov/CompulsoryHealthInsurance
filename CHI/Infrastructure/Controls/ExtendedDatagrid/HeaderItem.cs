@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Media;
 
-namespace CHI.Infrastructure.Controls._2DDataGrid
+namespace CHI.Infrastructure
 {
     public class HeaderItem : BindableBase
     {

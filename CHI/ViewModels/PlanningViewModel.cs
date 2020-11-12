@@ -22,7 +22,7 @@ namespace CHI.ViewModels
         bool isGrowing;
         IMainRegionService mainRegionService;
         IFileDialogService fileDialogService;
-        ReportService report;
+        OldReportService report;
 
         public bool KeepAlive { get => false; }
         public int Year
@@ -57,7 +57,7 @@ namespace CHI.ViewModels
         }
         public bool IsGrowing { get => isGrowing; set => SetProperty(ref isGrowing, value); }
         public Dictionary<int, string> Months { get; } = Enumerable.Range(1, 12).ToDictionary(x => x, x => CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(x));
-        public ReportService Report { get => report; set => SetProperty(ref report, value); }
+        public OldReportService Report { get => report; set => SetProperty(ref report, value); }
 
         public DelegateCommand IncreaseYear { get; }
         public DelegateCommand DecreaseYear { get; }
@@ -201,7 +201,7 @@ namespace CHI.ViewModels
 
             var rootComponent = dbContext.Components.Local.First(x => x.IsRoot);
 
-            Report = new ReportService(rootDepartment, rootComponent, true);
+            Report = new OldReportService(rootDepartment, rootComponent, true);
 
             Report.ApprovedBy = Settings.Instance.ApprovedBy;
 
