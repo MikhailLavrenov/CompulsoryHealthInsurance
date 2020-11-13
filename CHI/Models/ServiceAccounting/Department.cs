@@ -1,11 +1,11 @@
-﻿using CHI.Models.Infrastructure;
+﻿using CHI.Infrastructure;
 using Prism.Mvvm;
 using System.Collections.Generic;
 using System.Windows.Media;
 
 namespace CHI.Models.ServiceAccounting
 {
-    public class Department: BindableBase, IOrderedHierarchical<Department>
+    public class Department: BindableBase, IHierarchical<Department>, IOrdered
     {
         string hexColor = "#FFFFFF";
 

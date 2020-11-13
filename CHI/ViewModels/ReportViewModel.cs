@@ -11,7 +11,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Windows.Media;
 
 namespace CHI.ViewModels
 {
@@ -144,7 +143,7 @@ namespace CHI.ViewModels
 
         public void OnNavigatedTo(NavigationContext navigationContext)
         {
-            dbContext.Departments.Load();                                             
+            dbContext.Departments.Load();
 
             dbContext.Employees
                 .Include(x => x.Medic)
@@ -157,7 +156,7 @@ namespace CHI.ViewModels
                 .Include(x => x.Indicators).ThenInclude(x => x.Ratios)
                 .Include(x => x.CaseFilters)
                 .Load();
-           
+
             dbContext.Departments.Local.ToList().ForEach(x => x.Childs = x.Childs.OrderBy(x => x.Order).ToList());
             dbContext.Departments.Local.ToList().ForEach(x => x.Employees = x.Employees.OrderBy(x => x.Order).ToList());
             dbContext.Departments.Local.ToList().ForEach(x => x.Parameters = x.Parameters.OrderBy(x => x.Order).ToList());
@@ -170,27 +169,47 @@ namespace CHI.ViewModels
 
             reportService = new ReportService(rootDepartment, rootComponent);
 
-            foreach (var department in rootDepartment.ToListRecursive())
+            RowHeaders = CreateHeaderItemRecursive(rootDepartment, null).ToListRecursive().Skip(1).ToList();
+            ColumnHeaders = CreateHeaderItemRecursive(rootComponent, null).ToListRecursive().Skip(1).ToList();
+
+            GridItems = new GridItem[RowHeaders.Count][];
+
+            for (int row = 0; row < RowHeaders.Count; row++)
             {
+                GridItems[row] = new GridItem[ColumnHeaders.Count];
 
-
-               
+                for (int col = 0; col < ColumnHeaders.Count; col++)
+                    GridItems[row][col] = new GridItem(RowHeaders[0], ColumnHeaders[0], false);
             }
-            
-
         }
 
         private HeaderItem CreateHeaderItemRecursive(Department department, HeaderItem parent)
         {
-            var color = (Color)ColorConverter.ConvertFromString(department.HexColor);
             var subItemNames = department.Parameters.Select(x => x.Kind.GetShortDescription()).ToList();
 
-            var headerItem = new HeaderItem(department.Name, null, color, false, parent, subItemNames);
+            var headerItem = new HeaderItem(department.Name, null, department.HexColor, false, parent, subItemNames);
 
             foreach (var child in department.Childs)
+                CreateHeaderItemRecursive(child, headerItem);
+
+            foreach (var employee in department.Employees)
             {
-                headerItem.Childs.Add(CreateHeaderItemRecursive(child, headerItem));
+                subItemNames = employee.Parameters.Select(x => x.Kind.GetShortDescription()).ToList();
+
+                new HeaderItem(employee.Medic.FullName, employee.Specialty.Name, string.Empty, false, headerItem, subItemNames);
             }
+
+            return headerItem;
+        }
+
+        private HeaderItem CreateHeaderItemRecursive(Component component, HeaderItem parent)
+        {
+            var subItemNames = component.Indicators.Select(x => x.FacadeKind.GetShortDescription()).ToList();
+
+            var headerItem = new HeaderItem(component.Name, null, component.HexColor, false, parent, subItemNames);
+
+            foreach (var child in component.Childs)
+                CreateHeaderItemRecursive(child, headerItem);
 
             return headerItem;
         }

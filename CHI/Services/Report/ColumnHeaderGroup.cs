@@ -1,4 +1,4 @@
-﻿using CHI.Models.Infrastructure;
+﻿using CHI.Infrastructure;
 using CHI.Models.ServiceAccounting;
 using Prism.Commands;
 using Prism.Mvvm;
@@ -9,7 +9,7 @@ using System.Windows.Media;
 
 namespace CHI.Services.Report
 {
-    public class ColumnHeaderGroup : BindableBase, IOrderedHierarchical<ColumnHeaderGroup>
+    public class ColumnHeaderGroup : BindableBase, IHierarchical<ColumnHeaderGroup>, IOrdered
     {
         bool? isCollapsed;
         bool isVisible=true;

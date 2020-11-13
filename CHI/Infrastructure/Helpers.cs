@@ -1,5 +1,4 @@
-﻿using CHI.Models.Infrastructure;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -205,7 +204,7 @@ namespace CHI.Infrastructure
             return result;
         }
 
-        public static List<T> ToListRecursive<T>(this T obj) where T : class, IOrderedHierarchical<T>
+        public static List<T> ToListRecursive<T>(this T obj) where T : class, IHierarchical<T>
         {
             var result = new List<T>();
 
@@ -214,7 +213,7 @@ namespace CHI.Infrastructure
             return result;
         }
 
-        public static void ToListRecursive<T>(this T obj, List<T> result) where T : class, IOrderedHierarchical<T>
+        static void ToListRecursive<T>(this T obj, List<T> result) where T : class, IHierarchical<T>
         {
             result.Add(obj);
 
@@ -223,7 +222,7 @@ namespace CHI.Infrastructure
                     child.ToListRecursive(result);
         }
 
-        public static void OrderChildsRecursive<T>(this T obj) where T : class, IOrderedHierarchical<T>
+        public static void OrderChildsRecursive<T>(this T obj) where T : class, IHierarchical<T>, IOrdered
         {
             if (obj.Childs == null)
                 return;

@@ -7,7 +7,7 @@ using System.Windows.Media;
 
 namespace CHI.Infrastructure
 {
-    public class HeaderItem : BindableBase
+    public class HeaderItem : BindableBase, IHierarchical<HeaderItem>
     {
         bool? isCollapsed;
         bool isVisible = true;
@@ -50,8 +50,8 @@ namespace CHI.Infrastructure
                 UpdateChildrenVisibility();
             }
         }
-        public HeaderItem Parent { get; private set; }
-        public List<HeaderItem> Childs { get; private set; }
+        public HeaderItem Parent { get;  set; }
+        public List<HeaderItem> Childs { get;  set; }
         public List<HeaderSubItem> SubItems { get; private set; }
 
         public DelegateCommand SwitchCollapseCommand { get; }
@@ -60,11 +60,11 @@ namespace CHI.Infrastructure
         public event EventHandler ColorChangedEvent;
 
 
-        public HeaderItem(string name, string subName, Color color, bool alwaysHidden, HeaderItem parent, List<string> subItemNames)
+        public HeaderItem(string name, string subName, string hexColor, bool alwaysHidden, HeaderItem parent, List<string> subItemNames)
         {
             Name = name;
             SubName = subName;
-            Color = color;
+            Color = (Color)ColorConverter.ConvertFromString(hexColor);
             AlwaysHidden = alwaysHidden;
             Parent = parent;
             Parent?.Childs.Add(this);
