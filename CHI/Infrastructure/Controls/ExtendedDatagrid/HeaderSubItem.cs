@@ -8,5 +8,11 @@ namespace CHI.Infrastructure
     {
         public string Name { get; set; }
         public HeaderItem HeaderItem { get; set; }
+
+        public HeaderSubItem(string name, HeaderItem headerItem)
+        {
+            Name = name;
+            HeaderItem = headerItem;
+        }
     }
 }

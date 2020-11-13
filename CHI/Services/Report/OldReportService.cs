@@ -38,14 +38,9 @@ namespace CHI.Services.Report
                 .Where(x => x.Indicators?.Any() ?? false)
                 .ToList();
 
-            var indicators = new List<Indicator>();
-
-            foreach (var component in components)
-            {
+            foreach (var component in components)            
                 component.Indicators = component.Indicators.OrderBy(x => x.Order).ToList();
-
-                indicators.AddRange(component.Indicators);
-            }
+            
 
             rootColumn = ColumnHeaderGroup.CreateHeadersRecursive(null, rootComponent);
 
@@ -61,8 +56,6 @@ namespace CHI.Services.Report
                 .Where(x => x.Employees?.Any() ?? false)
                 .ToList();
 
-            var parameters = new List<Parameter>();
-
             foreach (var department in departments)
             {
                 department.Employees = department.Employees.OrderBy(x => x.Order).ToList();
@@ -71,8 +64,6 @@ namespace CHI.Services.Report
                 foreach (var employee in department.Employees)
                 {
                     employee.Parameters = employee.Parameters.OrderBy(x => x.Order).ToList();
-
-                    parameters.AddRange(employee.Parameters);
                 }
             }
 
