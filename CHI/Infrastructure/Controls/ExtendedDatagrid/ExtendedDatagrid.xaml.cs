@@ -1,5 +1,4 @@
-﻿using CHI.Infrastructure.Controls._2DDataGrid;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Windows;

@@ -79,7 +79,7 @@ namespace CHI.Services.Report
 
             for (int row = 0; row < RowItems.Count; row++)
             {
-                Values[row] = new ValueItem[indicators.Count];
+                Values[row] = new ValueItem[ColumnItems.Count];
 
                 for (int col = 0; col < ColumnItems.Count; col++)
                 {

@@ -18,12 +18,11 @@ namespace CHI.Infrastructure
         public bool IsEditable { get => isEditable; set => SetProperty(ref isEditable, value); }
         public Color Color { get => color; set => SetProperty(ref color, value); }
 
-        public GridItem(HeaderItem rowHeader, HeaderItem columnHeader, Color color, bool isEditable)
+        public GridItem(HeaderItem rowHeader, HeaderItem columnHeader, bool isEditable)
         {
             this.rowHeader = rowHeader;
             this.columnHeader = columnHeader;
             IsEditable = isEditable;
-            Color = color;
 
             rowHeader.ColorChangedEvent += (s, e) => Color = rowHeader.Color;
             rowHeader.IsVisibleChangedEvent += OnHeaderVisibleChanged;

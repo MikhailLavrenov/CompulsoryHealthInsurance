@@ -1,16 +1,10 @@
-﻿using System;
+﻿using CHI.Infrastructure;
 using System.Collections.Generic;
-using System.Text;
 
-namespace CHI.Models.Infrastructure
+namespace CHI.Infrastructure
 {
-    public interface IOrderedHierarchical<T> where T : class
+    public interface IOrdered
     {
-        public bool IsRoot { get; set; }
-
         public int Order { get; set; }
-
-        public T Parent { get; set; }
-        public List<T> Childs { get; set; }
     }
 }
