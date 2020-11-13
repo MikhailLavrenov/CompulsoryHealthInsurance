@@ -1,5 +1,6 @@
 ﻿using CHI.Infrastructure;
 using CHI.Models;
+using CHI.Models.ServiceAccounting;
 using CHI.Services;
 using CHI.Services.Report;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +11,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Windows.Media;
 
 namespace CHI.ViewModels
 {
@@ -42,6 +44,8 @@ namespace CHI.ViewModels
 
         public ReportViewModel(IMainRegionService mainRegionService, IFileDialogService fileDialogService)
         {
+            dbContext = new AppDBContext();
+
             settings = Settings.Instance;
 
             this.mainRegionService = mainRegionService;
@@ -140,27 +144,55 @@ namespace CHI.ViewModels
 
         public void OnNavigatedTo(NavigationContext navigationContext)
         {
-            dbContext = new AppDBContext();
-
-            dbContext.Departments.Load();
-
-            var rootDepartment = dbContext.Departments.Local.First(x => x.IsRoot);
-
-            dbContext.Parameters.Load();
+            dbContext.Departments.Load();                                             
 
             dbContext.Employees
                 .Include(x => x.Medic)
                 .Include(x => x.Specialty)
                 .Load();
 
+            dbContext.Parameters.Load();
+
             dbContext.Components
                 .Include(x => x.Indicators).ThenInclude(x => x.Ratios)
                 .Include(x => x.CaseFilters)
                 .Load();
+           
+            dbContext.Departments.Local.ToList().ForEach(x => x.Childs = x.Childs.OrderBy(x => x.Order).ToList());
+            dbContext.Departments.Local.ToList().ForEach(x => x.Employees = x.Employees.OrderBy(x => x.Order).ToList());
+            dbContext.Departments.Local.ToList().ForEach(x => x.Parameters = x.Parameters.OrderBy(x => x.Order).ToList());
+            dbContext.Employees.Local.ToList().ForEach(x => x.Parameters = x.Parameters.OrderBy(x => x.Order).ToList());
+            dbContext.Components.Local.ToList().ForEach(x => x.Childs = x.Childs.OrderBy(x => x.Order).ToList());
+            dbContext.Components.Local.ToList().ForEach(x => x.Indicators = x.Indicators.OrderBy(x => x.Order).ToList());
 
+            var rootDepartment = dbContext.Departments.Local.First(x => x.IsRoot);
             var rootComponent = dbContext.Components.Local.First(x => x.IsRoot);
 
             reportService = new ReportService(rootDepartment, rootComponent);
+
+            foreach (var department in rootDepartment.ToListRecursive())
+            {
+
+
+               
+            }
+            
+
+        }
+
+        private HeaderItem CreateHeaderItemRecursive(Department department, HeaderItem parent)
+        {
+            var color = (Color)ColorConverter.ConvertFromString(department.HexColor);
+            var subItemNames = department.Parameters.Select(x => x.Kind.GetShortDescription()).ToList();
+
+            var headerItem = new HeaderItem(department.Name, null, color, false, parent, subItemNames);
+
+            foreach (var child in department.Childs)
+            {
+                headerItem.Childs.Add(CreateHeaderItemRecursive(child, headerItem));
+            }
+
+            return headerItem;
         }
 
         public bool IsNavigationTarget(NavigationContext navigationContext)

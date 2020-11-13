@@ -1,4 +1,5 @@
-﻿using Prism.Mvvm;
+﻿using Prism.Commands;
+using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -49,16 +50,17 @@ namespace CHI.Infrastructure
                 UpdateChildrenVisibility();
             }
         }
-
         public HeaderItem Parent { get; private set; }
         public List<HeaderItem> Childs { get; private set; }
         public List<HeaderSubItem> SubItems { get; private set; }
+
+        public DelegateCommand SwitchCollapseCommand { get; }
 
         public event EventHandler IsVisibleChangedEvent;
         public event EventHandler ColorChangedEvent;
 
 
-        public HeaderItem(string name, string subName, Color color, bool alwaysHidden, HeaderItem parent, List<HeaderSubItem> subItems)
+        public HeaderItem(string name, string subName, Color color, bool alwaysHidden, HeaderItem parent, List<string> subItemNames)
         {
             Name = name;
             SubName = subName;
@@ -66,8 +68,10 @@ namespace CHI.Infrastructure
             AlwaysHidden = alwaysHidden;
             Parent = parent;
             Parent?.Childs.Add(this);
-            SubItems = subItems ?? new List<HeaderSubItem>();
+            SubItems = subItemNames?.Select(x=>new HeaderSubItem(x, this)).ToList() ?? new List<HeaderSubItem>();
             Childs = new List<HeaderItem>();
+
+            SwitchCollapseCommand = new DelegateCommand(SwitchCollapseExecute, () => CanCollapse);
         }
 
         private void UpdateVisibility()
@@ -84,7 +88,7 @@ namespace CHI.Infrastructure
                 child.UpdateVisibility();
         }
 
-        private void SwitchCollapse()
+        private void SwitchCollapseExecute()
         {
             if (!CanCollapse)
                 return;

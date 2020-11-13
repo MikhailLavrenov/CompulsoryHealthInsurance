@@ -13,8 +13,8 @@ namespace CHI.Services.Report
         List<Department> departments;
         List<Employee> employees;
         List<Component> components;
-       
-        public int MoneyRoundDigits { get; set; }
+
+        public int MoneyRoundDigits { get; set; } = 0;
         public int Month { get; private set; }
         public int Year { get; private set; }
         public bool IsGrowing { get; private set; }
