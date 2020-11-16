@@ -21,6 +21,9 @@ namespace CHI.ViewModels
         int year = DateTime.Now.Year;
         int month = DateTime.Now.Month;
         bool isGrowing;
+        List<HeaderItem> rowHeaders;
+        List<HeaderItem> columnHeaders;
+        GridItem[][] gridItems ;
         IMainRegionService mainRegionService;
         IFileDialogService fileDialogService;
         ReportService reportService;
@@ -31,9 +34,9 @@ namespace CHI.ViewModels
         public bool IsGrowing { get => isGrowing; set => SetProperty(ref isGrowing, value); }
         public Dictionary<int, string> Months { get; } = Enumerable.Range(1, 12).ToDictionary(x => x, x => CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(x));
 
-        public List<HeaderItem> RowHeaders { get; set; }
-        public List<HeaderItem> ColumnHeaders { get; set; }
-        public GridItem[][] GridItems { get; set; }
+        public List<HeaderItem> RowHeaders { get => rowHeaders; set => SetProperty(ref rowHeaders, value); }
+        public List<HeaderItem> ColumnHeaders { get => columnHeaders; set => SetProperty(ref columnHeaders, value); }
+        public GridItem[][] GridItems { get => gridItems; set => SetProperty(ref gridItems, value); }
         public DelegateCommand IncreaseYear { get; }
         public DelegateCommand DecreaseYear { get; }
         public DelegateCommandAsync BuildReportCommand { get; }
@@ -161,7 +164,7 @@ namespace CHI.ViewModels
             dbContext.Departments.Local.ToList().ForEach(x => x.Employees = x.Employees.OrderBy(x => x.Order).ToList());
             dbContext.Departments.Local.ToList().ForEach(x => x.Parameters = x.Parameters.OrderBy(x => x.Order).ToList());
             dbContext.Employees.Local.ToList().ForEach(x => x.Parameters = x.Parameters.OrderBy(x => x.Order).ToList());
-            dbContext.Components.Local.ToList().ForEach(x => x.Childs = x.Childs.OrderBy(x => x.Order).ToList());
+            dbContext.Components.Local.ToList().ForEach(x => x.Childs = x.Childs?.OrderBy(x => x.Order).ToList());
             dbContext.Components.Local.ToList().ForEach(x => x.Indicators = x.Indicators.OrderBy(x => x.Order).ToList());
 
             var rootDepartment = dbContext.Departments.Local.First(x => x.IsRoot);
@@ -172,14 +175,17 @@ namespace CHI.ViewModels
             RowHeaders = CreateHeaderItemRecursive(rootDepartment, null).ToListRecursive().Skip(1).ToList();
             ColumnHeaders = CreateHeaderItemRecursive(rootComponent, null).ToListRecursive().Skip(1).ToList();
 
-            GridItems = new GridItem[RowHeaders.Count][];
+            var rowSubHeaders = RowHeaders.SelectMany(x => x.SubItems).ToList();
+            var columnSubHeaders=ColumnHeaders.SelectMany(x => x.SubItems).ToList();
 
-            for (int row = 0; row < RowHeaders.Count; row++)
+            GridItems = new GridItem[rowSubHeaders.Count][];
+
+            for (int row = 0; row < rowSubHeaders.Count; row++)
             {
-                GridItems[row] = new GridItem[ColumnHeaders.Count];
+                GridItems[row] = new GridItem[columnSubHeaders.Count];
 
-                for (int col = 0; col < ColumnHeaders.Count; col++)
-                    GridItems[row][col] = new GridItem(RowHeaders[0], ColumnHeaders[0], false);
+                for (int col = 0; col < columnSubHeaders.Count; col++)
+                    GridItems[row][col] = new GridItem(rowSubHeaders[row], columnSubHeaders[col], false);
             }
         }
 
@@ -208,8 +214,9 @@ namespace CHI.ViewModels
 
             var headerItem = new HeaderItem(component.Name, null, component.HexColor, false, parent, subItemNames);
 
-            foreach (var child in component.Childs)
-                CreateHeaderItemRecursive(child, headerItem);
+            if (component.Childs != null)
+                foreach (var child in component.Childs)
+                    CreateHeaderItemRecursive(child, headerItem);
 
             return headerItem;
         }
