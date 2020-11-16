@@ -11,7 +11,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace CHI.Infrastructure.Controls
+namespace CHI.Infrastructure
 {
     /// <summary>
     /// Логика взаимодействия для Hierarchical2DDatagrid.xaml
@@ -51,7 +51,7 @@ namespace CHI.Infrastructure.Controls
         }
 
         public static readonly DependencyProperty GridItemsProperty =
-            DependencyProperty.Register(nameof(ColumnHeaderItems), typeof(HeaderItem[][]), typeof(ExtendedDatagrid));
+            DependencyProperty.Register(nameof(GridItems), typeof(HeaderItem[][]), typeof(ExtendedDatagrid));
 
 
 

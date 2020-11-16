@@ -50,8 +50,8 @@ namespace CHI.Infrastructure
                 UpdateChildrenVisibility();
             }
         }
-        public HeaderItem Parent { get;  set; }
-        public List<HeaderItem> Childs { get;  set; }
+        public HeaderItem Parent { get; set; }
+        public List<HeaderItem> Childs { get; set; }
         public List<HeaderSubItem> SubItems { get; private set; }
 
         public DelegateCommand SwitchCollapseCommand { get; }
@@ -64,11 +64,11 @@ namespace CHI.Infrastructure
         {
             Name = name;
             SubName = subName;
-            Color = (Color)ColorConverter.ConvertFromString(hexColor);
+            Color = string.IsNullOrEmpty(hexColor) ? Colors.Transparent : (Color)ColorConverter.ConvertFromString(hexColor);
             AlwaysHidden = alwaysHidden;
             Parent = parent;
             Parent?.Childs.Add(this);
-            SubItems = subItemNames?.Select(x=>new HeaderSubItem(x, this)).ToList() ?? new List<HeaderSubItem>();
+            SubItems = subItemNames?.Select(x => new HeaderSubItem(x, this)).ToList() ?? new List<HeaderSubItem>();
             Childs = new List<HeaderItem>();
 
             SwitchCollapseCommand = new DelegateCommand(SwitchCollapseExecute, () => CanCollapse);
