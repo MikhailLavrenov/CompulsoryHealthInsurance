@@ -19,8 +19,8 @@ namespace CHI.Infrastructure
 
         public string Name { get; private set; }
         public string SubName { get; private set; }
-        public Color Color { get => color; private set => SetProperty(ref color, value, () => ColorChangedEvent?.Invoke(this, new EventArgs())); }
-        public bool CanCollapse { get => Childs?.Any() ?? false; }
+        public Color Color { get => color; private set => SetProperty(ref color, value); }
+        public bool CanCollapse { get; private set; }
         public bool? IsCollapsed { get => isCollapsed; private set => SetProperty(ref isCollapsed, value); }
         public bool AlwaysHidden
         {
@@ -45,8 +45,6 @@ namespace CHI.Infrastructure
 
                 SetProperty(ref isVisible, value);
 
-                IsVisibleChangedEvent?.Invoke(this, new EventArgs());
-
                 UpdateChildrenVisibility();
             }
         }
@@ -56,15 +54,13 @@ namespace CHI.Infrastructure
 
         public DelegateCommand SwitchCollapseCommand { get; }
 
-        public event EventHandler IsVisibleChangedEvent;
-        public event EventHandler ColorChangedEvent;
-
-
-        public HeaderItem(string name, string subName, string hexColor, bool alwaysHidden, HeaderItem parent, List<string> subItemNames)
+        public HeaderItem(string name, string subName, string hexColor, bool alwaysHidden,bool haveChilds, HeaderItem parent, List<string> subItemNames)
         {
             Name = name;
             SubName = subName;
             Color = string.IsNullOrEmpty(hexColor) ? Colors.Transparent : (Color)ColorConverter.ConvertFromString(hexColor);
+            CanCollapse = haveChilds;
+            IsCollapsed = CanCollapse ? false : (bool?)null;
             AlwaysHidden = alwaysHidden;
             Parent = parent;
             Parent?.Childs.Add(this);
@@ -78,8 +74,8 @@ namespace CHI.Infrastructure
         {
             if (alwaysHidden || !Parent.IsVisible)
                 IsVisible = false;
-            else if (Parent.IsCollapsed == false)
-                IsVisible = true;
+            else 
+                IsVisible = !Parent.IsCollapsed.Value;
         }
 
         private void UpdateChildrenVisibility()

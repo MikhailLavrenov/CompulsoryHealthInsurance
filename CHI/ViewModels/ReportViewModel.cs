@@ -193,7 +193,7 @@ namespace CHI.ViewModels
         {
             var subItemNames = department.Parameters.Select(x => x.Kind.GetShortDescription()).ToList();
 
-            var headerItem = new HeaderItem(department.Name, null, department.HexColor, false, parent, subItemNames);
+            var headerItem = new HeaderItem(department.Name, null, department.HexColor, false, true, parent, subItemNames);
 
             foreach (var child in department.Childs)
                 CreateHeaderItemRecursive(child, headerItem);
@@ -202,7 +202,7 @@ namespace CHI.ViewModels
             {
                 subItemNames = employee.Parameters.Select(x => x.Kind.GetShortDescription()).ToList();
 
-                new HeaderItem(employee.Medic.FullName, employee.Specialty.Name, string.Empty, false, headerItem, subItemNames);
+                new HeaderItem(employee.Medic.FullName, employee.Specialty.Name, string.Empty, false, false, headerItem, subItemNames);
             }
 
             return headerItem;
@@ -212,7 +212,7 @@ namespace CHI.ViewModels
         {
             var subItemNames = component.Indicators.Select(x => x.FacadeKind.GetShortDescription()).ToList();
 
-            var headerItem = new HeaderItem(component.Name, null, component.HexColor, false, parent, subItemNames);
+            var headerItem = new HeaderItem(component.Name, null, component.HexColor, false, component.Childs.Any(), parent, subItemNames);
 
             if (component.Childs != null)
                 foreach (var child in component.Childs)
