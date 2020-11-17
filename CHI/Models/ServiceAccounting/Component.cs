@@ -20,5 +20,10 @@ namespace CHI.Models.ServiceAccounting
         public Component Parent { get; set; }
         public List<Component> Childs { get; set; }
 
+        public Component()
+        {
+            Childs = new List<Component>();
+        }
+
     }
 }

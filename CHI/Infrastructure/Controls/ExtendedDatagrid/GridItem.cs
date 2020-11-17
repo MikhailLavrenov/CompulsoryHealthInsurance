@@ -1,5 +1,6 @@
 ﻿using Prism.Mvvm;
 using System;
+using System.ComponentModel;
 using System.Windows.Media;
 
 namespace CHI.Infrastructure
@@ -25,14 +26,21 @@ namespace CHI.Infrastructure
             Color = rowSubHeader.HeaderItem.Color;
             IsEditable = isEditable;
 
-            rowSubHeader.HeaderItem.ColorChangedEvent += (s, e) => Color = rowSubHeader.HeaderItem.Color;
-            rowSubHeader.HeaderItem.IsVisibleChangedEvent += OnHeaderVisibleChanged;
-            columnSubHeader.HeaderItem.IsVisibleChangedEvent += OnHeaderVisibleChanged;
+            rowSubHeader.HeaderItem.PropertyChanged += OnRowPropertyChanged;
+            columnSubHeader.HeaderItem.PropertyChanged += OnColumnPropertyChanged;
         }
 
-        private void OnHeaderVisibleChanged(object sender, EventArgs e)
+        private void OnColumnPropertyChanged(object sender, PropertyChangedEventArgs args)
         {
-            IsVisible = columnSubHeader.HeaderItem.IsVisible && rowSubHeader.HeaderItem.IsVisible;
+            if (args.PropertyName == nameof(HeaderItem.IsVisible))
+                IsVisible = columnSubHeader.HeaderItem.IsVisible && rowSubHeader.HeaderItem.IsVisible;
+        }
+        private void OnRowPropertyChanged(object sender, PropertyChangedEventArgs args)
+        {
+            if (args.PropertyName==nameof(HeaderItem.Color))
+                Color = rowSubHeader.HeaderItem.Color;
+            else if (args.PropertyName == nameof(HeaderItem.IsVisible))
+                IsVisible = columnSubHeader.HeaderItem.IsVisible && rowSubHeader.HeaderItem.IsVisible;
         }
     }
 }
