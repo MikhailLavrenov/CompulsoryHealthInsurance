@@ -23,7 +23,8 @@ namespace CHI.ViewModels
         bool isGrowing;
         List<HeaderItem> rowHeaders;
         List<HeaderItem> columnHeaders;
-        GridItem[][] gridItems ;
+        GridItem[][] gridItems;
+        Dictionary<GridItem, (Parameter, Indicator)> gridItemDataComparator;
         IMainRegionService mainRegionService;
         IFileDialogService fileDialogService;
         ReportService reportService;
@@ -84,6 +85,9 @@ namespace CHI.ViewModels
             var plans = dbContext.Plans.Where(x => x.Year == Year && monthBegin <= x.Month && x.Month <= Month).ToList();
 
             report.Build(registers, plans, Month, Year, isGrowing);
+
+            foreach (var item in gridItemDataComparator)
+                item.Key.Value = report.Results[item.Value];            
         }
 
         private void SaveExcelExecute()
@@ -176,7 +180,7 @@ namespace CHI.ViewModels
             ColumnHeaders = CreateHeaderItemRecursive(rootComponent, null).ToListRecursive().Skip(1).ToList();
 
             var rowSubHeaders = RowHeaders.SelectMany(x => x.SubItems).ToList();
-            var columnSubHeaders=ColumnHeaders.SelectMany(x => x.SubItems).ToList();
+            var columnSubHeaders = ColumnHeaders.SelectMany(x => x.SubItems).ToList();
 
             GridItems = new GridItem[rowSubHeaders.Count][];
 
@@ -187,6 +191,15 @@ namespace CHI.ViewModels
                 for (int col = 0; col < columnSubHeaders.Count; col++)
                     GridItems[row][col] = new GridItem(rowSubHeaders[row], columnSubHeaders[col], false);
             }
+
+            var parameters = rootDepartment.ToListRecursive().Skip(1).SelectMany(x => x.Parameters.Concat(x.Employees.SelectMany(y => y.Parameters))).ToList();
+            var indicators = rootComponent.ToListRecursive().Skip(1).SelectMany(x => x.Indicators).ToList();
+
+            gridItemDataComparator = new Dictionary<GridItem, (Parameter, Indicator)>();
+
+            for (int row = 0; row < parameters.Count; row++)
+                for (int col = 0; col < indicators.Count; col++)
+                    gridItemDataComparator.Add(GridItems[row][col], (parameters[row], indicators[col]));
         }
 
         private HeaderItem CreateHeaderItemRecursive(Department department, HeaderItem parent)
