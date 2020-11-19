@@ -11,9 +11,9 @@ namespace CHI.Infrastructure
         bool isVisible = true;
         bool isEditable = false;
         Color color;
-        HeaderSubItem rowSubHeader;
-        HeaderSubItem columnSubHeader;
-
+        
+        public HeaderSubItem RowSubHeader { get; }
+        public HeaderSubItem ColumnSubHeader { get; }
         public double? Value { get => value; set => SetProperty(ref this.value, value); }
         public bool IsVisible { get => isVisible; set => SetProperty(ref isVisible, value); }
         public bool IsEditable { get => isEditable; set => SetProperty(ref isEditable, value); }
@@ -21,8 +21,8 @@ namespace CHI.Infrastructure
 
         public GridItem(HeaderSubItem rowSubHeader, HeaderSubItem columnSubHeader, bool isEditable)
         {
-            this.rowSubHeader = rowSubHeader;
-            this.columnSubHeader = columnSubHeader;
+            RowSubHeader = rowSubHeader;
+            ColumnSubHeader = columnSubHeader;
             Color = rowSubHeader.HeaderItem.Color;
             IsEditable = isEditable;
 
@@ -33,14 +33,14 @@ namespace CHI.Infrastructure
         private void OnColumnPropertyChanged(object sender, PropertyChangedEventArgs args)
         {
             if (args.PropertyName == nameof(HeaderItem.IsVisible))
-                IsVisible = columnSubHeader.HeaderItem.IsVisible && rowSubHeader.HeaderItem.IsVisible;
+                IsVisible = ColumnSubHeader.HeaderItem.IsVisible && RowSubHeader.HeaderItem.IsVisible;
         }
         private void OnRowPropertyChanged(object sender, PropertyChangedEventArgs args)
         {
             if (args.PropertyName==nameof(HeaderItem.Color))
-                Color = rowSubHeader.HeaderItem.Color;
+                Color = RowSubHeader.HeaderItem.Color;
             else if (args.PropertyName == nameof(HeaderItem.IsVisible))
-                IsVisible = columnSubHeader.HeaderItem.IsVisible && rowSubHeader.HeaderItem.IsVisible;
+                IsVisible = ColumnSubHeader.HeaderItem.IsVisible && RowSubHeader.HeaderItem.IsVisible;
         }
     }
 }
