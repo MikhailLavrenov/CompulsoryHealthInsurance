@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Windows.Media;
 
 namespace CHI.ViewModels
 {
@@ -25,9 +26,12 @@ namespace CHI.ViewModels
         List<HeaderItem> columnHeaders;
         GridItem[][] gridItems;
         Dictionary<GridItem, (Parameter, Indicator)> gridItemDataComparator;
+        Color alternationColor1 = Colors.White;
+        Color alternationColor2 = Colors.WhiteSmoke;
         IMainRegionService mainRegionService;
         IFileDialogService fileDialogService;
         ReportService reportService;
+
 
         public bool KeepAlive { get => false; }
         public int Year { get => year; set => SetProperty(ref year, value); }
@@ -87,7 +91,36 @@ namespace CHI.ViewModels
             report.Build(registers, plans, Month, Year, isGrowing);
 
             foreach (var item in gridItemDataComparator)
-                item.Key.Value = report.Results[item.Value];            
+                item.Key.Value = report.Results[item.Value];
+
+            //скрывает заголовки строк Employee где нет значений
+            var employeeHeaderGroups = GridItems
+                .SelectMany(x => x)
+                .Where(x => !x.RowSubHeader.HeaderItem.Childs.Any())
+                .GroupBy(x => x.RowSubHeader.HeaderItem);
+
+            foreach (var group in employeeHeaderGroups)
+                group.Key.AlwaysHidden = !group.Where(x => x.Value.HasValue).Any();
+
+            SetAlternationColor();
+        }
+
+        //задает чередование цвета в видимых строках с Employee
+        private void SetAlternationColor()
+        {
+            var colorSwitch = true;
+            HeaderItem previousItemParent = null;
+
+            foreach (var item in rowHeaders.Where(x => x.IsColorAlternation && !x.AlwaysHidden))
+            {
+                if (item.Parent != previousItemParent)
+                    colorSwitch = true;
+
+                item.Color = colorSwitch ? alternationColor1 : alternationColor2;
+
+                colorSwitch = !colorSwitch;
+                previousItemParent = item.Parent;
+            }
         }
 
         private void SaveExcelExecute()
@@ -200,13 +233,15 @@ namespace CHI.ViewModels
             for (int row = 0; row < parameters.Count; row++)
                 for (int col = 0; col < indicators.Count; col++)
                     gridItemDataComparator.Add(GridItems[row][col], (parameters[row], indicators[col]));
+
+            SetAlternationColor();
         }
 
         private HeaderItem CreateHeaderItemRecursive(Department department, HeaderItem parent)
         {
             var subItemNames = department.Parameters.Select(x => x.Kind.GetShortDescription()).ToList();
 
-            var headerItem = new HeaderItem(department.Name, null, department.HexColor, false, true, parent, subItemNames);
+            var headerItem = new HeaderItem(department.Name, null, department.HexColor, false, false, true, parent, subItemNames);
 
             foreach (var child in department.Childs)
                 CreateHeaderItemRecursive(child, headerItem);
@@ -215,7 +250,7 @@ namespace CHI.ViewModels
             {
                 subItemNames = employee.Parameters.Select(x => x.Kind.GetShortDescription()).ToList();
 
-                new HeaderItem(employee.Medic.FullName, employee.Specialty.Name, string.Empty, false, false, headerItem, subItemNames);
+                new HeaderItem(employee.Medic.FullName, employee.Specialty.Name, string.Empty, true, false, false, headerItem, subItemNames);
             }
 
             return headerItem;
@@ -225,7 +260,7 @@ namespace CHI.ViewModels
         {
             var subItemNames = component.Indicators.Select(x => x.FacadeKind.GetShortDescription()).ToList();
 
-            var headerItem = new HeaderItem(component.Name, null, component.HexColor, false, component.Childs.Any(), parent, subItemNames);
+            var headerItem = new HeaderItem(component.Name, null, component.HexColor, false, false, component.Childs.Any(), parent, subItemNames);
 
             if (component.Childs != null)
                 foreach (var child in component.Childs)
