@@ -45,6 +45,7 @@ namespace CHI.Infrastructure
                 UpdateChildrenVisibility();
             }
         }
+        public int Level { get; }
         public HeaderItem Parent { get; set; }
         public List<HeaderItem> Childs { get; set; }
         public List<HeaderSubItem> SubItems { get; }
@@ -62,6 +63,7 @@ namespace CHI.Infrastructure
             AlwaysHidden = alwaysHidden;
             Parent = parent;
             Parent?.Childs.Add(this);
+            Level = Parent == null ? 0 : parent.Level + 1;
             SubItems = subItemNames?.Select(x => new HeaderSubItem(x, this)).ToList() ?? new List<HeaderSubItem>();
             Childs = new List<HeaderItem>();
 
