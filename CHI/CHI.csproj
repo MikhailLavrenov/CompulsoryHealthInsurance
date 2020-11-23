@@ -17,6 +17,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Database.db" />
     <None Remove="licensing.pkey" />
   </ItemGroup>
 
