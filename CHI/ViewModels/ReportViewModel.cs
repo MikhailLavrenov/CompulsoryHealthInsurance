@@ -24,6 +24,7 @@ namespace CHI.ViewModels
         int year = DateTime.Now.Year;
         int month = DateTime.Now.Month;
         bool isGrowing;
+        bool reportIsVisible;
         List<HeaderItem> rowHeaders;
         List<HeaderItem> columnHeaders;
         GridItem[][] gridItems;
@@ -39,11 +40,13 @@ namespace CHI.ViewModels
         public int Year { get => year; set => SetProperty(ref year, value); }
         public int Month { get => month; set => SetProperty(ref month, value); }
         public bool IsGrowing { get => isGrowing; set => SetProperty(ref isGrowing, value); }
+        public bool ReportIsVisible { get => reportIsVisible; set => SetProperty(ref reportIsVisible, value); }
         public Dictionary<int, string> Months { get; } = Enumerable.Range(1, 12).ToDictionary(x => x, x => CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(x));
 
         public List<HeaderItem> RowHeaders { get => rowHeaders; set => SetProperty(ref rowHeaders, value); }
         public List<HeaderItem> ColumnHeaders { get => columnHeaders; set => SetProperty(ref columnHeaders, value); }
         public GridItem[][] GridItems { get => gridItems; set => SetProperty(ref gridItems, value); }
+
         public DelegateCommand IncreaseYear { get; }
         public DelegateCommand DecreaseYear { get; }
         public DelegateCommandAsync BuildReportCommand { get; }
@@ -74,14 +77,16 @@ namespace CHI.ViewModels
         {
             mainRegionService.ShowProgressBar("Построение отчета");
 
-            BuildReportInternal(reportService, IsGrowing);
+            BuildReportInternal();
+
+            ReportIsVisible = true;
 
             mainRegionService.HideProgressBar($"Отчет за {Months[Month]} {Year} построен");
         }
 
-        private void BuildReportInternal(ReportService report, bool isGrowing)
+        private void BuildReportInternal()
         {
-            var monthBegin = isGrowing ? 1 : Month;
+            var monthBegin = IsGrowing ? 1 : Month;
 
             var registers = dbContext.Registers
                 .Where(x => x.Year == Year && monthBegin <= x.Month && x.Month <= Month)
@@ -90,10 +95,10 @@ namespace CHI.ViewModels
 
             var plans = dbContext.Plans.Where(x => x.Year == Year && monthBegin <= x.Month && x.Month <= Month).ToList();
 
-            report.Build(registers, plans, Month, Year, isGrowing);
+            reportService.Build(registers, plans, Month, Year, IsGrowing);
 
             foreach (var item in gridItemDataComparator)
-                item.Key.Value = report.Results[item.Value];
+                item.Key.Value = reportService.Results[item.Value];
 
             //скрывает заголовки строк Employee где нет значений
             var employeeHeaderGroups = GridItems
@@ -113,7 +118,7 @@ namespace CHI.ViewModels
             var colorSwitch = true;
             HeaderItem previousItemParent = null;
 
-            foreach (var item in rowHeaders.Where(x => x.IsColorAlternation && !x.AlwaysHidden))
+            foreach (var item in RowHeaders.Where(x => x.IsColorAlternation && !x.AlwaysHidden))
             {
                 if (item.Parent != previousItemParent)
                     colorSwitch = true;
@@ -179,7 +184,7 @@ namespace CHI.ViewModels
             var exCol = 3;
 
             //вставляет в excel заголовки столбцов
-            foreach (var header in columnHeaders.Where(x => !x.AlwaysHidden))
+            foreach (var header in ColumnHeaders.Where(x => !x.AlwaysHidden))
             {
                 sheet.Cells[exRow, exCol, exRow, exCol + header.SubItems.Count - 1].Merge = true;
                 sheet.Cells[exRow, exCol].Value = header.Name;
@@ -213,7 +218,6 @@ namespace CHI.ViewModels
             }
 
             exRow = rowsOffset + 3;
-
 
             foreach (var gridRowItems in GridItems)
             {
@@ -266,7 +270,7 @@ namespace CHI.ViewModels
             range.Style.Border.Right.Style = ExcelBorderStyle.Hair;
             range.Style.Border.Bottom.Style = ExcelBorderStyle.Hair;
 
-            
+
             sheet.OutLineSummaryRight = false;
             sheet.OutLineSummaryBelow = false;
 
@@ -338,7 +342,7 @@ namespace CHI.ViewModels
 
         private void BuildAndSaveExcelExecute()
         {
-            mainRegionService.ShowProgressBar("Построение отчета");
+            mainRegionService.ShowProgressBar("Построение отчета");         
 
             if (!File.Exists(settings.ServiceAccountingReportPath))
             {
@@ -352,15 +356,19 @@ namespace CHI.ViewModels
                 return;
             }
 
-            var rootDepartment = dbContext.Departments.Local.First(x => x.IsRoot);
-            var rootComponent = dbContext.Components.Local.First(x => x.IsRoot);
-            var report = new ReportService(rootDepartment, rootComponent);
+            ReportIsVisible = false;
 
-            BuildReportInternal(report, false);
-            //report.SaveExcel(settings.ServiceAccountingReportPath);
+            var isGrowingInitialValue = IsGrowing;
 
-            BuildReportInternal(report, true);
-            //report.SaveExcel(settings.ServiceAccountingReportPath);
+            IsGrowing = false;
+            BuildReportInternal();
+            SaveExcelInternal(settings.ServiceAccountingReportPath);
+
+            IsGrowing = true;
+            BuildReportInternal();
+            SaveExcelInternal(settings.ServiceAccountingReportPath);
+
+            IsGrowing = isGrowingInitialValue;
 
             mainRegionService.HideProgressBar($"Отчет за месяц и нарастающий успешно построены и сохранены в excel файл");
         }

@@ -38,7 +38,7 @@ namespace CHI.ViewModels
 
         public void SelectFileExecute()
         {
-            fileDialogService.DialogType = FileDialogType.Open;
+            fileDialogService.DialogType = FileDialogType.Save;
             fileDialogService.Filter = "Excel files (*.xslx)|*.xlsx";
 
             if (fileDialogService.ShowDialog() != true)
