@@ -32,7 +32,6 @@ namespace CHI.ViewModels
         IFileDialogService fileDialogService;
         ReportService reportService;
         User currentUser;
-        List<Department> permittedDepartments;
 
         public bool KeepAlive { get => false; }
         public int Year
@@ -43,7 +42,7 @@ namespace CHI.ViewModels
                 if (year == value)
                     return;
 
-                SavePlanForPeriod();
+                BringChangesToDbContext();
 
                 SetProperty(ref year, value);
 
@@ -58,7 +57,7 @@ namespace CHI.ViewModels
                 if (month == value)
                     return;
 
-                SavePlanForPeriod();
+                BringChangesToDbContext();
 
                 SetProperty(ref month, value);
 
@@ -91,14 +90,35 @@ namespace CHI.ViewModels
             IncreaseYear = new DelegateCommand(() => ++Year);
             DecreaseYear = new DelegateCommand(() => --Year);
             SaveExcelCommand = new DelegateCommandAsync(SaveExcelExecute);
-            UpdateCalculatedCellsCommand = new DelegateCommandAsync(() => reportService.UpdateCalculatedCells());
+            UpdateCalculatedCellsCommand = new DelegateCommandAsync(UpdateCalculatedCellsExecute);
         }
 
+        private void UpdateCalculatedCellsExecute()
+        {
+            mainRegionService.ShowProgressBar("Обновление");
+
+            BringChangesToDbContext();
+
+            SetGridValues();
+
+            mainRegionService.HideProgressBar("Обновлено");
+        }
 
         private void BuildReport()
         {
             mainRegionService.ShowProgressBar("Построение плана");
 
+            SetGridValues();
+
+            SetHiddenRows();
+
+            SetAlternationColor();
+
+            mainRegionService.HideProgressBar("План построен");
+        }
+
+        private void SetGridValues()
+        {
             if (!dbContext.Plans.Local.Where(x => x.Year == Year && x.Month == Month).Any())
                 dbContext.Plans.Where(x => x.Year == Year && x.Month == Month).Load();
 
@@ -108,19 +128,52 @@ namespace CHI.ViewModels
 
             foreach (var item in gridItemDataComparator)
                 item.Key.Value = reportService.Results[item.Value];
+        }
 
-            for (int row = 0; row < rowHeaders.Count; row++)
+        private void SetHiddenRows()
+        {
+            var employeeHeaderGroups = GridItems    
+                .SelectMany(x => x)    
+                .Where(x => !x.RowSubHeader.HeaderItem.Childs.Any())   
+                .GroupBy(x => x.RowSubHeader.HeaderItem);
+
+            foreach (var group in employeeHeaderGroups)
+                group.Key.AlwaysHidden = !group.Where(x => x.Value.HasValue).Any();
+
+            for (int row = 0; row < RowHeaders.Count; row++)
             {
-                var rowHeader = rowHeaders[row];
+                var rowHeader = RowHeaders[row];
                 var rowGridItems = GridItems[row];
                 var employee = rowGridItems.Any() ? gridItemDataComparator[rowGridItems[0]].Item1.Employee : null;
 
-                rowHeader.AlwaysHidden = !rowGridItems.Where(x => x.Value.HasValue).Any() && (employee?.IsArchive ?? false);
+                if (employee == null)
+                    continue;
+
+                if (rowGridItems.Where(x => x.Value.HasValue && x.Value != 0).Any())
+                    rowHeader.AlwaysHidden = false;
+                else
+                    rowHeader.AlwaysHidden = employee.IsArchive;
+
+                // rowHeader.AlwaysHidden = !rowGridItems.Where(x => x.Value.HasValue && x.Value!=0).Any() && (employee?.IsArchive ?? false);
             }
+        }
 
-            SetAlternationColor();
+        //задает чередование цвета в видимых строках с Employee
+        private void SetAlternationColor()
+        {
+            var colorSwitch = true;
+            HeaderItem previousItemParent = null;
 
-            mainRegionService.HideProgressBar("План построен");
+            foreach (var item in RowHeaders.Where(x => x.IsColorAlternation && !x.AlwaysHidden))
+            {
+                if (item.Parent != previousItemParent)
+                    colorSwitch = true;
+
+                item.Color = colorSwitch ? alternationColor1 : alternationColor2;
+
+                colorSwitch = !colorSwitch;
+                previousItemParent = item.Parent;
+            }
         }
 
         private void SaveExcelExecute()
@@ -150,24 +203,6 @@ namespace CHI.ViewModels
             SaveExcelInternal(filePath);
 
             mainRegionService.HideProgressBar($"Файл сохранен: {filePath}");
-        }
-
-        //задает чередование цвета в видимых строках с Employee
-        private void SetAlternationColor()
-        {
-            var colorSwitch = true;
-            HeaderItem previousItemParent = null;
-
-            foreach (var item in RowHeaders.Where(x => x.IsColorAlternation && !x.AlwaysHidden))
-            {
-                if (item.Parent != previousItemParent)
-                    colorSwitch = true;
-
-                item.Color = colorSwitch ? alternationColor1 : alternationColor2;
-
-                colorSwitch = !colorSwitch;
-                previousItemParent = item.Parent;
-            }
         }
 
         private void SaveExcelInternal(string path)
@@ -351,37 +386,35 @@ namespace CHI.ViewModels
             excel.Save();
         }
 
-        private void SavePlanForPeriod()
+        private void BringChangesToDbContext()
         {
-            //reportService.UpdateCalculatedCells();
+            var plans = dbContext.Plans.Local.Where(x => x.Month == Month && x.Year == Year).ToLookup(x => (x.Parameter, x.Indicator));
 
-            //var plans = dbContext.Plans.Local.Where(x => x.Month == Month && x.Year == Year).ToLookup(x => (x.Parameter.Id, x.Indicator.Id));
+            foreach (var comparatorItem in gridItemDataComparator.Where(x => x.Key.IsEditable))
+            {
+                var gridItem = comparatorItem.Key;
 
-            //foreach (var valueItem in reportService.ValuesList.Where(x => x.IsWritable))
-            //{
-            //    var planItem = plans.FirstOrDefault(x => x.Key == (valueItem.RowHeader.Parameter.Id, valueItem.ColumnHeader.Indicator.Id))?.FirstOrDefault();
+                var storedPlanItem = plans.FirstOrDefault(x => x.Key == comparatorItem.Value)?.FirstOrDefault();
 
-            //    if (planItem == null && valueItem.Value != null)
-            //    {
-            //        planItem = new Plan()
-            //        {
-            //            Month = Month,
-            //            Year = Year,
-            //            Indicator = valueItem.ColumnHeader.Indicator,
-            //            Parameter = valueItem.RowHeader.Parameter,
-            //            Value = valueItem.Value.Value
-            //        };
+                if (gridItem.Value.HasValue && gridItem.Value != 0)
+                {
+                    if (storedPlanItem == null)
+                        dbContext.Add(new Plan()
+                        {
+                            Month = Month,
+                            Year = Year,
+                            Parameter = comparatorItem.Value.Item1,
+                            Indicator = comparatorItem.Value.Item2,
+                            Value = gridItem.Value.Value
+                        });
 
-            //        dbContext.Add(planItem);
-            //    }
-            //    else if (planItem != null)
-            //    {
-            //        if (valueItem.Value == null)
-            //            dbContext.Remove(planItem);
-            //        else
-            //            planItem.Value = valueItem.Value.Value;
-            //    }
-            //}
+                    else
+                        storedPlanItem.Value = gridItem.Value.Value;
+
+                }
+                else if (storedPlanItem != null)
+                    dbContext.Remove(storedPlanItem);
+            }
         }
 
         public void OnNavigatedTo(NavigationContext navigationContext)
@@ -410,7 +443,7 @@ namespace CHI.ViewModels
             dbContext.Components.Local.ToList().ForEach(x => x.Childs = x.Childs?.OrderBy(x => x.Order).ToList());
             dbContext.Components.Local.ToList().ForEach(x => x.Indicators = x.Indicators.OrderBy(x => x.Order).ToList());
 
-            permittedDepartments = user.PlanningPermisions.Select(x => x.Department).ToList();
+            var permittedDepartments = user.PlanningPermisions.Select(x => x.Department).ToList();
 
             var rootDepartment = new Department();
             rootDepartment.IsRoot = true;
@@ -503,7 +536,7 @@ namespace CHI.ViewModels
 
         public void OnNavigatedFrom(NavigationContext navigationContext)
         {
-            SavePlanForPeriod();
+            BringChangesToDbContext();
 
             dbContext.ChangeTracker
                 .Entries()
