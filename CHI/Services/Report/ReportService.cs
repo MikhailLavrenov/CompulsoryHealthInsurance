@@ -70,9 +70,12 @@ namespace CHI.Services.Report
             //вычисляет проценты в штатных единицах
             foreach (var employee in employees.Where(x => x.Parameters.Any()))
             {
-                var percentParamenter = employee.Parameters.Where(x => x.Kind == ParameterKind.EmployeePercent).First();
-                var dividendParameter = employee.Parameters.Where(x => x.Kind == ParameterKind.EmployeePlan).First();
-                var dividerParameter = employee.Parameters.Where(x => x.Kind == ParameterKind.EmployeeFact).First();
+                var percentParamenter = employee.Parameters.Where(x => x.Kind == ParameterKind.EmployeePercent).FirstOrDefault();
+                var dividendParameter = employee.Parameters.Where(x => x.Kind == ParameterKind.EmployeePlan).FirstOrDefault();
+                var dividerParameter = employee.Parameters.Where(x => x.Kind == ParameterKind.EmployeeFact).FirstOrDefault();
+
+                if (percentParamenter == null || dividendParameter == null || dividerParameter == null)
+                    continue;
 
                 foreach (var indicator in indicators)
                 {
@@ -85,9 +88,12 @@ namespace CHI.Services.Report
             //вычисляет проценты в подразделениях
             foreach (var department in departments.Where(x=>x.Parameters.Any()))
             {
-                var percentParamenter = department.Parameters.Where(x => x.Kind == ParameterKind.DepartmentPercent).First();
-                var dividendParameter = department.Parameters.Where(x => x.Kind == ParameterKind.DepartmentHandPlan).First();
-                var dividerParameter = department.Parameters.Where(x => x.Kind == ParameterKind.DepartmentFact).First();
+                var percentParamenter = department.Parameters.Where(x => x.Kind == ParameterKind.DepartmentPercent).FirstOrDefault();
+                var dividendParameter = department.Parameters.Where(x => x.Kind == ParameterKind.DepartmentHandPlan).FirstOrDefault();
+                var dividerParameter = department.Parameters.Where(x => x.Kind == ParameterKind.DepartmentFact).FirstOrDefault();
+
+                if (percentParamenter == null || dividendParameter == null || dividerParameter == null)
+                    continue;
 
                 foreach (var indicator in indicators)
                 {

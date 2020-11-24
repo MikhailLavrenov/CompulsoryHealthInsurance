@@ -414,7 +414,7 @@ namespace CHI.ViewModels
                 GridItems[row] = new GridItem[columnSubHeaders.Count];
 
                 for (int col = 0; col < columnSubHeaders.Count; col++)
-                    GridItems[row][col] = new GridItem(rowSubHeaders[row], columnSubHeaders[col], false);
+                    GridItems[row][col] = new GridItem(rowSubHeaders[row], columnSubHeaders[col]);
             }
 
             var parameters = rootDepartment.ToListRecursive().Skip(1).SelectMany(x => x.Parameters.Concat(x.Employees.SelectMany(y => y.Parameters))).ToList();
