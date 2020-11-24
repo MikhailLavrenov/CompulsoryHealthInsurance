@@ -1,14 +1,14 @@
 ﻿using CHI.Infrastructure;
-using CHI.Models;
 using CHI.Models.ServiceAccounting;
 using CHI.Services;
 using CHI.Services.Report;
 using Microsoft.EntityFrameworkCore;
+using OfficeOpenXml;
+using OfficeOpenXml.Style;
 using Prism.Commands;
 using Prism.Regions;
 using System;
 using System.Collections.Generic;
-using System.DirectoryServices.AccountManagement;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -32,6 +32,7 @@ namespace CHI.ViewModels
         IFileDialogService fileDialogService;
         ReportService reportService;
         User currentUser;
+        List<Department> permittedDepartments;
 
         public bool KeepAlive { get => false; }
         public int Year
@@ -107,6 +108,17 @@ namespace CHI.ViewModels
 
             foreach (var item in gridItemDataComparator)
                 item.Key.Value = reportService.Results[item.Value];
+
+            for (int row = 0; row < rowHeaders.Count; row++)
+            {
+                var rowHeader = rowHeaders[row];
+                var rowGridItems = GridItems[row];
+                var employee = rowGridItems.Any() ? gridItemDataComparator[rowGridItems[0]].Item1.Employee : null;
+
+                rowHeader.AlwaysHidden = !rowGridItems.Where(x => x.Value.HasValue).Any() && (employee?.IsArchive ?? false);
+            }
+
+            SetAlternationColor();
 
             mainRegionService.HideProgressBar("План построен");
         }
@@ -341,50 +353,40 @@ namespace CHI.ViewModels
 
         private void SavePlanForPeriod()
         {
-            reportService.UpdateCalculatedCells();
+            //reportService.UpdateCalculatedCells();
 
-            var plans = dbContext.Plans.Local.Where(x => x.Month == Month && x.Year == Year).ToLookup(x => (x.Parameter.Id, x.Indicator.Id));
+            //var plans = dbContext.Plans.Local.Where(x => x.Month == Month && x.Year == Year).ToLookup(x => (x.Parameter.Id, x.Indicator.Id));
 
-            foreach (var valueItem in reportService.ValuesList.Where(x => x.IsWritable))
-            {
-                var planItem = plans.FirstOrDefault(x => x.Key == (valueItem.RowHeader.Parameter.Id, valueItem.ColumnHeader.Indicator.Id))?.FirstOrDefault();
+            //foreach (var valueItem in reportService.ValuesList.Where(x => x.IsWritable))
+            //{
+            //    var planItem = plans.FirstOrDefault(x => x.Key == (valueItem.RowHeader.Parameter.Id, valueItem.ColumnHeader.Indicator.Id))?.FirstOrDefault();
 
-                if (planItem == null && valueItem.Value != null)
-                {
-                    planItem = new Plan()
-                    {
-                        Month = Month,
-                        Year = Year,
-                        Indicator = valueItem.ColumnHeader.Indicator,
-                        Parameter = valueItem.RowHeader.Parameter,
-                        Value = valueItem.Value.Value
-                    };
+            //    if (planItem == null && valueItem.Value != null)
+            //    {
+            //        planItem = new Plan()
+            //        {
+            //            Month = Month,
+            //            Year = Year,
+            //            Indicator = valueItem.ColumnHeader.Indicator,
+            //            Parameter = valueItem.RowHeader.Parameter,
+            //            Value = valueItem.Value.Value
+            //        };
 
-                    dbContext.Add(planItem);
-                }
-                else if (planItem != null)
-                {
-                    if (valueItem.Value == null)
-                        dbContext.Remove(planItem);
-                    else
-                        planItem.Value = valueItem.Value.Value;
-                }
-            }
+            //        dbContext.Add(planItem);
+            //    }
+            //    else if (planItem != null)
+            //    {
+            //        if (valueItem.Value == null)
+            //            dbContext.Remove(planItem);
+            //        else
+            //            planItem.Value = valueItem.Value.Value;
+            //    }
+            //}
         }
 
         public void OnNavigatedTo(NavigationContext navigationContext)
         {
-            dbContext.Departments.Load();
-
-            var user = dbContext.Users.Where(x => x.Id==currentUser.Id).Include(x => x.PlanningPermisions).FirstOrDefault();
-
-            var rootDepartment = new Department();
-            rootDepartment.IsRoot = true;
-            rootDepartment.Childs = user.PlanningPermisions.Select(x => x.Department).ToList();
-            rootDepartment.Childs.ForEach(x => x.Parent = rootDepartment);
-
-            dbContext.Parameters.Where(x => x.Kind == ParameterKind.EmployeePlan || x.Kind == ParameterKind.DepartmentHandPlan|| x.Kind == ParameterKind.DepartmentCalculatedPlan).Load();
-
+            dbContext.Parameters.Where(x => x.Kind == ParameterKind.EmployeePlan || x.Kind == ParameterKind.DepartmentHandPlan || x.Kind == ParameterKind.DepartmentCalculatedPlan).Load();
 
             dbContext.Employees
                 .Include(x => x.Medic)
@@ -396,14 +398,102 @@ namespace CHI.ViewModels
                 .Include(x => x.CaseFilters)
                 .Load();
 
+            var user = dbContext.Users
+                .Where(x => x.Id == currentUser.Id)
+                .Include(x => x.PlanningPermisions).ThenInclude(x => x.Department)
+                .FirstOrDefault();
+
+            dbContext.Departments.Local.ToList().ForEach(x => x.Childs = x.Childs.OrderBy(x => x.Order).ToList());
+            dbContext.Departments.Local.ToList().ForEach(x => x.Employees = x.Employees.OrderBy(x => x.Order).ToList());
+            dbContext.Departments.Local.ToList().ForEach(x => x.Parameters = x.Parameters.OrderBy(x => x.Order).ToList());
+            dbContext.Employees.Local.ToList().ForEach(x => x.Parameters = x.Parameters.OrderBy(x => x.Order).ToList());
+            dbContext.Components.Local.ToList().ForEach(x => x.Childs = x.Childs?.OrderBy(x => x.Order).ToList());
+            dbContext.Components.Local.ToList().ForEach(x => x.Indicators = x.Indicators.OrderBy(x => x.Order).ToList());
+
+            permittedDepartments = user.PlanningPermisions.Select(x => x.Department).ToList();
+
+            var rootDepartment = new Department();
+            rootDepartment.IsRoot = true;
+            foreach (var permittedDepartment in permittedDepartments.Where(x => !permittedDepartments.Contains(x.Parent)))
+            {
+                rootDepartment.Childs.Add(permittedDepartment);
+                permittedDepartment.Parent = rootDepartment;
+            }
 
             var rootComponent = dbContext.Components.Local.First(x => x.IsRoot);
 
-            Report = new OldReportService(rootDepartment, rootComponent, true);
+            reportService = new ReportService(rootDepartment, rootComponent);
 
-            Report.ApprovedBy = Settings.Instance.ApprovedBy;
+            RowHeaders = CreateHeaderItemRecursive(rootDepartment, null).ToListRecursive().Skip(1).ToList();
+            ColumnHeaders = CreateHeaderItemRecursive(rootComponent, null).ToListRecursive().Skip(1).ToList();
+
+            var rowSubHeaders = RowHeaders.SelectMany(x => x.SubItems).ToList();
+            var columnSubHeaders = ColumnHeaders.SelectMany(x => x.SubItems).ToList();
+
+            GridItems = new GridItem[rowSubHeaders.Count][];
+
+            for (int row = 0; row < rowSubHeaders.Count; row++)
+            {
+                GridItems[row] = new GridItem[columnSubHeaders.Count];
+
+                for (int col = 0; col < columnSubHeaders.Count; col++)
+                    GridItems[row][col] = new GridItem(rowSubHeaders[row], columnSubHeaders[col]);
+            }
+
+            var parameters = rootDepartment.ToListRecursive().Skip(1).SelectMany(x => x.Parameters.Concat(x.Employees.SelectMany(y => y.Parameters))).ToList();
+            var indicators = rootComponent.ToListRecursive().Skip(1).SelectMany(x => x.Indicators).ToList();
+
+            gridItemDataComparator = new Dictionary<GridItem, (Parameter, Indicator)>();
+
+            for (int row = 0; row < parameters.Count; row++)
+                for (int col = 0; col < indicators.Count; col++)
+                {
+                    var gridItem = GridItems[row][col];
+                    var parameter = parameters[row];
+                    var indicator = indicators[col];
+
+                    gridItem.IsEditable = indicator.Component.IsCanPlanning
+                        && (parameter.Kind == ParameterKind.EmployeePlan || parameter.Kind == ParameterKind.DepartmentHandPlan)
+                        && !(parameter.Department?.Childs.Any() ?? false);
+
+                    gridItemDataComparator.Add(gridItem, (parameter, indicator));
+                }
 
             BuildReport();
+
+            //SetAlternationColor();
+        }
+
+        private HeaderItem CreateHeaderItemRecursive(Department department, HeaderItem parent)
+        {
+            var subItemNames = department.Parameters.Select(x => x.Kind.GetShortDescription()).ToList();
+
+            var headerItem = new HeaderItem(department.Name, null, department.HexColor, false, false, true, parent, subItemNames);
+
+            foreach (var child in department.Childs)
+                CreateHeaderItemRecursive(child, headerItem);
+
+            foreach (var employee in department.Employees)
+            {
+                subItemNames = employee.Parameters.Select(x => x.Kind.GetShortDescription()).ToList();
+
+                new HeaderItem(employee.Medic.FullName, employee.Specialty.Name, string.Empty, true, false, false, headerItem, subItemNames);
+            }
+
+            return headerItem;
+        }
+
+        private HeaderItem CreateHeaderItemRecursive(Component component, HeaderItem parent)
+        {
+            var subItemNames = component.Indicators.Select(x => x.FacadeKind.GetShortDescription()).ToList();
+
+            var headerItem = new HeaderItem(component.Name, null, component.HexColor, false, false, component.Childs.Any(), parent, subItemNames);
+
+            if (component.Childs != null)
+                foreach (var child in component.Childs)
+                    CreateHeaderItemRecursive(child, headerItem);
+
+            return headerItem;
         }
 
         public bool IsNavigationTarget(NavigationContext navigationContext)

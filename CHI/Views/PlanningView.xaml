@@ -49,13 +49,13 @@
                         Value="True" />
                 <Style.Triggers>
 
-                    <DataTrigger Binding="{Binding IsWritable}"
+                    <DataTrigger Binding="{Binding IsEditable}"
                                  Value="True">
                         <Setter Property="Focusable"
                                 Value="True" />
                     </DataTrigger>
 
-                    <DataTrigger Binding="{Binding IsWritable}"
+                    <DataTrigger Binding="{Binding IsEditable}"
                                  Value="False">
                         <Setter Property="Focusable"
                                 Value="False" />
@@ -206,7 +206,7 @@
                           HorizontalScrollBarVisibility="Hidden"
                           Margin="0,0,17,0">
 
-                <ItemsControl ItemsSource="{Binding Report.ColumnGroups}">
+                <ItemsControl ItemsSource="{Binding ColumnHeaders}">
 
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -243,8 +243,8 @@
                                                    Text="{Binding Name}" />
                                     </StackPanel>
                                 </Border>
-                                <!--Элементы HeaderItems столбца заголовка-->
-                                <ItemsControl ItemsSource="{Binding HeaderItems}">
+                                <!--Элементы SubItems столбца заголовка-->
+                                <ItemsControl ItemsSource="{Binding SubItems}">
 
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
@@ -281,7 +281,7 @@
                           HorizontalScrollBarVisibility="Hidden"
                           Margin="0,0,0,17">
 
-                <ItemsControl ItemsSource="{Binding Report.RowGroups}">
+                <ItemsControl ItemsSource="{Binding RowHeaders}">
 
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -328,7 +328,7 @@
                                 </Border>
 
                                 <!--HeaderItems строки заголовка-->
-                                <ItemsControl ItemsSource="{Binding HeaderItems}">
+                                <ItemsControl ItemsSource="{Binding SubItems}">
 
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
@@ -372,7 +372,7 @@
                 </b:Interaction.Behaviors>
 
                 <ItemsControl SelectiveScrollingGrid.SelectiveScrollingOrientation="Both"
-                              ItemsSource="{Binding Report.Values}">
+                              ItemsSource="{Binding GridItems}">
 
                     <!--Строки-->
                     <ItemsControl.ItemsPanel>
