@@ -176,7 +176,11 @@ namespace CHI.ViewModels
 
             mainRegionService.ShowProgressBar("Сохранение файла");
 
-            ReportHelper.SaveExcel(filePath, RowHeaders, ColumnHeaders, GridItems, Month, Year, false, true, settings.ApprovedBy);
+            new ReportExcelBuilder(filePath)
+                .UsePlaningStyle(settings.ApprovedBy)
+                .SetNewSheet(Month,Year)
+                .FillSheet(RowHeaders,ColumnHeaders,GridItems)
+                .SaveAndClose();
 
             mainRegionService.HideProgressBar($"Файл сохранен: {filePath}");
         }

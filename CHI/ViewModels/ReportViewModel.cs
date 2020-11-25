@@ -129,7 +129,11 @@ namespace CHI.ViewModels
 
             mainRegionService.ShowProgressBar("Сохранение файла");
 
-            ReportHelper.SaveExcel(filePath, RowHeaders, ColumnHeaders, GridItems, reportService.Month, reportService.Year, reportService.IsGrowing, false, null);
+            new ReportExcelBuilder(filePath)   
+                .UseReportStyle()   
+                .SetNewSheet(reportService.Month,reportService.Year,reportService.IsGrowing)   
+                .FillSheet(RowHeaders, ColumnHeaders, GridItems)  
+                .SaveAndClose();
 
             mainRegionService.HideProgressBar($"Файл сохранен: {filePath}");
         }
@@ -138,13 +142,13 @@ namespace CHI.ViewModels
         {
             mainRegionService.ShowProgressBar("Построение отчета");
 
-            if (!File.Exists(settings.ServiceAccountingReportPath))
+            if (!Directory.Exists(Path.GetDirectoryName(settings.ServiceAccountingReportPath)))
             {
-                mainRegionService.HideProgressBar("Отменено. Путь к отчету не задан либо файл отсутствует");
+                mainRegionService.HideProgressBar("Отменено. Заданная директория не существует");
                 return;
             }
 
-            if (Helpers.IsFileLocked(settings.ServiceAccountingReportPath))
+            if (File.Exists(settings.ServiceAccountingReportPath) && Helpers.IsFileLocked(settings.ServiceAccountingReportPath))
             {
                 mainRegionService.HideProgressBar("Отменено. Файл занят другим пользователем, поэтому не может быть изменен");
                 return;
@@ -156,11 +160,18 @@ namespace CHI.ViewModels
 
             IsGrowing = false;
             BuildReportInternal();
-            ReportHelper.SaveExcel(settings.ServiceAccountingReportPath, RowHeaders, ColumnHeaders, GridItems, reportService.Month, reportService.Year, reportService.IsGrowing, false, null);
+
+            var excelBuilder = new ReportExcelBuilder(settings.ServiceAccountingReportPath)                
+                .UseReportStyle()
+                .SetNewSheet(reportService.Month, reportService.Year, reportService.IsGrowing)
+                .FillSheet(RowHeaders, ColumnHeaders, GridItems);
 
             IsGrowing = true;
             BuildReportInternal();
-            ReportHelper.SaveExcel(settings.ServiceAccountingReportPath, RowHeaders, ColumnHeaders, GridItems, reportService.Month, reportService.Year, reportService.IsGrowing, false, null);
+
+            excelBuilder.SetNewSheet(reportService.Month, reportService.Year, reportService.IsGrowing)
+                .FillSheet(RowHeaders, ColumnHeaders, GridItems)
+                .SaveAndClose();
 
             IsGrowing = isGrowingInitialValue;
 
