@@ -1,4 +1,5 @@
-﻿using Prism.Commands;
+﻿using CHI.Models.ServiceAccounting;
+using Prism.Commands;
 using Prism.Mvvm;
 using System.Collections.Generic;
 using System.Linq;
@@ -72,10 +73,10 @@ namespace CHI.Infrastructure
 
         private void UpdateVisibility()
         {
-            if (alwaysHidden || !Parent.IsVisible)
+            if (alwaysHidden || Parent?.IsVisible==false)
                 IsVisible = false;
             else
-                IsVisible = !Parent.IsCollapsed.Value;
+                IsVisible = !(Parent?.IsCollapsed.Value??false);
         }
 
         private void UpdateChildrenVisibility()
@@ -93,6 +94,8 @@ namespace CHI.Infrastructure
 
             UpdateChildrenVisibility();
         }
+
+
 
     }
 }
