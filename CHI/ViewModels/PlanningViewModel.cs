@@ -76,6 +76,7 @@ namespace CHI.ViewModels
         public DelegateCommandAsync UpdateCalculatedCellsCommand { get; }
 
 
+
         public PlanningViewModel(IMainRegionService mainRegionService, IFileDialogService fileDialogService, User currentUser)
         {
             this.mainRegionService = mainRegionService;
@@ -91,7 +92,9 @@ namespace CHI.ViewModels
             DecreaseYear = new DelegateCommand(() => --Year);
             SaveExcelCommand = new DelegateCommandAsync(SaveExcelExecute);
             UpdateCalculatedCellsCommand = new DelegateCommandAsync(UpdateCalculatedCellsExecute);
+
         }
+
 
         private void UpdateCalculatedCellsExecute()
         {

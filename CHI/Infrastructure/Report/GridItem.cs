@@ -1,4 +1,5 @@
-﻿using Prism.Mvvm;
+﻿using Prism.Commands;
+using Prism.Mvvm;
 using System.ComponentModel;
 using System.Windows.Media;
 
@@ -30,6 +31,9 @@ namespace CHI.Infrastructure
         public bool IsEditable { get => isEditable; set => SetProperty(ref isEditable, value); }
         public Color Color { get => color; set => SetProperty(ref color, value); }
 
+        public DelegateCommand<bool?> SelectedChangeCommand { get; }
+
+
         public GridItem(HeaderSubItem rowSubHeader, HeaderSubItem columnSubHeader)
         {
             RowSubHeader = rowSubHeader;
@@ -38,8 +42,16 @@ namespace CHI.Infrastructure
 
             rowSubHeader.HeaderItem.PropertyChanged += OnRowPropertyChanged;
             columnSubHeader.HeaderItem.PropertyChanged += OnColumnPropertyChanged;
+
+            SelectedChangeCommand = new DelegateCommand<bool?>(SelectedChangeExecute);
         }
 
+
+        private void SelectedChangeExecute(bool? selected)
+        {
+            if (selected.HasValue)
+                IsSelected = selected.Value;
+        }
         private void OnColumnPropertyChanged(object sender, PropertyChangedEventArgs args)
         {
             if (args.PropertyName == nameof(HeaderItem.IsVisible))
