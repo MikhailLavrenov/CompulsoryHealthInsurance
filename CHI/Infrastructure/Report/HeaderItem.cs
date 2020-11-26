@@ -12,6 +12,7 @@ namespace CHI.Infrastructure
         bool? isCollapsed;
         bool isVisible = true;
         bool alwaysHidden = false;
+        bool isSelected;
         Color color;
 
         public string Name { get; }
@@ -46,6 +47,7 @@ namespace CHI.Infrastructure
                 UpdateChildrenVisibility();
             }
         }
+        public bool IsSelected { get => isSelected; set => SetProperty(ref isSelected, value); }
         public int Level { get; }
         public HeaderItem Parent { get; set; }
         public List<HeaderItem> Childs { get; set; }

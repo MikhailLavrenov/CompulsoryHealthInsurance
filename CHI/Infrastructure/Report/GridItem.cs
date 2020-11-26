@@ -1,5 +1,4 @@
 ﻿using Prism.Mvvm;
-using System;
 using System.ComponentModel;
 using System.Windows.Media;
 
@@ -9,13 +8,25 @@ namespace CHI.Infrastructure
     {
         double? value;
         bool isVisible = true;
+        bool isSelected = false;
         bool isEditable = false;
         Color color;
-        
+
         public HeaderSubItem RowSubHeader { get; }
         public HeaderSubItem ColumnSubHeader { get; }
         public double? Value { get => value; set => SetProperty(ref this.value, value); }
         public bool IsVisible { get => isVisible; set => SetProperty(ref isVisible, value); }
+        public bool IsSelected
+        {
+            get => isSelected;
+            set
+            {
+                SetProperty(ref isSelected, value);
+
+                RowSubHeader.HeaderItem.IsSelected = value;
+                ColumnSubHeader.HeaderItem.IsSelected = value;
+            }
+        }
         public bool IsEditable { get => isEditable; set => SetProperty(ref isEditable, value); }
         public Color Color { get => color; set => SetProperty(ref color, value); }
 
@@ -36,7 +47,7 @@ namespace CHI.Infrastructure
         }
         private void OnRowPropertyChanged(object sender, PropertyChangedEventArgs args)
         {
-            if (args.PropertyName==nameof(HeaderItem.Color))
+            if (args.PropertyName == nameof(HeaderItem.Color))
                 Color = RowSubHeader.HeaderItem.Color;
             else if (args.PropertyName == nameof(HeaderItem.IsVisible))
                 IsVisible = ColumnSubHeader.HeaderItem.IsVisible && RowSubHeader.HeaderItem.IsVisible;
