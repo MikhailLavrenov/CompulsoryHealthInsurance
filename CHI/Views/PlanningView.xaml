@@ -48,19 +48,9 @@
                         Value="Light" />
                 <Setter Property="SnapsToDevicePixels"
                         Value="True" />
+                <Setter Property="Focusable" 
+                        Value="{Binding IsEditable}"/>
                 <Style.Triggers>
-
-                    <DataTrigger Binding="{Binding IsEditable}"
-                                 Value="True">
-                        <Setter Property="Focusable"
-                                Value="True" />
-                    </DataTrigger>
-
-                    <DataTrigger Binding="{Binding IsEditable}"
-                                 Value="False">
-                        <Setter Property="Focusable"
-                                Value="False" />
-                    </DataTrigger>
 
                     <Trigger Property="IsFocused"
                              Value="False">
@@ -106,6 +96,89 @@
                 <Setter Property="SnapsToDevicePixels"
                         Value="True" />
             </Style>
+
+            <Style TargetType="Border" x:Key="RowHeaderSelectedBorderStyle">
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                        <Setter Property="Background">
+                            <Setter.Value>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                    <GradientStop Color="gray" Offset="0.025"/>
+                                    <GradientStop Color="Transparent" Offset="0.25"/>
+                                    
+                                </LinearGradientBrush>
+                            </Setter.Value>
+                        </Setter>
+                    </DataTrigger>
+
+                    <DataTrigger Binding="{Binding IsSelected}" Value="False">
+                        <Setter Property="Background" Value="Transparent">
+                        </Setter>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+
+            <Style TargetType="Border" x:Key="RowSubHeaderSelectedBorderStyle">
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                        <Setter Property="Background">
+                            <Setter.Value>
+                                <LinearGradientBrush StartPoint="1,0" EndPoint="0,0">
+                                    <GradientStop Color="Transparent" Offset="0"/>
+                                    <GradientStop Color="Transparent" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Setter.Value>
+                        </Setter>
+                    </DataTrigger>
+
+                    <DataTrigger Binding="{Binding IsSelected}" Value="False">
+                        <Setter Property="Background" Value="Transparent">
+                        </Setter>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+
+            <Style TargetType="Border" x:Key="ColumnHeaderSelectedBorderStyle">
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                        <Setter Property="Background">
+                            <Setter.Value>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                    <GradientStop Color="LightGray" Offset="0"/>
+                                    <GradientStop Color="Gray" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Setter.Value>
+                        </Setter>
+                    </DataTrigger>
+
+                    <DataTrigger Binding="{Binding IsSelected}" Value="False">
+                        <Setter Property="Background" Value="Transparent">
+                        </Setter>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+
+            <Style TargetType="Border" x:Key="ColumnSubHeaderSelectedBorderStyle">
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                        <Setter Property="Background">
+                            <Setter.Value>
+                                <LinearGradientBrush StartPoint="0,1" EndPoint="0,0">
+                                    <GradientStop Color="LightGray" Offset="0"/>
+                                    <GradientStop Color="Gray" Offset="1"/>
+                                    
+                                </LinearGradientBrush>
+                            </Setter.Value>
+                        </Setter>
+                    </DataTrigger>
+
+                    <DataTrigger Binding="{Binding IsSelected}" Value="False">
+                        <Setter Property="Background" Value="Transparent">
+                        </Setter>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+
 
         </ResourceDictionary >
     </UserControl.Resources>
@@ -228,8 +301,9 @@
 
                                 <Border Style="{StaticResource BorderCellStyle}"
                                         Background="{StaticResource HeaderBrush}">
-                                    <StackPanel Orientation="Vertical">
-                                        <Button Style="{StaticResource IconTransparentButton}"
+                                    <Border Style="{StaticResource ColumnHeaderSelectedBorderStyle}">
+                                        <StackPanel Orientation="Vertical">
+                                            <Button Style="{StaticResource IconTransparentButton}"
                                                 HorizontalAlignment="Left"
                                                 Command="{Binding SwitchCollapseCommand}"
                                                 Visibility="{Binding CanCollapse, Converter={i:BoolToVisibleHiddenConverter}}">
@@ -239,12 +313,14 @@
                                                     <materialDesign:PackIcon Kind="KeyboardArrowRight"
                                                                              Visibility="{Binding IsCollapsed, Converter={i:InvertedBoolToVisibleConverter}}" />
                                                 </StackPanel>
-                                        </Button>
-                                        <TextBlock Style="{StaticResource HeaderCell}"
+                                            </Button>
+                                            <TextBlock Style="{StaticResource HeaderCell}"
                                                    Text="{Binding Name}" />
-                                    </StackPanel>
+                                        </StackPanel>
+                                    </Border>
                                 </Border>
-                                <!--Элементы SubItems столбца заголовка-->
+
+                                <!--Подзаголовки столбцов -->
                                 <ItemsControl ItemsSource="{Binding SubItems}">
 
                                     <ItemsControl.ItemsPanel>
@@ -257,9 +333,11 @@
                                         <DataTemplate>
                                             <Border Style="{StaticResource BorderCellStyle}"
                                                     Background="{StaticResource HeaderBrush}">
-                                                <TextBlock Style="{StaticResource HeaderCell}"
+                                                <Border Style="{StaticResource ColumnSubHeaderSelectedBorderStyle}">
+                                                    <TextBlock Style="{StaticResource HeaderCell}"
                                                            Width="70"
                                                            Text="{Binding Name}" />
+                                                </Border>
                                             </Border>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
@@ -304,8 +382,9 @@
 
                                 <Border Style="{StaticResource BorderCellStyle}"
                                         Background="{StaticResource HeaderBrush}">
-                                    <StackPanel Orientation="Horizontal" Width="300">
-                                        <Button Style="{StaticResource IconTransparentButton}"
+                                    <Border Style="{StaticResource RowHeaderSelectedBorderStyle}">
+                                        <StackPanel Orientation="Horizontal" Width="300">
+                                            <Button Style="{StaticResource IconTransparentButton}"
                                                 Margin="0,-2,0,-2"
                                                 VerticalAlignment="Center"
                                                 Command="{Binding SwitchCollapseCommand}"
@@ -316,19 +395,20 @@
                                                     <materialDesign:PackIcon Kind="ExpandMore"
                                                                              Visibility="{Binding IsCollapsed, Converter={i:InvertedBoolToVisibleConverter}}" />
                                                 </StackPanel>
-                                        </Button>
-                                        
-                                        <TextBlock Style="{StaticResource HeaderCell}" 
+                                            </Button>
+
+                                            <TextBlock Style="{StaticResource HeaderCell}" 
                                                    Text="{Binding Name}" />
 
-                                        <TextBlock Style="{StaticResource HeaderCell}"
+                                            <TextBlock Style="{StaticResource HeaderCell}"
                                                    FontWeight="Light"
                                                    Margin="15,0,0,0"
                                                    Text="{Binding SubName}" />
-                                    </StackPanel>
+                                        </StackPanel>
+                                    </Border>
                                 </Border>
 
-                                <!--HeaderItems строки заголовка-->
+                                <!--Подзаголовоки строк -->
                                 <ItemsControl ItemsSource="{Binding SubItems}">
 
                                     <ItemsControl.ItemsPanel>
@@ -342,8 +422,10 @@
                                             <Border Style="{StaticResource BorderCellStyle}"
                                                     Height="17"
                                                     Background="{StaticResource HeaderBrush}">
-                                                <TextBlock Style="{StaticResource RowHeaderItemCell}"
+                                                <Border Style="{StaticResource RowSubHeaderSelectedBorderStyle}">
+                                                    <TextBlock Style="{StaticResource RowHeaderItemCell}"
                                                            Text="{Binding Name}" />
+                                                </Border>
                                             </Border>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
@@ -403,7 +485,7 @@
                                             </Border.Background>
                                             <TextBox Style="{StaticResource Cell}"
                                                      Text="{Binding Value}">
-                                                
+
                                                 <b:Interaction.Triggers>
 
                                                     <b:EventTrigger EventName="GotFocus">
@@ -421,7 +503,7 @@
                                                             </b:InvokeCommandAction.CommandParameter>
                                                         </b:InvokeCommandAction>
                                                     </b:EventTrigger>
-                                                    
+
                                                 </b:Interaction.Triggers>
                                             </TextBox>
                                         </Border>
