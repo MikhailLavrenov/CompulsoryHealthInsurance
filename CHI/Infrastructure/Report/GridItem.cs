@@ -24,7 +24,9 @@ namespace CHI.Infrastructure
             {
                 SetProperty(ref isSelected, value);
 
+                RowSubHeader.IsSelected = value;
                 RowSubHeader.HeaderItem.IsSelected = value;
+                ColumnSubHeader.IsSelected = value;
                 ColumnSubHeader.HeaderItem.IsSelected = value;
             }
         }
