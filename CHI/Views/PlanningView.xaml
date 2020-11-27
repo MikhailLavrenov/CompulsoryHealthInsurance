@@ -48,8 +48,8 @@
                         Value="Light" />
                 <Setter Property="SnapsToDevicePixels"
                         Value="True" />
-                <Setter Property="Focusable" 
-                        Value="{Binding IsEditable}"/>
+                <Setter Property="Focusable"
+                        Value="{Binding IsEditable}" />
                 <Style.Triggers>
 
                     <Trigger Property="IsFocused"
@@ -75,11 +75,22 @@
             </Style>
 
             <Style TargetType="TextBlock"
+                   BasedOn="{StaticResource HeaderCell}"
+                   x:Key="SelectedHeaderCell">
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding IsSelected}"
+                                 Value="True">
+                        <Setter Property="Foreground"
+                                Value="White" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+
+            <Style TargetType="TextBlock"
+                   BasedOn="{StaticResource SelectedHeaderCell}"
                    x:Key="RowHeaderItemCell">
                 <Setter Property="Width"
                         Value="70" />
-                <Setter Property="Height"
-                        Value="17" />
             </Style>
 
             <SolidColorBrush x:Key="CellBorderBrush"
@@ -97,88 +108,25 @@
                         Value="True" />
             </Style>
 
-            <Style TargetType="Border" x:Key="RowHeaderSelectedBorderStyle">
+            <Style TargetType="Border"
+                   x:Key="HeaderSelectedBorderStyle">
                 <Style.Triggers>
-                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                        <Setter Property="Background">
-                            <Setter.Value>
-                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                                    <GradientStop Color="gray" Offset="0.025"/>
-                                    <GradientStop Color="Transparent" Offset="0.25"/>
-                                    
-                                </LinearGradientBrush>
-                            </Setter.Value>
-                        </Setter>
+                    <DataTrigger Binding="{Binding IsSelected}"
+                                 Value="True">
+                        <DataTrigger.Setters>
+                            <Setter Property="Background"
+                                    Value="DarkGray" />
+                        </DataTrigger.Setters>
                     </DataTrigger>
 
-                    <DataTrigger Binding="{Binding IsSelected}" Value="False">
-                        <Setter Property="Background" Value="Transparent">
+                    <DataTrigger Binding="{Binding IsSelected}"
+                                 Value="False">
+                        <Setter Property="Background"
+                                Value="Transparent">
                         </Setter>
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
-
-            <Style TargetType="Border" x:Key="RowSubHeaderSelectedBorderStyle">
-                <Style.Triggers>
-                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                        <Setter Property="Background">
-                            <Setter.Value>
-                                <LinearGradientBrush StartPoint="1,0" EndPoint="0,0">
-                                    <GradientStop Color="Transparent" Offset="0"/>
-                                    <GradientStop Color="Transparent" Offset="1"/>
-                                </LinearGradientBrush>
-                            </Setter.Value>
-                        </Setter>
-                    </DataTrigger>
-
-                    <DataTrigger Binding="{Binding IsSelected}" Value="False">
-                        <Setter Property="Background" Value="Transparent">
-                        </Setter>
-                    </DataTrigger>
-                </Style.Triggers>
-            </Style>
-
-            <Style TargetType="Border" x:Key="ColumnHeaderSelectedBorderStyle">
-                <Style.Triggers>
-                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                        <Setter Property="Background">
-                            <Setter.Value>
-                                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                                    <GradientStop Color="LightGray" Offset="0"/>
-                                    <GradientStop Color="Gray" Offset="1"/>
-                                </LinearGradientBrush>
-                            </Setter.Value>
-                        </Setter>
-                    </DataTrigger>
-
-                    <DataTrigger Binding="{Binding IsSelected}" Value="False">
-                        <Setter Property="Background" Value="Transparent">
-                        </Setter>
-                    </DataTrigger>
-                </Style.Triggers>
-            </Style>
-
-            <Style TargetType="Border" x:Key="ColumnSubHeaderSelectedBorderStyle">
-                <Style.Triggers>
-                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                        <Setter Property="Background">
-                            <Setter.Value>
-                                <LinearGradientBrush StartPoint="0,1" EndPoint="0,0">
-                                    <GradientStop Color="LightGray" Offset="0"/>
-                                    <GradientStop Color="Gray" Offset="1"/>
-                                    
-                                </LinearGradientBrush>
-                            </Setter.Value>
-                        </Setter>
-                    </DataTrigger>
-
-                    <DataTrigger Binding="{Binding IsSelected}" Value="False">
-                        <Setter Property="Background" Value="Transparent">
-                        </Setter>
-                    </DataTrigger>
-                </Style.Triggers>
-            </Style>
-
 
         </ResourceDictionary >
     </UserControl.Resources>
@@ -301,12 +249,12 @@
 
                                 <Border Style="{StaticResource BorderCellStyle}"
                                         Background="{StaticResource HeaderBrush}">
-                                    <Border Style="{StaticResource ColumnHeaderSelectedBorderStyle}">
+                                    <Border Style="{StaticResource HeaderSelectedBorderStyle}">
                                         <StackPanel Orientation="Vertical">
                                             <Button Style="{StaticResource IconTransparentButton}"
-                                                HorizontalAlignment="Left"
-                                                Command="{Binding SwitchCollapseCommand}"
-                                                Visibility="{Binding CanCollapse, Converter={i:BoolToVisibleHiddenConverter}}">
+                                                    HorizontalAlignment="Left"
+                                                    Command="{Binding SwitchCollapseCommand}"
+                                                    Visibility="{Binding CanCollapse, Converter={i:BoolToVisibleHiddenConverter}}">
                                                 <StackPanel>
                                                     <materialDesign:PackIcon Kind="ExpandMore"
                                                                              Visibility="{Binding IsCollapsed, Converter={i:BoolToVisibleConverter}}" />
@@ -314,12 +262,11 @@
                                                                              Visibility="{Binding IsCollapsed, Converter={i:InvertedBoolToVisibleConverter}}" />
                                                 </StackPanel>
                                             </Button>
-                                            <TextBlock Style="{StaticResource HeaderCell}"
-                                                   Text="{Binding Name}" />
+                                            <TextBlock Style="{StaticResource SelectedHeaderCell}"
+                                                       Text="{Binding Name}" />
                                         </StackPanel>
                                     </Border>
                                 </Border>
-
                                 <!--Подзаголовки столбцов -->
                                 <ItemsControl ItemsSource="{Binding SubItems}">
 
@@ -333,10 +280,10 @@
                                         <DataTemplate>
                                             <Border Style="{StaticResource BorderCellStyle}"
                                                     Background="{StaticResource HeaderBrush}">
-                                                <Border Style="{StaticResource ColumnSubHeaderSelectedBorderStyle}">
-                                                    <TextBlock Style="{StaticResource HeaderCell}"
-                                                           Width="70"
-                                                           Text="{Binding Name}" />
+                                                <Border Style="{StaticResource HeaderSelectedBorderStyle}">
+                                                    <TextBlock Style="{StaticResource SelectedHeaderCell}"
+                                                               Width="70"
+                                                               Text="{Binding Name}" />
                                                 </Border>
                                             </Border>
                                         </DataTemplate>
@@ -382,13 +329,14 @@
 
                                 <Border Style="{StaticResource BorderCellStyle}"
                                         Background="{StaticResource HeaderBrush}">
-                                    <Border Style="{StaticResource RowHeaderSelectedBorderStyle}">
-                                        <StackPanel Orientation="Horizontal" Width="300">
+                                    <Border Style="{StaticResource HeaderSelectedBorderStyle}">
+                                        <StackPanel Orientation="Horizontal"
+                                                    Width="300">
                                             <Button Style="{StaticResource IconTransparentButton}"
-                                                Margin="0,-2,0,-2"
-                                                VerticalAlignment="Center"
-                                                Command="{Binding SwitchCollapseCommand}"
-                                                Visibility="{Binding CanCollapse, Converter={i:BoolToVisibleHiddenConverter}}">
+                                                    Margin="0,-2,0,-2"
+                                                    VerticalAlignment="Center"
+                                                    Command="{Binding SwitchCollapseCommand}"
+                                                    Visibility="{Binding CanCollapse, Converter={i:BoolToVisibleHiddenConverter}}">
                                                 <StackPanel>
                                                     <materialDesign:PackIcon Kind="KeyboardArrowRight"
                                                                              Visibility="{Binding IsCollapsed, Converter={i:BoolToVisibleConverter}}" />
@@ -397,13 +345,13 @@
                                                 </StackPanel>
                                             </Button>
 
-                                            <TextBlock Style="{StaticResource HeaderCell}" 
-                                                   Text="{Binding Name}" />
+                                            <TextBlock Style="{StaticResource SelectedHeaderCell}"
+                                                       Text="{Binding Name}" />
 
-                                            <TextBlock Style="{StaticResource HeaderCell}"
-                                                   FontWeight="Light"
-                                                   Margin="15,0,0,0"
-                                                   Text="{Binding SubName}" />
+                                            <TextBlock Style="{StaticResource SelectedHeaderCell}"
+                                                       FontWeight="Light"
+                                                       Margin="15,0,0,0"
+                                                       Text="{Binding SubName}" />
                                         </StackPanel>
                                     </Border>
                                 </Border>
@@ -422,9 +370,9 @@
                                             <Border Style="{StaticResource BorderCellStyle}"
                                                     Height="17"
                                                     Background="{StaticResource HeaderBrush}">
-                                                <Border Style="{StaticResource RowSubHeaderSelectedBorderStyle}">
+                                                <Border Style="{StaticResource HeaderSelectedBorderStyle}">
                                                     <TextBlock Style="{StaticResource RowHeaderItemCell}"
-                                                           Text="{Binding Name}" />
+                                                               Text="{Binding Name}" />
                                                 </Border>
                                             </Border>
                                         </DataTemplate>
@@ -507,6 +455,7 @@
                                                 </b:Interaction.Triggers>
                                             </TextBox>
                                         </Border>
+
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
 
