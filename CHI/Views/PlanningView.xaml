@@ -21,14 +21,9 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/CHI;component/Views/Resources/WindowDefaultStyle.xaml" />
+                <ResourceDictionary Source="/CHI;component/Views/Resources/ReportCommonStyle.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
-            <Style TargetType="{x:Type materialDesign:PackIcon}">
-                <Setter Property="Width"
-                        Value="20" />
-                <Setter Property="Height"
-                        Value="20" />
-            </Style>
 
             <Style TargetType="{x:Type TextBox}"
                    x:Key="Cell">
@@ -68,12 +63,7 @@
                 </Style.Triggers>
             </Style>
 
-            <Style TargetType="TextBlock"
-                   x:Key="HeaderCell">
-                <Setter Property="Height"
-                        Value="17" />
-            </Style>
-
+            
             <Style TargetType="TextBlock"
                    BasedOn="{StaticResource HeaderCell}"
                    x:Key="SelectedHeaderCell">
@@ -86,6 +76,7 @@
                 </Style.Triggers>
             </Style>
 
+            
             <Style TargetType="TextBlock"
                    BasedOn="{StaticResource SelectedHeaderCell}"
                    x:Key="RowHeaderItemCell">
@@ -93,20 +84,6 @@
                         Value="70" />
             </Style>
 
-            <SolidColorBrush x:Key="CellBorderBrush"
-                             Color="DarkGray" />
-
-            <Style TargetType="Border"
-                   x:Key="BorderCellStyle">
-                <Setter Property="BorderThickness"
-                        Value="0,0,1,1" />
-                <Setter Property="MinHeight"
-                        Value="18" />
-                <Setter Property="BorderBrush"
-                        Value="{StaticResource CellBorderBrush}" />
-                <Setter Property="SnapsToDevicePixels"
-                        Value="True" />
-            </Style>
 
             <Style TargetType="Border"
                    BasedOn="{StaticResource BorderCellStyle}"
@@ -128,26 +105,7 @@
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
-
-            <Style TargetType="Button"
-                   BasedOn="{StaticResource IconTransparentButton}"
-                   x:Key="ExpandCollapseButton">
-                <Setter Property="Command"
-                        Value="{Binding SwitchCollapseCommand}" />
-                <Style.Triggers>
-                    <DataTrigger Binding="{Binding CanCollapse}"
-                                 Value="false">
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate>
-                                    <FrameworkElement Width="17"
-                                                      Height="17" />
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
-                    </DataTrigger>
-                </Style.Triggers>
-            </Style>
+            
 
         </ResourceDictionary >
     </UserControl.Resources>
