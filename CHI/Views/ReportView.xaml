@@ -20,14 +20,9 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/CHI;component/Views/Resources/WindowDefaultStyle.xaml" />
+                <ResourceDictionary Source="/CHI;component/Views/Resources/ReportCommonStyle.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
-            <Style TargetType="{x:Type materialDesign:PackIcon}">
-                <Setter Property="Width"
-                        Value="20" />
-                <Setter Property="Height"
-                        Value="20" />
-            </Style>
 
             <Style TargetType="{x:Type TextBlock}"
                    x:Key="Cell">
@@ -43,11 +38,6 @@
                         Value="True" />
             </Style>
 
-            <Style TargetType="TextBlock"
-                   x:Key="HeaderCell">
-                <Setter Property="Height"
-                        Value="17" />
-            </Style>
 
             <Style TargetType="TextBlock"
                    x:Key="RowHeaderItemCell">
@@ -57,38 +47,6 @@
                         Value="17" />
             </Style>
 
-            <SolidColorBrush x:Key="CellBorderBrush"
-                             Color="DarkGray" />
-
-            <Style TargetType="Border"
-                   x:Key="BorderCellStyle">
-                <Setter Property="BorderThickness"
-                        Value="0,0,1,1" />
-                <Setter Property="BorderBrush"
-                        Value="{StaticResource CellBorderBrush}" />
-                <Setter Property="SnapsToDevicePixels"
-                        Value="True" />
-            </Style>
-
-            <Style TargetType="Button"
-                   BasedOn="{StaticResource IconTransparentButton}"
-                   x:Key="ExpandCollapseButton">
-                <Setter Property="Command"
-                        Value="{Binding SwitchCollapseCommand}" />
-                <Style.Triggers>
-                    <DataTrigger Binding="{Binding CanCollapse}"
-                                 Value="false">
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate>
-                                    <FrameworkElement Width="17"
-                                                      Height="17" />
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
-                    </DataTrigger>
-                </Style.Triggers>
-            </Style>
 
         </ResourceDictionary >
     </UserControl.Resources>
@@ -305,13 +263,14 @@
                                         Background="{StaticResource HeaderBrush}">
                                     <StackPanel Orientation="Horizontal">
                                         <Button Style="{StaticResource ExpandCollapseButton}"
-                                                VerticalAlignment="Top" />
-                                        <StackPanel>
-                                            <materialDesign:PackIcon Kind="KeyboardArrowRight"
-                                                                     Visibility="{Binding IsCollapsed, Converter={i:BoolToVisibleConverter}}" />
-                                            <materialDesign:PackIcon Kind="ExpandMore"
-                                                                     Visibility="{Binding IsCollapsed, Converter={i:InvertedBoolToVisibleConverter}}" />
-                                        </StackPanel>
+                                                VerticalAlignment="Top">
+                                            <StackPanel>
+                                                <materialDesign:PackIcon Kind="KeyboardArrowRight"
+                                                                         Visibility="{Binding IsCollapsed, Converter={i:BoolToVisibleConverter}}" />
+                                                <materialDesign:PackIcon Kind="ExpandMore"
+                                                                         Visibility="{Binding IsCollapsed, Converter={i:InvertedBoolToVisibleConverter}}" />
+                                            </StackPanel>
+                                        </Button>
 
                                         <StackPanel Orientation="Vertical"
                                                     Width="150">
