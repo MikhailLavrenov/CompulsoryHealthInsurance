@@ -129,11 +129,31 @@
                 </Style.Triggers>
             </Style>
 
+            <Style TargetType="Button"
+                   BasedOn="{StaticResource IconTransparentButton}"
+                   x:Key="ExpandCollapseButton">
+                <Setter Property="Command"
+                        Value="{Binding SwitchCollapseCommand}" />
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding CanCollapse}"
+                                 Value="false">
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate>
+                                    <FrameworkElement Width="17"
+                                                      Height="17" />
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+
         </ResourceDictionary >
     </UserControl.Resources>
-    
-    
-    
+
+
+
 
     <Grid d:DataContext="{d:DesignInstance vm:PlanningViewModel}">
 
@@ -253,10 +273,8 @@
 
                                 <Border Style="{StaticResource HeaderSelectedBorderStyle}">
                                     <StackPanel Orientation="Vertical">
-                                        <Button Style="{StaticResource IconTransparentButton}"
-                                                HorizontalAlignment="Left"
-                                                Command="{Binding SwitchCollapseCommand}"
-                                                Visibility="{Binding CanCollapse, Converter={i:BoolToVisibleHiddenConverter}}">
+                                        <Button Style="{StaticResource ExpandCollapseButton}"
+                                                HorizontalAlignment="Left">
                                             <StackPanel>
                                                 <materialDesign:PackIcon Kind="ExpandMore"
                                                                          Visibility="{Binding IsCollapsed, Converter={i:BoolToVisibleConverter}}" />
@@ -328,11 +346,8 @@
                                 <Border Style="{StaticResource HeaderSelectedBorderStyle}">
                                     <StackPanel Orientation="Horizontal"
                                                 Width="300">
-                                        <Button Style="{StaticResource IconTransparentButton}"
-                                                Margin="0,-2,0,-2"
-                                                VerticalAlignment="Center"
-                                                Command="{Binding SwitchCollapseCommand}"
-                                                Visibility="{Binding CanCollapse, Converter={i:BoolToVisibleHiddenConverter}}">
+                                        <Button Style="{StaticResource ExpandCollapseButton}"
+                                                Margin="0,-2,0,-2">
                                             <StackPanel>
                                                 <materialDesign:PackIcon Kind="KeyboardArrowRight"
                                                                          Visibility="{Binding IsCollapsed, Converter={i:BoolToVisibleConverter}}" />
