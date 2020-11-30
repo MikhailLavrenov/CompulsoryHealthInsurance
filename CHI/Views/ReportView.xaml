@@ -23,10 +23,10 @@
             </ResourceDictionary.MergedDictionaries>
 
             <Style TargetType="{x:Type materialDesign:PackIcon}">
-                <Setter Property="Width" 
-                        Value="20"/>
-                <Setter Property="Height" 
-                        Value="20"/>
+                <Setter Property="Width"
+                        Value="20" />
+                <Setter Property="Height"
+                        Value="20" />
             </Style>
 
             <Style TargetType="{x:Type TextBlock}"
@@ -70,8 +70,32 @@
                         Value="True" />
             </Style>
 
+            <Style TargetType="Button"
+                   BasedOn="{StaticResource IconTransparentButton}"
+                   x:Key="ExpandCollapseButton">
+                <Setter Property="Command"
+                        Value="{Binding SwitchCollapseCommand}" />
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding CanCollapse}"
+                                 Value="false">
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate>
+                                    <FrameworkElement Width="17"
+                                                      Height="17" />
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+
         </ResourceDictionary >
     </UserControl.Resources>
+
+
+
+
 
     <Grid d:DataContext="{d:DesignInstance vm:ReportViewModel}">
 
@@ -153,7 +177,8 @@
                           Style="{StaticResource Separator}"
                           x:Name="proxyElement" />
 
-        <Grid Grid.Row="2" Visibility="{Binding ReportIsVisible, Converter={i:BoolToVisibleConverter}}">
+        <Grid Grid.Row="2"
+              Visibility="{Binding ReportIsVisible, Converter={i:BoolToVisibleConverter}}">
 
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto" />
@@ -205,10 +230,8 @@
                                 <Border Style="{StaticResource BorderCellStyle}"
                                         Background="{StaticResource HeaderBrush}">
                                     <StackPanel Orientation="Vertical">
-                                        <Button Style="{StaticResource IconTransparentButton}"
-                                                HorizontalAlignment="Left"
-                                                Command="{Binding SwitchCollapseCommand}"
-                                                Visibility="{Binding CanCollapse, Converter={i:BoolToVisibleHiddenConverter}}">
+                                        <Button Style="{StaticResource ExpandCollapseButton}"
+                                                HorizontalAlignment="Left">
                                             <StackPanel>
                                                 <materialDesign:PackIcon Kind="ExpandMore"
                                                                          Visibility="{Binding IsCollapsed, Converter={i:BoolToVisibleConverter}}" />
@@ -281,19 +304,15 @@
                                 <Border Style="{StaticResource BorderCellStyle}"
                                         Background="{StaticResource HeaderBrush}">
                                     <StackPanel Orientation="Horizontal">
-                                        <Button Style="{StaticResource IconTransparentButton}"
-                                                VerticalAlignment="Top"
-                                                Command="{Binding SwitchCollapseCommand}"
-                                                Visibility="{Binding CanCollapse, Converter={i:BoolToVisibleHiddenConverter}}">
-                                            <StackPanel>
-                                                <materialDesign:PackIcon Kind="KeyboardArrowRight"
-                                                                         Canvas.Left="0"
-                                                                         Canvas.Top="0"
-                                                                         Visibility="{Binding IsCollapsed, Converter={i:BoolToVisibleConverter}}" />
-                                                <materialDesign:PackIcon Kind="ExpandMore"
-                                                                         Visibility="{Binding IsCollapsed, Converter={i:InvertedBoolToVisibleConverter}}" />
-                                            </StackPanel>
-                                        </Button>
+                                        <Button Style="{StaticResource ExpandCollapseButton}"
+                                                VerticalAlignment="Top" />
+                                        <StackPanel>
+                                            <materialDesign:PackIcon Kind="KeyboardArrowRight"
+                                                                     Visibility="{Binding IsCollapsed, Converter={i:BoolToVisibleConverter}}" />
+                                            <materialDesign:PackIcon Kind="ExpandMore"
+                                                                     Visibility="{Binding IsCollapsed, Converter={i:InvertedBoolToVisibleConverter}}" />
+                                        </StackPanel>
+
                                         <StackPanel Orientation="Vertical"
                                                     Width="150">
                                             <TextBlock Style="{StaticResource HeaderCell}"
