@@ -109,20 +109,21 @@
             </Style>
 
             <Style TargetType="Border"
+                   BasedOn="{StaticResource BorderCellStyle}"
                    x:Key="HeaderSelectedBorderStyle">
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding IsSelected}"
                                  Value="True">
                         <DataTrigger.Setters>
                             <Setter Property="Background"
-                                    Value="#FF0067B8" />
+                                    Value="{StaticResource PrimaryHueMidBrush}" />
                         </DataTrigger.Setters>
                     </DataTrigger>
 
                     <DataTrigger Binding="{Binding IsSelected}"
                                  Value="False">
                         <Setter Property="Background"
-                                Value="Transparent">
+                                Value="{DynamicResource HeaderBrush}">
                         </Setter>
                     </DataTrigger>
                 </Style.Triggers>
@@ -130,6 +131,9 @@
 
         </ResourceDictionary >
     </UserControl.Resources>
+    
+    
+    
 
     <Grid d:DataContext="{d:DesignInstance vm:PlanningViewModel}">
 
@@ -247,25 +251,22 @@
                                                      po:Freeze="True" />
                                 </StackPanel.Resources>
 
-                                <Border Style="{StaticResource BorderCellStyle}"
-                                        Background="{StaticResource HeaderBrush}">
-                                    <Border Style="{StaticResource HeaderSelectedBorderStyle}">
-                                        <StackPanel Orientation="Vertical">
-                                            <Button Style="{StaticResource IconTransparentButton}"
-                                                    HorizontalAlignment="Left"
-                                                    Command="{Binding SwitchCollapseCommand}"
-                                                    Visibility="{Binding CanCollapse, Converter={i:BoolToVisibleHiddenConverter}}">
-                                                <StackPanel>
-                                                    <materialDesign:PackIcon Kind="ExpandMore"
-                                                                             Visibility="{Binding IsCollapsed, Converter={i:BoolToVisibleConverter}}" />
-                                                    <materialDesign:PackIcon Kind="KeyboardArrowRight"
-                                                                             Visibility="{Binding IsCollapsed, Converter={i:InvertedBoolToVisibleConverter}}" />
-                                                </StackPanel>
-                                            </Button>
-                                            <TextBlock Style="{StaticResource SelectedHeaderCell}"
-                                                       Text="{Binding Name}" />
-                                        </StackPanel>
-                                    </Border>
+                                <Border Style="{StaticResource HeaderSelectedBorderStyle}">
+                                    <StackPanel Orientation="Vertical">
+                                        <Button Style="{StaticResource IconTransparentButton}"
+                                                HorizontalAlignment="Left"
+                                                Command="{Binding SwitchCollapseCommand}"
+                                                Visibility="{Binding CanCollapse, Converter={i:BoolToVisibleHiddenConverter}}">
+                                            <StackPanel>
+                                                <materialDesign:PackIcon Kind="ExpandMore"
+                                                                         Visibility="{Binding IsCollapsed, Converter={i:BoolToVisibleConverter}}" />
+                                                <materialDesign:PackIcon Kind="KeyboardArrowRight"
+                                                                         Visibility="{Binding IsCollapsed, Converter={i:InvertedBoolToVisibleConverter}}" />
+                                            </StackPanel>
+                                        </Button>
+                                        <TextBlock Style="{StaticResource SelectedHeaderCell}"
+                                                   Text="{Binding Name}" />
+                                    </StackPanel>
                                 </Border>
                                 <!--Подзаголовки столбцов -->
                                 <ItemsControl ItemsSource="{Binding SubItems}">
@@ -278,13 +279,10 @@
 
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
-                                            <Border Style="{StaticResource BorderCellStyle}"
-                                                    Background="{StaticResource HeaderBrush}">
-                                                <Border Style="{StaticResource HeaderSelectedBorderStyle}">
-                                                    <TextBlock Style="{StaticResource SelectedHeaderCell}"
-                                                               Width="70"
-                                                               Text="{Binding Name}" />
-                                                </Border>
+                                            <Border Style="{StaticResource HeaderSelectedBorderStyle}">
+                                                <TextBlock Style="{StaticResource SelectedHeaderCell}"
+                                                           Width="70"
+                                                           Text="{Binding Name}" />
                                             </Border>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
@@ -327,33 +325,30 @@
                                                      po:Freeze="True" />
                                 </StackPanel.Resources>
 
-                                <Border Style="{StaticResource BorderCellStyle}"
-                                        Background="{StaticResource HeaderBrush}">
-                                    <Border Style="{StaticResource HeaderSelectedBorderStyle}">
-                                        <StackPanel Orientation="Horizontal"
-                                                    Width="300">
-                                            <Button Style="{StaticResource IconTransparentButton}"
-                                                    Margin="0,-2,0,-2"
-                                                    VerticalAlignment="Center"
-                                                    Command="{Binding SwitchCollapseCommand}"
-                                                    Visibility="{Binding CanCollapse, Converter={i:BoolToVisibleHiddenConverter}}">
-                                                <StackPanel>
-                                                    <materialDesign:PackIcon Kind="KeyboardArrowRight"
-                                                                             Visibility="{Binding IsCollapsed, Converter={i:BoolToVisibleConverter}}" />
-                                                    <materialDesign:PackIcon Kind="ExpandMore"
-                                                                             Visibility="{Binding IsCollapsed, Converter={i:InvertedBoolToVisibleConverter}}" />
-                                                </StackPanel>
-                                            </Button>
+                                <Border Style="{StaticResource HeaderSelectedBorderStyle}">
+                                    <StackPanel Orientation="Horizontal"
+                                                Width="300">
+                                        <Button Style="{StaticResource IconTransparentButton}"
+                                                Margin="0,-2,0,-2"
+                                                VerticalAlignment="Center"
+                                                Command="{Binding SwitchCollapseCommand}"
+                                                Visibility="{Binding CanCollapse, Converter={i:BoolToVisibleHiddenConverter}}">
+                                            <StackPanel>
+                                                <materialDesign:PackIcon Kind="KeyboardArrowRight"
+                                                                         Visibility="{Binding IsCollapsed, Converter={i:BoolToVisibleConverter}}" />
+                                                <materialDesign:PackIcon Kind="ExpandMore"
+                                                                         Visibility="{Binding IsCollapsed, Converter={i:InvertedBoolToVisibleConverter}}" />
+                                            </StackPanel>
+                                        </Button>
 
-                                            <TextBlock Style="{StaticResource SelectedHeaderCell}"
-                                                       Text="{Binding Name}" />
+                                        <TextBlock Style="{StaticResource SelectedHeaderCell}"
+                                                   Text="{Binding Name}" />
 
-                                            <TextBlock Style="{StaticResource SelectedHeaderCell}"
-                                                       FontWeight="Light"
-                                                       Margin="15,0,0,0"
-                                                       Text="{Binding SubName}" />
-                                        </StackPanel>
-                                    </Border>
+                                        <TextBlock Style="{StaticResource SelectedHeaderCell}"
+                                                   FontWeight="Light"
+                                                   Margin="15,0,0,0"
+                                                   Text="{Binding SubName}" />
+                                    </StackPanel>
                                 </Border>
 
                                 <!--Подзаголовоки строк -->
@@ -367,13 +362,10 @@
 
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
-                                            <Border Style="{StaticResource BorderCellStyle}"
-                                                    Height="17"
-                                                    Background="{StaticResource HeaderBrush}">
-                                                <Border Style="{StaticResource HeaderSelectedBorderStyle}">
-                                                    <TextBlock Style="{StaticResource RowHeaderItemCell}"
-                                                               Text="{Binding Name}" />
-                                                </Border>
+                                            <Border Style="{StaticResource HeaderSelectedBorderStyle}"
+                                                    Height="17">
+                                                <TextBlock Style="{StaticResource RowHeaderItemCell}"
+                                                           Text="{Binding Name}" />
                                             </Border>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
