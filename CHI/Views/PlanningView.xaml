@@ -115,7 +115,7 @@
                                  Value="True">
                         <DataTrigger.Setters>
                             <Setter Property="Background"
-                                    Value="DarkGray" />
+                                    Value="#FF0067B8" />
                         </DataTrigger.Setters>
                     </DataTrigger>
 
