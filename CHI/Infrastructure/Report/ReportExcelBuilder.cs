@@ -42,8 +42,8 @@ namespace CHI.Infrastructure
             return this;
         }
 
-        public ReportExcelBuilder SetNewSheet(int monthNumber, int year)        
-            => SetNewSheet(monthNumber, year, false);        
+        public ReportExcelBuilder SetNewSheet(int monthNumber, int year)
+            => SetNewSheet(monthNumber, year, false);
 
         public ReportExcelBuilder SetNewSheet(int monthNumber, int year, bool isGrowing)
         {
@@ -165,6 +165,11 @@ namespace CHI.Infrastructure
                 exRow++;
             }
 
+            var firstRow = rowsOffset + 1;
+            var lastRow = sheet.Dimension.Rows;
+            var firstColumn = 1;
+            var lastColumn = sheet.Dimension.Columns;
+
             //форматирование
             sheet.PrinterSettings.Orientation = eOrientation.Landscape;
             sheet.PrinterSettings.PaperSize = ePaperSize.A4;
@@ -179,32 +184,49 @@ namespace CHI.Infrastructure
             sheet.Column(1).Width = isPlaning == true ? 35 : 20;
             if (isPlaning == true)
                 sheet.Row(1).Height = 80;
-            Enumerable.Range(1, rowsOffset).ToList().ForEach(x => sheet.Cells[x, 1, x, sheet.Dimension.Columns].Merge = true);
-            sheet.Cells[1 + rowsOffset, 1, 2 + rowsOffset, 2].Merge = true;
+            Enumerable.Range(1, rowsOffset).ToList().ForEach(x => sheet.Cells[x, firstColumn, x, lastColumn].Merge = true);
+            sheet.Cells[firstRow, firstColumn, firstRow + 1, firstColumn + 1].Merge = true;
             sheet.Cells.Style.VerticalAlignment = ExcelVerticalAlignment.Top;
             sheet.Cells.Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
             if (isPlaning == true)
                 sheet.Row(1).Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
-            sheet.Column(1).Style.Font.Bold = true;
-            sheet.Column(2).Style.Font.Bold = true;
+            sheet.Column(firstColumn).Style.Font.Bold = true;
+            sheet.Column(firstColumn + 1).Style.Font.Bold = true;
             sheet.Row(1).Style.Font.Bold = true;
             sheet.Row(2).Style.Font.Bold = false;
-            sheet.Row(1 + rowsOffset).Style.Font.Bold = true;
-            sheet.Row(2 + rowsOffset).Style.Font.Bold = true;
+            sheet.Row(firstRow).Style.Font.Bold = true;
+            sheet.Row(firstRow + 1).Style.Font.Bold = true;
 
-            var range = sheet.Cells[1 + rowsOffset, 1, sheet.Dimension.Rows, sheet.Dimension.Columns];
+            //добавление линии сетки таблицы
+            var range = sheet.Cells[firstRow, firstColumn, lastRow, lastColumn];
 
             range.Style.Border.Left.Style = ExcelBorderStyle.Hair;
             range.Style.Border.Top.Style = ExcelBorderStyle.Hair;
             range.Style.Border.Right.Style = ExcelBorderStyle.Hair;
             range.Style.Border.Bottom.Style = ExcelBorderStyle.Hair;
 
+            sheet.Cells[firstRow, firstColumn, firstRow, lastColumn].Style.Border.Top.Style = ExcelBorderStyle.Thin;
+            sheet.Cells[lastRow+1, firstColumn, lastRow+1, lastColumn].Style.Border.Top.Style = ExcelBorderStyle.Thin;
+            sheet.Cells[firstRow, firstColumn, lastRow, firstColumn].Style.Border.Left.Style = ExcelBorderStyle.Thin;
+            sheet.Cells[firstRow, lastColumn+1, lastRow, lastColumn+1].Style.Border.Left.Style = ExcelBorderStyle.Thin;
 
+            exRow = firstRow + 2;
+
+            foreach (var header in rowHeaders.Where(x => !x.AlwaysHidden))
+            {
+                if (header.CanCollapse == true)
+                    sheet.Cells[exRow, firstColumn, exRow, lastColumn].Style.Border.Top.Style = ExcelBorderStyle.Thin;
+
+                exRow += header.SubItems.Count;
+            }
+
+
+            //добавление группировок
             sheet.OutLineSummaryRight = false;
             sheet.OutLineSummaryBelow = false;
 
             //добавление группировок по строкам
-            exRow = rowsOffset + 3;
+            exRow = firstRow + 2;
 
             foreach (var rowItems in gridItems)
             {
