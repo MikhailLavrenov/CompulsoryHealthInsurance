@@ -93,6 +93,12 @@
                     HorizontalAlignment="Center"
                     Orientation="Horizontal">
 
+            <TextBlock Text="Нарастающий" />
+
+            <CheckBox IsChecked="{Binding IsGrowing}" />
+
+            <FrameworkElement Style="{StaticResource Separator}" />
+
             <ComboBox Grid.Row="1"
                       Grid.Column="2"
                       Width="90"
@@ -120,14 +126,7 @@
                 </Viewbox>
             </Button>
 
-        </StackPanel>
 
-        <StackPanel Orientation="Horizontal"
-                    HorizontalAlignment="Right">
-
-            <TextBlock Text="Нарастающий" />
-
-            <CheckBox IsChecked="{Binding IsGrowing}" />
 
         </StackPanel>
 
