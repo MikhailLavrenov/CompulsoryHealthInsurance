@@ -1,5 +1,4 @@
 ﻿using CHI.Infrastructure;
-using CHI.Models;
 using CHI.Models.ServiceAccounting;
 using CHI.Services;
 using CHI.Services.BillsRegister;
@@ -180,7 +179,7 @@ namespace CHI.ViewModels
 
         private static Employee FindEmployeeInDbOrCreateNew(string medicFomsId, int specialtyFomsId, AgeKind ageKind, AppDBContext dbContext, Department defaultDepartment)
         {
-            var employee = dbContext.Employees.Local.FirstOrDefault(x => x.Specialty.FomsId == specialtyFomsId && string.Equals(x.Medic.FomsId, medicFomsId, StringComparison.Ordinal) && (x.AgeKind==AgeKind.Any || x.AgeKind==ageKind));
+            var employee = dbContext.Employees.Local.FirstOrDefault(x => x.Specialty.FomsId == specialtyFomsId && string.Equals(x.Medic.FomsId, medicFomsId, StringComparison.Ordinal) && (x.AgeKind == AgeKind.Any || x.AgeKind == ageKind));
 
             if (employee != null)
                 return employee;
@@ -257,7 +256,7 @@ namespace CHI.ViewModels
         {
             dbContext = new AppDBContext();
             dbContext.Registers.Load();
-            Registers = dbContext.Registers.Local.ToObservableCollection();
+            Registers = new ObservableCollection<Register>(dbContext.Registers.Local.OrderByDescending(x => x.Year).OrderByDescending(x => x.Month));
         }
 
         public void OnNavigatedTo(NavigationContext navigationContext)

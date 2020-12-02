@@ -61,10 +61,10 @@ namespace CHI.Services.MedicalExaminations
                 int HashingMultiplier = 16777619;
 
                 int hash = HashingBase;
-                hash = (hash * HashingMultiplier) ^ (!ReferenceEquals(null, StepKind) ? StepKind.GetHashCode() : 0);
-                hash = (hash * HashingMultiplier) ^ (!ReferenceEquals(null, Date) ? Date.GetHashCode() : 0);
-                hash = (hash * HashingMultiplier) ^ (!ReferenceEquals(null, HealthGroup) ? HealthGroup.GetHashCode() : 0);
-                hash = (hash * HashingMultiplier) ^ (!ReferenceEquals(null, Referral) ? Referral.GetHashCode() : 0);
+                hash = (hash * HashingMultiplier) ^ StepKind.GetHashCode();
+                hash = (hash * HashingMultiplier) ^ Date.GetHashCode();
+                hash = (hash * HashingMultiplier) ^ HealthGroup.GetHashCode();
+                hash = (hash * HashingMultiplier) ^ Referral.GetHashCode();
 
                 return hash;
             }
