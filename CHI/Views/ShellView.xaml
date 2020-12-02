@@ -228,7 +228,7 @@
 
         <Border Grid.Row="2" HorizontalAlignment="Stretch" 
                 Height="40"
-                Background="#FF424141">
+                Background="#FF4B4B4B">
             <TextBlock Text="{Binding MainRegionService.Message}"
                        Foreground="White"                                   
                        HorizontalAlignment="Stretch"

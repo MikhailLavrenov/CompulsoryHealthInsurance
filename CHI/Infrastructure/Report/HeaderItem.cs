@@ -67,7 +67,7 @@ namespace CHI.Infrastructure
             Parent = parent;
             Parent?.Childs.Add(this);
             Level = Parent == null ? 0 : parent.Level + 1;
-            SubItems = subItemNames?.Select(x => new HeaderSubItem(x, this)).ToList() ?? new List<HeaderSubItem>();
+            SubItems = subItemNames?.Select(x => new HeaderSubItem(x, this, subItemNames.First()==x)).ToList() ?? new List<HeaderSubItem>();
             Childs = new List<HeaderItem>();
 
             SwitchCollapseCommand = new DelegateCommand(SwitchCollapseExecute, () => CanCollapse);

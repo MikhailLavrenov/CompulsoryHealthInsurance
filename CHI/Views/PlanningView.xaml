@@ -63,7 +63,7 @@
                 </Style.Triggers>
             </Style>
 
-            
+
             <Style TargetType="TextBlock"
                    BasedOn="{StaticResource HeaderCell}"
                    x:Key="SelectedHeaderCell">
@@ -76,7 +76,7 @@
                 </Style.Triggers>
             </Style>
 
-            
+
             <Style TargetType="TextBlock"
                    BasedOn="{StaticResource SelectedHeaderCell}"
                    x:Key="RowHeaderItemCell">
@@ -105,7 +105,7 @@
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
-            
+
 
         </ResourceDictionary >
     </UserControl.Resources>
@@ -292,60 +292,68 @@
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
 
-                            <StackPanel Orientation="Horizontal"
+                            <StackPanel Orientation="Vertical"
                                         Visibility="{Binding IsVisible, Converter={i:BoolToVisibleConverter}}">
 
-                                <StackPanel.Resources>
-                                    <SolidColorBrush x:Key="HeaderBrush"
-                                                     Color="{Binding Color}"
-                                                     po:Freeze="True" />
-                                </StackPanel.Resources>
+                                <Separator Style="{StaticResource RowGroupLine}"
+                                           Visibility="{Binding CanCollapse, Converter={i:BoolToVisibleConverter}}" />
 
-                                <Border Style="{StaticResource HeaderSelectedBorderStyle}">
-                                    <StackPanel Orientation="Horizontal"
-                                                Width="300">
-                                        <Button Style="{StaticResource ExpandCollapseButton}"
-                                                Margin="0,-2,0,-2">
-                                            <StackPanel>
-                                                <materialDesign:PackIcon Kind="KeyboardArrowRight"
-                                                                         Visibility="{Binding IsCollapsed, Converter={i:BoolToVisibleConverter}}" />
-                                                <materialDesign:PackIcon Kind="ExpandMore"
-                                                                         Visibility="{Binding IsCollapsed, Converter={i:InvertedBoolToVisibleConverter}}" />
-                                            </StackPanel>
-                                        </Button>
+                                <StackPanel Orientation="Horizontal">
 
-                                        <TextBlock Style="{StaticResource SelectedHeaderCell}"
-                                                   Text="{Binding Name}" />
+                                    <StackPanel.Resources>
+                                        <SolidColorBrush x:Key="HeaderBrush"
+                                                         Color="{Binding Color}"
+                                                         po:Freeze="True" />
+                                    </StackPanel.Resources>
 
-                                        <TextBlock Style="{StaticResource SelectedHeaderCell}"
-                                                   FontWeight="Light"
-                                                   Margin="15,0,0,0"
-                                                   Text="{Binding SubName}" />
-                                    </StackPanel>
-                                </Border>
+                                    <Border Style="{StaticResource HeaderSelectedBorderStyle}">
+                                        <StackPanel Orientation="Horizontal"
+                                                    Width="300">
+                                            <Button Style="{StaticResource ExpandCollapseButton}"
+                                                    Margin="0,-2,0,-2">
+                                                <StackPanel>
+                                                    <materialDesign:PackIcon Kind="KeyboardArrowRight"
+                                                                             Visibility="{Binding IsCollapsed, Converter={i:BoolToVisibleConverter}}" />
+                                                    <materialDesign:PackIcon Kind="ExpandMore"
+                                                                             Visibility="{Binding IsCollapsed, Converter={i:InvertedBoolToVisibleConverter}}" />
+                                                </StackPanel>
+                                            </Button>
 
-                                <!--Подзаголовоки строк -->
-                                <ItemsControl ItemsSource="{Binding SubItems}">
+                                            <TextBlock Style="{StaticResource SelectedHeaderCell}"
+                                                       Text="{Binding Name}" />
 
-                                    <ItemsControl.ItemsPanel>
-                                        <ItemsPanelTemplate>
-                                            <VirtualizingStackPanel Orientation="Vertical" />
-                                        </ItemsPanelTemplate>
-                                    </ItemsControl.ItemsPanel>
+                                            <TextBlock Style="{StaticResource SelectedHeaderCell}"
+                                                       FontWeight="Light"
+                                                       Margin="15,0,0,0"
+                                                       Text="{Binding SubName}" />
+                                        </StackPanel>
+                                    </Border>
 
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <Border Style="{StaticResource HeaderSelectedBorderStyle}"
-                                                    Height="17">
-                                                <TextBlock Style="{StaticResource RowHeaderItemCell}"
-                                                           Text="{Binding Name}" />
-                                            </Border>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
+                                    <!--Подзаголовоки строк -->
+                                    <ItemsControl ItemsSource="{Binding SubItems}">
 
-                                </ItemsControl>
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <VirtualizingStackPanel Orientation="Vertical" />
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Style="{StaticResource HeaderSelectedBorderStyle}"
+                                                        Height="17">
+                                                    <TextBlock Style="{StaticResource RowHeaderItemCell}"
+                                                               Text="{Binding Name}" />
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+
+                                    </ItemsControl>
+
+                                </StackPanel>
 
                             </StackPanel>
+
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
 
@@ -391,35 +399,43 @@
 
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <Border Style="{StaticResource BorderCellStyle}"
-                                                Visibility="{Binding IsVisible, Converter={i:BoolToVisibleConverter}}">
-                                            <Border.Background>
-                                                <SolidColorBrush Color="{Binding Color}" />
-                                            </Border.Background>
-                                            <TextBox Style="{StaticResource Cell}"
-                                                     Text="{Binding Value}">
 
-                                                <b:Interaction.Triggers>
+                                        <StackPanel Orientation="Vertical">
 
-                                                    <b:EventTrigger EventName="GotFocus">
-                                                        <b:InvokeCommandAction Command="{Binding SelectedChangeCommand}">
-                                                            <b:InvokeCommandAction.CommandParameter>
-                                                                <sys:Boolean>True</sys:Boolean>
-                                                            </b:InvokeCommandAction.CommandParameter>
-                                                        </b:InvokeCommandAction>
-                                                    </b:EventTrigger>
+                                            <Separator Style="{StaticResource RowGroupLine}"
+                                                       Visibility="{Binding RowSubHeader.IsFirstAndGroupCanCollapse, Converter={i:BoolToVisibleConverter}}" />
 
-                                                    <b:EventTrigger EventName="LostFocus">
-                                                        <b:InvokeCommandAction Command="{Binding SelectedChangeCommand}">
-                                                            <b:InvokeCommandAction.CommandParameter>
-                                                                <sys:Boolean>False</sys:Boolean>
-                                                            </b:InvokeCommandAction.CommandParameter>
-                                                        </b:InvokeCommandAction>
-                                                    </b:EventTrigger>
+                                            <Border Style="{StaticResource BorderCellStyle}"
+                                                    Visibility="{Binding IsVisible, Converter={i:BoolToVisibleConverter}}">
+                                                <Border.Background>
+                                                    <SolidColorBrush Color="{Binding Color}" />
+                                                </Border.Background>
+                                                <TextBox Style="{StaticResource Cell}"
+                                                         Text="{Binding Value}">
 
-                                                </b:Interaction.Triggers>
-                                            </TextBox>
-                                        </Border>
+                                                    <b:Interaction.Triggers>
+
+                                                        <b:EventTrigger EventName="GotFocus">
+                                                            <b:InvokeCommandAction Command="{Binding SelectedChangeCommand}">
+                                                                <b:InvokeCommandAction.CommandParameter>
+                                                                    <sys:Boolean>True</sys:Boolean>
+                                                                </b:InvokeCommandAction.CommandParameter>
+                                                            </b:InvokeCommandAction>
+                                                        </b:EventTrigger>
+
+                                                        <b:EventTrigger EventName="LostFocus">
+                                                            <b:InvokeCommandAction Command="{Binding SelectedChangeCommand}">
+                                                                <b:InvokeCommandAction.CommandParameter>
+                                                                    <sys:Boolean>False</sys:Boolean>
+                                                                </b:InvokeCommandAction.CommandParameter>
+                                                            </b:InvokeCommandAction>
+                                                        </b:EventTrigger>
+
+                                                    </b:Interaction.Triggers>
+                                                </TextBox>
+                                            </Border>
+
+                                        </StackPanel>
 
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
