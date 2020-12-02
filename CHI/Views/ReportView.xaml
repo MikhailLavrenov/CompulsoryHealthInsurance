@@ -46,11 +46,10 @@
                 <Setter Property="Height"
                         Value="17" />
             </Style>
-
+            
 
         </ResourceDictionary >
     </UserControl.Resources>
-
 
 
 
@@ -125,8 +124,6 @@
                     <materialDesign:PackIcon Kind="MenuRight" />
                 </Viewbox>
             </Button>
-
-
 
         </StackPanel>
 
@@ -249,61 +246,70 @@
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
 
-                            <StackPanel Orientation="Horizontal"
+                            <StackPanel Orientation="Vertical"
                                         Visibility="{Binding IsVisible, Converter={i:BoolToVisibleConverter}}">
 
-                                <StackPanel.Resources>
-                                    <SolidColorBrush x:Key="HeaderBrush"
-                                                     Color="{Binding Color}"
-                                                     po:Freeze="True" />
-                                </StackPanel.Resources>
+                                <Separator Style="{StaticResource RowGroupLine}"
+                                           Visibility="{Binding CanCollapse, Converter={i:BoolToVisibleConverter}}" />
 
-                                <Border Style="{StaticResource BorderCellStyle}"
-                                        Background="{StaticResource HeaderBrush}">
-                                    <StackPanel Orientation="Horizontal">
-                                        <Button Style="{StaticResource ExpandCollapseButton}"
-                                                VerticalAlignment="Top">
-                                            <StackPanel>
-                                                <materialDesign:PackIcon Kind="KeyboardArrowRight"
-                                                                         Visibility="{Binding IsCollapsed, Converter={i:BoolToVisibleConverter}}" />
-                                                <materialDesign:PackIcon Kind="ExpandMore"
-                                                                         Visibility="{Binding IsCollapsed, Converter={i:InvertedBoolToVisibleConverter}}" />
-                                            </StackPanel>
-                                        </Button>
+                                <StackPanel Orientation="Horizontal">
 
-                                        <StackPanel Orientation="Vertical"
-                                                    Width="150">
-                                            <TextBlock Style="{StaticResource HeaderCell}"
-                                                       Text="{Binding Name}" />
-                                            <TextBlock Style="{StaticResource HeaderCell}"
-                                                       FontWeight="Light"
-                                                       Text="{Binding SubName}" />
-                                        </StackPanel>
-                                    </StackPanel>
-                                </Border>
+                                    <StackPanel.Resources>
+                                        <SolidColorBrush x:Key="HeaderBrush"
+                                                         Color="{Binding Color}"
+                                                         po:Freeze="True" />
+                                    </StackPanel.Resources>
 
-                                <!--HeaderItems строки заголовка-->
-                                <ItemsControl ItemsSource="{Binding SubItems}">
+                                    <Border Style="{StaticResource BorderCellStyle}"
+                                            Background="{StaticResource HeaderBrush}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Button Style="{StaticResource ExpandCollapseButton}"
+                                                    VerticalAlignment="Top">
+                                                <StackPanel>
+                                                    <materialDesign:PackIcon Kind="KeyboardArrowRight"
+                                                                             Visibility="{Binding IsCollapsed, Converter={i:BoolToVisibleConverter}}" />
+                                                    <materialDesign:PackIcon Kind="ExpandMore"
+                                                                             Visibility="{Binding IsCollapsed, Converter={i:InvertedBoolToVisibleConverter}}" />
+                                                </StackPanel>
+                                            </Button>
 
-                                    <ItemsControl.ItemsPanel>
-                                        <ItemsPanelTemplate>
-                                            <VirtualizingStackPanel Orientation="Vertical" />
-                                        </ItemsPanelTemplate>
-                                    </ItemsControl.ItemsPanel>
-
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <Border Style="{StaticResource BorderCellStyle}"
-                                                    Background="{StaticResource HeaderBrush}">
-                                                <TextBlock Style="{StaticResource RowHeaderItemCell}"
+                                            <StackPanel Orientation="Vertical"
+                                                        Width="150">
+                                                <TextBlock Style="{StaticResource HeaderCell}"
                                                            Text="{Binding Name}" />
-                                            </Border>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
+                                                <TextBlock Style="{StaticResource HeaderCell}"
+                                                           FontWeight="Light"
+                                                           Text="{Binding SubName}" />
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Border>
 
-                                </ItemsControl>
+                                    <!--HeaderItems строки заголовка-->
+                                    <ItemsControl ItemsSource="{Binding SubItems}">
+
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <VirtualizingStackPanel Orientation="Vertical" />
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Style="{StaticResource BorderCellStyle}"
+                                                        Background="{StaticResource HeaderBrush}">
+                                                    <TextBlock Style="{StaticResource RowHeaderItemCell}"
+                                                               Text="{Binding Name}" />
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+
+                                    </ItemsControl>
+
+                                </StackPanel>
 
                             </StackPanel>
+
+
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
 
@@ -349,14 +355,20 @@
 
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <Border Style="{StaticResource BorderCellStyle}"
-                                                Visibility="{Binding IsVisible, Converter={i:BoolToVisibleConverter}}">
-                                            <Border.Background>
-                                                <SolidColorBrush Color="{Binding Color}" />
-                                            </Border.Background>
-                                            <TextBlock Style="{StaticResource Cell}"
-                                                       Text="{Binding Value}" />
-                                        </Border>
+
+                                        <StackPanel Orientation="Vertical">
+                                            <Separator Style="{StaticResource RowGroupLine}"
+                                                       Visibility="{Binding RowSubHeader.IsFirstAndGroupCanCollapse, Converter={i:BoolToVisibleConverter}}" />
+                                            <Border Style="{StaticResource BorderCellStyle}"
+                                                    Visibility="{Binding IsVisible, Converter={i:BoolToVisibleConverter}}">
+                                                <Border.Background>
+                                                    <SolidColorBrush Color="{Binding Color}" />
+                                                </Border.Background>
+                                                <TextBlock Style="{StaticResource Cell}"
+                                                           Text="{Binding Value}" />
+                                            </Border>
+                                        </StackPanel>
+
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
 
