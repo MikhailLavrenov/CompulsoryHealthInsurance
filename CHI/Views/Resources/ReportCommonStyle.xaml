@@ -56,5 +56,20 @@
         </Style.Triggers>
     </Style>
 
+
+    <Style TargetType="Separator"
+           x:Key="RowGroupLine">
+        <Setter Property="HorizontalAlignment"
+                Value="Stretch" />
+        <Setter Property="Height"
+                Value="1" />
+        <Setter Property="Background"
+                Value="DimGray" />
+        <Setter Property="Margin"
+                Value="0,-1,0,-0" />
+        <Setter Property="Panel.ZIndex"
+                Value="1" />
+    </Style>
+
 </ResourceDictionary>
 
