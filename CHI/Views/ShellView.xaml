@@ -117,6 +117,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0"
@@ -212,7 +213,7 @@
                     Background="LightGray"
                     Visibility="{Binding MainRegionService.IsLocked, Converter={i:BoolToVisibleConverter}}" />
 
-            <i:CustomContentControl Margin="15,15,15,40"
+            <i:CustomContentControl Margin="15"
                                     Background="White"
                                     prism:RegionManager.RegionName="{x:Static i:RegionNames.MainRegion}"
                                     IsEnabled="{Binding MainRegionService.IsLocked, Converter={i:InvertBoolConverter}}">
@@ -223,34 +224,19 @@
 
             </i:CustomContentControl>
 
-            <materialDesign:Snackbar Margin="0"
-                                     Opacity="0.9"
-                                     HorizontalAlignment="Stretch"
-                                     VerticalAlignment="Bottom"
-                                     IsActive="{Binding MainRegionService.IsShowStatus}">
-
-                <materialDesign:SnackbarMessage ActionCommand="{Binding MainRegionService.CloseStatusCommand}">
-
-                    <materialDesign:SnackbarMessage.ActionContent>
-                        <materialDesign:PackIcon Width="25"
-                                                 Height="25"
-                                                 Kind="ChevronDown"
-                                                 Foreground="White" />
-                    </materialDesign:SnackbarMessage.ActionContent>
-
-                    <materialDesign:SnackbarMessage.Content>
-                        <TextBlock Text="{Binding MainRegionService.Message}"
-                                   HorizontalAlignment="Stretch"
-                                   Margin="0"
-                                   FontWeight="Regular"
-                                   TextWrapping="Wrap" />
-                    </materialDesign:SnackbarMessage.Content>
-
-                </materialDesign:SnackbarMessage>
-
-            </materialDesign:Snackbar>
-
         </Grid>
+
+        <Border Grid.Row="2" HorizontalAlignment="Stretch" 
+                Height="40"
+                Background="#FF424141">
+            <TextBlock Text="{Binding MainRegionService.Message}"
+                       Foreground="White"                                   
+                       HorizontalAlignment="Stretch"
+                       VerticalAlignment="Center"
+                       Margin="15,0,15,0"
+                       FontWeight="Regular"
+                       TextWrapping="Wrap" />
+        </Border>
 
     </Grid>
 
