@@ -17,6 +17,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="C:\Users\ЛавреновМВ\.nuget\packages\nlog.config\4.7.5\contentFiles\any\any\NLog.config" />
     <None Remove="Database.db" />
     <None Remove="licensing.pkey" />
   </ItemGroup>
@@ -95,6 +96,12 @@
     <Compile Update="Views\SrzSettingsView.xaml.cs">
       <DependentUpon>SrzSettingsView.xaml</DependentUpon>
     </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="NLog.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
