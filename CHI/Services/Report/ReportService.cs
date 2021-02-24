@@ -70,9 +70,10 @@ namespace CHI.Services.Report
             //вычисляет проценты в штатных единицах
             foreach (var employee in employees.Where(x => x.Parameters.Any()))
             {
+
+                var dividendParameter = employee.Parameters.Where(x => x.Kind == ParameterKind.EmployeeFact).FirstOrDefault();
+                var dividerParameter = employee.Parameters.Where(x => x.Kind == ParameterKind.EmployeePlan).FirstOrDefault();
                 var percentParamenter = employee.Parameters.Where(x => x.Kind == ParameterKind.EmployeePercent).FirstOrDefault();
-                var dividendParameter = employee.Parameters.Where(x => x.Kind == ParameterKind.EmployeePlan).FirstOrDefault();
-                var dividerParameter = employee.Parameters.Where(x => x.Kind == ParameterKind.EmployeeFact).FirstOrDefault();
 
                 if (percentParamenter == null || dividendParameter == null || dividerParameter == null)
                     continue;
@@ -81,16 +82,16 @@ namespace CHI.Services.Report
                 {
                     var dividend = Results[(dividendParameter, indicator)];
                     var divider = Results[(dividerParameter, indicator)];
-                    Results[(percentParamenter, indicator)] = divider == 0 ? 0 : dividend / divider;
+                    Results[(percentParamenter, indicator)] = divider == 0 ? 0 : dividend / divider * 100;
                 }
             }
 
             //вычисляет проценты в подразделениях
-            foreach (var department in departments.Where(x=>x.Parameters.Any()))
+            foreach (var department in departments.Where(x => x.Parameters.Any()))
             {
+                var dividendParameter = department.Parameters.Where(x => x.Kind == ParameterKind.DepartmentFact).FirstOrDefault();
+                var dividerParameter = department.Parameters.Where(x => x.Kind == ParameterKind.DepartmentHandPlan).FirstOrDefault();
                 var percentParamenter = department.Parameters.Where(x => x.Kind == ParameterKind.DepartmentPercent).FirstOrDefault();
-                var dividendParameter = department.Parameters.Where(x => x.Kind == ParameterKind.DepartmentHandPlan).FirstOrDefault();
-                var dividerParameter = department.Parameters.Where(x => x.Kind == ParameterKind.DepartmentFact).FirstOrDefault();
 
                 if (percentParamenter == null || dividendParameter == null || dividerParameter == null)
                     continue;
@@ -99,7 +100,7 @@ namespace CHI.Services.Report
                 {
                     var dividend = Results[(dividendParameter, indicator)];
                     var divider = Results[(dividerParameter, indicator)];
-                    Results[(percentParamenter, indicator)] = divider == 0 ? 0 : dividend / divider;
+                    Results[(percentParamenter, indicator)] = divider == 0 ? 0 : dividend / divider * 100;
                 }
             }
 
@@ -198,7 +199,7 @@ namespace CHI.Services.Report
                 .GroupBy(x => x.Employee)
                 .ToDictionary(x => x.Key, x => x.ToList());
 
-            foreach (var component in components.Where(x => x.CaseFilters.Any() &&  x.CaseFilters.First().Kind != CaseFilterKind.Total))
+            foreach (var component in components.Where(x => x.CaseFilters.Any() && x.CaseFilters.First().Kind != CaseFilterKind.Total))
             {
                 //отбирает фильтры которые удовлетворяют заданому месяцу и году
                 var groupedFilterCodes = component.CaseFilters
