@@ -256,7 +256,7 @@ namespace CHI.ViewModels
         {
             dbContext = new AppDBContext();
             dbContext.Registers.Load();
-            Registers = new ObservableCollection<Register>(dbContext.Registers.Local.OrderByDescending(x => x.Year).OrderByDescending(x => x.Month));
+            Registers = new ObservableCollection<Register>(dbContext.Registers.Local.OrderByDescending(x => x.Month).OrderByDescending(x => x.Year));
         }
 
         public void OnNavigatedTo(NavigationContext navigationContext)
