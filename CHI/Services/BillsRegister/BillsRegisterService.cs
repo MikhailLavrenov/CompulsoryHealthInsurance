@@ -306,7 +306,7 @@ namespace CHI.Services.BillsRegister
             {
                 Month = casesRegisters.First().SCHET.MONTH,
                 Year = casesRegisters.First().SCHET.YEAR,
-                BuildDate = casesRegisters.First().ZGLV.DATA,
+                BuildDate = casesRegisters.Select(x => x.ZGLV.DATA).Max(),
                 Title = casesRegisters.First().ZGLV.FILENAME.Substring(titleIndex),
                 Cases = new List<Case>()
 
