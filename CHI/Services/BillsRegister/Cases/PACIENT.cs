@@ -13,7 +13,7 @@ namespace CHI.Services.BillsRegister
         /// Guid пациента
         /// </summary>
         [XmlElement(ElementName = "ID_PAC")]
-        public Guid ID_PAC { get; set; }
+        public string ID_PAC { get; set; }
         /// <summary>
         /// Серия полиса ОМС
         /// </summary>
