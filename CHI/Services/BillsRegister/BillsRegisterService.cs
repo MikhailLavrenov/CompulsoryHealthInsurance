@@ -455,9 +455,11 @@ namespace CHI.Services.BillsRegister
                 case 12:
                     return HealthGroup.Second;
                 case 31:
+                case 33:
                 case 14:
                     return HealthGroup.ThirdA;
                 case 32:
+                case 34:
                 case 15:
                     return HealthGroup.ThirdB;
                 default:
