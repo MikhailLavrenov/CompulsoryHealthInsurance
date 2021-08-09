@@ -98,9 +98,8 @@ namespace CHI.ViewModels
 
             var db = dbLoadingTask.ConfigureAwait(false).GetAwaiter().GetResult();
 
-            var file = new PatientsFileService();
-            file.Open(Settings.PatientsFilePath, Settings.ColumnProperties);
-            file.AddFullNames(db.Patients.ToList());
+            using var file = new PatientsFileService(Settings.PatientsFilePath, Settings.ColumnProperties);
+            file.AddPatientsWithFullName(db.Patients.ToList());
 
             var resultReport = new StringBuilder();
 
@@ -113,7 +112,7 @@ namespace CHI.ViewModels
 
                 resultReport.Append($"Запрошено пациентов в СРЗ: {foundPatients.Count()}, лимит {Settings.SrzRequestsLimit}. ");
                 MainRegionService.ShowProgressBar("Подстановка ФИО в файл.");
-                file.AddFullNames(foundPatients);
+                file.AddPatientsWithFullName(foundPatients);
 
                 MainRegionService.ShowProgressBar("Добавление ФИО в локальную базу данных.");
                 var duplicateInsuranceNumbers = new HashSet<string>(foundPatients.Select(x => x.InsuranceNumber).ToList());
