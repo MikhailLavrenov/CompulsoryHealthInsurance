@@ -1,7 +1,6 @@
 ﻿using CHI.Infrastructure;
 using CHI.Models;
 using CHI.Services;
-using CHI.Services.AttachedPatients;
 using Microsoft.EntityFrameworkCore;
 using Prism.Commands;
 using Prism.Regions;
@@ -29,8 +28,6 @@ namespace CHI.ViewModels
         public DelegateCommand ClearDatabaseCommand { get; }
 
 
-
-        #region Конструкторы
         public AttachedPatientsStorageSettingsViewModel(IMainRegionService mainRegionService, IFileDialogService fileDialogService, IDialogService dialogService)
         {
             this.fileDialogService = fileDialogService;
@@ -47,9 +44,8 @@ namespace CHI.ViewModels
             SaveExampleCommand = new DelegateCommandAsync(SaveExampleExecute);
             ClearDatabaseCommand = new DelegateCommand(ClearDatabaseExecute);
         }
-        #endregion
 
-        #region Методы
+
         private void ImportPatientsExecute()
         {
             fileDialogService.DialogType = FileDialogType.Open;
@@ -62,7 +58,8 @@ namespace CHI.ViewModels
 
             mainRegionService.ShowProgressBar("Открытие файла.");
 
-            var newPatients = PatientsFileService.ReadImportPatientsFile(importFilePath);
+            var importReader = new ImportPatientsReaderService();
+            var newPatients = importReader.Read(importFilePath);
 
             mainRegionService.ShowProgressBar("Проверка значений.");
             var db = new AppDBContext();
@@ -83,6 +80,7 @@ namespace CHI.ViewModels
 
             mainRegionService.HideProgressBar($"В файле найдено {newPatients.Count} человек(а). В БД добавлено {newUniqPatients.Count} новых человек(а).");
         }
+
         private void SaveExampleExecute()
         {
             mainRegionService.ShowProgressBar("Выбор пути");
@@ -98,10 +96,11 @@ namespace CHI.ViewModels
 
             mainRegionService.ShowProgressBar("Сохранение файла");
 
-            PatientsFileService.SaveImportFileExample(saveExampleFilePath);
+            ImportPatientsReaderService.SaveExample(saveExampleFilePath);
 
             mainRegionService.HideProgressBar($"Файл сохранен: {saveExampleFilePath}");
         }
+
         private async void ClearDatabaseExecute()
         {
             mainRegionService.ShowProgressBar("Очистка базы данных.");
@@ -121,6 +120,5 @@ namespace CHI.ViewModels
             PatientsCount = db.Patients.Count().ToString();
             mainRegionService.HideProgressBar("База данных очищена.");
         }
-        #endregion
     }
 }
