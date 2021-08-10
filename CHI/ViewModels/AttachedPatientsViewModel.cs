@@ -99,20 +99,20 @@ namespace CHI.ViewModels
             var db = dbLoadingTask.ConfigureAwait(false).GetAwaiter().GetResult();
 
             using var file = new PatientsFileService(Settings.PatientsFilePath, Settings.ColumnProperties);
-            file.AddPatientsWithFullName(db.Patients.ToList());
+            file.InsertPatientsWithFullName(db.Patients.ToList());
 
             var resultReport = new StringBuilder();
 
             if (Settings.SrzConnectionIsValid)
             {
-                var unknownInsuaranceNumbers = file.GetUnknownInsuaranceNumbers(Settings.SrzRequestsLimit);
+                var unknownInsuaranceNumbers = file.GetInsuranceNumberOfPatientsWithoutFullName().Take((int)Settings.SrzRequestsLimit).ToList();
 
                 MainRegionService.ShowProgressBar("Поиск ФИО в СРЗ.");
                 var foundPatients = GetPatients(unknownInsuaranceNumbers);
 
                 resultReport.Append($"Запрошено пациентов в СРЗ: {foundPatients.Count()}, лимит {Settings.SrzRequestsLimit}. ");
                 MainRegionService.ShowProgressBar("Подстановка ФИО в файл.");
-                file.AddPatientsWithFullName(foundPatients);
+                file.InsertPatientsWithFullName(foundPatients);
 
                 MainRegionService.ShowProgressBar("Добавление ФИО в локальную базу данных.");
                 var duplicateInsuranceNumbers = new HashSet<string>(foundPatients.Select(x => x.InsuranceNumber).ToList());
@@ -127,7 +127,7 @@ namespace CHI.ViewModels
             else
                 resultReport.Append("ФИО подставлены только из локальной БД. ");
 
-            var unknownPatients = file.GetUnknownInsuaranceNumbers(int.MaxValue);
+            var unknownPatients = file.GetInsuranceNumberOfPatientsWithoutFullName();
 
             if (Settings.FormatPatientsFile && unknownPatients.Count == 0)
             {

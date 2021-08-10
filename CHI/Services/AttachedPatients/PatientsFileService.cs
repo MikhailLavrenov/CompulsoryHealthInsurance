@@ -48,11 +48,11 @@ namespace CHI.Services.AttachedPatients
 
         void SetColumnsIndexes()
         {
-            insuranceColumn = GetColumnIndex("ENP");
-            initialsColumn = GetColumnIndex("FIO");
-            surnameColumn = GetColumnIndex("Фамилия");
-            nameColumn = GetColumnIndex("Имя");
-            patronymicColumn = GetColumnIndex("Отчество");
+            insuranceColumn = FindColumnIndexByHeaderName("ENP");
+            initialsColumn = FindColumnIndexByHeaderName("FIO");
+            surnameColumn = FindColumnIndexByHeaderName("Фамилия");
+            nameColumn = FindColumnIndexByHeaderName("Имя");
+            patronymicColumn = FindColumnIndexByHeaderName("Отчество");
 
             if (insuranceColumn == -1)
                 throw new InvalidOperationException("Не найден столбец с номером полиса");
@@ -76,11 +76,46 @@ namespace CHI.Services.AttachedPatients
         int AddMissingColumn(int previousColumnIndex, string columnName)
         {
             var columnIndex = previousColumnIndex + 1;
-            sheet.InsertColumn(surnameColumn, 1);
-            sheet.Cells[headerRowIndex, surnameColumn].Value = columnName;
+            sheet.InsertColumn(columnIndex, 1);
+            sheet.Cells[headerRowIndex, columnIndex].Value = columnName;
             maxCol++;
 
             return columnIndex;
+        }
+
+        IColumnProperties GetColumnProperty(string text)
+            => columnProperties.Where(x => x.NameOrAltNameIsEqual(text)).FirstOrDefault();
+
+        int FindColumnIndexByHeaderName(string[] nameVariants)
+        {
+            var cell = sheet.Cells[headerRowIndex, 1, headerRowIndex, maxCol]
+                .Where(x => x.Value != null && nameVariants.Contains(x.Value.ToString()))
+                .FirstOrDefault();
+
+            return cell?.Start.Column ?? -1;
+
+            //for (int col = 1; col <= maxCol; col++)
+            //{
+            //    var cellValue = sheet.Cells[headerRowIndex, col].Value;
+
+            //    if (cellValue == null)
+            //        continue;
+
+            //    var cellText = cellValue.ToString();
+            //    if ((cellText == name) || (cellText == altName))
+            //        return col;
+            //}
+            //return -1;
+        }
+
+        int FindColumnIndexByHeaderName(IColumnProperties columnProperties)
+            => FindColumnIndexByHeaderName(new[] { columnProperties.Name, columnProperties.AltName });
+
+        int FindColumnIndexByHeaderName(string columnName)
+        {
+            var columnProperty = GetColumnProperty(columnName);
+
+            return columnProperty == null ? FindColumnIndexByHeaderName(new[] { columnName }) : FindColumnIndexByHeaderName(columnProperty);
         }
 
         void ReadPatients()
@@ -131,18 +166,15 @@ namespace CHI.Services.AttachedPatients
         /// <summary>
         /// Получает список серии и/или номера полиса пациентов без полных ФИО
         /// </summary>
-        /// <param name="limitCount">Предельное кол-во возвращаемого списка</param>
         /// <returns>Список серии и/или номера полиса пациентов без полных ФИО</returns>
-        public List<string> GetUnknownInsuaranceNumbers(long limitCount)
-        {
-            return patientsInFile.Where(x => !x.FullNameExist).Take((int)limitCount).Select(x => x.InsuranceNumber).ToList();
-        }
+        public List<string> GetInsuranceNumberOfPatientsWithoutFullName()
+            => patientsInFile.Where(x => !x.FullNameExist).Select(x => x.InsuranceNumber).ToList();
 
         /// <summary>
         /// Вставляет полные ФИО в файл.
         /// </summary>
         /// <param name="patients">Коллекиця сведений о пациентах.</param>
-        public void AddPatientsWithFullName(IEnumerable<Patient> patients)
+        public void InsertPatientsWithFullName(IEnumerable<Patient> patients)
         {
             var patientsToAdd = patients.ToDictionary(x => x.insuranceNumber, x => x);
 
@@ -167,112 +199,13 @@ namespace CHI.Services.AttachedPatients
         public void Format()
         {
             ApplyColumnProperty();
-            SetColumnsOrder();
-            RenameSex();
+            ApplyColumnsOrder();
+            RenameSexColumn();
             sheet.Cells.AutoFitColumns();
             sheet.Cells[sheet.Dimension.Address].AutoFilter = true;
-
             SetColumnsIndexes();
         }
 
-        /// <summary>
-        /// Ищет номер столбца в файле по названию заголовка.
-        /// </summary>
-        /// <param name="columnName">Название столбца</param>
-        /// <returns>Индекс искомого столбца, если столбец не найден возвращает -1.</returns>
-        int GetColumnIndex(string columnName)
-        {
-            var columnProperty = columnProperties
-                .Where(x => string.Equals(x.Name, columnName, StringComparison.OrdinalIgnoreCase) || string.Equals(x.AltName, columnName, StringComparison.OrdinalIgnoreCase))
-                .FirstOrDefault();
-
-            if (columnProperty == null)
-                return GetColumnIndex(columnName, columnName);
-
-            return GetColumnIndex(columnProperty.Name, columnProperty.AltName);
-        }
-
-        /// <summary>
-        /// Ищет номер столбца в файле по названию заголовка или его алтернативному названию.
-        /// </summary>
-        /// <param name="name">Название столбца.</param>
-        /// <param name="altName">Альтернативное название столбца.</param>
-        /// <returns>Индекс искомого столбца, если столбец не найден возвращает -1.</returns>
-        int GetColumnIndex(string name, string altName)
-        {
-            for (int col = 1; col <= maxCol; col++)
-            {
-                var cellValue = sheet.Cells[headerRowIndex, col].Value;
-
-                if (cellValue == null)
-                    continue;
-
-                var cellText = cellValue.ToString();
-                if ((cellText == name) || (cellText == altName))
-                    return col;
-            }
-            return -1;
-        }
-
-        /// <summary>
-        /// возвращает атрибуты столбца по имени, если такого нет - null
-        /// </summary>
-        /// <param name="name">Имя столбца</param>
-        /// <returns>Атрибуты столбца</returns>
-        IColumnProperties GetColumnProperty(string name)
-            => columnProperties.Where(x => string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase) || string.Equals(x.AltName, name, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
-
-        /// <summary>
-        /// Изменяет порядок столбоцов в соответствии с порядком следования свойств настроек столбцов.
-        /// </summary>
-        void SetColumnsOrder()
-        {
-            int correctIndex = 1;
-
-            foreach (var columnProperty in columnProperties)
-            {
-                var currentIndex = GetColumnIndex(columnProperty.Name, columnProperty.AltName);
-
-                //если столбец на своем месте 
-                if (currentIndex == correctIndex)
-                    correctIndex++;
-                //если столбец не на своем месте и столбец найден в таблице
-                else if (currentIndex != -1)
-                {
-                    sheet.InsertColumn(correctIndex, 1);
-                    currentIndex++;
-                    var currentRange = sheet.Cells[headerRowIndex, currentIndex, maxRow, currentIndex];
-                    var correctRange = sheet.Cells[headerRowIndex, correctIndex, maxRow, correctIndex];
-                    currentRange.Copy(correctRange);
-                    sheet.DeleteColumn(currentIndex);
-                    correctIndex++;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Заменяет цифры с полом в понятные названия
-        /// </summary>
-        void RenameSex()
-        {
-            int sexColumn = GetColumnIndex("SEX");
-
-            if (sexColumn == -1)
-                return;
-
-            var cells = sheet.Cells[headerRowIndex + 1, sexColumn, maxRow, sexColumn]
-                .Where(x => x.Value != null);
-
-            foreach (var cell in cells)
-                cell.Value = cell.Value.ToString()
-                    .Replace("1", "Мужской")
-                    .Replace("2", "Женский");
-        }
-
-        /// <summary>
-        /// Применяет свойства столбцов к таблице в соотвествии с настройками свойств столбцов:
-        /// заменяет названия столбцов на настроенные, скрывает и удаляет столбцы.
-        /// </summary>
         void ApplyColumnProperty()
         {
             for (int i = 1; i <= maxCol; i++)
@@ -282,10 +215,12 @@ namespace CHI.Services.AttachedPatients
                 if (cellValue == null)
                     continue;
 
-                var name = cellValue.ToString();
-                var columnProperty = GetColumnProperty(name);
+                var columnProperty = GetColumnProperty(cellValue.ToString());
 
-                if (columnProperty?.AltName != string.Empty)
+                if (columnProperty == null)
+                    continue;
+
+                if (!string.IsNullOrEmpty(columnProperty.AltName))
                     sheet.Cells[headerRowIndex, i].Value = columnProperty.AltName;
 
                 if (columnProperty.Hide)
@@ -300,6 +235,56 @@ namespace CHI.Services.AttachedPatients
             }
         }
 
+        void ApplyColumnsOrder()
+        {
+            int mustBeIndex = 1;
+            var tempsheet = excel.Workbook.Worksheets.Add("tempSheet");
+
+            foreach (var columnProperty in columnProperties)
+            {
+                var actualIndex = FindColumnIndexByHeaderName(columnProperty);
+
+                if (actualIndex == -1)
+                    continue;
+
+                else if (mustBeIndex != actualIndex)
+                {
+                    var propertyRange = sheet.Cells[headerRowIndex, actualIndex, maxRow, actualIndex];
+                    var notInPlaceRange = sheet.Cells[headerRowIndex, mustBeIndex, maxRow, mustBeIndex];
+                    var tempRange = tempsheet.Cells[headerRowIndex, mustBeIndex, maxRow, mustBeIndex];
+
+                    notInPlaceRange.Copy(tempRange);
+                    propertyRange.Copy(notInPlaceRange);
+                    tempRange.Copy(propertyRange);
+                    tempRange.Clear();
+                }
+
+                mustBeIndex++;                
+            }
+
+            excel.Workbook.Worksheets.Delete("tempSheet");
+        }
+
+        void RenameSexColumn()
+        {
+            int sexColumn = FindColumnIndexByHeaderName("SEX");
+
+            if (sexColumn == -1)
+                return;
+
+            var cells = sheet.Cells[headerRowIndex + 1, sexColumn, maxRow, sexColumn];
+
+            foreach (var cell in cells.Where(x => x.Value != null))
+            {
+                cell.Value = cell.Value.ToString() switch
+                {
+                    "1" => "Мужской",
+                    "2" => "Женский",
+                    _ => cell.Value
+                };
+            }
+        }
+        
         public void Dispose()
         {
             excel?.Dispose();
