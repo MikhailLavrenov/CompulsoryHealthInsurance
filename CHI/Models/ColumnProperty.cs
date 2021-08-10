@@ -31,7 +31,7 @@ namespace CHI.Models
             Delete = false;
         }
 
-        public ColumnProperty() 
+        public ColumnProperty()
             : this(null, null)
         {
         }
@@ -45,6 +45,9 @@ namespace CHI.Models
             if (propertyName == nameof(AltName) || propertyName == null)
                 ValidateIsNullOrEmptyString(nameof(AltName), AltName);
         }
+
+        public bool NameOrAltNameIsEqual(string text) 
+            => Name.Equals(text, StringComparison.OrdinalIgnoreCase) || AltName.Equals(text, StringComparison.OrdinalIgnoreCase);
     }
 }
 

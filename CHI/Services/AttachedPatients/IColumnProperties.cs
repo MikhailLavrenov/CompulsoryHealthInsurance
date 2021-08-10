@@ -21,5 +21,7 @@
         /// Удалить
         /// </summary>
         bool Delete { get; set; }
+
+        bool NameOrAltNameIsEqual(string text);
     }
 }
