@@ -27,14 +27,14 @@ namespace CHI.Services
         {
             
 
-            var patientsFiles = GetFiles(new Regex("^L", RegexOptions.IgnoreCase));
-            var patientsRegisters = DeserializeXmlCollection<PERS_LIST>(patientsFiles);
+            var patientsFiles = GetXmlFiles(new Regex("^L", RegexOptions.IgnoreCase));
+            var patientsRegisters = DeserializeXmlFiles<PERS_LIST>(patientsFiles);
 
             foreach (var file in patientsFiles)
                 file.Dispose();
 
-            var casesFiles = GetFiles(new Regex("^(?!L)", RegexOptions.IgnoreCase));
-            var casesRegisters = DeserializeXmlCollection<ZL_LIST>(casesFiles);
+            var casesFiles = GetXmlFiles(new Regex("^(?!L)", RegexOptions.IgnoreCase));
+            var casesRegisters = DeserializeXmlFiles<ZL_LIST>(casesFiles);
 
             foreach (var file in casesFiles)
                 file.Dispose();
