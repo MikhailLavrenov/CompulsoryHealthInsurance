@@ -24,8 +24,8 @@ namespace CHI.Services.BillsRegister
         /// <returns></returns>
         public Register GetRegister()
         {
-            var fomsRegistersFiles = GetFiles(new Regex("^(?!L)", RegexOptions.IgnoreCase));
-            var fomsRegisters = DeserializeXmlCollection<ZL_LIST>(fomsRegistersFiles);
+            var fomsRegistersFiles = GetXmlFiles(new Regex("^(?!L)", RegexOptions.IgnoreCase));
+            var fomsRegisters = DeserializeXmlFiles<ZL_LIST>(fomsRegistersFiles);
 
             foreach (var fomsRegistersFile in fomsRegistersFiles)
                 fomsRegistersFile.Dispose();

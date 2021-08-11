@@ -27,14 +27,14 @@ namespace CHI.Services
         /// <returns>Список профилактических осмотров пациентовю</returns>
         public List<PatientExaminations> GetPatientsExaminations(Regex fileNameMatchPattern)
         {
-            var patientsFiles = GetFiles(fileNameMatchPattern);
-            var patientsRegisters = DeserializeXmlCollection<PERS_LIST>(patientsFiles);
+            var patientsFiles = GetXmlFiles(fileNameMatchPattern);
+            var patientsRegisters = DeserializeXmlFiles<PERS_LIST>(patientsFiles);
 
             foreach (var file in patientsFiles)
                 file.Dispose();
 
-            var examinationsFiles = GetFiles(fileNameMatchPattern);
-            var examinationsRegisters = DeserializeXmlCollection<ZL_LIST>(examinationsFiles);
+            var examinationsFiles = GetXmlFiles(fileNameMatchPattern);
+            var examinationsRegisters = DeserializeXmlFiles<ZL_LIST>(examinationsFiles);
 
             foreach (var file in examinationsFiles)
                 file.Dispose();

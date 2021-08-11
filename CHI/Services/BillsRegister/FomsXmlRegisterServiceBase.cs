@@ -38,73 +38,65 @@ namespace CHI.Services
         /// </summary>
         /// <param name="fileNamesStartsWith">Коллекция начала имен файлов.</param>
         /// <returns>Список потоков файлов.</returns>
-        protected List<Stream> GetFiles(Regex fileNameMatchPattern)
+        protected List<Stream> GetXmlFiles(Regex fileNameMatchPattern)
         {
-            var xmlFiles = filePaths.SelectMany(x => Directory.GetFiles(x, "*.xml", SearchOption.AllDirectories))
+            var allFiles = filePaths.SelectMany(x => Directory.GetFiles(x, "*.*", SearchOption.AllDirectories)).ToList();
+
+            var xmlFiles = allFiles.Where(x=>x.EndsWith(".xml", comparer))
                 .Where(x => fileNameMatchPattern.IsMatch(Path.GetFileName(x)))
                 .Select(x => new FileStream(x, FileMode.Open))
                 .ToList<Stream>();
 
-            var archivePaths = filePaths.SelectMany(x => Directory.GetFiles(x, "*.zip", SearchOption.AllDirectories));
-            foreach (var archivePath in archivePaths)
+            foreach (var zipFilePath in allFiles.Where(x => x.EndsWith(".zip", comparer)))
             {
-                using (var archive = ZipFile.OpenRead(archivePath))
-                {
-                    var xmlFilesFromArchvie = archive.Entries.SelectMany(x => ArchiveEntryGetXmlFilesRecursive(x, fileNameMatchPattern));
-                    xmlFiles.AddRange(xmlFilesFromArchvie);
-                }
+                using var zipFile = new FileStream(zipFilePath, FileMode.Open);
+                xmlFiles.AddRange(GetXmlFilesFromArchiveRecursive(zipFile, fileNameMatchPattern));
             }
 
             return xmlFiles;
         }
 
-        /// <summary>
-        /// Получает список потоков на файлы в архиве, имена которых начинаются с опеределенных строк.
-        /// </summary>
-        /// <param name="archiveEntry">Файл внутри zip архива.</param>
-        /// <param name="fileNamesStartsWith">Коллекция начала имен файлов.</param>
-        /// <returns>Список потоков файлов.</returns>
-        protected List<Stream> ArchiveEntryGetXmlFilesRecursive(ZipArchiveEntry archiveEntry, Regex fileNameMatchPattern)
+        protected List<Stream> GetXmlFilesFromArchiveRecursive(Stream zipFile, Regex fileNameMatchPattern)
         {
             var xmlFiles = new List<Stream>();
 
-            if (string.IsNullOrEmpty(archiveEntry.Name))
-                return xmlFiles;
-
-            var extension = Path.GetExtension(archiveEntry.Name);
-
-            if (extension.Equals(".xml", comparer) && fileNameMatchPattern.IsMatch(archiveEntry.Name))
+            using var archive = new ZipArchive(zipFile, ZipArchiveMode.Read);
+            foreach (var archiveEntry in archive.Entries)
             {
-                var extractedEntry = new MemoryStream();
-                archiveEntry.Open().CopyTo(extractedEntry);
-                xmlFiles.Add(extractedEntry);
-            }
-            else if (extension.Equals(".zip", comparer))
-            {
-                var extractedEntry = new MemoryStream();
-                archiveEntry.Open().CopyTo(extractedEntry);
+                //Архиватор представляет папку и вложенные в нее файлы отдельными ZipArchiveEntry в плоском стиле, поэтому сами папки пропускаем.
+                //Свойство Name - это имя файла, у папок его нет.
+                if (string.IsNullOrEmpty(archiveEntry.Name))
+                    continue;
 
-                using (var archive = new ZipArchive(extractedEntry))
+                var extension = Path.GetExtension(archiveEntry.Name);
+
+                if (extension.Equals(".xml", comparer) && fileNameMatchPattern.IsMatch(archiveEntry.Name))
                 {
-                    foreach (var entry in archive.Entries)
-                        xmlFiles.AddRange(ArchiveEntryGetXmlFilesRecursive(entry, fileNameMatchPattern));
+                    var xmlFile = new MemoryStream();
+                    archiveEntry.Open().CopyTo(xmlFile);
+                    xmlFiles.Add(xmlFile);
+                }
+                else if (extension.Equals(".zip", comparer))
+                {
+                    var nestedZipFile = archiveEntry.Open();                    
+                    xmlFiles.AddRange(GetXmlFilesFromArchiveRecursive(nestedZipFile, fileNameMatchPattern));
                 }
             }
 
             return xmlFiles;
         }
 
-        protected List<T> DeserializeXmlCollection<T>(IEnumerable<Stream> files) where T : class
+        protected List<T> DeserializeXmlFiles<T>(IEnumerable<Stream> files) where T : class
         {
             var result = new List<T>();
 
             foreach (var file in files)
-                result.Add(DeserializeXml<T>(file));
+                result.Add(DeserializeXmlFile<T>(file));
 
             return result;
         }
 
-        protected T DeserializeXml<T>(Stream file) where T : class
+        protected T DeserializeXmlFile<T>(Stream file) where T : class
         {
             file.Seek(0, SeekOrigin.Begin);
 
