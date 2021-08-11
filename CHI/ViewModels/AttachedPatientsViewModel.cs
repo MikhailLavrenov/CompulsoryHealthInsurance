@@ -1,7 +1,6 @@
 ﻿using CHI.Infrastructure;
 using CHI.Models;
 using CHI.Services;
-using CHI.Services.AttachedPatients;
 using CHI.Services.Common;
 using CHI.Services.SRZ;
 using Microsoft.EntityFrameworkCore;

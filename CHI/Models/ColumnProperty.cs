@@ -1,5 +1,5 @@
 ﻿using CHI.Infrastructure;
-using CHI.Services.AttachedPatients;
+using CHI.Services;
 using System;
 
 namespace CHI.Models
@@ -46,7 +46,7 @@ namespace CHI.Models
                 ValidateIsNullOrEmptyString(nameof(AltName), AltName);
         }
 
-        public bool NameOrAltNameIsEqual(string text) 
+        public bool NameOrAltNameIsEqual(string text)
             => Name.Equals(text, StringComparison.OrdinalIgnoreCase) || AltName.Equals(text, StringComparison.OrdinalIgnoreCase);
     }
 }

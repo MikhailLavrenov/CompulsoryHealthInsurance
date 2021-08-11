@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Xml.Serialization;
 
-namespace CHI.Services.BillsRegister
+namespace CHI.Services.CasesPaymentDTO
 {
     /// <summary>
     /// Представляет заголовок файла

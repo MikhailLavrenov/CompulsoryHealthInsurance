@@ -1,5 +1,4 @@
 ﻿using CHI.Models;
-using CHI.Services.AttachedPatients;
 using CHI.Services.Common;
 using OfficeOpenXml;
 using System;
@@ -94,7 +93,7 @@ namespace CHI.Services.SRZ
             var responseLines = responseText.Split(new string[] { "||" }, 7, StringSplitOptions.None);
 
             if (responseLines[0] != "0")
-                return  new Patient(responseLines[2], responseLines[3], responseLines[4], responseLines[5]);
+                return new Patient(responseLines[2], responseLines[3], responseLines[4], responseLines[5]);
             else
                 return null;
         }
@@ -126,7 +125,7 @@ namespace CHI.Services.SRZ
         /// <param name="onDate">Дата на которую сформирован файл.</param>
         /// <returns>Ссылку на скачивание файла прикрепленных пациентов.</returns>
         private string GetPatientsFileReference(DateTime onDate)
-        {            
+        {
             string shortFileDate = onDate.ToShortDateString();
 
             var content = new Dictionary<string, string> {

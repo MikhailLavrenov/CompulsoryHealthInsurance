@@ -1,6 +1,6 @@
 ﻿using System.Xml.Serialization;
 
-namespace CHI.Services.BillsRegister.CasesPayment
+namespace CHI.Services.CasesPaymentDTO
 {
     /// <summary>
     /// Представляет информацию о записи в реестре-счетов

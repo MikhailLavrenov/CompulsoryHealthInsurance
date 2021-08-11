@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Xml.Serialization;
 
-namespace CHI.Services.BillsRegister.CasesPayment
+namespace CHI.Services.CasesDTO
 {
     /// <summary>
     /// Представляет информацию о счете.
@@ -24,5 +24,13 @@ namespace CHI.Services.BillsRegister.CasesPayment
         /// </summary>
         [XmlElement(ElementName = "CODE_MO")]
         public string CODE_MO { get; set; }
+        /// <summary>
+        /// Тип диспансеризации
+        /// ДВ2 Второй этап диспансеризации определенных групп взрослого населения с периодичностью 1 раз в 3 года
+        /// ОПВ Профилактические медицинские осмотры взрослого населения
+        /// ДВ4 Первый этап диспансеризации определенных групп взрослого населения с периодичностью 1 раз в год
+        /// </summary>
+        [XmlElement(ElementName = "DISP")]
+        public string DISP { get; set; }
     }
 }
