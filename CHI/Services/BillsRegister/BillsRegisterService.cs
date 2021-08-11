@@ -1,5 +1,7 @@
 ﻿using CHI.Models.ServiceAccounting;
+using CHI.Services.CasesDTO;
 using CHI.Services.MedicalExaminations;
+using CHI.Services.PersonsDTO;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -14,15 +16,15 @@ namespace CHI.Services.BillsRegister
     /// </summary>
     public class BillsRegisterService
     {
-        private static readonly StringComparison comparer = StringComparison.OrdinalIgnoreCase;
-        private List<string> filePaths;
+        static readonly StringComparison comparer = StringComparison.OrdinalIgnoreCase;
+        List<string> filePaths;
 
 
         /// <summary>
         /// Конструктор
         /// </summary>
         /// <param name="filePaths">Коллекиця путей к xml файлам. Могут быть многократно упакованны в zip-архив.</param>
-        public BillsRegisterService(ICollection<string> filePaths)
+        public BillsRegisterService(IEnumerable<string> filePaths)
         {
             this.filePaths = filePaths.ToList();
         }
@@ -41,12 +43,11 @@ namespace CHI.Services.BillsRegister
         /// </summary>
         /// <returns></returns>
         public Register GetRegister(bool casePaymentOnly)
-        {
-            var fomsRegistersFiles = GetFiles(fileNamesNotStartsWith: new List<string> { "L" });
-
+        {            
             if (casePaymentOnly)
             {
-                var fomsRegisters = DeserializeCollection<CasesPayment.ZL_LIST>(fomsRegistersFiles);
+                var fomsRegistersFiles = GetFiles(fileNamesNotStartsWith: new List<string> { "L" });
+                var fomsRegisters = DeserializeCollection<CasesPaymentDTO.ZL_LIST>(fomsRegistersFiles);
 
                 foreach (var fomsRegistersFile in fomsRegistersFiles)
                     fomsRegistersFile.Dispose();
@@ -99,7 +100,7 @@ namespace CHI.Services.BillsRegister
         /// </summary>
         /// <param name="fileNamesStartsWith">Коллекция начала имен файлов.</param>
         /// <returns>Список потоков файлов.</returns>
-        private List<Stream> GetFiles(IEnumerable<string> fileNamesStartsWith = null, IEnumerable<string> fileNamesNotStartsWith = null)
+        List<Stream> GetFiles(IEnumerable<string> fileNamesStartsWith = null, IEnumerable<string> fileNamesNotStartsWith = null)
         {
             var files = new List<Stream>();
 
@@ -115,7 +116,7 @@ namespace CHI.Services.BillsRegister
         /// <param name="path">Путь к файлу.</param>
         /// <param name="fileNamesStartsWith">Коллекция начала имен файлов.</param>
         /// <returns>Список потоков файлов.</returns>
-        private List<Stream> GetFilesRecursive(string path, IEnumerable<string> fileNamesStartsWith = null, IEnumerable<string> fileNamesNotStartsWith = null)
+        List<Stream> GetFilesRecursive(string path, IEnumerable<string> fileNamesStartsWith = null, IEnumerable<string> fileNamesNotStartsWith = null)
         {
             var result = new List<Stream>();
             var isDirectory = new FileInfo(path).Attributes.HasFlag(FileAttributes.Directory);
@@ -154,7 +155,7 @@ namespace CHI.Services.BillsRegister
         /// <param name="archiveEntry">Файл внутри zip архива.</param>
         /// <param name="fileNamesStartsWith">Коллекция начала имен файлов.</param>
         /// <returns>Список потоков файлов.</returns>
-        private List<Stream> ArchiveEntryGetFilesRecursive(ZipArchiveEntry archiveEntry, IEnumerable<string> fileNamesStartsWith, IEnumerable<string> fileNamesNotStartsWith = null)
+        List<Stream> ArchiveEntryGetFilesRecursive(ZipArchiveEntry archiveEntry, IEnumerable<string> fileNamesStartsWith, IEnumerable<string> fileNamesNotStartsWith = null)
         {
             var result = new List<Stream>();
 
@@ -192,7 +193,7 @@ namespace CHI.Services.BillsRegister
         /// <param name="examinationsRegisters">Десериализованные классы услуг xml реестров-счетов.</param>
         /// <param name="patientsRegisters">>Десериализованные классы пациентов xml реестров-счетов.</param>
         /// <returns>Список профилактических осмотров пациентов.</returns>
-        private static List<PatientExaminations> ConvertToPatientExaminations(IEnumerable<ZL_LIST> examinationsRegisters, IEnumerable<PERS_LIST> patientsRegisters)
+        List<PatientExaminations> ConvertToPatientExaminations(IEnumerable<ZL_LIST> examinationsRegisters, IEnumerable<PERS_LIST> patientsRegisters)
         {
             var result = new List<PatientExaminations>();
 
@@ -285,13 +286,11 @@ namespace CHI.Services.BillsRegister
         /// <summary>
         /// Конвертирует типы xml реестров-счетов в Register.
         /// </summary>
-        private static Register ConvertToRegister(IEnumerable<ZL_LIST> casesRegisters, IEnumerable<PERS_LIST> patientsRegisters)
+        Register ConvertToRegister(IEnumerable<ZL_LIST> casesRegisters, IEnumerable<PERS_LIST> patientsRegisters)
         {
             foreach (var item in casesRegisters)
                 if (casesRegisters.First().SCHET.MONTH != item.SCHET.MONTH || casesRegisters.First().SCHET.YEAR != item.SCHET.YEAR)
                     throw new InvalidOperationException("Реестры должны принадлежать одному периоду");
-
-            var result = new List<PatientExaminations>();
 
             var patients = new List<PERS>();
 
@@ -363,7 +362,7 @@ namespace CHI.Services.BillsRegister
         /// <summary>
         /// Конвертирует типы xml реестров-счетов в Register.
         /// </summary>
-        private static Register ConvertToRegisterWithPayment(IEnumerable<CasesPayment.ZL_LIST> fomsRegisters)
+        Register ConvertToRegisterWithPayment(IEnumerable<CasesPaymentDTO.ZL_LIST> fomsRegisters)
         {
             foreach (var item in fomsRegisters)
                 if (fomsRegisters.First().SCHET.MONTH != item.SCHET.MONTH || fomsRegisters.First().SCHET.YEAR != item.SCHET.YEAR)
@@ -406,7 +405,7 @@ namespace CHI.Services.BillsRegister
         /// </summary>
         /// <param name="disp">Тип профилактического осмотра.</param>
         /// <returns>Этап профилактического осмотра.</returns>
-        private static int DispToExaminationStage(string disp)
+        int DispToExaminationStage(string disp)
         {
             switch (disp.ToUpper())
             {
@@ -426,7 +425,7 @@ namespace CHI.Services.BillsRegister
         /// <param name="disp">Тип профилактического осмотра.</param>
         /// <param name="age">Возраст пациента.</param>
         /// <returns>Вид осмотра.</returns>
-        private static ExaminationKind DispToExaminationType(string disp, int age)
+        ExaminationKind DispToExaminationType(string disp, int age)
         {
             switch (disp.ToUpper())
             {
@@ -445,7 +444,7 @@ namespace CHI.Services.BillsRegister
         /// </summary>
         /// <param name="RSLT_D">Результат профилактического осмотра.</param>
         /// <returns>Группа здоровья</returns>
-        private static HealthGroup RSLT_DToHealthGroup(int RSLT_D)
+        HealthGroup RSLT_DToHealthGroup(int RSLT_D)
         {
             switch (RSLT_D)
             {
@@ -473,7 +472,7 @@ namespace CHI.Services.BillsRegister
         /// <typeparam name="T">Тип Т в который десериализуется поток.</typeparam>
         /// <param name="files">Коллекция потоков.</param>
         /// <returns>Список экземпляров типа Т.</returns>
-        private static List<T> DeserializeCollection<T>(IEnumerable<Stream> files) where T : class
+        List<T> DeserializeCollection<T>(IEnumerable<Stream> files) where T : class
         {
             var result = new List<T>();
 
@@ -489,7 +488,6 @@ namespace CHI.Services.BillsRegister
 
             return result;
         }
-
     }
 }
 

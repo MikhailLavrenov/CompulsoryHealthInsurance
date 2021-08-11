@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Xml.Serialization;
 
-namespace CHI.Services.BillsRegister.CasesPayment
+namespace CHI.Services.CasesDTO
 {
     /// <summary>
     /// Представляет информацию о законченных случаях реестра-счетов.

@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace CHI.Services.AttachedPatients
+namespace CHI.Services
 {
     /// <summary>
     /// Cервис для работа с файлом прикрепленных пациентов

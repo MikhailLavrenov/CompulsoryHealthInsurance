@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Xml.Serialization;
 
-namespace CHI.Services.BillsRegister.CasesPayment
+namespace CHI.Services.CasesPaymentDTO
 {
     /// <summary>
     /// Представляет информацию о случае обращения за мед. помощью

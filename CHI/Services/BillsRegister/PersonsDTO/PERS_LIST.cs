@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Xml.Serialization;
 
-namespace CHI.Services.BillsRegister
+namespace CHI.Services.PersonsDTO
 {
     /// <summary>
     /// Представляет информацию о пациентах реестра-счетов.

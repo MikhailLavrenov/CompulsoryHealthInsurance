@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Xml.Serialization;
 
-namespace CHI.Services.BillsRegister
+namespace CHI.Services.CasesDTO
 {
     /// <summary>
     /// Представляет информацию о пациенте

@@ -1,4 +1,4 @@
-﻿namespace CHI.Services.AttachedPatients
+﻿namespace CHI.Services
 {
     /// <summary>
     /// Представляет настраиваемые свойства столбца файла выгрузки.
