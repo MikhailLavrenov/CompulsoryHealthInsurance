@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Xml.Serialization;
 
-namespace CHI.Services.PersonsDTO
+namespace CHI.Services
 {
     /// <summary>
     /// Представляет сведения о пациенте

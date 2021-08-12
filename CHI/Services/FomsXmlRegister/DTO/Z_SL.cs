@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Xml.Serialization;
 
-namespace CHI.Services.CasesDTO
+namespace CHI.Services
 {
     /// <summary>
     /// Представляет информацию о законченном случае мед. помощи
@@ -47,13 +47,13 @@ namespace CHI.Services.CasesDTO
         /// Сумма, принятая к оплате 
         /// </summary>
         [XmlElement(ElementName = "SUMP")]
-        public int SUMP { get; set; }
+        public double SUMP { get; set; }
 
         /// <summary>
         /// Сумма санкций
         /// </summary>
         [XmlElement(ElementName = "SANK_IT")]
-        public int SANK_IT { get; set; }
+        public double SANK_IT { get; set; }
 
         /// <summary>
         /// Случай обращения за мед. помощью

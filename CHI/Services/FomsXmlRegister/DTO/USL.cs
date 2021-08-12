@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Xml.Serialization;
 
-namespace CHI.Services.CasesDTO
+namespace CHI.Services
 {
     /// <summary>
     /// Представляет информацию об оказанной услуге

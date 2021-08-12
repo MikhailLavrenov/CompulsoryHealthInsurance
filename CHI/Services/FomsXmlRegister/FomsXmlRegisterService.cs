@@ -1,6 +1,4 @@
 ﻿using CHI.Models.ServiceAccounting;
-using CHI.Services.CasesDTO;
-using CHI.Services.PersonsDTO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,8 +23,6 @@ namespace CHI.Services
         /// <returns></returns>
         public Register GetRegister()
         {
-            
-
             var patientsFiles = GetXmlFiles(new Regex("^L", RegexOptions.IgnoreCase));
             var patientsRegisters = DeserializeXmlFiles<PERS_LIST>(patientsFiles);
 

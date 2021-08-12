@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Xml.Serialization;
 
-namespace CHI.Services.CasesPaymentDTO
+namespace CHI.Services
 {
     /// <summary>
     /// Представляет информацию о законченных случаях реестра-счетов.
     /// </summary>
     [XmlRoot(ElementName = "ZL_LIST")]
-    public class ZL_LIST
+    public class ZL_LIST: REGISTER_LIST
     {
         /// <summary>
         /// Счет

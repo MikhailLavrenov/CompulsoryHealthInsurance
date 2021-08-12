@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Xml.Serialization;
 
-namespace CHI.Services.CasesDTO
+namespace CHI.Services
 {
     /// <summary>
     /// Представляет заголовок файла
@@ -21,5 +21,10 @@ namespace CHI.Services.CasesDTO
         /// </summary>
         [XmlElement(ElementName = "FILENAME")]
         public string FILENAME { get; set; }
+        /// <summary>
+        /// Имя связанного файла
+        /// </summary>
+        [XmlElement(ElementName = "FILENAME1")]
+        public string FILENAME1 { get; set; }
     }
 }
