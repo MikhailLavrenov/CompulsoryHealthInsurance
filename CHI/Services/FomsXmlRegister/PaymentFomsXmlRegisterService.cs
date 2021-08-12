@@ -37,7 +37,7 @@ namespace CHI.Services.BillsRegister
         /// <summary>
         /// Конвертирует типы xml реестров-счетов в Register.
         /// </summary>
-        Register ConvertToRegisterWithPayment(IEnumerable<CasesPaymentDTO.ZL_LIST> fomsRegisters)
+        Register ConvertToRegisterWithPayment(IEnumerable<ZL_LIST> fomsRegisters)
         {
             foreach (var item in fomsRegisters)
                 if (fomsRegisters.First().SCHET.MONTH != item.SCHET.MONTH || fomsRegisters.First().SCHET.YEAR != item.SCHET.YEAR)
