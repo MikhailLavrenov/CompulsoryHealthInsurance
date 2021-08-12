@@ -11,8 +11,7 @@ namespace CHI.Services
     {
         protected static readonly StringComparison comparer = StringComparison.OrdinalIgnoreCase;
         protected List<string> paths;
-        protected List<PERS_LIST> persLists;
-        protected List<ZL_LIST> zlLists;
+        protected FomsRegister fomsRegister;
 
 
         /// <summary>
@@ -36,8 +35,7 @@ namespace CHI.Services
 
         protected void LoadXmlFiles()
         {
-            persLists = new List<PERS_LIST>();
-            zlLists = new List<ZL_LIST>();
+            fomsRegister = new FomsRegister();
 
             var allFiles = paths.SelectMany(x => Directory.GetFiles(x, "*.*", SearchOption.AllDirectories)).ToList();
 
@@ -45,7 +43,7 @@ namespace CHI.Services
             {
                 using var file = new FileStream(xmlFilePath, FileMode.Open);
                 var fileName = Path.GetFileName(xmlFilePath);
-                DeserializeXmlFile(fileName, file);
+                LoadXmlToFomsRegister(fileName, file);
             }
 
             foreach (var zipFilePath in allFiles.Where(x => x.EndsWith(".zip", comparer)))
@@ -70,7 +68,7 @@ namespace CHI.Services
                 if (extension.Equals(".xml", comparer))
                 {
                     using var file = archiveEntry.Open();
-                    DeserializeXmlFile(archiveEntry.Name, file);
+                    LoadXmlToFomsRegister(archiveEntry.Name, file);
                 }
                 else if (extension.Equals(".zip", comparer))
                 {
@@ -80,17 +78,17 @@ namespace CHI.Services
             }
         }
 
-        void DeserializeXmlFile(string fileName, Stream file)
+        void LoadXmlToFomsRegister(string fileName, Stream file)
         {
             if (fileName.StartsWith("L", comparer))
             {
                 var persList = DeserializeXmlFile<PERS_LIST>(file);
-                persLists.Add(persList);
+                fomsRegister.Add(persList);
             }
             else
             {
                 var zlList=DeserializeXmlFile<ZL_LIST>(file);
-                zlLists.Add(zlList);
+                fomsRegister.Add(zlList);
             }
         }
 
