@@ -1,7 +1,5 @@
 ﻿using CHI.Models.ServiceAccounting;
-using CHI.Services.CasesDTO;
 using CHI.Services.MedicalExaminations;
-using CHI.Services.PersonsDTO;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,7 +7,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Xml.Serialization;
 
-namespace CHI.Services.BillsRegister
+namespace CHI.Services
 {
     /// <summary>
     /// Представляет сервис для работы с xml выгрузкой реестров-счетов по программе ОМС ХК ФОМС
@@ -43,11 +41,11 @@ namespace CHI.Services.BillsRegister
         /// </summary>
         /// <returns></returns>
         public Register GetRegister(bool casePaymentOnly)
-        {            
+        {
             if (casePaymentOnly)
             {
                 var fomsRegistersFiles = GetFiles(fileNamesNotStartsWith: new List<string> { "L" });
-                var fomsRegisters = DeserializeCollection<CasesPaymentDTO.ZL_LIST>(fomsRegistersFiles);
+                var fomsRegisters = DeserializeCollection<ZL_LIST>(fomsRegistersFiles);
 
                 foreach (var fomsRegistersFile in fomsRegistersFiles)
                     fomsRegistersFile.Dispose();
@@ -362,7 +360,7 @@ namespace CHI.Services.BillsRegister
         /// <summary>
         /// Конвертирует типы xml реестров-счетов в Register.
         /// </summary>
-        Register ConvertToRegisterWithPayment(IEnumerable<CasesPaymentDTO.ZL_LIST> fomsRegisters)
+        Register ConvertToRegisterWithPayment(IEnumerable<ZL_LIST> fomsRegisters)
         {
             foreach (var item in fomsRegisters)
                 if (fomsRegisters.First().SCHET.MONTH != item.SCHET.MONTH || fomsRegisters.First().SCHET.YEAR != item.SCHET.YEAR)

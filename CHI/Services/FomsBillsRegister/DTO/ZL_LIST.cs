@@ -7,7 +7,7 @@ namespace CHI.Services
     /// Представляет информацию о законченных случаях реестра-счетов.
     /// </summary>
     [XmlRoot(ElementName = "ZL_LIST")]
-    public class ZL_LIST
+    public class ZL_LIST: BillPart
     {
         /// <summary>
         /// Счет

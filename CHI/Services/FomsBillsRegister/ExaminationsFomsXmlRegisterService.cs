@@ -1,6 +1,4 @@
-﻿using CHI.Services.CasesDTO;
-using CHI.Services.MedicalExaminations;
-using CHI.Services.PersonsDTO;
+﻿using CHI.Services.MedicalExaminations;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
