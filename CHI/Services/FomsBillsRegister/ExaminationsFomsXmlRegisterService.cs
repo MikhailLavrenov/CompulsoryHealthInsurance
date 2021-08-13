@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 
 namespace CHI.Services
 {
-    public class ExaminationsFomsXmlRegisterService : FomsXmlRegisterServiceBase
+    public class ExaminationsFomsXmlRegisterService
     {
         public ExaminationsFomsXmlRegisterService(IEnumerable<string> filePaths)
             : base(filePaths)
@@ -135,7 +135,6 @@ namespace CHI.Services
 
             return result;
         }
-
 
         /// <summary>
         /// Определяет этап профилактического осмотра по его типу.
