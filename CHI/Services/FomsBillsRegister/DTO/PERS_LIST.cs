@@ -7,7 +7,7 @@ namespace CHI.Services
     /// Представляет информацию о пациентах реестра-счетов.
     /// </summary>
     [XmlRoot(ElementName = "PERS_LIST")]
-    public class PERS_LIST
+    public class PERS_LIST: BillPart
     {
         /// <summary>
         /// Список сведений о пациентах

@@ -7,18 +7,18 @@ using System.Xml.Serialization;
 
 namespace CHI.Services
 {
-    public abstract class FomsXmlRegisterServiceBase
+    public class XmlBillsLoader
     {
-        protected static readonly StringComparison comparer = StringComparison.OrdinalIgnoreCase;
-        protected List<string> paths;
-        protected FomsRegister fomsRegister;
+        static readonly StringComparison comparer = StringComparison.OrdinalIgnoreCase;
+        List<string> paths;
+        List<BillPart> loaded;
 
 
         /// <summary>
         ///
         /// </summary>
         /// <param name="paths">Коллекиця путей к xml файлам: папки, xml, zip, многократно упакованные zip.</param>
-        public FomsXmlRegisterServiceBase(IEnumerable<string> paths)
+        public XmlBillsLoader(IEnumerable<string> paths)
         {
             this.paths = paths.ToList();
         }
@@ -27,15 +27,15 @@ namespace CHI.Services
         ///
         /// </summary>
         /// <param name="path">Путь к xml файлам: папки, xml, zip, многократно упакованные zip.</param>
-        public FomsXmlRegisterServiceBase(string path)
+        public XmlBillsLoader(string path)
         {
             paths = new List<string>() { path };
         }
 
 
-        protected void LoadXmlFiles()
+        public List<BillPart> Load()
         {
-            fomsRegister = new FomsRegister();
+            loaded = new List<BillPart>();
 
             var allFiles = paths.SelectMany(x => Directory.GetFiles(x, "*.*", SearchOption.AllDirectories)).ToList();
 
@@ -43,17 +43,19 @@ namespace CHI.Services
             {
                 using var file = new FileStream(xmlFilePath, FileMode.Open);
                 var fileName = Path.GetFileName(xmlFilePath);
-                LoadXmlToFomsRegister(fileName, file);
+                AddToLoaded(fileName, file);
             }
 
             foreach (var zipFilePath in allFiles.Where(x => x.EndsWith(".zip", comparer)))
             {
                 using var zipFile = new FileStream(zipFilePath, FileMode.Open);
-                LoadXmlFilesFromArchiveRecursive(zipFile);
+                LoadFromArchiveRecursive(zipFile);
             }
+
+            return loaded;
         }
 
-        void LoadXmlFilesFromArchiveRecursive(Stream zipFile)
+        void LoadFromArchiveRecursive(Stream zipFile)
         {
             using var archive = new ZipArchive(zipFile, ZipArchiveMode.Read);
             foreach (var archiveEntry in archive.Entries)
@@ -68,31 +70,31 @@ namespace CHI.Services
                 if (extension.Equals(".xml", comparer))
                 {
                     using var file = archiveEntry.Open();
-                    LoadXmlToFomsRegister(archiveEntry.Name, file);
+                    AddToLoaded(archiveEntry.Name, file);
                 }
                 else if (extension.Equals(".zip", comparer))
                 {
                     using var file = archiveEntry.Open();
-                    LoadXmlFilesFromArchiveRecursive(file);
+                    LoadFromArchiveRecursive(file);
                 }
             }
         }
 
-        void LoadXmlToFomsRegister(string fileName, Stream file)
+        void AddToLoaded(string fileName, Stream file)
         {
             if (fileName.StartsWith("L", comparer))
             {
-                var persList = DeserializeXmlFile<PERS_LIST>(file);
-                fomsRegister.Add(persList);
+                var persList = Deserialize<PERS_LIST>(file);
+                loaded.Add(persList);
             }
             else
             {
-                var zlList=DeserializeXmlFile<ZL_LIST>(file);
-                fomsRegister.Add(zlList);
+                var zlList = Deserialize<ZL_LIST>(file);
+                loaded.Add(zlList);
             }
         }
 
-        T DeserializeXmlFile<T>(Stream file) where T : class
+        T Deserialize<T>(Stream file) where T : class
         {
             file.Seek(0, SeekOrigin.Begin);
 

@@ -29,12 +29,12 @@ namespace CHI.Services
         /// <summary>
         ///
         /// </summary>
-        /// <param name="filePath">Полный путь к файлу.</param>
+        /// <param name="xlsxFilePath">Полный путь к xlsx файлу.</param>
         /// <param name="columnProperties">Коллекиця настроиваемых свойств столбоц файла.</param>
-        public PatientsFileService(string filePath, IEnumerable<IColumnProperties> columnProperties)
+        public PatientsFileService(string xlsxFilePath, IEnumerable<IColumnProperties> columnProperties)
         {
 
-            excel = new ExcelPackage(new FileInfo(filePath));
+            excel = new ExcelPackage(new FileInfo(xlsxFilePath));
             sheet = excel.Workbook.Worksheets.First();
             this.columnProperties = columnProperties.ToList();
             maxRow = sheet.Dimension.Rows;

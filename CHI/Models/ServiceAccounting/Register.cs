@@ -15,5 +15,9 @@ namespace CHI.Models.ServiceAccounting
         public int PaymentStateCasesCount { get; set; }
         public List<Case> Cases { get; set; }
 
+        public Register()
+        {
+            Cases = new List<Case>();
+        }
     }
 }

@@ -2,17 +2,16 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 
 namespace CHI.Services
 {
-    public class FomsXmlRegisterService : FomsXmlRegisterServiceBase
+    public class FomsXmlRegisterService
     {
-        public FomsXmlRegisterService(IEnumerable<string> filePaths) : base(filePaths)
+        public FomsXmlRegisterService()
         {
         }
 
-        public FomsXmlRegisterService(string filePath) : base(filePath)
+        public FomsXmlRegisterService(string filePath)
         {
         }
 
@@ -21,55 +20,38 @@ namespace CHI.Services
         /// Получает счет-реестр за один период (отчетный месяц года)
         /// </summary>
         /// <returns></returns>
-        public Register GetRegister()
+        public Register GetRegister(IEnumerable<string> filePaths)
         {
-            var patientsFiles = GetXmlFiles(new Regex("^L", RegexOptions.IgnoreCase));
-            var patientsRegisters = DeserializeXmlFiles<PERS_LIST>(patientsFiles);
+            var loader = new XmlBillsLoader(filePaths);
+            var billParts = loader.Load();
+            var builder = new BillsRegisterBulder();
+            builder.Add(billParts);
+            var billsRegister = builder.Build();
 
-            foreach (var file in patientsFiles)
-                file.Dispose();
-
-            var casesFiles = GetXmlFiles(new Regex("^(?!L)", RegexOptions.IgnoreCase));
-            var casesRegisters = DeserializeXmlFiles<ZL_LIST>(casesFiles);
-
-            foreach (var file in casesFiles)
-                file.Dispose();
-
-            return ConvertToRegister(casesRegisters, patientsRegisters);
+            return ConvertToRegister(billsRegister);
         }
 
         /// <summary>
         /// Конвертирует типы xml реестров-счетов в Register.
         /// </summary>
-        Register ConvertToRegister(IEnumerable<ZL_LIST> casesRegisters, IEnumerable<PERS_LIST> patientsRegisters)
+        Register ConvertToRegister(BillsRegister billsRegister)
         {
-            foreach (var item in casesRegisters)
-                if (casesRegisters.First().SCHET.MONTH != item.SCHET.MONTH || casesRegisters.First().SCHET.YEAR != item.SCHET.YEAR)
-                    throw new InvalidOperationException("Реестры должны принадлежать одному периоду");
 
-            var patients = new List<PERS>();
-
-            foreach (var patientsRegister in patientsRegisters)
-                patients.AddRange(patientsRegister?.PERS);
-
-            patients = patients.Distinct().ToList();
-
-            var titleIndex = casesRegisters.First().ZGLV.FILENAME.IndexOfAny("0123456789".ToCharArray());
+            var firstFileName = billsRegister.Bills.First().Cases.ZGLV.FILENAME;
+            var titleIndex = firstFileName.IndexOfAny("0123456789".ToCharArray());
 
             var register = new Register()
             {
-                Month = casesRegisters.First().SCHET.MONTH,
-                Year = casesRegisters.First().SCHET.YEAR,
-                BuildDate = casesRegisters.Select(x => x.ZGLV.DATA).Max(),
-                Title = casesRegisters.First().ZGLV.FILENAME.Substring(titleIndex),
-                Cases = new List<Case>()
-
+                Month = billsRegister.Month,
+                Year = billsRegister.Year,
+                BuildDate = billsRegister.Bills.Max(x => x.Cases.ZGLV.DATA),
+                Title = firstFileName.Substring(titleIndex),
             };
 
-            foreach (var fomsRegister in casesRegisters)
-                foreach (var fomsCase in fomsRegister.ZAP)
+            foreach (var bill in billsRegister.Bills)
+                foreach (var fomsCase in bill.Cases.ZAP)
                 {
-                    var foundPatient = patients.FirstOrDefault(x => x.ID_PAC == fomsCase.PACIENT.ID_PAC);
+                    var foundPatient = bill.Persons.PERS.FirstOrDefault(x => x.ID_PAC == fomsCase.PACIENT.ID_PAC);
 
                     if (foundPatient == default)
                         throw new InvalidOperationException($"В xml реестре не найдена информация о пациенте ID_PAC={fomsCase.PACIENT.ID_PAC}, которому были оказаны услуги.");

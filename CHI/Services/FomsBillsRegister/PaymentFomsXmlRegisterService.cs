@@ -1,11 +1,10 @@
 ﻿using CHI.Models.ServiceAccounting;
-using CHI.Services.CasesPaymentDTO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace CHI.Services.BillsRegister
+namespace CHI.Services
 {
     public class PaymentFomsXmlRegisterService : FomsXmlRegisterServiceBase
     {

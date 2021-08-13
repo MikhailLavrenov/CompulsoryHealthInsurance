@@ -4,39 +4,33 @@ using System.Linq;
 
 namespace CHI.Services
 {
-    public class FomsRegister
+    public class BillsRegisterBulder
     {
         int month;
         int year;
         List<PERS_LIST> notPairedPersons;
         List<ZL_LIST> notPairedCases;
+        BillsRegister billsRegister;
 
-        public List<BillPair> Bills { get; private set; }
 
-
-        public FomsRegister()
+        public BillsRegisterBulder()
         {
             notPairedPersons = new List<PERS_LIST>();
             notPairedCases = new List<ZL_LIST>();
-            Bills = new List<BillPair>();
-
         }
 
-
-        public void Add(BillPair pair)
+        public void Add(IEnumerable<BillPart> billParts)
         {
-            if (Bills.Count == 0)
+            foreach (var billPart in billParts)
             {
-                month = pair.Cases.SCHET.MONTH;
-                year = pair.Cases.SCHET.YEAR;
+                if (billPart is PERS_LIST persons)
+                    Add(persons);
+                else if (billPart is ZL_LIST cases)
+                    Add(cases);
             }
-            else if (pair.Cases.SCHET.MONTH != month || pair.Cases.SCHET.YEAR != year)
-                throw new ArgumentException("Реестр не может состоять из счетов за разные отчетные периоды");
-
-            Bills.Add(pair);
         }
 
-        public void Add(PERS_LIST persons)
+        void Add(PERS_LIST persons)
         {
             if (persons == null)
                 throw new ArgumentNullException(nameof(persons));
@@ -54,7 +48,7 @@ namespace CHI.Services
             Add(pair);
         }
 
-        public void Add(ZL_LIST cases)
+        void Add(ZL_LIST cases)
         {
             if (cases == null)
                 throw new ArgumentNullException(nameof(cases));
@@ -71,5 +65,21 @@ namespace CHI.Services
             var pair = new BillPair(persons, cases);
             Add(pair);
         }
+
+        void Add(BillPair bill)
+        {
+            if (billsRegister == null)
+                billsRegister = new BillsRegister(bill.Cases.SCHET.MONTH, bill.Cases.SCHET.YEAR);
+
+            billsRegister.Add(bill);
+        }
+
+        public bool CanBuild()
+            => billsRegister != null && notPairedPersons.Any() == false && notPairedCases.Any() == false;
+
+        public BillsRegister Build()
+            => CanBuild() ? billsRegister : throw new InvalidOperationException("Невозможно построить реестр, т.к. не сопоставлены все пары файлов либо они отсуствуют.");
+
+
     }
 }
