@@ -11,31 +11,17 @@ namespace CHI.Services
     {
         static readonly StringComparison comparer = StringComparison.OrdinalIgnoreCase;
         List<string> paths;
-        List<BillPart> loaded;
+        public List<PERS_LIST> PersonsBills { get; private set; }
+        public List<ZL_LIST> CasesBills { get; private set; }
 
 
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="paths">Коллекиця путей к xml файлам: папки, xml, zip, многократно упакованные zip.</param>
-        public XmlBillsLoader(IEnumerable<string> paths)
+        public void Load(string path) 
+            => Load(new List<string>() { path });
+
+        public void Load(IEnumerable<string> paths)
         {
-            this.paths = paths.ToList();
-        }
-
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="path">Путь к xml файлам: папки, xml, zip, многократно упакованные zip.</param>
-        public XmlBillsLoader(string path)
-        {
-            paths = new List<string>() { path };
-        }
-
-
-        public List<BillPart> Load()
-        {
-            loaded = new List<BillPart>();
+            PersonsBills = new List<PERS_LIST>();
+            CasesBills = new List<ZL_LIST>();
 
             var allFiles = paths.SelectMany(x => Directory.GetFiles(x, "*.*", SearchOption.AllDirectories)).ToList();
 
@@ -43,7 +29,7 @@ namespace CHI.Services
             {
                 using var file = new FileStream(xmlFilePath, FileMode.Open);
                 var fileName = Path.GetFileName(xmlFilePath);
-                AddToLoaded(fileName, file);
+                AddToBillsLists(fileName, file);
             }
 
             foreach (var zipFilePath in allFiles.Where(x => x.EndsWith(".zip", comparer)))
@@ -51,8 +37,6 @@ namespace CHI.Services
                 using var zipFile = new FileStream(zipFilePath, FileMode.Open);
                 LoadFromArchiveRecursive(zipFile);
             }
-
-            return loaded;
         }
 
         void LoadFromArchiveRecursive(Stream zipFile)
@@ -70,7 +54,7 @@ namespace CHI.Services
                 if (extension.Equals(".xml", comparer))
                 {
                     using var file = archiveEntry.Open();
-                    AddToLoaded(archiveEntry.Name, file);
+                    AddToBillsLists(archiveEntry.Name, file);
                 }
                 else if (extension.Equals(".zip", comparer))
                 {
@@ -80,17 +64,17 @@ namespace CHI.Services
             }
         }
 
-        void AddToLoaded(string fileName, Stream file)
+        void AddToBillsLists(string fileName, Stream file)
         {
             if (fileName.StartsWith("L", comparer))
             {
                 var persList = Deserialize<PERS_LIST>(file);
-                loaded.Add(persList);
+                PersonsBills.Add(persList);
             }
             else
             {
                 var zlList = Deserialize<ZL_LIST>(file);
-                loaded.Add(zlList);
+                CasesBills.Add(zlList);
             }
         }
 

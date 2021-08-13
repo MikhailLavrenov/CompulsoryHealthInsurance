@@ -22,11 +22,9 @@ namespace CHI.Services
         /// <returns></returns>
         public Register GetRegister(IEnumerable<string> filePaths)
         {
-            var loader = new XmlBillsLoader(filePaths);
-            var billParts = loader.Load();
-            var builder = new BillsRegisterBulder();
-            builder.Add(billParts);
-            var billsRegister = builder.Build();
+            var xmlLoader = new XmlBillsLoader();
+            xmlLoader.Load(filePaths);
+            var billsRegister =  BillsRegister.Create(xmlLoader.PersonsBills, xmlLoader.CasesBills);
 
             return ConvertToRegister(billsRegister);
         }
@@ -36,7 +34,6 @@ namespace CHI.Services
         /// </summary>
         Register ConvertToRegister(BillsRegister billsRegister)
         {
-
             var firstFileName = billsRegister.Bills.First().Cases.ZGLV.FILENAME;
             var titleIndex = firstFileName.IndexOfAny("0123456789".ToCharArray());
 
