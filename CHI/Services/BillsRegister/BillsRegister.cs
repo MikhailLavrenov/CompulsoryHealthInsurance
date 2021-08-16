@@ -4,6 +4,9 @@ using System.Linq;
 
 namespace CHI.Services
 {
+    /// <summary>
+    /// Реестр-счетов
+    /// </summary>
     public class BillsRegister
     {
         public int Month { get; }

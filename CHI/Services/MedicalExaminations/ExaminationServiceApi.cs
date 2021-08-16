@@ -13,14 +13,12 @@ namespace CHI.Services.MedicalExaminations
     /// </summary>
     public class ExaminationServiceApi : WebServiceBase
     {
-        #region Свойства
         /// <summary>
         /// ФОМС код медицинской организации
         /// </summary>
         public string FomsCodeMO { get; private set; }
-        #endregion
 
-        #region Конструкторы
+
         /// <summary>
         /// Конструктор
         /// </summary>
@@ -31,9 +29,8 @@ namespace CHI.Services.MedicalExaminations
         protected ExaminationServiceApi(string URL, bool useProxy, string proxyAddress = null, int? proxyPort = null)
             : base(URL, useProxy, proxyAddress, proxyPort)
         { }
-        #endregion
 
-        #region Методы
+
         /// <summary>
         /// Авторизация на сайте. При успешной авторизации инициализирует FomsCodeMO.
         /// </summary>
@@ -49,12 +46,12 @@ namespace CHI.Services.MedicalExaminations
             var responseText = SendRequest(HttpMethod.Post, @"account/login", requestValues);
 
             if (!string.IsNullOrEmpty(responseText) && !responseText.Contains(@"<li>Пользователь не найден</li>"))
-            {                
-                FomsCodeMO= SubstringBetween(responseText, "<div>", "<div>", "</div>");
+            {
+                FomsCodeMO = SubstringBetween(responseText, "<div>", "<div>", "</div>");
                 return IsAuthorized = true;
             }
             else
-            {                
+            {
                 FomsCodeMO = null;
                 return IsAuthorized = false;
             }
@@ -326,154 +323,9 @@ namespace CHI.Services.MedicalExaminations
 
             return string.Empty;
         }
-        #endregion
 
         #region Классы для десериализации
-        /// <summary>
-        /// Представляет информацию о прохождении пациентом осмотров в конкретному году
-        /// </summary>
-        public class WebPatientData
-        {
-            /// <summary>
-            /// Id пациента в портале диспансеризации
-            /// </summary>
-            public int Id { get; set; }
-            /// <summary>
-            /// Id пациента в СРЗ
-            /// </summary>
-            public int PersonId { get; set; }
-            /// <summary>
-            /// Дата начала 1ого этапа
-            /// </summary>
-            public DateTime? Disp1BeginDate { get; set; }
-            /// <summary>
-            /// Дата окончания 1ого этапа
-            /// </summary>
-            public DateTime? Disp1Date { get; set; }
-            /// <summary>
-            /// Группа здоровья 1ого этапа
-            /// </summary>
-            public HealthGroup? Stage1ResultId { get; set; }
-            /// <summary>
-            /// Направление по результатам 1ого этапа
-            /// </summary>
-            public Referral? Stage1DestId { get; set; }
-            /// <summary>
-            /// Дата направления на 2ой этап
-            /// </summary>
-            public DateTime? Disp2DirectDate { get; set; }
-            /// <summary>
-            /// Дата начала 2ого этапа
-            /// </summary>
-            public DateTime? Disp2BeginDate { get; set; }
-            /// <summary>
-            /// Дата окончания 2ого этапа
-            /// </summary>
-            public DateTime? Disp2Date { get; set; }
-            /// <summary>
-            /// Группа здоровья 2ого этапа
-            /// </summary>
-            public HealthGroup? Stage2ResultId { get; set; }
-            /// <summary>
-            /// Направление по результатам 2ого этапа
-            /// </summary>
-            public Referral? Stage2DestId { get; set; }
-            ///// <summary>
-            ///// Итоговая дата завершения прохождения осмотра 
-            ///// </summary>
-            //public DateTime? DispSuccessDate { get; set; }
-            /// <summary>
-            /// Дата отказа от прохождения осмотра
-            /// </summary>
-            public DateTime? DispCancelDate { get; set; }
-            /// <summary>
-            /// Вид осмотра
-            /// </summary>
-            public ExaminationKind DispType { get; set; }
-            public int YearId { get; set; }
-        }
-        /// <summary>
-        /// Представляет ответ веб-сервера при поиске пациента в плане осмотров
-        /// </summary>
-        protected class PlanResponse
-        {
-            /// <summary>
-            /// Список WebPatientData
-            /// </summary>
-            public List<WebPatientData> Data { get; set; }
-        }
-        /// <summary>
-        /// Представляет простой ответ веб-сервер о результате выполнения запроса
-        /// </summary>
-        protected class WebResponse
-        {
-            /// <summary>
-            /// Возникла ошибка, true-ошибка, false-без ошибок.
-            /// </summary>
-            public bool IsError { get; set; }
-        }
-        /// <summary>
-        /// Представляет ответ веб-сервера о списке дальнейших возможных шагов
-        /// </summary>
-        public class AvailableStagesResponse
-        {
-            /// <summary>
-            /// Список дальнейших возможных шагов
-            /// </summary>
-            public List<AvailableStage> AvailableStages { get; set; }
-        }
-        /// <summary>
-        /// Представляет информацию о списке дальнейших возможных шагов
-        /// </summary>
-        public class AvailableStage
-        {
-            /// <summary>
-            /// Текущий шаг осмотра
-            /// </summary>
-            public StepKind StageId { get; set; }
-            /// <summary>
-            /// Следующий шаг осмотра
-            /// </summary>
-            public int NextStageId { get; set; }
-            /// <summary>
-            /// Предыдущий шаг осмотра
-            /// </summary>
-            public object PreviousStageId { get; set; }
-        }
-        /// <summary>
-        /// Представляет ответ веб-сервера при удалении последнго шага осмотра
-        /// </summary>
-        public class DeleteLastStepResponse
-        {
-            /// <summary>
-            /// Возникла ошибка, true-ошибка, false-без ошибок.
-            /// </summary>
-            public bool IsError { get; set; }
-            /// <summary>
-            /// Список выполненных шагов
-            /// </summary>
-            public List<StepData> Data { get; set; }
-        }
-        /// <summary>
-        /// Представляет информацию и шагах осмотра
-        /// </summary>
-        public class StepData
-        {
-            /// <summary>
-            /// Шаг осмотра
-            /// </summary>
-            public Step DispStage { get; set; }
-        }
-        /// <summary>
-        /// Предствляет шаг 
-        /// </summary>
-        public class Step
-        {
-            /// <summary>
-            /// Вид шага
-            /// </summary>
-            public StepKind DispStageId { get; set; }
-        }
+
         #endregion
     }
 }

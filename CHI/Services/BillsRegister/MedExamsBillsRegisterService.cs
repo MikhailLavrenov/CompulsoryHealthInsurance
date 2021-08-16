@@ -4,12 +4,12 @@ using System.Linq;
 
 namespace CHI.Services
 {
-    public class ExaminationsFomsXmlRegisterService
+    public class MedExamsBillsRegisterService
     {
         /// <summary>
-        /// Получает список периодических осмотров пациентов из xml файлов реестров-счетов. Среди всех файлов выбирает только необходимые.
+        /// Получает список медосмотров пациентов из xml файлов реестра-счетов за один период.
         /// </summary>
-        /// <param name="filePaths">Путь к xml файлам реестров-счетов. (может быть папками, xml файлами и/или zip архивами)</param>
+        /// <param name="filePaths">Пути к xml файлам реестров-счетов. (может быть папками, xml файлами и/или zip архивами)</param>
         /// <returns></returns>
         public List<PatientExaminations> GetPatientExaminationsList(IEnumerable<string> filePaths)
         {
@@ -17,11 +17,6 @@ namespace CHI.Services
             xmlLoader.Load(filePaths);
             var billsRegister = BillsRegister.Create(xmlLoader.PersonsBills, xmlLoader.CasesBills);
 
-            return GetPatientExaminationsListInternal(billsRegister);
-        }
-
-        List<PatientExaminations> GetPatientExaminationsListInternal(BillsRegister billsRegister)
-        {
             var result = new Dictionary<string, PatientExaminations>();
 
             foreach (var bill in billsRegister.Bills)
@@ -35,35 +30,14 @@ namespace CHI.Services
 
                 foreach (var billCase in bill.Cases.ZAP)
                 {
-                    var examination = new Examination();
+                    var examination = GetExamination(billCase, examinationStage);
 
-                    if (examinationStage == 1)
-                        examination.BeginDate = billCase.Z_SL.SL.USL.First(x => x.CODE_USL == 24101).DATE_IN;
-                    else
-                        examination.BeginDate = billCase.Z_SL.SL.DATE_1;
-
-                    examination.EndDate = billCase.Z_SL.SL.DATE_2;
-
-                    if (TryGetHealthGroup(billCase.Z_SL.RSLT_D, out var healthGroup))
+                    if (examination.HealthGroup == HealthGroup.None)
                         continue;
 
-                    examination.HealthGroup = healthGroup;
-
-                    var naz_r = billCase.Z_SL.SL.NAZ.FirstOrDefault()?.NAZ_R ?? 0;
-
-                    examination.Referral = GetRefferal(healthGroup, naz_r);
-
-                    string insuranceNumber;
-
-                    if (string.IsNullOrEmpty(billCase.PACIENT.SPOLIS))
-                        insuranceNumber = billCase.PACIENT.NPOLIS;
-                    else
-                        insuranceNumber = $"{billCase.PACIENT.SPOLIS} {billCase.PACIENT.NPOLIS}";
-
+                    var insuranceNumber = GetInsuranceNumber(billCase.PACIENT.SPOLIS, billCase.PACIENT.NPOLIS);
                     var examinationYear = billCase.Z_SL.SL.DATE_2.Year;
-
                     var patient = billPersons[billCase.PACIENT.ID_PAC];
-
                     var examinationKind = GetExaminationType(bill.Cases.SCHET.DISP, examinationYear - patient.DR.Year);
 
                     PatientExaminations patientExamination;
@@ -90,6 +64,34 @@ namespace CHI.Services
             }
 
             return result.Values.ToList();
+        }      
+
+        string GetInsuranceNumber (string SPOLIS, string NPOLIS)
+        {
+            if (string.IsNullOrEmpty(SPOLIS))
+                return NPOLIS;
+            else
+                return $"{SPOLIS} {NPOLIS}";
+        }
+
+        Examination GetExamination(ZAP billCase, int examinationStage)
+        {
+            var examination = new Examination();
+
+            if (examinationStage == 1)
+                examination.BeginDate = billCase.Z_SL.SL.USL.First(x => x.CODE_USL == 24101).DATE_IN;
+            else
+                examination.BeginDate = billCase.Z_SL.SL.DATE_1;
+
+            examination.EndDate = billCase.Z_SL.SL.DATE_2;
+
+            examination.HealthGroup = GetHealthGroup(billCase.Z_SL.RSLT_D);
+
+            var naz_r = billCase.Z_SL.SL.NAZ.FirstOrDefault()?.NAZ_R ?? 0;
+
+            examination.Referral = GetRefferal(examination.HealthGroup, naz_r);
+
+            return examination;
         }
 
         bool TryGetExaminationStage(string DISP, out int stage)
@@ -123,30 +125,25 @@ namespace CHI.Services
             }
         }
 
-        bool TryGetHealthGroup(int RSLT_D, out HealthGroup healthGroup)
+        HealthGroup GetHealthGroup(int RSLT_D)
         {
             switch (RSLT_D)
             {
                 case 1:
-                    healthGroup = HealthGroup.First;
-                    return true;
+                    return HealthGroup.First;
                 case 2:
                 case 12:
-                    healthGroup = HealthGroup.Second;
-                    return true;
+                    return HealthGroup.Second;
                 case 31:
                 case 33:
                 case 14:
-                    healthGroup = HealthGroup.ThirdA;
-                    return true;
+                    return HealthGroup.ThirdA;
                 case 32:
                 case 34:
                 case 15:
-                    healthGroup = HealthGroup.ThirdB;
-                    return true;
+                    return HealthGroup.ThirdB;
                 default:
-                    healthGroup = HealthGroup.None;
-                    return false;
+                   return HealthGroup.None;
             }
         }
 

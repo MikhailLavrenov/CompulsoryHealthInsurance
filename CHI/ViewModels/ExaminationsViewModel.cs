@@ -1,6 +1,6 @@
 ﻿using CHI.Infrastructure;
 using CHI.Models;
-using CHI.Services.BillsRegister;
+using CHI.Services;
 using CHI.Services.Common;
 using CHI.Services.MedicalExaminations;
 using Prism.Regions;
@@ -72,7 +72,7 @@ namespace CHI.ViewModels
             //    Stage1 = examination1Stage,
             //    Stage2 = examination2Stage
             //};
-            
+
             //Result = new List<Tuple<PatientExaminations, bool, string>> {
             //    new Tuple<PatientExaminations, bool,string>(pe, true, ""),
             //    new Tuple<PatientExaminations,bool, string>(pe, true, ""),
@@ -120,11 +120,11 @@ namespace CHI.ViewModels
                 return;
             }
 
-            Settings.ExaminationsFileDirectory =Path.GetDirectoryName(fileDialogService.FileNames.FirstOrDefault());
+            Settings.ExaminationsFileDirectory = Path.GetDirectoryName(fileDialogService.FileNames.FirstOrDefault());
 
             MainRegionService.ShowProgressBar("Чтение файлов.");
 
-            var registers = new BillsRegisterService(fileDialogService.FileNames);
+            var registers = new MedExamsBillsRegisterService();
             var patientsFileNames = Settings.PatientFileNames.Split(',');
             var examinationFileNames = Settings.ExaminationFileNames.Split(',');
 
@@ -133,7 +133,7 @@ namespace CHI.ViewModels
             for (int i = 0; i < examinationFileNames.Length; i++)
                 examinationFileNames[i] = examinationFileNames[i].Trim();
 
-            var patientsExaminations = registers.GetPatientsExaminations(examinationFileNames, patientsFileNames);
+            var patientsExaminations = registers.GetPatientExaminationsList(fileDialogService.FileNames);
 
             var maxDate1 = patientsExaminations.Max(x => x.Stage1?.EndDate);
             var maxDate2 = patientsExaminations.Max(x => x.Stage2?.EndDate);
@@ -214,7 +214,7 @@ namespace CHI.ViewModels
                                 //универсальный InterLocked-паттерн, потокобезопасно уменьшает sleepRate если он положительный
                                 int initial, desired;
 
-                                do 
+                                do
                                 {
                                     initial = sleepTime;
                                     desired = initial;

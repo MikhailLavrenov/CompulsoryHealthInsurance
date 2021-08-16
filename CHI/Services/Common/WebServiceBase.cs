@@ -11,20 +11,17 @@ namespace CHI.Services.Common
     /// </summary>
     public abstract class WebServiceBase : IDisposable
     {
-        #region Поля   
         private HttpClient client;
-        #endregion
 
-        #region Свойства
+
         /// <summary>
         /// Авторизация пройдена успешно
         /// </summary>
         public bool IsAuthorized { get; protected set; }
-        #endregion
 
-        #region Конструкторы
+
         /// <summary>
-        /// Конструктор
+        ///
         /// </summary>
         /// <param name="URL">URL</param>
         /// <param name="useProxy">Использовать прокси-сервер</param>
@@ -47,9 +44,8 @@ namespace CHI.Services.Common
             client.BaseAddress = new Uri(URL);
             client.Timeout = new TimeSpan(0, 2, 0);
         }
-        #endregion
 
-        #region Методы
+
         /// <summary>
         /// Отправка HTTP-запроса
         /// </summary>
@@ -70,6 +66,7 @@ namespace CHI.Services.Common
 
             return response.Content.ReadAsStringAsync().ConfigureAwait(false).GetAwaiter().GetResult();
         }
+
         /// <summary>
         /// Отправка HTTP GET-запроса
         /// </summary>
@@ -85,6 +82,7 @@ namespace CHI.Services.Common
 
             return response.Content.ReadAsStreamAsync().ConfigureAwait(false).GetAwaiter().GetResult();
         }
+
         /// <summary>
         /// Проверяет авторизацию, вызывает исключение, если авторизация не пройдена
         /// </summary>
@@ -96,6 +94,7 @@ namespace CHI.Services.Common
             if (!IsAuthorized)
                 throw new UnauthorizedAccessException("Сначала необходимо авторизоваться.");
         }
+
         /// <summary>
         /// Освобождает неуправляемые ресурсы.
         /// </summary>
@@ -103,6 +102,6 @@ namespace CHI.Services.Common
         {
             client?.Dispose();
         }
-        #endregion
+
     }
 }
