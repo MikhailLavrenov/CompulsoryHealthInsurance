@@ -2,6 +2,9 @@
 
 namespace CHI.Services
 {
+    /// <summary>
+    /// Ппациенты и случаи одного счета
+    /// </summary>
     public class BillPair
     {
         public PERS_LIST Persons { get; private set; }

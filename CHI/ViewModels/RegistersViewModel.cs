@@ -1,7 +1,6 @@
 ﻿using CHI.Infrastructure;
 using CHI.Models.ServiceAccounting;
 using CHI.Services;
-using CHI.Services.BillsRegister;
 using Microsoft.EntityFrameworkCore;
 using Prism.Regions;
 using System;
@@ -58,8 +57,8 @@ namespace CHI.ViewModels
 
             mainRegionService.ShowProgressBar("Загрузка xml-реестров");
 
-            var registerService = new BillsRegisterService(fileDialogService.FileNames);
-            var register = registerService.GetRegister(false);
+            var registerService = new BillsRegisterService();
+            var register = registerService.GetRegister(fileDialogService.FileNames);
 
             using var localDbContext = new AppDBContext();
 
@@ -222,8 +221,8 @@ namespace CHI.ViewModels
 
             mainRegionService.ShowProgressBar("Загрузка xml-реестров");
 
-            var registerService = new BillsRegisterService(fileDialogService.FileNames);
-            var paidRegister = registerService.GetRegister(true);
+            var registerService = new BillsRegisterService();
+            var paidRegister = registerService.GetRegister(fileDialogService.FileNames);
 
             var dbContext = new AppDBContext();
 

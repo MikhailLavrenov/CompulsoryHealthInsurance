@@ -7,14 +7,19 @@ using System.Xml.Serialization;
 
 namespace CHI.Services
 {
+    /// <summary>
+    /// Загружает реестры-счетов из xml файлов.
+    /// </summary>
     public class XmlBillsLoader
     {
         static readonly StringComparison comparer = StringComparison.OrdinalIgnoreCase;
-        List<string> paths;
         public List<PERS_LIST> PersonsBills { get; private set; }
         public List<ZL_LIST> CasesBills { get; private set; }
 
-
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="paths">Пути к xml файлам реестров-счетов. (может быть папками, xml файлами и/или zip архивами)</param>
         public void Load(IEnumerable<string> paths)
         {
             PersonsBills = new List<PERS_LIST>();
