@@ -2,41 +2,29 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 
 namespace CHI.Services
 {
-    public class PaymentFomsXmlRegisterService : FomsXmlRegisterServiceBase
+    public class PaymentFomsXmlRegisterService
     {
-        public PaymentFomsXmlRegisterService(IEnumerable<string> filePaths) : base(filePaths)
-        {
-        }
-
-        public PaymentFomsXmlRegisterService(string filePath) : base(filePath)
-        {
-        }
-
-
         /// <summary>
         /// Получает счет-реестр за один период (отчетный месяц года)
         /// </summary>
+        /// <param name="filePaths">Путь к xml файлам реестров-счетов. (может быть папками, xml файлами и/или zip архивами)</param>
         /// <returns></returns>
-        public Register GetRegister()
+        public Register GetRegister(IEnumerable<string> filePaths)
         {
-            var fomsRegistersFiles = GetXmlFiles(new Regex("^(?!L)", RegexOptions.IgnoreCase));
-            var fomsRegisters = DeserializeXmlFiles<ZL_LIST>(fomsRegistersFiles);
+            var xmlLoader = new XmlBillsLoader();
+            xmlLoader.Load(filePaths);
+            var billsRegister = BillsRegister.Create(xmlLoader.PersonsBills, xmlLoader.CasesBills);
 
-            foreach (var fomsRegistersFile in fomsRegistersFiles)
-                fomsRegistersFile.Dispose();
-
-            return ConvertToRegisterWithPayment(fomsRegisters);
-
+            return GetRegisterInternal(billsRegister);
         }
 
         /// <summary>
         /// Конвертирует типы xml реестров-счетов в Register.
         /// </summary>
-        Register ConvertToRegisterWithPayment(IEnumerable<ZL_LIST> fomsRegisters)
+        Register GetRegisterInternal(BillsRegister billsRegister)
         {
             foreach (var item in fomsRegisters)
                 if (fomsRegisters.First().SCHET.MONTH != item.SCHET.MONTH || fomsRegisters.First().SCHET.YEAR != item.SCHET.YEAR)

@@ -30,24 +30,29 @@ namespace CHI.Services.MedicalExaminations
         /// <summary>
         /// 1й этап профилактического осмотра
         /// </summary>
-        public Examination Stage1 { get; set; }
+        public Examination Stage1 { get; private set; }
         /// <summary>
         /// 2й этап профилактического осмотра
         /// </summary>
-        public Examination Stage2 { get; set; }
+        public Examination Stage2 { get; private set; }
         /// <summary>
         /// Год прохождения профилактического осмотра
         /// </summary>
-        public int Year { get; private set; }
+        public int Year { get; set; }
         /// <summary>
         /// Вид профилактического осмотра
         /// </summary>
-        public ExaminationKind Kind { get; private set; }
+        public ExaminationKind Kind { get; set; }
+
+
+        public PatientExaminations()
+        {
+        }
 
         /// <summary>
-        /// Конструктор
+        /// 
         /// </summary>
-        /// <param name="insuranceNumber">Серия и/или номер полиса ОМС</param>
+        /// <param name="insuranceNumber">Серия и номер полиса ОМС</param>
         /// <param name="year">Год прохождения профилактического осмотра</param>
         /// <param name="examinationKind">Вид профилактического осмотра</param>
         public PatientExaminations(string insuranceNumber, int year, ExaminationKind examinationKind)
@@ -55,6 +60,15 @@ namespace CHI.Services.MedicalExaminations
             InsuranceNumber = insuranceNumber;
             Year = year;
             Kind = examinationKind;
+        }
+
+
+        public void AddStage(int stageNumber, Examination examination)
+        {
+            if (stageNumber == 1)
+                Stage1 = examination;
+            else if (stageNumber == 2)
+                Stage2 = examination;
         }
     }
 }
