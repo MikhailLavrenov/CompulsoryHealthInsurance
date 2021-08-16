@@ -7,32 +7,21 @@ namespace CHI.Services
 {
     public class FomsXmlRegisterService
     {
-        public FomsXmlRegisterService()
-        {
-        }
-
-        public FomsXmlRegisterService(string filePath)
-        {
-        }
-
-
         /// <summary>
         /// Получает счет-реестр за один период (отчетный месяц года)
         /// </summary>
+        /// <param name="filePaths">Путь к xml файлам реестров-счетов. (может быть папками, xml файлами и/или zip архивами)</param>
         /// <returns></returns>
         public Register GetRegister(IEnumerable<string> filePaths)
         {
             var xmlLoader = new XmlBillsLoader();
             xmlLoader.Load(filePaths);
-            var billsRegister =  BillsRegister.Create(xmlLoader.PersonsBills, xmlLoader.CasesBills);
+            var billsRegister = BillsRegister.Create(xmlLoader.PersonsBills, xmlLoader.CasesBills);
 
-            return ConvertToRegister(billsRegister);
+            return GetRegisterInternal(billsRegister);
         }
 
-        /// <summary>
-        /// Конвертирует типы xml реестров-счетов в Register.
-        /// </summary>
-        Register ConvertToRegister(BillsRegister billsRegister)
+        Register GetRegisterInternal(BillsRegister billsRegister)
         {
             var firstFileName = billsRegister.Bills.First().Cases.ZGLV.FILENAME;
             var titleIndex = firstFileName.IndexOfAny("0123456789".ToCharArray());
@@ -46,32 +35,32 @@ namespace CHI.Services
             };
 
             foreach (var bill in billsRegister.Bills)
-                foreach (var fomsCase in bill.Cases.ZAP)
+            {
+                var billPersons = bill.Persons.PERS.ToDictionary(x => x.ID_PAC, x => x);
+
+                foreach (var billCase in bill.Cases.ZAP)
                 {
-                    var foundPatient = bill.Persons.PERS.FirstOrDefault(x => x.ID_PAC == fomsCase.PACIENT.ID_PAC);
+                    var foundPatient = billPersons[billCase.PACIENT.ID_PAC];
 
-                    if (foundPatient == default)
-                        throw new InvalidOperationException($"В xml реестре не найдена информация о пациенте ID_PAC={fomsCase.PACIENT.ID_PAC}, которому были оказаны услуги.");
-
-                    var ageYears = (DateTime.MinValue + (fomsCase.Z_SL.SL.DATE_2 - foundPatient.DR)).Year - 1;
+                    var ageYears = (DateTime.MinValue + (billCase.Z_SL.SL.DATE_2 - foundPatient.DR)).Year - 1;
 
                     var mCase = new Case()
                     {
-                        IdCase = fomsCase.Z_SL.SL.SL_ID,
-                        Place = fomsCase.Z_SL.USL_OK,
-                        VisitPurpose = fomsCase.Z_SL.SL.P_CEL,
-                        TreatmentPurpose = fomsCase.Z_SL.SL.CEL,
-                        DateEnd = fomsCase.Z_SL.SL.DATE_2,
+                        IdCase = billCase.Z_SL.SL.SL_ID,
+                        Place = billCase.Z_SL.USL_OK,
+                        VisitPurpose = billCase.Z_SL.SL.P_CEL,
+                        TreatmentPurpose = billCase.Z_SL.SL.CEL,
+                        DateEnd = billCase.Z_SL.SL.DATE_2,
                         AgeKind = ageYears < 18 ? AgeKind.Сhildren : AgeKind.Adults,
-                        BedDays = fomsCase.Z_SL.SL.KD,
-                        PaidStatus = (PaidKind)fomsCase.Z_SL.OPLATA,
-                        AmountPaid = fomsCase.Z_SL.SUMP,
-                        AmountUnpaid = fomsCase.Z_SL.SANK_IT,
-                        Employee = Employee.CreateUnknown(fomsCase.Z_SL.SL.IDDOKT, fomsCase.Z_SL.SL.PRVS),
+                        BedDays = billCase.Z_SL.SL.KD,
+                        PaidStatus = (PaidKind)billCase.Z_SL.OPLATA,
+                        AmountPaid = billCase.Z_SL.SUMP,
+                        AmountUnpaid = billCase.Z_SL.SANK_IT,
+                        Employee = Employee.CreateUnknown(billCase.Z_SL.SL.IDDOKT, billCase.Z_SL.SL.PRVS),
                         Services = new List<Service>()
                     };
 
-                    foreach (var fomsServices in fomsCase.Z_SL.SL.USL)
+                    foreach (var fomsServices in billCase.Z_SL.SL.USL)
                     {
                         var service = new Service()
                         {
@@ -85,8 +74,8 @@ namespace CHI.Services
                     }
 
                     register.Cases.Add(mCase);
-
                 }
+            }
 
             register.CasesCount = register.Cases.Count;
 

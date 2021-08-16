@@ -15,9 +15,6 @@ namespace CHI.Services
         public List<ZL_LIST> CasesBills { get; private set; }
 
 
-        public void Load(string path) 
-            => Load(new List<string>() { path });
-
         public void Load(IEnumerable<string> paths)
         {
             PersonsBills = new List<PERS_LIST>();
