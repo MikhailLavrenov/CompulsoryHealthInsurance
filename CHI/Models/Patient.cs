@@ -1,6 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
-using System.Text;
+﻿using System.Text;
 
 namespace CHI.Models
 {
@@ -9,17 +7,15 @@ namespace CHI.Models
     /// </summary>
     public class Patient
     {
-        #region Поля
         public string insuranceNumber;
         public string initials;
-        #endregion
 
-        #region Свойства
+
         /// <summary>
         /// Серия и/или номер полиса
         /// </summary>
         public int Id { get; set; }
-        public string InsuranceNumber { get=> insuranceNumber; set=> insuranceNumber=value.ToUpper(); }
+        public string InsuranceNumber { get => insuranceNumber; set => insuranceNumber = value.ToUpper(); }
         /// <summary>
         /// Инициалы ФИО
         /// </summary>
@@ -40,11 +36,10 @@ namespace CHI.Models
         /// Имеется полное ФИО
         /// </summary>
         public bool FullNameExist { get; set; }
-        #endregion
 
-        #region Конструкторы
+
         /// <summary>
-        /// Конструктор.
+        /// 
         /// </summary>
         /// <param name="insuranceNumber">Серия и/или номер полиса</param>
         /// <param name="surname">Фамилия</param>
@@ -59,8 +54,9 @@ namespace CHI.Models
             DefineInitilas();
             FullNameExist = true;
         }
+
         /// <summary>
-        /// Конструктор.
+        /// 
         /// </summary>
         /// <param name="insuranceNumber">Серия и/или номер полиса/</param>
         /// <param name="initials">Инициалы ФИО/</param>
@@ -70,14 +66,11 @@ namespace CHI.Models
             Initials = initials;
             FullNameExist = false;
         }
-        /// <summary>
-        /// Конструктор по умолчанию.
-        /// </summary>
+
         public Patient()
         { }
-        #endregion
 
-        #region Методы
+
         /// <summary>
         /// определяет инициалы по полному ФИО/
         /// </summary>
@@ -94,6 +87,5 @@ namespace CHI.Models
 
             Initials = str.ToString();
         }
-         #endregion
     }
 }

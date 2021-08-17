@@ -11,7 +11,7 @@ namespace CHI.Services.Common
     /// </summary>
     public abstract class WebServiceBase : IDisposable
     {
-        private HttpClient client;
+        HttpClient client;
 
 
         /// <summary>
@@ -42,7 +42,7 @@ namespace CHI.Services.Common
 
             client = new HttpClient(clientHandler);
             client.BaseAddress = new Uri(URL);
-            client.Timeout = new TimeSpan(0, 2, 0);
+            client.Timeout = new TimeSpan(0, 2, 0);            
         }
 
 
@@ -95,13 +95,9 @@ namespace CHI.Services.Common
                 throw new UnauthorizedAccessException("Сначала необходимо авторизоваться.");
         }
 
-        /// <summary>
-        /// Освобождает неуправляемые ресурсы.
-        /// </summary>
         public virtual void Dispose()
         {
             client?.Dispose();
         }
-
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CHI.Models;
+using System;
 using System.Collections.Generic;
 
 namespace CHI.Services.MedicalExaminations

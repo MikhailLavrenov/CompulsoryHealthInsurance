@@ -9,22 +9,16 @@ namespace CHI.Models
 {
     public class Credential : DomainObject, ICredential
     {
-        #region Поля
         private string login;
         private string password;
-        #endregion
 
-        #region Свойства
+
         [XmlIgnore] public string Login { get => login; set => SetProperty(ref login, value); }        
         [XmlIgnore] public string Password { get => password; set => SetProperty(ref password, value); }
         public string ProtectedLogin { get; set; }
         public string ProtectedPassword { get; set; }
-        #endregion
 
-        #region Конструкторы
-        #endregion
 
-        #region Методы
         //валидация свойств
         public override void Validate(string propertyName = null)
         {
@@ -34,18 +28,21 @@ namespace CHI.Models
             if (propertyName == nameof(Password) || propertyName == null)
                 ValidateIsNullOrEmptyString(nameof(Password), Password);
         }
+
         //шифрует учетные данные в соответствии с видимостью
         public void Encrypt(CredentialScope scope)
         {
             ProtectedLogin = InternalEncrypt(Login, scope);
             ProtectedPassword = InternalEncrypt(Password, scope);
         }
+
         //расшифровывает текст в соответствии с видимостью
         public void Decrypt(CredentialScope scope)
         {
             Login = InternalDecrypt(ProtectedLogin, scope);
             Password = InternalDecrypt(ProtectedPassword, scope);
         }
+
         //шифрует текст в соответствии с видимостью
         private static string InternalEncrypt(string text, CredentialScope scope)
         {
@@ -62,6 +59,7 @@ namespace CHI.Models
 
             return Convert.ToBase64String(protectedText);
         }
+
         //расшифровывает текст в соответствии с видимостью
         private static string InternalDecrypt(string text, CredentialScope scope)
         {
@@ -77,6 +75,5 @@ namespace CHI.Models
             var unprotectedText = ProtectedData.Unprotect(byteText, null, protectionScope);
             return Encoding.Default.GetString(unprotectedText);
         }
-        #endregion
     }
 }

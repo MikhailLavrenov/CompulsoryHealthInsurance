@@ -11,7 +11,7 @@ namespace CHI.Services
     /// <summary>
     /// Cервис для работа с файлом прикрепленных пациентов
     /// </summary>
-    public class PatientsFileService : IDisposable
+    public class AttachedPatientsFileService : IDisposable
     {
         ExcelPackage excel;
         ExcelWorksheet sheet;
@@ -31,7 +31,7 @@ namespace CHI.Services
         /// </summary>
         /// <param name="xlsxFilePath">Полный путь к xlsx файлу.</param>
         /// <param name="columnProperties">Коллекиця настроиваемых свойств столбоц файла.</param>
-        public PatientsFileService(string xlsxFilePath, IEnumerable<IColumnProperties> columnProperties)
+        public AttachedPatientsFileService(string xlsxFilePath, IEnumerable<IColumnProperties> columnProperties)
         {
 
             excel = new ExcelPackage(new FileInfo(xlsxFilePath));
@@ -93,19 +93,6 @@ namespace CHI.Services
                 .FirstOrDefault();
 
             return cell?.Start.Column ?? -1;
-
-            //for (int col = 1; col <= maxCol; col++)
-            //{
-            //    var cellValue = sheet.Cells[headerRowIndex, col].Value;
-
-            //    if (cellValue == null)
-            //        continue;
-
-            //    var cellText = cellValue.ToString();
-            //    if ((cellText == name) || (cellText == altName))
-            //        return col;
-            //}
-            //return -1;
         }
 
         int FindColumnIndexByHeaderName(IColumnProperties columnProperties)

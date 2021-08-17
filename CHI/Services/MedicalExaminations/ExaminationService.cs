@@ -1,4 +1,5 @@
-﻿using CHI.Services.Common;
+﻿using CHI.Models;
+using CHI.Services.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,11 +11,9 @@ namespace CHI.Services.MedicalExaminations
     /// </summary>
     public class ExaminationService : ExaminationServiceApi
     {
-        #region Поля
-        private static readonly StepKind[] examinationSteps;
-        #endregion
+        static readonly StepKind[] examinationSteps;
 
-        #region Конструкторы
+
         /// <summary>
         /// Статический конструктор по-умолчанию
         /// </summary>
@@ -26,6 +25,7 @@ namespace CHI.Services.MedicalExaminations
                 .OrderBy(x => (int)x)
                 .ToArray();
         }
+
         /// <summary>
         /// Конструктор
         /// </summary>
@@ -36,9 +36,8 @@ namespace CHI.Services.MedicalExaminations
         public ExaminationService(string URL, bool useProxy, string proxyAddress = null, int? proxyPort = null)
             : base(URL, useProxy, proxyAddress, proxyPort)
         { }
-        #endregion
 
-        #region Методы
+
         /// <summary>
         /// Добавление пациента в нужный план, добавление информации о прохождении этапов профилактических осмотров.
         /// При необходимости удаление пациента из др. планов и информации о прохождении профилактических осмотров.
@@ -66,6 +65,7 @@ namespace CHI.Services.MedicalExaminations
 
             AddExaminationSteps(webPatientData.Id, userSteps, webSteps);
         }
+
         /// <summary>
         /// Добавление пациента в нужный план.
         /// При необходимости удаление пациента из др. планов и информации о прохождении профилактических осмотров.
@@ -73,7 +73,7 @@ namespace CHI.Services.MedicalExaminations
         /// <param name="patientExaminations">Экземпляр PatientExaminations</param>
         /// <param name="srzPatientId">Id пациента в СРЗ</param>
         /// <returns>Возвращает информацию о пациенте </returns>
-        private WebPatientData GetOrAddPatientToPlan(PatientExaminations patientExaminations, int? srzPatientId = null)
+        WebPatientData GetOrAddPatientToPlan(PatientExaminations patientExaminations, int? srzPatientId = null)
         {
             var webPatientData = GetPatientDataFromPlan(srzPatientId, patientExaminations.InsuranceNumber, patientExaminations.Kind, patientExaminations.Year);
 
@@ -120,6 +120,7 @@ namespace CHI.Services.MedicalExaminations
 
             return webPatientData;
         }
+
         /// <summary>
         /// Сравнение каждого шага, пропуск, добавление или замена информации о прохождении шагов профилактических осмотров. 
         /// В случае возникновения ошибки на стороне сервера - возврат изменений назад.
@@ -127,7 +128,7 @@ namespace CHI.Services.MedicalExaminations
         /// <param name="patientId">Id пациента</param>
         /// <param name="userSteps">Список добавляемых шагов</param>
         /// <param name="webSteps">Список шагов уже содержащихся в веб-портале</param>
-        private void AddExaminationSteps(int patientId, List<ExaminationStep> userSteps, List<ExaminationStep> webSteps)
+        void AddExaminationSteps(int patientId, List<ExaminationStep> userSteps, List<ExaminationStep> webSteps)
         {
             try
             {
@@ -181,6 +182,7 @@ namespace CHI.Services.MedicalExaminations
                 throw;
             }
         }
+
         /// <summary>
         /// Конвертация PatientExaminations в список ExaminationStep
         /// </summary>
@@ -189,7 +191,7 @@ namespace CHI.Services.MedicalExaminations
         /// Необходимо задать, если информация о прохождении пациентом профилактических осмотров содержит только 2ой этап.
         /// </param>
         /// <returns>Список ExaminationStep</returns>
-        private static List<ExaminationStep> ConvertToExaminationsSteps(PatientExaminations patientExaminations, DateTime? transfer2StageDate = null)
+        static List<ExaminationStep> ConvertToExaminationsSteps(PatientExaminations patientExaminations, DateTime? transfer2StageDate = null)
         {
             var examinationSteps = new List<ExaminationStep>();
 
@@ -247,12 +249,13 @@ namespace CHI.Services.MedicalExaminations
 
             return examinationSteps;
         }
+
         /// <summary>
         /// Конвертация WebPatientData в список ExaminationStep
         /// </summary>
         /// <param name="webPatientData">Экземпляр WebPatientData</param>
         /// <returns>Список ExaminationStep</returns>
-        private static List<ExaminationStep> ConvertToExaminationsSteps(WebPatientData webPatientData)
+        static List<ExaminationStep> ConvertToExaminationsSteps(WebPatientData webPatientData)
         {
             var examinationSteps = new List<ExaminationStep>();
 
@@ -318,26 +321,27 @@ namespace CHI.Services.MedicalExaminations
 
             return examinationSteps;
         }
+
         /// <summary>
         /// Добавление шага профилактического осмотра на веб-портал
         /// </summary>
         /// <param name="patientId">Id пациента</param>
         /// <param name="examinationStep">Информация о шаге профилактического осмотра</param>
         /// <returns>Текущий шаг прохождения профилактического осмотра</returns>
-        private StepKind AddStep(int patientId, ExaminationStep examinationStep)
+        StepKind AddStep(int patientId, ExaminationStep examinationStep)
         {
             AddStep(patientId, examinationStep.StepKind, examinationStep.Date, examinationStep.HealthGroup, examinationStep.Referral);
 
             return examinationStep.StepKind;
         }
+
         /// <summary>
         /// Удаление всех шагов
         /// </summary>
         /// <param name="patientId">Id пациента</param>
-        private void DeleteAllSteps(int patientId)
+        void DeleteAllSteps(int patientId)
         {
             while (DeleteLastStep(patientId) != 0) ;
         }
-        #endregion
     }
 }

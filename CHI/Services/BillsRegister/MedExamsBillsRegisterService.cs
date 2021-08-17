@@ -1,4 +1,4 @@
-﻿using CHI.Services.MedicalExaminations;
+﻿using CHI.Models;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -70,9 +70,9 @@ namespace CHI.Services
             }
 
             return result.Values.ToList();
-        }      
+        }
 
-        string GetInsuranceNumber (string SPOLIS, string NPOLIS)
+        string GetInsuranceNumber(string SPOLIS, string NPOLIS)
         {
             if (string.IsNullOrEmpty(SPOLIS))
                 return NPOLIS;
@@ -149,7 +149,7 @@ namespace CHI.Services
                 case 15:
                     return HealthGroup.ThirdB;
                 default:
-                   return HealthGroup.None;
+                    return HealthGroup.None;
             }
         }
 
