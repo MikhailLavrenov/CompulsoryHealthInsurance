@@ -17,15 +17,12 @@ namespace CHI.ViewModels
 {
     class ExaminationsViewModel : DomainObject, IRegionMemberLifetime
     {
-        #region Поля
-        private Settings settings;
-        private List<Tuple<PatientExaminations, bool, string>> result;
-        private bool showErrors;
+        Settings settings;
+        List<Tuple<PatientExaminations, bool, string>> result;
+        bool showErrors;
+        readonly IFileDialogService fileDialogService;
 
-        private readonly IFileDialogService fileDialogService;
-        #endregion
 
-        #region Свойства
         public IMainRegionService MainRegionService { get; set; }
         public ILicenseManager LicenseManager { get; set; }
         public bool KeepAlive { get => false; }
@@ -33,9 +30,8 @@ namespace CHI.ViewModels
         public List<Tuple<PatientExaminations, bool, string>> Result { get => result; set => SetProperty(ref result, value); }
         public Settings Settings { get => settings; set => SetProperty(ref settings, value); }
         public DelegateCommandAsync ExportExaminationsCommand { get; }
-        #endregion
 
-        #region Конструкторы
+
         public ExaminationsViewModel(IMainRegionService mainRegionService, IFileDialogService fileDialogService, ILicenseManager licenseManager)
         {
             this.fileDialogService = fileDialogService;
@@ -86,9 +82,8 @@ namespace CHI.ViewModels
             //    Result.Add(item);
             //}
         }
-        #endregion
 
-        #region Методы
+
         private void ExportExaminationsExecute()
         {
             Result?.Clear();
@@ -123,15 +118,10 @@ namespace CHI.ViewModels
             Settings.ExaminationsFileDirectory = Path.GetDirectoryName(fileDialogService.FileNames.FirstOrDefault());
 
             MainRegionService.ShowProgressBar("Чтение файлов.");
-
+            
             var registers = new MedExamsBillsRegisterService();
-            var patientsFileNames = Settings.PatientFileNames.Split(',');
-            var examinationFileNames = Settings.ExaminationFileNames.Split(',');
-
-            for (int i = 0; i < patientsFileNames.Length; i++)
-                patientsFileNames[i] = patientsFileNames[i].Trim();
-            for (int i = 0; i < examinationFileNames.Length; i++)
-                examinationFileNames[i] = examinationFileNames[i].Trim();
+            var fileFilter = $"{Settings.PatientFileNames},{Settings.ExaminationFileNames}".Split(',', StringSplitOptions.TrimEntries);
+            registers.XmlFileNameStartsWithFilter = fileFilter.ToList();
 
             var patientsExaminations = registers.GetPatientExaminationsList(fileDialogService.FileNames);
 
@@ -161,6 +151,7 @@ namespace CHI.ViewModels
             SleepMode.Allow();
             MainRegionService.HideProgressBar("Завершено.");
         }
+
         /// <summary>
         /// Загружает осмотры на портал диспансеризации. В случае возникновения исключений при загрузке осмотра - предпринимает несколько попыток.
         /// </summary>
@@ -271,9 +262,5 @@ namespace CHI.ViewModels
 
             return result.ToList();
         }
-        #endregion
-
-
-
     }
 }

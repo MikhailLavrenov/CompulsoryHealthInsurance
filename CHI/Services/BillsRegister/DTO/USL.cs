@@ -39,5 +39,10 @@ namespace CHI.Services
         /// </summary>
         [XmlElement(ElementName = "DATE_OUT")]
         public DateTime DATE_OUT { get; set; }
+        /// <summary>
+        /// Медицинские работники, выполнившие услугу
+        /// </summary>
+        [XmlElement(ElementName = "MR_USL_N")]
+        public MR_USL_N MR_USL_N { get; set; }
     }
 }

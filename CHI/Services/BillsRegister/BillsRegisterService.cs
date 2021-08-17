@@ -74,7 +74,7 @@ namespace CHI.Services
                     Code = fomsServices.CODE_USL,
                     Count = fomsServices.KOL_USL,
                     Date = fomsServices.DATE_OUT,
-                    Employee = Employee.CreateUnknown(fomsServices.CODE_MD, fomsServices.PRVS)
+                    Employee = Employee.CreateUnknown(fomsServices.MR_USL_N?.CODE_MD ?? fomsServices.CODE_MD, fomsServices.MR_USL_N?.PRVS ?? fomsServices.PRVS)
                 };
 
                 mCase.Services.Add(service);
