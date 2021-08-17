@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace CHI.Services.MedicalExaminations
+namespace CHI.Models
 {
     /// <summary>
     /// Группа здоровья

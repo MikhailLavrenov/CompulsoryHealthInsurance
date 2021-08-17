@@ -96,9 +96,6 @@ namespace CHI.Services
                 .HasMany(x => x.Parameters)
                 .WithOne(x => x.Employee)
                 .OnDelete(DeleteBehavior.Cascade);
-
-
-
         }
     }
 }

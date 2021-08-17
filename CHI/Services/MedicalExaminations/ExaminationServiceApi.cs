@@ -1,4 +1,5 @@
-﻿using CHI.Services.Common;
+﻿using CHI.Models;
+using CHI.Services.Common;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -181,9 +182,6 @@ namespace CHI.Services.MedicalExaminations
 
             var idString = SubstringBetween(responseText, "personId", "\"", "\"");
 
-            //if (responseText.IndexOf(">Застрахованное лицо находится в плане диспансеризации другой МО<") != -1)
-            //    throw new WebServiceOperationException("Пациент находится в плане др. ЛПУ");
-
             if (responseText.IndexOf(">Начата диспансеризация другой МО<") != -1)
                 throw new WebServiceOperationException("Ошибка добавления в план: При поиске в СРЗ установлено - периодический осмотр был выполнен в др. ЛПУ.");
 
@@ -323,9 +321,5 @@ namespace CHI.Services.MedicalExaminations
 
             return string.Empty;
         }
-
-        #region Классы для десериализации
-
-        #endregion
     }
 }

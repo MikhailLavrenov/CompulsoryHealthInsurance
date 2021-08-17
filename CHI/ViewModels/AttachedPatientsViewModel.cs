@@ -97,7 +97,7 @@ namespace CHI.ViewModels
 
             var db = dbLoadingTask.ConfigureAwait(false).GetAwaiter().GetResult();
 
-            using var file = new PatientsFileService(Settings.PatientsFilePath, Settings.ColumnProperties);
+            using var file = new AttachedPatientsFileService(Settings.PatientsFilePath, Settings.ColumnProperties);
             file.InsertPatientsWithFullName(db.Patients.ToList());
 
             var resultReport = new StringBuilder();

@@ -14,7 +14,6 @@ namespace CHI.ViewModels
     public class AttachedPatientsStorageSettingsViewModel : DomainObject, IRegionMemberLifetime
     {
         Settings settings;
-        IDialogService dialogService;
         readonly IFileDialogService fileDialogService;
         IMainRegionService mainRegionService;
         string patientsCount = "Вычисляется...";
@@ -28,10 +27,9 @@ namespace CHI.ViewModels
         public DelegateCommand ClearDatabaseCommand { get; }
 
 
-        public AttachedPatientsStorageSettingsViewModel(IMainRegionService mainRegionService, IFileDialogService fileDialogService, IDialogService dialogService)
+        public AttachedPatientsStorageSettingsViewModel(IMainRegionService mainRegionService, IFileDialogService fileDialogService)
         {
             this.fileDialogService = fileDialogService;
-            this.dialogService = dialogService;
             this.mainRegionService = mainRegionService;
 
             Settings = Settings.Instance;
@@ -58,8 +56,8 @@ namespace CHI.ViewModels
 
             mainRegionService.ShowProgressBar("Открытие файла.");
 
-            var importReader = new ImportPatientsReaderService();
-            var newPatients = importReader.Read(importFilePath);
+            var importReader = new ImportPatientsFileService(importFilePath);
+            var newPatients = importReader.GetPatients();
 
             mainRegionService.ShowProgressBar("Проверка значений.");
             var db = new AppDBContext();
@@ -96,7 +94,7 @@ namespace CHI.ViewModels
 
             mainRegionService.ShowProgressBar("Сохранение файла");
 
-            ImportPatientsReaderService.SaveExample(saveExampleFilePath);
+            ImportPatientsFileService.SaveExample(saveExampleFilePath);
 
             mainRegionService.HideProgressBar($"Файл сохранен: {saveExampleFilePath}");
         }

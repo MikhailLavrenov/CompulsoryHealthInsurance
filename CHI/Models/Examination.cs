@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CHI.Services.MedicalExaminations
+namespace CHI.Models
 {
     /// <summary>
     /// Представляет медицинский профилактический осмотр

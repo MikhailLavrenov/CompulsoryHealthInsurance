@@ -1,4 +1,4 @@
-﻿namespace CHI.Services
+﻿namespace CHI.Models
 {
     /// <summary>
     /// Представляет настраиваемые свойства столбца файла выгрузки.

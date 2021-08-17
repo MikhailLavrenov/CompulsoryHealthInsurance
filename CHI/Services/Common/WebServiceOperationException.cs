@@ -14,7 +14,8 @@ namespace CHI.Services.Common
             : this(defaultErrorMessage)
         { }
 
-        public WebServiceOperationException(string message) : base(message)
+        public WebServiceOperationException(string message) 
+            : base(message)
         { }
     }
 }
