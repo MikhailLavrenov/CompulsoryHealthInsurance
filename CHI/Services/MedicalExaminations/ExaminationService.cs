@@ -3,6 +3,7 @@ using CHI.Services.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace CHI.Services.MedicalExaminations
 {
@@ -12,11 +13,9 @@ namespace CHI.Services.MedicalExaminations
     public class ExaminationService : ExaminationServiceApi
     {
         static readonly StepKind[] examinationSteps;
+        static readonly ExaminationKind[] examinationKinds;
 
 
-        /// <summary>
-        /// Статический конструктор по-умолчанию
-        /// </summary>
         static ExaminationService()
         {
             examinationSteps = Enum.GetValues(typeof(StepKind))
@@ -24,10 +23,15 @@ namespace CHI.Services.MedicalExaminations
                 .Where(x => x != StepKind.Refuse && x != StepKind.None)
                 .OrderBy(x => (int)x)
                 .ToArray();
+
+            var examinationKinds = Enum.GetValues(typeof(ExaminationKind))
+                .Cast<ExaminationKind>()
+                .Where(x => x != ExaminationKind.None)
+                .ToList();
         }
 
         /// <summary>
-        /// Конструктор
+        /// 
         /// </summary>
         /// <param name="URL">URL</param>
         /// <param name="useProxy">Использовать прокси-сервер</param>
@@ -46,15 +50,12 @@ namespace CHI.Services.MedicalExaminations
         /// <exception cref="InvalidOperationException">
         /// Вызвыет исключение при невозможности добавить пациента в нужный план.
         /// </exception>
-        public void AddPatientExaminations(PatientExaminations patientExaminations)
+        public async Task AddPatientExaminationsAsync(PatientExaminations patientExaminations)
         {
-            if ((patientExaminations.Stage1?.BeginDate != null && patientExaminations.Stage1.BeginDate > DateTime.Today)
-                || (patientExaminations.Stage1?.EndDate != null && patientExaminations.Stage1.EndDate > DateTime.Today)
-                || (patientExaminations.Stage2?.BeginDate != null && patientExaminations.Stage2.BeginDate > DateTime.Today)
-                || (patientExaminations.Stage2?.EndDate != null && patientExaminations.Stage2.EndDate > DateTime.Today))
-                throw new InvalidOperationException("Осмотры будущей датой не могут быть загружены.");
+            if (AnyFutureDateFound(patientExaminations))
+                throw new InvalidOperationException("Осмотр будущей датой не может быть загружен.");
 
-            var webPatientData = GetOrAddPatientToPlan(patientExaminations);
+            var webPatientData = await GetOrAddPatientToPlanAsync(patientExaminations);
 
             if (webPatientData == null)
                 throw new InvalidOperationException("Ошибка добавления пациента в план");
@@ -63,8 +64,15 @@ namespace CHI.Services.MedicalExaminations
             var userSteps = ConvertToExaminationsSteps(patientExaminations, transfer2StageDate);
             var webSteps = ConvertToExaminationsSteps(webPatientData);
 
-            AddExaminationSteps(webPatientData.Id, userSteps, webSteps);
+            await AddExaminationStepsAsync(webPatientData.Id, userSteps, webSteps);
         }
+
+        static bool AnyFutureDateFound(PatientExaminations patientExaminations)
+            => ((patientExaminations.Stage1?.BeginDate ?? default) > DateTime.Today)
+                || ((patientExaminations.Stage1?.EndDate ?? default) > DateTime.Today)
+                || ((patientExaminations.Stage2?.BeginDate ?? default) > DateTime.Today)
+                || ((patientExaminations.Stage2?.EndDate ?? default) > DateTime.Today);
+
 
         /// <summary>
         /// Добавление пациента в нужный план.
@@ -73,49 +81,46 @@ namespace CHI.Services.MedicalExaminations
         /// <param name="patientExaminations">Экземпляр PatientExaminations</param>
         /// <param name="srzPatientId">Id пациента в СРЗ</param>
         /// <returns>Возвращает информацию о пациенте </returns>
-        WebPatientData GetOrAddPatientToPlan(PatientExaminations patientExaminations, int? srzPatientId = null)
+        async Task<WebPatientData> GetOrAddPatientToPlanAsync(PatientExaminations patientExaminations, int? srzPatientId = null)
         {
-            var webPatientData = GetPatientDataFromPlan(srzPatientId, patientExaminations.InsuranceNumber, patientExaminations.Kind, patientExaminations.Year);
+            var webPatientData = await GetPatientDataFromPlanAsync(srzPatientId, patientExaminations.InsuranceNumber, patientExaminations.Kind, patientExaminations.Year);
 
-            //пациент найден в нужном плане
+            //пациент не найден в нужном плане
             if (webPatientData == null)
             {
-                var otherExaminationKinds = Enum.GetValues(typeof(ExaminationKind))
-                    .Cast<ExaminationKind>()
-                    .Where(x => x != ExaminationKind.None && x != patientExaminations.Kind)
-                    .ToList();
+                var otherExaminationKinds = examinationKinds.Where(x => x != patientExaminations.Kind).ToList();
 
                 //ищем в др. планах
                 foreach (var examinationType in otherExaminationKinds)
                 {
-                    webPatientData = GetPatientDataFromPlan(srzPatientId, patientExaminations.InsuranceNumber, examinationType, patientExaminations.Year);
+                    webPatientData = await GetPatientDataFromPlanAsync(srzPatientId, patientExaminations.InsuranceNumber, examinationType, patientExaminations.Year);
                     //пациент найден в другом план
                     if (webPatientData != null)
                     {
                         //заполнены шаги осмотра
-                        if (webPatientData.Disp1BeginDate != default || webPatientData.Disp2BeginDate != default || webPatientData.DispCancelDate != default)
-                            DeleteAllSteps(webPatientData.Id);
+                        if (webPatientData.Disp1BeginDate != default || webPatientData.DispCancelDate != default)
+                            await DeleteAllStepsAsync(webPatientData.Id);
 
-                        DeletePatientFromPlan(webPatientData.Id);
+                        await DeletePatientFromPlanAsync(webPatientData.Id);
 
                         break;
                     }
                 }
 
                 if (srzPatientId == null)
-                    srzPatientId = webPatientData?.PersonId ?? GetPatientIdFromSRZ(patientExaminations.InsuranceNumber, null, patientExaminations.Year);
+                    srzPatientId = webPatientData?.PersonId ?? await GetPatientIdFromSRZAsync(patientExaminations.InsuranceNumber, null, patientExaminations.Year);
 
                 //если пациент не найден по полису - возможно неправильный полис, ищем по ФИО и ДР
                 if (srzPatientId == null)
                 {
-                    srzPatientId = GetPatientIdFromSRZ(null, patientExaminations, patientExaminations.Year);
+                    srzPatientId = await GetPatientIdFromSRZAsync(null, patientExaminations, patientExaminations.Year);
 
-                    return srzPatientId == null ? null : GetOrAddPatientToPlan(patientExaminations, srzPatientId);
+                    return srzPatientId == null ? null : await GetOrAddPatientToPlanAsync(patientExaminations, srzPatientId);
                 }
 
-                AddPatientToPlan(srzPatientId.Value, patientExaminations.Kind, patientExaminations.Year);
+                await AddPatientToPlanAsync(srzPatientId.Value, patientExaminations.Kind, patientExaminations.Year);
 
-                webPatientData = GetPatientDataFromPlan(srzPatientId, null, patientExaminations.Kind, patientExaminations.Year);
+                webPatientData = await GetPatientDataFromPlanAsync(srzPatientId, null, patientExaminations.Kind, patientExaminations.Year);
             }
 
             return webPatientData;
@@ -128,7 +133,7 @@ namespace CHI.Services.MedicalExaminations
         /// <param name="patientId">Id пациента</param>
         /// <param name="userSteps">Список добавляемых шагов</param>
         /// <param name="webSteps">Список шагов уже содержащихся в веб-портале</param>
-        void AddExaminationSteps(int patientId, List<ExaminationStep> userSteps, List<ExaminationStep> webSteps)
+        async Task AddExaminationStepsAsync(int patientId, List<ExaminationStep> userSteps, List<ExaminationStep> webSteps)
         {
             try
             {
@@ -145,17 +150,17 @@ namespace CHI.Services.MedicalExaminations
                         if (!userStep.Equals(userStep, webStep))
                         {
                             if (webStep == null && realWebStep < step)
-                                realWebStep = AddStep(patientId, userStep);
+                                realWebStep = await AddStepAsync(patientId, userStep);
                             else
                             {
                                 while (realWebStep >= userStep.StepKind)
-                                    realWebStep = DeleteLastStep(patientId);
+                                    realWebStep = await DeleteLastStepAsync(patientId);
 
-                                realWebStep = AddStep(patientId, userStep);
+                                realWebStep = await AddStepAsync(patientId, userStep);
                             }
                         }
                         else if (realWebStep < userStep.StepKind)
-                            realWebStep = AddStep(patientId, userStep);
+                            realWebStep = await AddStepAsync(patientId, userStep);
                     }
                     else
                     {
@@ -167,20 +172,42 @@ namespace CHI.Services.MedicalExaminations
                                 break;
                         }
                         else if (realWebStep < webStep.StepKind)
-                            realWebStep = AddStep(patientId, webStep);
+                            realWebStep = await AddStepAsync(patientId, webStep);
                     }
                 }
 
             }
             catch (WebServiceOperationException)
             {
-                DeleteAllSteps(patientId);
+                await DeleteAllStepsAsync(patientId);
 
                 foreach (var webStep in webSteps)
-                    AddStep(patientId, webStep);
+                    await AddStepAsync(patientId, webStep);
 
                 throw;
             }
+        }
+
+        /// <summary>
+        /// Добавление шага профилактического осмотра на веб-портал
+        /// </summary>
+        /// <param name="patientId">Id пациента</param>
+        /// <param name="examinationStep">Информация о шаге профилактического осмотра</param>
+        /// <returns>Текущий шаг прохождения профилактического осмотра</returns>
+        async Task<StepKind> AddStepAsync(int patientId, ExaminationStep examinationStep)
+        {
+            await AddStepAsync(patientId, examinationStep.StepKind, examinationStep.Date, examinationStep.HealthGroup, examinationStep.Referral);
+
+            return examinationStep.StepKind;
+        }
+
+        /// <summary>
+        /// Удаление всех шагов
+        /// </summary>
+        /// <param name="patientId">Id пациента</param>
+        async Task DeleteAllStepsAsync(int patientId)
+        {
+            while (await DeleteLastStepAsync(patientId) != 0) ;
         }
 
         /// <summary>
@@ -320,28 +347,6 @@ namespace CHI.Services.MedicalExaminations
                 });
 
             return examinationSteps;
-        }
-
-        /// <summary>
-        /// Добавление шага профилактического осмотра на веб-портал
-        /// </summary>
-        /// <param name="patientId">Id пациента</param>
-        /// <param name="examinationStep">Информация о шаге профилактического осмотра</param>
-        /// <returns>Текущий шаг прохождения профилактического осмотра</returns>
-        StepKind AddStep(int patientId, ExaminationStep examinationStep)
-        {
-            AddStep(patientId, examinationStep.StepKind, examinationStep.Date, examinationStep.HealthGroup, examinationStep.Referral);
-
-            return examinationStep.StepKind;
-        }
-
-        /// <summary>
-        /// Удаление всех шагов
-        /// </summary>
-        /// <param name="patientId">Id пациента</param>
-        void DeleteAllSteps(int patientId)
-        {
-            while (DeleteLastStep(patientId) != 0) ;
         }
     }
 }

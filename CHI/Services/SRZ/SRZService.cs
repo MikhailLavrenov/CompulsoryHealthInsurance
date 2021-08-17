@@ -15,19 +15,14 @@ namespace CHI.Services.SRZ
     /// </summary>
     public class SRZService : WebServiceBase, IDisposable
     {
-        #region Поля
-        #endregion
-
-        #region Свойства
         /// <summary>
         /// Используемые учетные данные для авторизации
         /// </summary>
         public ICredential Credential { get; private set; }
-        #endregion
 
-        #region Конструкторы
+
         /// <summary>
-        /// Конструктор
+        /// 
         /// </summary>
         /// <param name="URL">URL</param>
         /// <param name="useProxy">Использовать прокси-сервер</param>
@@ -36,9 +31,8 @@ namespace CHI.Services.SRZ
         public SRZService(string URL, bool useProxy, string proxyAddress = null, int? proxyPort = null)
             : base(URL, useProxy, proxyAddress, proxyPort)
         { }
-        #endregion
 
-        #region Методы
+
         /// <summary>
         /// Авторизация в веб-портале
         /// </summary>
@@ -66,6 +60,7 @@ namespace CHI.Services.SRZ
                 return IsAuthorized = false;
             }
         }
+
         /// <summary>
         /// Выход с сайта
         /// </summary>
@@ -74,6 +69,7 @@ namespace CHI.Services.SRZ
             SendRequest(HttpMethod.Get, @"?show=logoff", null);
             IsAuthorized = false;
         }
+
         /// <summary>
         /// Запрашивает данные о пациенте по полису
         /// </summary>
@@ -97,6 +93,7 @@ namespace CHI.Services.SRZ
             else
                 return null;
         }
+
         /// <summary>
         /// Скачивает и записывает на диск excel файл прикрепленных пациентов на дату.
         /// </summary>
@@ -119,12 +116,13 @@ namespace CHI.Services.SRZ
 
             ConvertDbfToExcel(dbfFile, excelFile);
         }
+
         /// <summary>
         /// Получает ссылку на скачивание файла прикрепленных пациентов.
         /// </summary>
         /// <param name="onDate">Дата на которую сформирован файл.</param>
         /// <returns>Ссылку на скачивание файла прикрепленных пациентов.</returns>
-        private string GetPatientsFileReference(DateTime onDate)
+        string GetPatientsFileReference(DateTime onDate)
         {
             string shortFileDate = onDate.ToShortDateString();
 
@@ -140,12 +138,13 @@ namespace CHI.Services.SRZ
 
             return responseText.Substring(begin, length);
         }
+
         /// <summary>
         /// Конвертирует dbf файл в excel
         /// </summary>
         /// <param name="dbfFile">Поток dbf файла.</param>
         /// <param name="excelFilePath">Путь для сохранения excel файла.</param>
-        private static void ConvertDbfToExcel(Stream dbfFile, string excelFilePath)
+        static void ConvertDbfToExcel(Stream dbfFile, string excelFilePath)
         {
             dbfFile.Position = 0;
 
@@ -179,7 +178,6 @@ namespace CHI.Services.SRZ
                 excel.SaveAs(new FileInfo(excelFilePath));
             }
         }
-        #endregion
     }
 }
 
