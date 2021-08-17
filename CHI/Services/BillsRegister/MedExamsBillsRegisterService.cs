@@ -4,16 +4,22 @@ using System.Linq;
 
 namespace CHI.Services
 {
+    /// <summary>
+    /// Получает список медосмотров пациентов из xml файлов реестра-счетов за один период.
+    /// </summary>
     public class MedExamsBillsRegisterService
     {
+        public List<string> XmlFileNameStartsWithFilter { get; set; }
+
         /// <summary>
-        /// Получает список медосмотров пациентов из xml файлов реестра-счетов за один период.
+        /// 
         /// </summary>
         /// <param name="filePaths">Пути к xml файлам реестров-счетов. (может быть папками, xml файлами и/или zip архивами)</param>
         /// <returns></returns>
         public List<PatientExaminations> GetPatientExaminationsList(IEnumerable<string> filePaths)
         {
             var xmlLoader = new XmlBillsLoader();
+            xmlLoader.XmlFileNameStartsWithFilter = XmlFileNameStartsWithFilter;
             xmlLoader.Load(filePaths);
             var billsRegister = BillsRegister.Create(xmlLoader.PersonsBills, xmlLoader.CasesBills);
 
