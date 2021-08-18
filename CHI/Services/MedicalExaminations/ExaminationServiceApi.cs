@@ -13,6 +13,7 @@ namespace CHI.Services.MedicalExaminations
     /// <summary>
     /// Представляет базовые операции с веб-порталом диспансеризации
     /// </summary>
+
     public class ExaminationServiceApi : WebServiceBase
     {
         /// <summary>
@@ -75,9 +76,6 @@ namespace CHI.Services.MedicalExaminations
         {
             ThrowExceptionIfNotAuthorized();
 
-            if (srzPatientId != null)
-                insuranceNumber = null;
-
             var uriParameters = new Dictionary<string, string> {
                 {"Filter.Year", GetYearId(year).ToString() },
                 {"Filter.PolisNum", insuranceNumber??string.Empty },
@@ -103,6 +101,26 @@ namespace CHI.Services.MedicalExaminations
 
             return planResponse.Data?.FirstOrDefault();
         }
+
+        /// <summary>
+        /// Получает информацию о прохождении пациентом профилактического осмотра из плана.
+        /// </summary>
+        /// <param name="srzPatientId">Id пациента в СРЗ</param>
+        /// <param name="examinationType">Вид осмотра</param>
+        /// <param name="year">Год осмотра</param>
+        /// <returns>Экземпляр WebPatientData если пациент найден в плане, иначе null.</returns>
+        protected async Task<WebPatientData> GetPatientDataFromPlanAsync(int srzPatientId, ExaminationKind examinationType, int year)
+            => await GetPatientDataFromPlanAsync(srzPatientId, null, examinationType, year);
+
+        /// <summary>
+        /// Получает информацию о прохождении пациентом профилактического осмотра из плана.
+        /// </summary>
+        /// <param name="insuranceNumber">Серия и/или номер полиса ОМС</param>
+        /// <param name="examinationType">Вид осмотра</param>
+        /// <param name="year">Год осмотра</param>
+        /// <returns>Экземпляр WebPatientData если пациент найден в плане, иначе null.</returns>
+        protected async Task<WebPatientData> GetPatientDataFromPlanAsync(string insuranceNumber, ExaminationKind examinationType, int year)
+            => await GetPatientDataFromPlanAsync(null, insuranceNumber, examinationType, year);
 
         /// <summary>
         /// Добавляет пациента в план.
@@ -156,26 +174,49 @@ namespace CHI.Services.MedicalExaminations
         /// Получает Id пациента в СРЗ. Осуществляет поиск по полису или данным пациента. Если заданы оба - полис приоритетнее.
         /// </summary>
         /// <param name="insuranceNumber">Серия и/или номер полиса ОМС.</param>
-        /// <param name="patient">Информация о пациенте.</param>
-        /// <param name="year">Год осмотра.</param>
+        /// <param name="examinationYear">Год осмотра.</param>
         /// <returns>Id пациента в СРЗ если пациент найден, null-иначе.</returns>
         /// <exception cref="WebServiceOperationException">Возникает если пациент находится в плане другой ЛПУ.</exception>
-        protected async Task<int?> GetPatientIdFromSRZAsync(string insuranceNumber, IPatient patient, int year)
+        protected async Task<int?> GetPatientIdFromSRZAsync(string insuranceNumber, int examinationYear)
         {
-            ThrowExceptionIfNotAuthorized();
-
-            var selector = string.IsNullOrEmpty(insuranceNumber) ? "fio" : "polis";
-
             var contentParameters = new Dictionary<string, string>
             {
-                {"SearchData.DispYearId", GetYearId(year).ToString() },
-                {"SearchData.Surname", patient?.Surname??string.Empty },
-                {"SearchData.Firstname", patient?.Name??string.Empty },
-                {"SearchData.Secname", patient?.Patronymic??string.Empty },
-                {"SearchData.Birthday", patient?.Birthdate.ToShortDateString() ?? string.Empty },
-                {"SearchData.PolisNum", insuranceNumber??string.Empty },
-                {"SearchData.SelectSearchValues", selector}
+                {"SearchData.DispYearId", GetYearId(examinationYear).ToString() },
+                {"SearchData.Surname", string.Empty },
+                {"SearchData.Firstname", string.Empty },
+                {"SearchData.Secname", string.Empty },
+                {"SearchData.Birthday", string.Empty },
+                {"SearchData.PolisNum", insuranceNumber },
+                {"SearchData.SelectSearchValues", "polis"}
+            }; ;
+            return await GetPatientIdFromSRZInternalAsync(contentParameters);
+        }
+
+        /// <summary>
+        /// Получает Id пациента в СРЗ. Осуществляет поиск по полису или данным пациента. Если заданы оба - полис приоритетнее.
+        /// </summary>
+        /// <param name="insuranceNumber">Серия и/или номер полиса ОМС.</param>
+        /// <param name="examinationYear">Год осмотра.</param>
+        /// <returns>Id пациента в СРЗ если пациент найден, null-иначе.</returns>
+        /// <exception cref="WebServiceOperationException">Возникает если пациент находится в плане другой ЛПУ.</exception>
+        protected async Task<int?> GetPatientIdFromSRZAsync(IPatient patient, int examinationYear)
+        {
+            var contentParameters = new Dictionary<string, string>
+            {
+                { "SearchData.DispYearId", GetYearId(examinationYear).ToString() },
+                { "SearchData.Surname", patient.Surname },
+                { "SearchData.Firstname", patient.Name },
+                { "SearchData.Secname", patient.Patronymic ?? string.Empty },
+                { "SearchData.Birthday", patient.Birthdate.ToShortDateString() },
+                { "SearchData.PolisNum", string.Empty },
+                { "SearchData.SelectSearchValues", "fio" }
             };
+            return await GetPatientIdFromSRZInternalAsync(contentParameters);
+        }
+
+        async Task<int?> GetPatientIdFromSRZInternalAsync(Dictionary<string, string> contentParameters)
+        {
+            ThrowExceptionIfNotAuthorized();
 
             var responseText = await SendPostAsync(@"disp/SrzSearch", contentParameters);
 

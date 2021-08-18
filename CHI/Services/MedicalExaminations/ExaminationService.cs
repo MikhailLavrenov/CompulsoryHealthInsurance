@@ -24,10 +24,10 @@ namespace CHI.Services.MedicalExaminations
                 .OrderBy(x => (int)x)
                 .ToArray();
 
-            var examinationKinds = Enum.GetValues(typeof(ExaminationKind))
+            examinationKinds = Enum.GetValues(typeof(ExaminationKind))
                 .Cast<ExaminationKind>()
                 .Where(x => x != ExaminationKind.None)
-                .ToList();
+                .ToArray();
         }
 
         /// <summary>
@@ -81,49 +81,37 @@ namespace CHI.Services.MedicalExaminations
         /// <param name="patientExaminations">Экземпляр PatientExaminations</param>
         /// <param name="srzPatientId">Id пациента в СРЗ</param>
         /// <returns>Возвращает информацию о пациенте </returns>
-        async Task<WebPatientData> GetOrAddPatientToPlanAsync(PatientExaminations patientExaminations, int? srzPatientId = null)
+        async Task<WebPatientData> GetOrAddPatientToPlanAsync(PatientExaminations patientExaminations)
         {
-            var webPatientData = await GetPatientDataFromPlanAsync(srzPatientId, patientExaminations.InsuranceNumber, patientExaminations.Kind, patientExaminations.Year);
+            var webPatientData = await GetPatientDataFromPlanAsync(patientExaminations.InsuranceNumber, patientExaminations.Kind, patientExaminations.Year);
 
-            //пациент не найден в нужном плане
-            if (webPatientData == null)
+            if (webPatientData != null)
+                return webPatientData;
+
+            //если пациент не найден в нужном плане - ищем в др. планах
+            foreach (var otherEexaminationKind in examinationKinds.Where(x => x != patientExaminations.Kind))
             {
-                var otherExaminationKinds = examinationKinds.Where(x => x != patientExaminations.Kind).ToList();
-
-                //ищем в др. планах
-                foreach (var examinationType in otherExaminationKinds)
+                webPatientData = await GetPatientDataFromPlanAsync(patientExaminations.InsuranceNumber, otherEexaminationKind, patientExaminations.Year);
+                //пациент найден в другом плане
+                if (webPatientData != null)
                 {
-                    webPatientData = await GetPatientDataFromPlanAsync(srzPatientId, patientExaminations.InsuranceNumber, examinationType, patientExaminations.Year);
-                    //пациент найден в другом план
-                    if (webPatientData != null)
-                    {
-                        //заполнены шаги осмотра
-                        if (webPatientData.Disp1BeginDate != default || webPatientData.DispCancelDate != default)
-                            await DeleteAllStepsAsync(webPatientData.Id);
+                    //заполнены шаги осмотра
+                    if (webPatientData.Disp1BeginDate != default || webPatientData.DispCancelDate != default)
+                        await DeleteAllStepsAsync(webPatientData.Id);
 
-                        await DeletePatientFromPlanAsync(webPatientData.Id);
+                    await DeletePatientFromPlanAsync(webPatientData.Id);
 
-                        break;
-                    }
+                    await AddPatientToPlanAsync(webPatientData.PersonId, patientExaminations.Kind, patientExaminations.Year);
+
+                    return await GetPatientDataFromPlanAsync(webPatientData.PersonId, patientExaminations.Kind, patientExaminations.Year);
                 }
-
-                if (srzPatientId == null)
-                    srzPatientId = webPatientData?.PersonId ?? await GetPatientIdFromSRZAsync(patientExaminations.InsuranceNumber, null, patientExaminations.Year);
-
-                //если пациент не найден по полису - возможно неправильный полис, ищем по ФИО и ДР
-                if (srzPatientId == null)
-                {
-                    srzPatientId = await GetPatientIdFromSRZAsync(null, patientExaminations, patientExaminations.Year);
-
-                    return srzPatientId == null ? null : await GetOrAddPatientToPlanAsync(patientExaminations, srzPatientId);
-                }
-
-                await AddPatientToPlanAsync(srzPatientId.Value, patientExaminations.Kind, patientExaminations.Year);
-
-                webPatientData = await GetPatientDataFromPlanAsync(srzPatientId, null, patientExaminations.Kind, patientExaminations.Year);
             }
 
-            return webPatientData;
+            //если не нашли по полису - пробуем искать по SrzPatientId
+            var srzPatientId = await GetPatientIdFromSRZAsync(patientExaminations.InsuranceNumber, patientExaminations.Year)
+                ?? await GetPatientIdFromSRZAsync(patientExaminations, patientExaminations.Year);
+
+            //этот же метод только по PatientId
         }
 
         /// <summary>
