@@ -131,6 +131,19 @@ namespace CHI.Services.MedicalExaminations
         /// <exception cref="WebServiceOperationException">Возникает если не удалось добавить пациента в план.</exception>
         protected async Task AddPatientToPlanAsync(int srzPatientId, ExaminationKind examinationType, int year)
         {
+            if (! await TryAddPatientToPlanAsync(srzPatientId, examinationType, year))
+                throw new WebServiceOperationException("Ошибка при добавлении пациента в план.");
+        }
+
+        /// <summary>
+        /// Добавляет пациента в план.
+        /// </summary>
+        /// <param name="srzPatientId">Id пациента в СРЗ</param>
+        /// <param name="examinationType">Вид осмотра</param>
+        /// <param name="year">Год осмотра</param>
+        /// <returns>Успешное завершение -True, иначе - False</returns>
+        protected async Task<bool> TryAddPatientToPlanAsync(int srzPatientId, ExaminationKind examinationType, int year)
+        {
             ThrowExceptionIfNotAuthorized();
 
             var contentParameters = new Dictionary<string, string>
@@ -144,8 +157,7 @@ namespace CHI.Services.MedicalExaminations
 
             var response = JsonConvert.DeserializeObject<WebResponse>(responseText);
 
-            if (response.IsError)
-                throw new WebServiceOperationException("Ошибка при добавлении пациента в план.");
+            return !response.IsError;
         }
 
         /// <summary>

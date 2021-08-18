@@ -55,10 +55,7 @@ namespace CHI.Services.MedicalExaminations
             if (AnyFutureDateFound(patientExaminations))
                 throw new InvalidOperationException("Осмотр будущей датой не может быть загружен.");
 
-            var webPatientData = await GetOrAddPatientToPlanAsync(patientExaminations);
-
-            if (webPatientData == null)
-                throw new InvalidOperationException("Ошибка добавления пациента в план");
+            var webPatientData = await ChangeOrAddPatientToPlanAsync(patientExaminations);
 
             var transfer2StageDate = patientExaminations.Stage1?.EndDate ?? webPatientData.Disp1Date;
             var userSteps = ConvertToExaminationsSteps(patientExaminations, transfer2StageDate);
@@ -81,37 +78,68 @@ namespace CHI.Services.MedicalExaminations
         /// <param name="patientExaminations">Экземпляр PatientExaminations</param>
         /// <param name="srzPatientId">Id пациента в СРЗ</param>
         /// <returns>Возвращает информацию о пациенте </returns>
-        async Task<WebPatientData> GetOrAddPatientToPlanAsync(PatientExaminations patientExaminations)
+        async Task<WebPatientData> ChangeOrAddPatientToPlanAsync(PatientExaminations patientExaminations)
         {
             var webPatientData = await GetPatientDataFromPlanAsync(patientExaminations.InsuranceNumber, patientExaminations.Kind, patientExaminations.Year);
 
             if (webPatientData != null)
                 return webPatientData;
 
-            //если пациент не найден в нужном плане - ищем в др. планах
-            foreach (var otherEexaminationKind in examinationKinds.Where(x => x != patientExaminations.Kind))
+            var otherExaminationKinds = examinationKinds.Where(x => x != patientExaminations.Kind).ToList();
+
+            //если пациент находится в не правильном плане, его нужно удалить из этого плана
+            foreach (var otherEexaminationKind in otherExaminationKinds)
             {
                 webPatientData = await GetPatientDataFromPlanAsync(patientExaminations.InsuranceNumber, otherEexaminationKind, patientExaminations.Year);
                 //пациент найден в другом плане
                 if (webPatientData != null)
                 {
-                    //заполнены шаги осмотра
-                    if (webPatientData.Disp1BeginDate != default || webPatientData.DispCancelDate != default)
-                        await DeleteAllStepsAsync(webPatientData.Id);
-
-                    await DeletePatientFromPlanAsync(webPatientData.Id);
-
-                    await AddPatientToPlanAsync(webPatientData.PersonId, patientExaminations.Kind, patientExaminations.Year);
-
-                    return await GetPatientDataFromPlanAsync(webPatientData.PersonId, patientExaminations.Kind, patientExaminations.Year);
+                    await DeepDeleteFromPlanAsync(webPatientData);
+                    break;
                 }
             }
 
-            //если не нашли по полису - пробуем искать по SrzPatientId
-            var srzPatientId = await GetPatientIdFromSRZAsync(patientExaminations.InsuranceNumber, patientExaminations.Year)
-                ?? await GetPatientIdFromSRZAsync(patientExaminations, patientExaminations.Year);
+            var srzPatientId = webPatientData?.PersonId
+                ?? await GetPatientIdFromSRZAsync(patientExaminations.InsuranceNumber, patientExaminations.Year)
+                ?? await GetPatientIdFromSRZAsync(patientExaminations, patientExaminations.Year)
+                ?? throw new InvalidOperationException("Не удалось найти пациента в СРЗ");
 
-            //этот же метод только по PatientId
+            if (await TryAddPatientToPlanAsync(srzPatientId, patientExaminations.Kind, patientExaminations.Year))
+                return await GetPatientDataFromPlanAsync(srzPatientId, patientExaminations.Kind, patientExaminations.Year);
+
+            //если дошли сюда, значит пациент состоит в плане но поиск по полису не дал результат, пробуем искать по SrzPatientId
+            webPatientData = await GetPatientDataFromPlanAsync(srzPatientId, patientExaminations.Kind, patientExaminations.Year);
+
+            if (webPatientData != null)
+                return webPatientData;
+
+            //если пациент не найден в нужном плане - ищем в др. планах
+            foreach (var otherEexaminationKind in otherExaminationKinds)
+            {
+                webPatientData = await GetPatientDataFromPlanAsync(srzPatientId, otherEexaminationKind, patientExaminations.Year);
+                //пациент найден в другом плане
+                if (webPatientData != null)
+                {
+                    await DeepDeleteFromPlanAsync(webPatientData);
+                    break;
+                }
+            }
+
+            if (webPatientData == null)
+                throw new InvalidOperationException("Ошибка добавления пациента в план");
+
+            await AddPatientToPlanAsync(srzPatientId, patientExaminations.Kind, patientExaminations.Year);
+
+            return await GetPatientDataFromPlanAsync(srzPatientId, patientExaminations.Kind, patientExaminations.Year);
+        }
+
+        async Task DeepDeleteFromPlanAsync(WebPatientData webPatientData)
+        {
+            //заполнены шаги осмотра
+            if (webPatientData.Disp1BeginDate != default || webPatientData.DispCancelDate != default)
+                await DeleteAllStepsAsync(webPatientData.Id);
+
+            await DeletePatientFromPlanAsync(webPatientData.Id);
         }
 
         /// <summary>
