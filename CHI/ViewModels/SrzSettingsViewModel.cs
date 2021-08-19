@@ -38,7 +38,7 @@ namespace CHI.ViewModels
             ShowProtectedPassword = !ShowTextPassword;
 
             SetDefaultCommand = new DelegateCommand(SetDefaultExecute);
-            TestCommand = new DelegateCommandAsync(TestExecute);
+            TestCommand = new DelegateCommandAsync(TestExecuteAsync);
             SwitchShowPasswordCommand = new DelegateCommand(SwitchShowPasswordExecute);
         }
         #endregion
@@ -50,10 +50,10 @@ namespace CHI.ViewModels
 
             MainRegionService.HideProgressBar("Настройки установлены по умолчанию.");
         }
-        private void TestExecute()
+        async void TestExecuteAsync()
         {
             MainRegionService.ShowProgressBar("Проверка настроек.");
-            Settings.TestConnectionSRZ();
+            await Settings.TestConnectionSRZAsync();
 
             if (Settings.SrzConnectionIsValid)
                 MainRegionService.HideProgressBar("Настройки корректны.");

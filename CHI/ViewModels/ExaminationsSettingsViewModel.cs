@@ -2,8 +2,6 @@
 using CHI.Models;
 using Prism.Commands;
 using Prism.Regions;
-using System.Linq;
-using System.Text;
 
 namespace CHI.ViewModels
 {
@@ -37,7 +35,7 @@ namespace CHI.ViewModels
             ShowProtectedPassword = !ShowTextPassword;
 
             SetDefaultCommand = new DelegateCommand(SetDefaultExecute);
-            TestCommand = new DelegateCommandAsync(TestExecute);
+            TestCommand = new DelegateCommandAsync(TestExecuteAsync);
             SwitchShowPasswordCommand = new DelegateCommand(SwitchShowPasswordExecute);
         }
         #endregion
@@ -48,14 +46,14 @@ namespace CHI.ViewModels
             Settings.SetDefaultExaminations();
             MainRegionService.HideProgressBar("Настройки установлены по умолчанию.");
         }
-        private void TestExecute()
+        async void TestExecuteAsync()
         {
             MainRegionService.ShowProgressBar("Проверка настроек.");
-            Settings.TestConnectionExaminations();
+            await Settings.TestConnectionExaminationsAsync();
 
             if (Settings.ExaminationsConnectionIsValid)
                 MainRegionService.HideProgressBar("Настройки корректны.");
-            else if (Settings.ContainsErrorMessage(nameof(Settings.ProxyAddress),ErrorMessages.Connection))
+            else if (Settings.ContainsErrorMessage(nameof(Settings.ProxyAddress), ErrorMessages.Connection))
                 MainRegionService.HideProgressBar("Прокси сервер не доступен.");
             else if (Settings.ContainsErrorMessage(nameof(Settings.ExaminationsAddress), ErrorMessages.Connection))
                 MainRegionService.HideProgressBar("Портал диспансеризации не доступен.");

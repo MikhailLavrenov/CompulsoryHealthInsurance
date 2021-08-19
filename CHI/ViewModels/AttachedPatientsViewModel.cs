@@ -17,22 +17,17 @@ namespace CHI.ViewModels
 {
     class AttachedPatientsViewModel : DomainObject, IRegionMemberLifetime
     {
-        #region Поля
-        private Settings settings;
-        private DateTime fileDate;
+        Settings settings;
+        DateTime fileDate;
+        readonly IFileDialogService fileDialogService;
 
-        private readonly IFileDialogService fileDialogService;
-        #endregion
-
-        #region Свойства
         public IMainRegionService MainRegionService { get; set; }
         public bool KeepAlive { get => false; }
         public Settings Settings { get => settings; set => SetProperty(ref settings, value); }
         public DateTime FileDate { get => fileDate; set => SetProperty(ref fileDate, value); }
         public DelegateCommandAsync ProcessFileCommand { get; }
-        #endregion
 
-        #region Конструкторы
+
         public AttachedPatientsViewModel(IMainRegionService mainRegionService, IFileDialogService fileDialogService)
         {
             this.fileDialogService = fileDialogService;
@@ -44,15 +39,14 @@ namespace CHI.ViewModels
 
             ProcessFileCommand = new DelegateCommandAsync(ProcessFileExecute);
         }
-        #endregion
 
-        #region Методы
-        private void ProcessFileExecute()
+
+        async void ProcessFileExecute()
         {
             MainRegionService.ShowProgressBar("Проверка подключения к СРЗ.");
 
             if (!Settings.SrzConnectionIsValid)
-                Settings.TestConnectionSRZ();
+                await Settings.TestConnectionSRZAsync();
 
             if (!Settings.SrzConnectionIsValid && Settings.DownloadNewPatientsFile)
             {
@@ -89,8 +83,8 @@ namespace CHI.ViewModels
                 var service = new SRZService(Settings.SrzAddress, Settings.UseProxy, Settings.ProxyAddress, Settings.ProxyPort);
 
                 var credential = Settings.SrzCredentials.First();
-                service.Authorize(credential);
-                service.GetPatientsFile(Settings.PatientsFilePath, FileDate);
+                await service.AuthorizeAsync(credential);
+                await service.GetPatientsFileAsync(Settings.PatientsFilePath, FileDate);
             }
 
             MainRegionService.ShowProgressBar("Подстановка ФИО в файл.");
@@ -148,8 +142,9 @@ namespace CHI.ViewModels
             SleepMode.Deny();
             MainRegionService.HideProgressBar(resultReport.ToString());
         }
+
         //запускает многопоточно запросы к сайту для поиска пациентов
-        private Patient[] GetPatients(List<string> insuranceNumbers)
+        Patient[] GetPatients(List<string> insuranceNumbers)
         {
             int counter = 0;
             int threadsLimit = insuranceNumbers.Count > Settings.SrzThreadsLimit ? Settings.SrzThreadsLimit : insuranceNumbers.Count;
@@ -165,19 +160,19 @@ namespace CHI.ViewModels
             {
                 var insuranceNumber = insuranceNumbers[i];
                 var index = Task.WaitAny(tasks);
-                tasks[index] = tasks[index].ContinueWith((task) =>
+                tasks[index] = tasks[index].ContinueWith(async (task) =>
                 {
-                    var service = task.ConfigureAwait(false).GetAwaiter().GetResult();
+                    var service = await task;
                     var credential = (Credential)service?.Credential;
 
                     if (credential == null)
                     {
                         service = new SRZService(Settings.SrzAddress, Settings.UseProxy, Settings.ProxyAddress, Settings.ProxyPort);
 
-                        service.Authorize(circularList.GetNext());
+                        await service.AuthorizeAsync(circularList.GetNext());
                     }
 
-                    var patient = service.GetPatient(insuranceNumber);
+                    var patient = await service.GetPatientAsync(insuranceNumber);
 
                     if (patient != null)
                     {
@@ -198,13 +193,12 @@ namespace CHI.ViewModels
                 tasks[index] = tasks[index].ContinueWith((task) =>
                 {
                     var service = task.ConfigureAwait(false).GetAwaiter().GetResult();
-                    service?.Logout();
+                    service?.LogoutAsync();
                     return service;
                 });
             }
 
             return verifiedPatients.ToArray();
         }
-        #endregion
     }
 }
