@@ -252,9 +252,9 @@ namespace CHI.Models
         public CredentialScope CredentialsScope { get => credentialsScope; set => SetProperty(ref credentialsScope, value); }
         public string DomainName { get => domainName; set => SetProperty(ref domainName, value); }
         public string DomainUsersRootOU { get => domainUsersRootOU; set => SetProperty(ref domainUsersRootOU, value); }
-        public string  ApprovedBy { get => approvedBy; set => SetProperty(ref approvedBy, value); }
-        public bool UseSQLServer { get=> useSQLServer; set=>SetProperty(ref useSQLServer, value); }
-        public string SQLServerName { get=> sqlServerName; set=>SetProperty(ref sqlServerName, value); }
+        public string ApprovedBy { get => approvedBy; set => SetProperty(ref approvedBy, value); }
+        public bool UseSQLServer { get => useSQLServer; set => SetProperty(ref useSQLServer, value); }
+        public string SQLServerName { get => sqlServerName; set => SetProperty(ref sqlServerName, value); }
         public string SQLServerDBName { get => sqlServerDBName; set => SetProperty(ref sqlServerDBName, value); }
         public string ServiceAccountingReportPath { get => serviceAccountingReportPath; set => SetProperty(ref serviceAccountingReportPath, value); }
 
@@ -324,9 +324,9 @@ namespace CHI.Models
         public ObservableCollection<ColumnProperty> ColumnProperties { get => columnProperties; set => SetProperty(ref columnProperties, value); }
 
         //проверяет учетные данные СРЗ, в случае успеха - true
-        private bool TryAuthorizeSrzCredentials()
+        private async Task<bool> TryAuthorizeSrzCredentialsAsync()
         {
-            Parallel.ForEach(SrzCredentials, new ParallelOptions { MaxDegreeOfParallelism = SrzThreadsLimit }, credential =>
+            Parallel.ForEach(SrzCredentials, new ParallelOptions { MaxDegreeOfParallelism = SrzThreadsLimit }, async credential =>
             {
                 using (var service = new SRZService(SrzAddress, UseProxy, ProxyAddress, ProxyPort))
                 {
@@ -334,7 +334,7 @@ namespace CHI.Models
 
                     try
                     {
-                        isAuthorized = service.Authorize(credential);
+                        isAuthorized = await service.AuthorizeAsync(credential);
                     }
                     catch (Exception)
                     {
@@ -343,7 +343,7 @@ namespace CHI.Models
 
                     if (isAuthorized)
                     {
-                        service.Logout();
+                        await service.LogoutAsync();
 
                         credential.RemoveErrors(nameof(credential.Login));
                         credential.RemoveErrors(nameof(credential.Password));
@@ -373,7 +373,7 @@ namespace CHI.Models
                 ColumnProperties.Move(itemIndex, itemIndex + 1);
         }
         //проверить настройки подключения к СРЗ
-        public void TestConnectionSRZ()
+        public async Task TestConnectionSRZAsync()
         {
             SrzConnectionIsValid = false;
 
@@ -388,7 +388,7 @@ namespace CHI.Models
             if (!TryConnectSite(SrzAddress, nameof(SrzAddress)))
                 return;
 
-            if (!TryAuthorizeSrzCredentials())
+            if (! await TryAuthorizeSrzCredentialsAsync())
                 return;
 
             SrzConnectionIsValid = true;
@@ -475,11 +475,11 @@ namespace CHI.Models
         [XmlIgnore] public bool ExaminationsConnectionIsValid { get => examinationsConnectionIsValid; set => SetProperty(ref examinationsConnectionIsValid, value); }
 
         //проверяет учетные данные портала диспансеризации, в случае успеха - true
-        private bool TryAuthorizeExaminationsCredentials()
+        private async Task<bool> TryAuthorizeExaminationsCredentialsAsync()
         {
             var codesMO = new ConcurrentBag<string>();
 
-            Parallel.ForEach(ExaminationsCredentials, new ParallelOptions { MaxDegreeOfParallelism = ExaminationsThreadsLimit }, credential =>
+           Parallel.ForEach(ExaminationsCredentials, new ParallelOptions { MaxDegreeOfParallelism = ExaminationsThreadsLimit }, async credential =>
             {
                 using (var service = new ExaminationService(ExaminationsAddress, UseProxy, ProxyAddress, ProxyPort))
                 {
@@ -487,7 +487,7 @@ namespace CHI.Models
 
                     try
                     {
-                        isAuthorized = service.Authorize(credential);
+                        isAuthorized = await service.AuthorizeAsync(credential);
                     }
                     catch (Exception)
                     {
@@ -498,7 +498,7 @@ namespace CHI.Models
                     {
                         codesMO.Add(service.FomsCodeMO);
 
-                        service.Logout();
+                        await service.LogoutAsync();
 
                         credential.RemoveErrors(nameof(credential.Login));
                         credential.RemoveErrors(nameof(credential.Password));
@@ -536,7 +536,7 @@ namespace CHI.Models
              };
         }
         //проверить настройеки подключения к порталу диспансризации
-        public void TestConnectionExaminations()
+        public async Task TestConnectionExaminationsAsync()
         {
             ExaminationsConnectionIsValid = false;
 
@@ -551,7 +551,7 @@ namespace CHI.Models
             if (!TryConnectSite(ExaminationsAddress, nameof(ExaminationsAddress)))
                 return;
 
-            if (!TryAuthorizeExaminationsCredentials())
+            if (! await TryAuthorizeExaminationsCredentialsAsync())
                 return;
 
             ExaminationsConnectionIsValid = true;

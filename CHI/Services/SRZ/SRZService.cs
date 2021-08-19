@@ -7,6 +7,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Net.Http;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace CHI.Services.SRZ
 {
@@ -38,7 +39,7 @@ namespace CHI.Services.SRZ
         /// </summary>
         /// <param name="credential">Учетные данные</param>
         /// <returns>True-успешно авторизован, False-иначе.</returns>
-        public bool Authorize(ICredential credential)
+        public async Task<bool> AuthorizeAsync(ICredential credential)
         {
             Credential = credential;
             var content = new Dictionary<string, string> {
@@ -48,7 +49,7 @@ namespace CHI.Services.SRZ
 
             try
             {
-                var responseText = SendRequest(HttpMethod.Post, @"data/user.ajax.logon.php", content);
+                var responseText = await SendPostAsync(@"data/user.ajax.logon.php", content);
 
                 if (responseText == "")
                     return IsAuthorized = true;
@@ -64,9 +65,9 @@ namespace CHI.Services.SRZ
         /// <summary>
         /// Выход с сайта
         /// </summary>
-        public void Logout()
+        public async Task LogoutAsync()
         {
-            SendRequest(HttpMethod.Get, @"?show=logoff", null);
+            await SendGetTextAsync(@"?show=logoff");
             IsAuthorized = false;
         }
 
@@ -75,16 +76,16 @@ namespace CHI.Services.SRZ
         /// </summary>
         /// <param name="insuranceNumber">Серия и/или номер полиса.</param>
         /// <returns>Сведения о пациенте.</returns>
-        public Patient GetPatient(string insuranceNumber)
+        public async Task<Patient> GetPatientAsync(string insuranceNumber)
         {
-            CheckAuthorization();
+            ThrowExceptionIfNotAuthorized();
 
             var content = new Dictionary<string, string> {
                 { "mode", "1" },
                 { "person_enp", insuranceNumber },
             };
 
-            var responseText = SendRequest(HttpMethod.Post, @"data/reg.person.polis.search.php", content);
+            var responseText = await SendPostAsync(@"data/reg.person.polis.search.php", content);
 
             var responseLines = responseText.Split(new string[] { "||" }, 7, StringSplitOptions.None);
 
@@ -99,14 +100,14 @@ namespace CHI.Services.SRZ
         /// </summary>
         /// <param name="excelFile">Путь к файлу для записи.</param>
         /// <param name="onDate">Дата на которую выгружается файл.</param>
-        public void GetPatientsFile(string excelFile, DateTime onDate)
+        public async Task GetPatientsFileAsync(string excelFile, DateTime onDate)
         {
-            CheckAuthorization();
+            ThrowExceptionIfNotAuthorized();
 
-            var reference = GetPatientsFileReference(onDate);
+            var urn =await GetPatientsFileReferenceAsync(onDate);
 
             //скачивает zip архив
-            var zipFile = SendGetRequest(reference);
+            var zipFile =await SendGetStreamAsync(urn);
 
             //извлекает dbf файл
             Stream dbfFile = new MemoryStream();
@@ -122,7 +123,7 @@ namespace CHI.Services.SRZ
         /// </summary>
         /// <param name="onDate">Дата на которую сформирован файл.</param>
         /// <returns>Ссылку на скачивание файла прикрепленных пациентов.</returns>
-        string GetPatientsFileReference(DateTime onDate)
+        async Task<string> GetPatientsFileReferenceAsync(DateTime onDate)
         {
             string shortFileDate = onDate.ToShortDateString();
 
@@ -131,7 +132,7 @@ namespace CHI.Services.SRZ
                 { "exportlist_id", "25" },
             };
 
-            var responseText = SendRequest(HttpMethod.Post, @"data/dbase.export.php", content);
+            var responseText =await SendPostAsync( @"data/dbase.export.php", content);
 
             int begin = responseText.IndexOf(@"<a href='") + 9;
             int length = responseText.IndexOf(@"' ", begin) - begin;

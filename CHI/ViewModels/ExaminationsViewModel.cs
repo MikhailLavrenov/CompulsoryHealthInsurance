@@ -44,7 +44,7 @@ namespace CHI.ViewModels
             Settings = Settings.Instance;
             MainRegionService.Header = "Загрузка осмотров на портал Диспансеризации";
 
-            ExportExaminationsCommand = new DelegateCommandAsync(ExportExaminationsExecute);
+            ExportExaminationsCommand = new DelegateCommandAsync(ExportExaminationsExecuteAsync);
 
 
             //var examination1Stage = new Examination
@@ -84,7 +84,7 @@ namespace CHI.ViewModels
         }
 
 
-        private void ExportExaminationsExecute()
+        async void ExportExaminationsExecuteAsync()
         {
             Result?.Clear();
             ShowErrors = false;
@@ -93,7 +93,7 @@ namespace CHI.ViewModels
             {
                 MainRegionService.ShowProgressBar("Проверка настроек.");
 
-                Settings.TestConnectionExaminations();
+                await Settings.TestConnectionExaminationsAsync();
                 if (!Settings.ExaminationsConnectionIsValid)
                 {
                     MainRegionService.HideProgressBar("Не удалось подключиться к web-сервису.");
@@ -174,9 +174,9 @@ namespace CHI.ViewModels
             {
                 var patientExaminations = patientsExaminations[i];
                 var index = Task.WaitAny(tasks);
-                tasks[index] = tasks[index].ContinueWith((task) =>
+                tasks[index] = tasks[index].ContinueWith(async (task) =>
                 {
-                    var service = task.ConfigureAwait(false).GetAwaiter().GetResult();
+                    var service = await task;
                     string error = string.Empty;
                     bool isSuccessful = true;
 
@@ -193,10 +193,10 @@ namespace CHI.ViewModels
                             if (service == null)
                             {
                                 service = new ExaminationService(Settings.ExaminationsAddress, Settings.UseProxy, Settings.ProxyAddress, Settings.ProxyPort);
-                                service.Authorize(circularList.GetNext());
+                                await service.AuthorizeAsync(circularList.GetNext());
                             }
 
-                            service.AddPatientExaminations(patientExaminations);
+                            await service.AddPatientExaminationsAsync(patientExaminations);
                             error = string.Empty;
                             isSuccessful = true;
 
@@ -250,10 +250,10 @@ namespace CHI.ViewModels
             {
                 var index = Task.WaitAny(tasks);
 
-                tasks[index] = tasks[index].ContinueWith((task) =>
+                tasks[index] = tasks[index].ContinueWith(async (task) =>
                 {
-                    var service = task.ConfigureAwait(false).GetAwaiter().GetResult();
-                    service?.Logout();
+                    var service =await task;
+                    await service?.LogoutAsync();
                     return service;
                 });
             }

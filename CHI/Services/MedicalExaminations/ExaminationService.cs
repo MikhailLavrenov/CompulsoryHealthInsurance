@@ -12,18 +12,11 @@ namespace CHI.Services.MedicalExaminations
     /// </summary>
     public class ExaminationService : ExaminationServiceApi
     {
-        static readonly StepKind[] examinationSteps;
         static readonly ExaminationKind[] examinationKinds;
 
 
         static ExaminationService()
         {
-            examinationSteps = Enum.GetValues(typeof(StepKind))
-                .Cast<StepKind>()
-                .Where(x => x != StepKind.Refuse && x != StepKind.None)
-                .OrderBy(x => (int)x)
-                .ToArray();
-
             examinationKinds = Enum.GetValues(typeof(ExaminationKind))
                 .Cast<ExaminationKind>()
                 .Where(x => x != ExaminationKind.None)
@@ -126,6 +119,12 @@ namespace CHI.Services.MedicalExaminations
         /// <param name="webSteps">Список шагов уже содержащихся в веб-портале</param>
         async Task AddExaminationStepsAsync(int patientId, List<ExaminationStep> userSteps, List<ExaminationStep> webSteps)
         {
+            var examinationSteps = Enum.GetValues(typeof(StepKind))
+                .Cast<StepKind>()
+                .Where(x => x != StepKind.Refuse && x != StepKind.None)
+                .OrderBy(x => (int)x)
+                .ToArray();
+
             try
             {
                 var realWebStep = webSteps.LastOrDefault()?.StepKind ?? StepKind.None;
