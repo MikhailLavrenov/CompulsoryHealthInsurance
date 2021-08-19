@@ -1,13 +1,12 @@
 ﻿using CHI.Models;
 using System;
-using System.Collections.Generic;
 
 namespace CHI.Services.MedicalExaminations
 {
     /// <summary>
     /// Представляет информацию о шаге профилактического осмотра
     /// </summary>
-    public class ExaminationStep : IEqualityComparer<ExaminationStep>
+    public class ExaminationStep : IEquatable<ExaminationStep>
     {
         /// <summary>
         /// Шаг прохождения профилактического осмотра
@@ -26,49 +25,17 @@ namespace CHI.Services.MedicalExaminations
         /// </summary>
         public Referral Referral { get; set; }
 
-        /// <summary>
-        /// Определяет, равны ли два указанных объекта.
-        /// </summary>
-        /// <param name="x">Первый объект типа T для сравнения.</param>
-        /// <param name="y">Второй объект типа T для сравнения.</param>
-        /// <returns>true, если указанные объекты равны; в противном случае — false.</returns>
-        public bool Equals(ExaminationStep x, ExaminationStep y)
-        {
-            if (x.Equals(y))
-                return true;
+        public override bool Equals(object obj)
+            => obj is ExaminationStep step && Equals(step);
 
-            if (x == null && y != null)
-                return false;
+        public bool Equals(ExaminationStep other)       
+            => StepKind == other.StepKind &&
+            Date == other.Date &&
+            HealthGroup == other.HealthGroup &&
+            Referral == other.Referral;
 
-            if (x != null && y == null)
-                return false;
+        public override int GetHashCode()
+            => HashCode.Combine(StepKind, Date, HealthGroup, Referral);
 
-            return x.StepKind.Equals(y.StepKind)
-                && x.Date.Equals(y.Date)
-                && x.HealthGroup.Equals(y.HealthGroup)
-                && x.Referral.Equals(y.Referral);
-        }
-        /// <summary>
-        /// Возвращает хэш-код указанного объекта.
-        /// </summary>
-        /// <param name="obj">"Экземпляр для которого должен быть возвращен хэш-код.</param>
-        /// <returns>Хэш-код указанного объекта.</returns>
-        public int GetHashCode(ExaminationStep obj)
-        {
-            unchecked
-            {
-                // Выбираем большие простые числа, чтобы избежать коллизий хэширования
-                int HashingBase = (int)2166136261;
-                int HashingMultiplier = 16777619;
-
-                int hash = HashingBase;
-                hash = (hash * HashingMultiplier) ^ StepKind.GetHashCode();
-                hash = (hash * HashingMultiplier) ^ Date.GetHashCode();
-                hash = (hash * HashingMultiplier) ^ HealthGroup.GetHashCode();
-                hash = (hash * HashingMultiplier) ^ Referral.GetHashCode();
-
-                return hash;
-            }
-        }
     }
 }
