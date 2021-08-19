@@ -64,6 +64,9 @@ namespace CHI.Services.MedicalExaminations
         /// Вид осмотра
         /// </summary>
         public ExaminationKind DispType { get; set; }
+        /// <summary>
+        /// Id года (рассчитывается от 2017)
+        /// </summary>
         public int YearId { get; set; }
     }
 }

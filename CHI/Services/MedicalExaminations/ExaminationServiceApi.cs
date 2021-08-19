@@ -131,19 +131,6 @@ namespace CHI.Services.MedicalExaminations
         /// <exception cref="WebServiceOperationException">Возникает если не удалось добавить пациента в план.</exception>
         protected async Task AddPatientToPlanAsync(int srzPatientId, ExaminationKind examinationType, int year)
         {
-            if (! await TryAddPatientToPlanAsync(srzPatientId, examinationType, year))
-                throw new WebServiceOperationException("Ошибка при добавлении пациента в план.");
-        }
-
-        /// <summary>
-        /// Добавляет пациента в план.
-        /// </summary>
-        /// <param name="srzPatientId">Id пациента в СРЗ</param>
-        /// <param name="examinationType">Вид осмотра</param>
-        /// <param name="year">Год осмотра</param>
-        /// <returns>Успешное завершение -True, иначе - False</returns>
-        protected async Task<bool> TryAddPatientToPlanAsync(int srzPatientId, ExaminationKind examinationType, int year)
-        {
             ThrowExceptionIfNotAuthorized();
 
             var contentParameters = new Dictionary<string, string>
@@ -157,7 +144,8 @@ namespace CHI.Services.MedicalExaminations
 
             var response = JsonConvert.DeserializeObject<WebResponse>(responseText);
 
-            return !response.IsError;
+            if (response.IsError)
+                throw new WebServiceOperationException("Ошибка при добавлении пациента в план.");
         }
 
         /// <summary>
@@ -183,13 +171,13 @@ namespace CHI.Services.MedicalExaminations
         }
 
         /// <summary>
-        /// Получает Id пациента в СРЗ. Осуществляет поиск по полису или данным пациента. Если заданы оба - полис приоритетнее.
+        /// Получает Id пациента в СРЗ. Работает медленнее чем поиск по ФИО и ДР.
         /// </summary>
         /// <param name="insuranceNumber">Серия и/или номер полиса ОМС.</param>
         /// <param name="examinationYear">Год осмотра.</param>
-        /// <returns>Id пациента в СРЗ если пациент найден, null-иначе.</returns>
+        /// <returns>Экземпляр SrzInfo если пациент найден, иначе null.</returns>
         /// <exception cref="WebServiceOperationException">Возникает если пациент находится в плане другой ЛПУ.</exception>
-        protected async Task<int?> GetPatientIdFromSRZAsync(string insuranceNumber, int examinationYear)
+        protected async Task<SrzInfo> GetInfoFromSRZAsync(string insuranceNumber, int examinationYear)
         {
             var contentParameters = new Dictionary<string, string>
             {
@@ -201,17 +189,17 @@ namespace CHI.Services.MedicalExaminations
                 {"SearchData.PolisNum", insuranceNumber },
                 {"SearchData.SelectSearchValues", "polis"}
             }; ;
-            return await GetPatientIdFromSRZInternalAsync(contentParameters);
+            return await GetInfoFromSRZAsyncInternalAsync(contentParameters);
         }
 
         /// <summary>
-        /// Получает Id пациента в СРЗ. Осуществляет поиск по полису или данным пациента. Если заданы оба - полис приоритетнее.
+        /// Получает Id пациента в СРЗ. Работает быстрее чем поиск по полису.
         /// </summary>
         /// <param name="insuranceNumber">Серия и/или номер полиса ОМС.</param>
         /// <param name="examinationYear">Год осмотра.</param>
-        /// <returns>Id пациента в СРЗ если пациент найден, null-иначе.</returns>
+        /// <returns>Экземпляр SrzInfo если пациент найден, иначе null.</returns>
         /// <exception cref="WebServiceOperationException">Возникает если пациент находится в плане другой ЛПУ.</exception>
-        protected async Task<int?> GetPatientIdFromSRZAsync(IPatient patient, int examinationYear)
+        protected async Task<SrzInfo> GetInfoFromSRZAsync(IPatient patient, int examinationYear)
         {
             var contentParameters = new Dictionary<string, string>
             {
@@ -223,10 +211,10 @@ namespace CHI.Services.MedicalExaminations
                 { "SearchData.PolisNum", string.Empty },
                 { "SearchData.SelectSearchValues", "fio" }
             };
-            return await GetPatientIdFromSRZInternalAsync(contentParameters);
+            return await GetInfoFromSRZAsyncInternalAsync(contentParameters);
         }
 
-        async Task<int?> GetPatientIdFromSRZInternalAsync(Dictionary<string, string> contentParameters)
+        async Task<SrzInfo> GetInfoFromSRZAsyncInternalAsync(Dictionary<string, string> contentParameters)
         {
             ThrowExceptionIfNotAuthorized();
 
@@ -234,12 +222,15 @@ namespace CHI.Services.MedicalExaminations
 
             var idString = SubstringBetween(responseText, "personId", "\"", "\"");
 
-            if (responseText.IndexOf(">Начата диспансеризация другой МО<") != -1)
-                throw new WebServiceOperationException("Ошибка добавления в план: При поиске в СРЗ установлено - осмотр уже подан др. ЛПУ.");
+            if (!int.TryParse(idString, out int srzPatientId))
+                return null;
 
-            int.TryParse(idString, out var srzPatientId);
-
-            return srzPatientId == 0 ? null : srzPatientId;
+            return new SrzInfo
+            {
+                SrzPatientId = srzPatientId,
+                FilledByAnotherClinic = responseText.Contains("Начата диспансеризация другой МО"),
+                ExistInPlan = responseText.Contains("Застрахованное лицо уже находится в плане диспансеризации вашей МО")
+            };
         }
 
         /// <summary>
