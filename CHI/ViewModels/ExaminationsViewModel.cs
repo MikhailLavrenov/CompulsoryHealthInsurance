@@ -160,7 +160,6 @@ namespace CHI.ViewModels
         private List<Tuple<PatientExaminations, bool, string>> AddExaminationsParallel(List<PatientExaminations> patientsExaminations)
         {
             var threadsLimit = patientsExaminations.Count > Settings.ExaminationsThreadsLimit ? Settings.ExaminationsThreadsLimit : patientsExaminations.Count;
-            var circularList = new CircularList<Credential>(Settings.ExaminationsCredentials);
             var result = new ConcurrentBag<Tuple<PatientExaminations, bool, string>>();
             var tasks = new Task<ExaminationService>[threadsLimit];
             var counter = 0;
@@ -193,7 +192,7 @@ namespace CHI.ViewModels
                             if (service == null)
                             {
                                 service = new ExaminationService(Settings.ExaminationsAddress, Settings.UseProxy, Settings.ProxyAddress, Settings.ProxyPort);
-                                await service.AuthorizeAsync(circularList.GetNext());
+                                await service.AuthorizeAsync(settings.ExaminationsCredentials.First());
                             }
 
                             await service.AddPatientExaminationsAsync(patientExaminations);

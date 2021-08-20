@@ -326,37 +326,32 @@ namespace CHI.Models
         //проверяет учетные данные СРЗ, в случае успеха - true
         private async Task<bool> TryAuthorizeSrzCredentialsAsync()
         {
-            Parallel.ForEach(SrzCredentials, new ParallelOptions { MaxDegreeOfParallelism = SrzThreadsLimit }, async credential =>
+            var credential = SrzCredentials.First();
+
+            using var service = new SRZService(SrzAddress, UseProxy, ProxyAddress, ProxyPort);
+
+            try
             {
-                using (var service = new SRZService(SrzAddress, UseProxy, ProxyAddress, ProxyPort))
-                {
-                    bool isAuthorized;
+                await service.AuthorizeAsync(credential);
+            }
+            catch (Exception)
+            {
+            }
 
-                    try
-                    {
-                        isAuthorized = await service.AuthorizeAsync(credential);
-                    }
-                    catch (Exception)
-                    {
-                        isAuthorized = false;
-                    }
+            if (service.IsAuthorized)
+            {
+                await service.LogoutAsync();
 
-                    if (isAuthorized)
-                    {
-                        await service.LogoutAsync();
+                credential.RemoveErrors(nameof(credential.Login));
+                credential.RemoveErrors(nameof(credential.Password));
+            }
+            else
+            {
+                credential.AddError(ErrorMessages.Authorization, nameof(credential.Login));
+                credential.AddError(ErrorMessages.Authorization, nameof(credential.Password));
+            }
 
-                        credential.RemoveErrors(nameof(credential.Login));
-                        credential.RemoveErrors(nameof(credential.Password));
-                    }
-                    else
-                    {
-                        credential.AddError(ErrorMessages.Authorization, nameof(credential.Login));
-                        credential.AddError(ErrorMessages.Authorization, nameof(credential.Password));
-                    }
-                }
-            });
-
-            return !SrzCredentials.Any(x => x.HasErrors);
+            return service.IsAuthorized;
         }
         //сдвигает вверх элемент коллекции ColumnProperties
         public void MoveUpColumnProperty(ColumnProperty item)
@@ -388,7 +383,7 @@ namespace CHI.Models
             if (!TryConnectSite(SrzAddress, nameof(SrzAddress)))
                 return;
 
-            if (! await TryAuthorizeSrzCredentialsAsync())
+            if (!await TryAuthorizeSrzCredentialsAsync())
                 return;
 
             SrzConnectionIsValid = true;
@@ -477,85 +472,72 @@ namespace CHI.Models
         //проверяет учетные данные портала диспансеризации, в случае успеха - true
         private async Task<bool> TryAuthorizeExaminationsCredentialsAsync()
         {
-            var codesMO = new ConcurrentBag<string>();
+            var credential = ExaminationsCredentials.First();
 
-           Parallel.ForEach(ExaminationsCredentials, new ParallelOptions { MaxDegreeOfParallelism = ExaminationsThreadsLimit }, async credential =>
+            using var service = new ExaminationService(ExaminationsAddress, UseProxy, ProxyAddress, ProxyPort);
+
+            try
             {
-                using (var service = new ExaminationService(ExaminationsAddress, UseProxy, ProxyAddress, ProxyPort))
-                {
-                    bool isAuthorized;
+                await service.AuthorizeAsync(credential);
+            }
+            catch (Exception)
+            {
+            }
 
-                    try
-                    {
-                        isAuthorized = await service.AuthorizeAsync(credential);
-                    }
-                    catch (Exception)
-                    {
-                        isAuthorized = false;
-                    }
+            if (service.IsAuthorized)
+            {
+                FomsCodeMO = service.FomsCodeMO;
 
-                    if (isAuthorized)
-                    {
-                        codesMO.Add(service.FomsCodeMO);
+                await service.LogoutAsync();
 
-                        await service.LogoutAsync();
+                credential.RemoveErrors(nameof(credential.Login));
+                credential.RemoveErrors(nameof(credential.Password));
 
-                        credential.RemoveErrors(nameof(credential.Login));
-                        credential.RemoveErrors(nameof(credential.Password));
-                    }
-                    else
-                    {
-                        credential.AddError(ErrorMessages.Authorization, nameof(credential.Login));
-                        credential.AddError(ErrorMessages.Authorization, nameof(credential.Password));
-                    }
-                }
-            });
+            }
+            else
+            {
+                credential.AddError(ErrorMessages.Authorization, nameof(credential.Login));
+                credential.AddError(ErrorMessages.Authorization, nameof(credential.Password));
+            }        
 
-            var uniqCodes = codesMO.ToList().Distinct(StringComparer.OrdinalIgnoreCase).ToList();
-
-            if (uniqCodes.Count > 1)
-                throw new InvalidOperationException("Ошибка: учетные записи не должны принадлежать разным ЛПУ");
-
-            FomsCodeMO = uniqCodes.FirstOrDefault();
-
-            return !ExaminationsCredentials.Any(x => x.HasErrors);
+            return service.IsAuthorized;
         }
-        //Устанавливает значения по умолчанию для портала диспансеризации
-        public void SetDefaultExaminations()
-        {
-            ExaminationsAddress = @"http://10.0.0.203/";
-            ExaminationsThreadsLimit = 5;
-            PatientFileNames = @"LPM, LVM, LOM";
-            ExaminationFileNames = @"DPM, DVM, DOM";
+    //Устанавливает значения по умолчанию для портала диспансеризации
+    public void SetDefaultExaminations()
+    {
+        ExaminationsAddress = @"http://10.0.0.203/";
+        ExaminationsThreadsLimit = 5;
+        PatientFileNames = @"LPM, LVM, LOM";
+        ExaminationFileNames = @"DPM, DVM, DOM";
 
-            ExaminationsCredentials = new ObservableCollection<Credential>()
+        ExaminationsCredentials = new ObservableCollection<Credential>()
              {
                     new Credential{Login="МойЛогин1", Password="МойПароль1"},
                     new Credential{Login="МойЛогин2", Password="МойПароль2"},
                     new Credential{Login="МойЛогин3", Password="МойПароль3"}
              };
-        }
-        //проверить настройеки подключения к порталу диспансризации
-        public async Task TestConnectionExaminationsAsync()
-        {
-            ExaminationsConnectionIsValid = false;
-
-            RemoveError(ErrorMessages.Connection, nameof(ExaminationsAddress));
-            ExaminationsCredentials.ToList().ForEach(x => x.RemoveErrorsMessage(ErrorMessages.Authorization));
-
-            TestConnectionProxy();
-
-            if (!ProxyConnectionIsValid)
-                return;
-
-            if (!TryConnectSite(ExaminationsAddress, nameof(ExaminationsAddress)))
-                return;
-
-            if (! await TryAuthorizeExaminationsCredentialsAsync())
-                return;
-
-            ExaminationsConnectionIsValid = true;
-        }
-        #endregion
     }
+    //проверить настройеки подключения к порталу диспансризации
+    public async Task TestConnectionExaminationsAsync()
+    {
+        ExaminationsConnectionIsValid = false;
+
+        RemoveError(ErrorMessages.Connection, nameof(ExaminationsAddress));
+        ExaminationsCredentials.ToList().ForEach(x => x.RemoveErrorsMessage(ErrorMessages.Authorization));
+
+        TestConnectionProxy();
+
+        if (!ProxyConnectionIsValid)
+            return;
+
+        if (!TryConnectSite(ExaminationsAddress, nameof(ExaminationsAddress)))
+            return;
+
+        if (!await TryAuthorizeExaminationsCredentialsAsync())
+            return;
+
+        ExaminationsConnectionIsValid = true;
+    }
+    #endregion
+}
 }
