@@ -1,4 +1,5 @@
-﻿using CHI.Models;
+﻿using CHI.Infrastructure;
+using CHI.Models;
 using CHI.Services.Common;
 using Newtonsoft.Json;
 using System;
@@ -43,7 +44,7 @@ namespace CHI.Services.MedicalExaminations
 
             if (!string.IsNullOrEmpty(responseText) && !responseText.Contains(@"<li>Пользователь не найден</li>"))
             {
-                FomsCodeMO = SubstringBetween(responseText, "<div>", "<div>", "</div>");
+                FomsCodeMO = responseText.SubstringBetween("<div>", "<div>", "</div>");
                 return IsAuthorized = true;
             }
             else
@@ -220,7 +221,7 @@ namespace CHI.Services.MedicalExaminations
 
             var responseText = await SendPostAsync(@"disp/SrzSearch", contentParameters);
 
-            var idString = SubstringBetween(responseText, "personId", "\"", "\"");
+            var idString = responseText.SubstringBetween("personId", "\"", "\"");
 
             if (!int.TryParse(idString, out int srzPatientId))
                 return null;
@@ -308,50 +309,5 @@ namespace CHI.Services.MedicalExaminations
 
         static int GetYearId(int year)
            => year - 2017;
-
-        /// <summary>
-        /// Возвращает подстроку между левой leftStr и правой rightStr строками, поиск начинается от начальной позиции offsetStr.
-        /// Если одна из строк не найдена-возвращает пустую строку.
-        /// </summary>
-        /// <param name="text">Текст</param>
-        /// <param name="offsetStr">Начальная позиция поиска</param>
-        /// <param name="leftStr">Левая подстрока</param>
-        /// <param name="rightStr">Правая подстрока</param>
-        /// <returns>Искомая или пустая строка</returns>
-        protected static string SubstringBetween(string text, string offsetStr, string leftStr, string rightStr)
-        {
-            int offset;
-
-            if (string.IsNullOrEmpty(offsetStr))
-                offset = 0;
-            else
-            {
-                offset = text.IndexOf(offsetStr);
-
-                if (offset == -1)
-                    return string.Empty;
-
-                offset += offsetStr.Length;
-            }
-
-            var begin = text.IndexOf(leftStr, offset);
-
-            if (begin == -1)
-                return string.Empty;
-
-            begin += leftStr.Length;
-
-            var end = text.IndexOf(rightStr, begin);
-
-            if (end == -1)
-                return string.Empty;
-
-            var length = end - begin;
-
-            if (length > 0)
-                return text.Substring(begin, length);
-
-            return string.Empty;
-        }
     }
 }

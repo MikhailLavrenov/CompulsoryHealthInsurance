@@ -261,5 +261,50 @@ namespace CHI.Infrastructure
 
             return false;
         }
+
+        /// <summary>
+        /// Возвращает подстроку между левой leftStr и правой rightStr строками, поиск начинается от начальной позиции offsetStr.
+        /// Если одна из строк не найдена-возвращает пустую строку.
+        /// </summary>
+        /// <param name="text">Текст</param>
+        /// <param name="offsetStr">Подстрока, после которой начинается поиск. Можеть быть null или пустой</param>
+        /// <param name="leftStr">Левая подстрока</param>
+        /// <param name="rightStr">Правая подстрока</param>
+        /// <returns>Искомая подстрока, иначе пустая</returns>
+        public static string SubstringBetween(this string text, string offsetStr, string leftStr, string rightStr)
+        {
+            int offset;
+
+            if (string.IsNullOrEmpty(offsetStr))
+                offset = 0;
+            else
+            {
+                offset = text.IndexOf(offsetStr);
+
+                if (offset == -1)
+                    return string.Empty;
+
+                offset += offsetStr.Length;
+            }
+
+            var begin = text.IndexOf(leftStr, offset);
+
+            if (begin == -1)
+                return string.Empty;
+
+            begin += leftStr.Length;
+
+            var end = text.IndexOf(rightStr, begin);
+
+            if (end == -1)
+                return string.Empty;
+
+            var length = end - begin;
+
+            if (length > 0)
+                return text.Substring(begin, length);
+
+            return string.Empty;
+        }
     }
 }

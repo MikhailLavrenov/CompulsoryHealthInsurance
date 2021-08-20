@@ -1,11 +1,11 @@
-﻿using CHI.Models;
+﻿using CHI.Infrastructure;
+using CHI.Models;
 using CHI.Services.Common;
 using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
-using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -17,7 +17,7 @@ namespace CHI.Services.SRZ
     public class SRZService : WebServiceBase, IDisposable
     {
         /// <summary>
-        /// Используемые учетные данные для авторизации
+        /// Учетные данные для авторизации
         /// </summary>
         public ICredential Credential { get; private set; }
 
@@ -47,19 +47,9 @@ namespace CHI.Services.SRZ
                 { "pw", credential.Password},
             };
 
-            try
-            {
-                var responseText = await SendPostAsync(@"data/user.ajax.logon.php", content);
+            var responseText = await SendPostAsync(@"data/user.ajax.logon.php", content);
 
-                if (responseText == "")
-                    return IsAuthorized = true;
-                else
-                    return IsAuthorized = false;
-            }
-            catch (Exception)
-            {
-                return IsAuthorized = false;
-            }
+            return IsAuthorized = string.IsNullOrEmpty(responseText);
         }
 
         /// <summary>
@@ -104,18 +94,12 @@ namespace CHI.Services.SRZ
         {
             ThrowExceptionIfNotAuthorized();
 
-            var urn =await GetPatientsFileReferenceAsync(onDate);
+            var urn = await GetPatientsFileUrnAsync(onDate);
 
-            //скачивает zip архив
-            var zipFile =await SendGetStreamAsync(urn);
-
-            //извлекает dbf файл
-            Stream dbfFile = new MemoryStream();
+            var zipFile = await SendGetStreamAsync(urn);
 
             using (var archive = new ZipArchive(zipFile, ZipArchiveMode.Read))
-                archive.Entries[0].Open().CopyTo(dbfFile);
-
-            ConvertDbfToExcel(dbfFile, excelFile);
+                ConvertDbfToExcel(archive.Entries[0].Open(), excelFile);
         }
 
         /// <summary>
@@ -123,21 +107,16 @@ namespace CHI.Services.SRZ
         /// </summary>
         /// <param name="onDate">Дата на которую сформирован файл.</param>
         /// <returns>Ссылку на скачивание файла прикрепленных пациентов.</returns>
-        async Task<string> GetPatientsFileReferenceAsync(DateTime onDate)
+        async Task<string> GetPatientsFileUrnAsync(DateTime onDate)
         {
-            string shortFileDate = onDate.ToShortDateString();
-
             var content = new Dictionary<string, string> {
-                { "export_date_on", shortFileDate },
+                { "export_date_on", onDate.ToShortDateString() },
                 { "exportlist_id", "25" },
             };
 
-            var responseText =await SendPostAsync( @"data/dbase.export.php", content);
+            var responseText = await SendPostAsync(@"data/dbase.export.php", content);
 
-            int begin = responseText.IndexOf(@"<a href='") + 9;
-            int length = responseText.IndexOf(@"' ", begin) - begin;
-
-            return responseText.Substring(begin, length);
+            return responseText.SubstringBetween(null, @"<a href='", @"' ");
         }
 
         /// <summary>
@@ -147,37 +126,37 @@ namespace CHI.Services.SRZ
         /// <param name="excelFilePath">Путь для сохранения excel файла.</param>
         static void ConvertDbfToExcel(Stream dbfFile, string excelFilePath)
         {
-            dbfFile.Position = 0;
+            if (dbfFile.CanSeek)
+                dbfFile.Seek(0, SeekOrigin.Begin);
 
-            using (var table = NDbfReader.Table.Open(dbfFile))
-            using (var excel = new ExcelPackage())
+            using var table = NDbfReader.Table.Open(dbfFile);
+            using var excel = new ExcelPackage();
+
+            var reader = table.OpenReader(Encoding.GetEncoding(866));
+            var sheet = excel.Workbook.Worksheets.Add("Лист1");
+
+            //вставляет заголовки и устанавливает формат столбцов
+            for (int columnIndex = 0; columnIndex < table.Columns.Count; columnIndex++)
             {
-                var reader = table.OpenReader(Encoding.GetEncoding(866));
-                var sheet = excel.Workbook.Worksheets.Add("Лист1");
+                sheet.Cells[1, columnIndex + 1].Value = table.Columns[columnIndex].Name.ToString();
 
-                //вставляет заголовки и устанавливает формат столбцов
-                for (int column = 0; column < table.Columns.Count; column++)
-                {
-                    sheet.Cells[1, column + 1].Value = table.Columns[column].Name.ToString();
+                var type = table.Columns[columnIndex].Type;
+                type = Nullable.GetUnderlyingType(type) ?? type;
 
-                    var type = table.Columns[column].Type;
-                    type = Nullable.GetUnderlyingType(type) ?? type;
-
-                    if (type.Name == "DateTime")
-                        sheet.Column(column + 1).Style.Numberformat.Format = "dd.MM.yyyy";
-                }
-
-                //заполняет строки таблицы
-                int row = 2;
-                while (reader.Read())
-                {
-                    for (int column = 0; column < table.Columns.Count; column++)
-                        sheet.Cells[row, column + 1].Value = reader.GetValue(table.Columns[column]);
-                    row++;
-                }
-
-                excel.SaveAs(new FileInfo(excelFilePath));
+                if (type.Name == "DateTime")
+                    sheet.Column(columnIndex + 1).Style.Numberformat.Format = "dd.MM.yyyy";
             }
+
+            //заполняет строки таблицы
+            int rowIndex = 2;
+            while (reader.Read())
+            {
+                for (int columnIndex = 0; columnIndex < table.Columns.Count; columnIndex++)
+                    sheet.Cells[rowIndex, columnIndex + 1].Value = reader.GetValue(table.Columns[columnIndex]);
+                rowIndex++;
+            }
+
+            excel.SaveAs(new FileInfo(excelFilePath));
         }
     }
 }

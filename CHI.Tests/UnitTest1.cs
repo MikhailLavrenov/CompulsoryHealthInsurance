@@ -1,21 +1,15 @@
-using CHI.Models;
-using CHI.Services.MedicalExaminations;
 using NUnit.Framework;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace CHI.Tests
 {
     public class Tests
     {
-        [SetUp]
-        public void Setup()
-        {
-        }
-
         [Test]
-        public async Task Test1()
+        public void Test1()
         {
-            Assert.Pass();
         }
     }
 }
