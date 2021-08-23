@@ -2,7 +2,6 @@
 using CHI.Services.MedicalExaminations;
 using CHI.Services.SRZ;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -330,9 +329,10 @@ namespace CHI.Models
 
             using var service = new SRZService(SrzAddress, UseProxy, ProxyAddress, ProxyPort);
 
+            var isAuthorized = false;
             try
             {
-                await service.AuthorizeAsync(credential);
+                isAuthorized = await service.AuthorizeAsync(credential);
             }
             catch (Exception)
             {
@@ -351,7 +351,7 @@ namespace CHI.Models
                 credential.AddError(ErrorMessages.Authorization, nameof(credential.Password));
             }
 
-            return service.IsAuthorized;
+            return isAuthorized;
         }
         //сдвигает вверх элемент коллекции ColumnProperties
         public void MoveUpColumnProperty(ColumnProperty item)
@@ -476,9 +476,11 @@ namespace CHI.Models
 
             using var service = new ExaminationService(ExaminationsAddress, UseProxy, ProxyAddress, ProxyPort);
 
+            var isAuthorized = false;
+
             try
             {
-                await service.AuthorizeAsync(credential);
+                isAuthorized = await service.AuthorizeAsync(credential);
             }
             catch (Exception)
             {
@@ -498,46 +500,46 @@ namespace CHI.Models
             {
                 credential.AddError(ErrorMessages.Authorization, nameof(credential.Login));
                 credential.AddError(ErrorMessages.Authorization, nameof(credential.Password));
-            }        
+            }
 
-            return service.IsAuthorized;
+            return isAuthorized;
         }
-    //Устанавливает значения по умолчанию для портала диспансеризации
-    public void SetDefaultExaminations()
-    {
-        ExaminationsAddress = @"http://10.0.0.203/";
-        ExaminationsThreadsLimit = 5;
-        PatientFileNames = @"LPM, LVM, LOM";
-        ExaminationFileNames = @"DPM, DVM, DOM";
+        //Устанавливает значения по умолчанию для портала диспансеризации
+        public void SetDefaultExaminations()
+        {
+            ExaminationsAddress = @"http://10.0.0.203/";
+            ExaminationsThreadsLimit = 5;
+            PatientFileNames = @"LPM, LVM, LOM";
+            ExaminationFileNames = @"DPM, DVM, DOM";
 
-        ExaminationsCredentials = new ObservableCollection<Credential>()
+            ExaminationsCredentials = new ObservableCollection<Credential>()
              {
                     new Credential{Login="МойЛогин1", Password="МойПароль1"},
                     new Credential{Login="МойЛогин2", Password="МойПароль2"},
                     new Credential{Login="МойЛогин3", Password="МойПароль3"}
              };
+        }
+        //проверить настройеки подключения к порталу диспансризации
+        public async Task TestConnectionExaminationsAsync()
+        {
+            ExaminationsConnectionIsValid = false;
+
+            RemoveError(ErrorMessages.Connection, nameof(ExaminationsAddress));
+            ExaminationsCredentials.ToList().ForEach(x => x.RemoveErrorsMessage(ErrorMessages.Authorization));
+
+            TestConnectionProxy();
+
+            if (!ProxyConnectionIsValid)
+                return;
+
+            if (!TryConnectSite(ExaminationsAddress, nameof(ExaminationsAddress)))
+                return;
+
+            if (!await TryAuthorizeExaminationsCredentialsAsync())
+                return;
+
+            ExaminationsConnectionIsValid = true;
+        }
+        #endregion
     }
-    //проверить настройеки подключения к порталу диспансризации
-    public async Task TestConnectionExaminationsAsync()
-    {
-        ExaminationsConnectionIsValid = false;
-
-        RemoveError(ErrorMessages.Connection, nameof(ExaminationsAddress));
-        ExaminationsCredentials.ToList().ForEach(x => x.RemoveErrorsMessage(ErrorMessages.Authorization));
-
-        TestConnectionProxy();
-
-        if (!ProxyConnectionIsValid)
-            return;
-
-        if (!TryConnectSite(ExaminationsAddress, nameof(ExaminationsAddress)))
-            return;
-
-        if (!await TryAuthorizeExaminationsCredentialsAsync())
-            return;
-
-        ExaminationsConnectionIsValid = true;
-    }
-    #endregion
-}
 }

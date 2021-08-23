@@ -169,7 +169,7 @@ namespace CHI.ViewModels
 
             for (int i = 0; i < tasks.Length; i++)
             {
-                tasks[i] = Task.Factory.StartNew(async () =>
+                tasks[i] = Task.Run(async () =>
                 {
                     ExaminationService service = null;
 
