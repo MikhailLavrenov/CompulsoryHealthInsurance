@@ -139,7 +139,10 @@ namespace CHI.ViewModels
 
             MainRegionService.ShowProgressBar($"Загрузка осмотров. Всего пациентов: {patientsExaminations.Count}.");
 
-            Result = await AddExaminationsParallel(patientsExaminations);
+            var parallelSerivce = new ParallelExaminationsService(Settings.ExaminationsAddress, Settings.ExaminationsCredentials.First(), Settings.ExaminationsThreadsLimit);
+            if (Settings.UseProxy)
+                parallelSerivce.UseProxy(Settings.ProxyAddress, Settings.ProxyPort);
+            Result = await parallelSerivce.AddExaminationsAsync(patientsExaminations);
 
             Result.OrderBy(x => x.IsLoaded)                
                 .ThenBy(x => x.PatientExaminations.Kind)
@@ -153,101 +156,7 @@ namespace CHI.ViewModels
             MainRegionService.HideProgressBar("Завершено.");
         }
 
-        /// <summary>
-        /// Загружает осмотры на портал диспансеризации. В случае возникновения исключений при загрузке осмотра - предпринимает несколько попыток.
-        /// </summary>
-        /// <param name="patientsExaminations">Список профилактических осмотров пациентов.</param>
-        /// <returns>Список кортежей состоящий из PatientExaminations, флага успешной загрузки (true-успешно, false-иначе), строки с сообщением об ошибке.</returns>
-        async Task<List<(PatientExaminations, bool, string)>> AddExaminationsParallel(List<PatientExaminations> patientsExaminations)
-        {
-            var loadedExaminations = new ConcurrentBag<(PatientExaminations PatientExaminations, bool IsLoaded, string Error)>();
-            var tasks = new Task[Math.Min(Settings.ExaminationsThreadsLimit, patientsExaminations.Count)];
-            var patientsExaminationsStack = new ConcurrentStack<PatientExaminations>(patientsExaminations);
 
-            //задержка потока перед обращением к веб-серверу, увеличивается при росте неудачных попыток, и уменьшается при росте удачных
-            var sleepTime = 0;
-
-            for (int i = 0; i < tasks.Length; i++)
-            {
-                tasks[i] = Task.Run(async () =>
-                {
-                    ExaminationService service = null;
-
-                    while (patientsExaminationsStack.TryPop(out var patientExaminations))
-                    {
-                        string error = string.Empty;
-                        bool isSuccessful = true;
-
-                        //3 попытки на загрузку осмотра, т.к. иногда веб-сервер обрывает сессии
-                        for (int j = 1; j < 4; j++)
-                        {
-                            if (j != 1)
-                                Interlocked.Add(ref sleepTime, 5000);
-
-                            Thread.Sleep(sleepTime);
-
-                            try
-                            {
-                                if (service == null)
-                                {
-                                    service = new ExaminationService(Settings.ExaminationsAddress, Settings.UseProxy, Settings.ProxyAddress, Settings.ProxyPort);
-                                    await service.AuthorizeAsync(settings.ExaminationsCredentials.First());
-                                }
-
-                                await service.AddPatientExaminationsAsync(patientExaminations);
-                                error = string.Empty;
-                                isSuccessful = true;
-
-                                if (sleepTime != 0)
-                                {
-                                    //универсальный InterLocked-паттерн, потокобезопасно уменьшает sleepRate если он положительный
-                                    int initial, desired;
-
-                                    do
-                                    {
-                                        initial = sleepTime;
-                                        desired = initial;
-                                        if (desired >= 1000)
-                                            desired -= 1000;
-                                        else if (desired > 0)
-                                            desired = 0;
-                                    }
-                                    while (initial != Interlocked.CompareExchange(ref sleepTime, desired, initial));
-                                }
-
-                                break;
-                            }
-                            catch (HttpRequestException ex)
-                            {
-                                error = ex.Message;
-                                isSuccessful = false;
-                                service = null;
-                            }
-                            //??????????????????????????
-                            catch (InvalidOperationException ex)
-                            {
-                                error = ex.Message;
-                                isSuccessful = false;
-                            }
-                            catch (WebServiceOperationException ex)
-                            {
-                                error = ex.Message;
-                                isSuccessful = false;
-                                break;
-                            }
-                        }
-
-                        loadedExaminations.Add((patientExaminations, isSuccessful, error));
-
-                        MainRegionService.ShowProgressBar($"Загрузка осмотров. Обработано пациентов: {loadedExaminations.Count} из {patientsExaminations.Count}.");
-                    }
-                });
-            }
-
-            await Task.WhenAll(tasks);
-
-            return loadedExaminations.ToList();
-        }
 
         //private List<Tuple<PatientExaminations, bool, string>> AddExaminationsParallel(List<PatientExaminations> patientsExaminations)
         //{
