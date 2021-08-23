@@ -5,7 +5,6 @@ using CHI.Services.SRZ;
 using Microsoft.EntityFrameworkCore;
 using Prism.Regions;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -99,9 +98,13 @@ namespace CHI.ViewModels
                 var unknownInsuaranceNumbers = file.GetInsuranceNumberOfPatientsWithoutFullName().Take((int)Settings.SrzRequestsLimit).ToList();
 
                 MainRegionService.ShowProgressBar("Поиск ФИО в СРЗ.");
-                var foundPatients = await LoadPatientsAsync(unknownInsuaranceNumbers);
+                var parallelSrzService = new ParallelSRZService(Settings.SrzAddress, Settings.SrzCredentials.First(), Settings.SrzThreadsLimit);
+                if (Settings.UseProxy)
+                    parallelSrzService.UseProxy(Settings.ProxyAddress, Settings.ProxyPort);
 
-                resultReport.Append($"Запрошено пациентов в СРЗ: {foundPatients.Count()}, лимит {Settings.SrzRequestsLimit}. ");
+                var foundPatients = await parallelSrzService.GetPatientsAsync(unknownInsuaranceNumbers);
+
+                resultReport.Append($"Запрошено пациентов в СРЗ: {foundPatients.Count}, лимит {Settings.SrzRequestsLimit}. ");
                 MainRegionService.ShowProgressBar("Подстановка ФИО в файл.");
                 file.InsertPatientsWithFullName(foundPatients);
 
@@ -140,70 +143,5 @@ namespace CHI.ViewModels
             SleepMode.Deny();
             MainRegionService.HideProgressBar(resultReport.ToString());
         }
-
-        //запускает многопоточно запросы к сайту для поиска пациентов
-        async Task<List<Patient>> LoadPatientsAsync(List<string> insuranceNumbers)
-        {
-            var requestsLimit = Math.Min(insuranceNumbers.Count, (int)Settings.SrzRequestsLimit);
-
-            var verifiedPatients = new ConcurrentBag<Patient>();
-            var enpStack = new ConcurrentStack<string>(insuranceNumbers.Take(requestsLimit));
-            var tasks = new Task[Math.Min(Settings.SrzThreadsLimit, insuranceNumbers.Count)];
-
-            for (int i = 0; i < tasks.Length; i++)
-            {
-                tasks[i] = Task.Run(async () =>
-                  {
-                      var service = new SRZService(Settings.SrzAddress, Settings.UseProxy, Settings.ProxyAddress, Settings.ProxyPort);
-
-                      await service.AuthorizeAsync(settings.SrzCredentials.First());
-
-                      while (enpStack.TryPop(out string enp))
-                      {
-                          var patient = await service.GetPatientAsync(enp);
-
-                          if (patient != null)
-                          {
-                              verifiedPatients.Add(patient);
-                              MainRegionService.ShowProgressBar($"Запрошено ФИО в СРЗ: {verifiedPatients.Count()} из {requestsLimit}.");
-                          }
-                      }
-
-                      await service.LogoutAsync();
-                  });
-            }
-
-            await Task.WhenAll(tasks);
-
-            return verifiedPatients.ToList();
-        }
-
-        //        async Task<List<Patient>> GetPatientsOld(List<string> insuranceNumbers)
-        //        {
-        //            var requestsLimit = Math.Min(insuranceNumbers.Count, (int)Settings.SrzRequestsLimit);
-
-        //            var verifiedPatients = new ConcurrentBag<Patient>();
-        //            var enpStack = new ConcurrentStack<string>(insuranceNumbers.Take(requestsLimit));
-
-        //            var options = new ParallelOptions();
-        //            options.MaxDegreeOfParallelism = Math.Min(Settings.SrzThreadsLimit, insuranceNumbers.Count);
-        //            Parallel.Invoke(options, async () =>
-        //            {
-        //                var service = new SRZService(Settings.SrzAddress, Settings.UseProxy, Settings.ProxyAddress, Settings.ProxyPort);
-
-        //                await service.AuthorizeAsync(settings.SrzCredentials.First());
-
-        //                while (enpStack.TryPop(out string enp))
-        //                {
-        //                    var patient = await service.GetPatientAsync(enp);
-
-        //                    if (patient != null)
-        //                    {
-        //                        verifiedPatients.Add(patient);
-        //                        MainRegionService.ShowProgressBar($"Запрошено ФИО в СРЗ: {verifiedPatients.Count()} из {insuranceNumbers.Count}.");
-        //                    }
-        //                }
-        //            }
-        //}
     }
 }
