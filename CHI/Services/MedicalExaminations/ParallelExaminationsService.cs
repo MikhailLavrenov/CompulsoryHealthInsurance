@@ -12,6 +12,9 @@ namespace CHI.Services.MedicalExaminations
 {
     public class ParallelExaminationsService : ParallelWebServiceBase
     {
+        static readonly int increaseWaiting = 5000;
+        static readonly int decreaseWaiting = 1000;
+
         public ParallelExaminationsService(string address, ICredential credential, int maxDegreeOfParallelism)
             : base(address, credential, maxDegreeOfParallelism)
         {
@@ -29,7 +32,7 @@ namespace CHI.Services.MedicalExaminations
             var patientsExaminationsStack = new ConcurrentStack<PatientExaminations>(patientsExaminations);
 
             //задержка потока перед обращением к веб-серверу, увеличивается при росте неудачных попыток, и уменьшается при росте удачных
-            var sleepTime = 0;
+            var waitTime = 0;
 
             for (int i = 0; i < tasks.Length; i++)
             {
@@ -40,19 +43,16 @@ namespace CHI.Services.MedicalExaminations
                     while (patientsExaminationsStack.TryPop(out var patientExaminations))
                     {
                         string error = string.Empty;
-                        bool isSuccessful = true;
+                        bool isSuccessful = false;
 
                         //3 попытки на загрузку осмотра, т.к. иногда веб-сервер обрывает сессии
-                        for (int j = 1; j < 4; j++)
+                        for (int j = 0; j < 3; j++)
                         {
-                            if (j != 1)
-                                Interlocked.Add(ref sleepTime, 5000);
-
-                            Thread.Sleep(sleepTime);
+                            await Task.Delay(waitTime);
 
                             try
                             {
-                                if (service == null)
+                                if (service == null || j == 2)
                                 {
                                     service = new ExaminationService(address, useProxy, proxyAddress, proxyPort);
                                     await service.AuthorizeAsync(credential);
@@ -62,41 +62,18 @@ namespace CHI.Services.MedicalExaminations
                                 error = string.Empty;
                                 isSuccessful = true;
 
-                                if (sleepTime != 0)
-                                {
-                                    //универсальный InterLocked-паттерн, потокобезопасно уменьшает sleepRate если он положительный
-                                    int initial, desired;
-
-                                    do
-                                    {
-                                        initial = sleepTime;
-                                        desired = initial;
-                                        if (desired >= 1000)
-                                            desired -= 1000;
-                                        else if (desired > 0)
-                                            desired = 0;
-                                    }
-                                    while (initial != Interlocked.CompareExchange(ref sleepTime, desired, initial));
-                                }
+                                DecreaseWaitTimeThreadSafety(ref waitTime);
 
                                 break;
                             }
                             catch (HttpRequestException ex)
                             {
                                 error = ex.Message;
-                                isSuccessful = false;
-                                service = null;
-                            }
-                            //??????????????????????????
-                            catch (InvalidOperationException ex)
-                            {
-                                error = ex.Message;
-                                isSuccessful = false;
+                                Interlocked.Add(ref waitTime, increaseWaiting);
                             }
                             catch (WebServiceOperationException ex)
                             {
                                 error = ex.Message;
-                                isSuccessful = false;
                                 break;
                             }
                         }
@@ -111,6 +88,22 @@ namespace CHI.Services.MedicalExaminations
             await Task.WhenAll(tasks);
 
             return loadedExaminations.ToList();
+        }
+
+        void DecreaseWaitTimeThreadSafety(ref int value)
+        {
+            if (value == 0)
+                return;
+
+            //универсальный InterLocked-паттерн, потокобезопасно уменьшает waitTime
+            int initial, desired;
+
+            do
+            {
+                initial = value;
+                desired = initial < decreaseWaiting ? 0 : initial - decreaseWaiting;
+            }
+            while (initial != Interlocked.CompareExchange(ref value, desired, initial));
         }
     }
 }
