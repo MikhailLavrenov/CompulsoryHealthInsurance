@@ -1,35 +1,27 @@
 ﻿using CHI.Infrastructure;
-using CHI.Models;
-using CHI.Models.ServiceAccounting;
-using CHI.Services;
-using Microsoft.EntityFrameworkCore;
-using Prism.Commands;
+using CHI.Models.AppSettings;
 using Prism.Regions;
 using Prism.Services.Dialogs;
-using System.Linq;
 
 namespace CHI.ViewModels
 {
     public class ServiceAccountingSettingsViewModel : DomainObject, IRegionMemberLifetime
     {
-        private Settings settings;
-        private IDialogService dialogService;
-        private readonly IFileDialogService fileDialogService;
+        readonly IFileDialogService fileDialogService;
 
         public IMainRegionService MainRegionService { get; set; }
         public bool KeepAlive { get => false; }
-        public Settings Settings { get => settings; set => SetProperty(ref settings, value); }
+        public AppSettings Settings { get; set; }
 
         public DelegateCommandAsync SelectFileCommand { get; set; }
 
 
-        public ServiceAccountingSettingsViewModel(IMainRegionService mainRegionService, IFileDialogService fileDialogService, IDialogService dialogService)
+        public ServiceAccountingSettingsViewModel(AppSettings settings, IMainRegionService mainRegionService, IFileDialogService fileDialogService, IDialogService dialogService)
         {
+            Settings = settings;
             this.fileDialogService = fileDialogService;
-            this.dialogService = dialogService;
             MainRegionService = mainRegionService;
 
-            Settings = Settings.Instance;
             MainRegionService.Header = "Настройки учета услуг";
 
             SelectFileCommand = new DelegateCommandAsync(SelectFileExecute);
@@ -44,8 +36,7 @@ namespace CHI.ViewModels
             if (fileDialogService.ShowDialog() != true)
                 return;
 
-            Settings.ServiceAccountingReportPath = fileDialogService.FileName;
+            Settings.ServiceAccounting.ReportPath = fileDialogService.FileName;
         }
-
     }
 }

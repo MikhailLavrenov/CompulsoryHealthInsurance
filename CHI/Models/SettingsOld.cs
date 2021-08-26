@@ -13,21 +13,21 @@ using System.Xml.Serialization;
 
 namespace CHI.Models
 {
-    public class Settings : DomainObject
+    public class SettingsOld : DomainObject
     {
         #region Общие
         static readonly int timeoutConnection = 3000;
         static readonly string settingsFileName = "Settings.xml";
 
-        public static Settings Instance { get; private set; }
+        public static SettingsOld Instance { get; private set; }
         [XmlIgnore] public bool FailedToDecrypt { get; set; }
         [XmlIgnore] public string BackupSettingsFile { get; set; }
 
-        static Settings()
+        static SettingsOld()
         {
             Instance = Load();
         }
-        public Settings()
+        public SettingsOld()
         {
             SrzCredentials = new ObservableCollection<Credential>();
             ExaminationsCredentials = new ObservableCollection<Credential>();
@@ -66,16 +66,16 @@ namespace CHI.Models
             }
         }
         //загружает настройки из xml
-        public static Settings Load()
+        public static SettingsOld Load()
         {
-            Settings settings;
+            SettingsOld settings;
 
             if (File.Exists(settingsFileName))
             {
                 using (var stream = new FileStream(settingsFileName, FileMode.Open))
                 {
-                    var formatter = new XmlSerializer(typeof(Settings));
-                    settings = formatter.Deserialize(stream) as Settings;
+                    var formatter = new XmlSerializer(typeof(SettingsOld));
+                    settings = formatter.Deserialize(stream) as SettingsOld;
                 }
 
                 try
@@ -103,7 +103,7 @@ namespace CHI.Models
 
             else
             {
-                settings = new Settings();
+                settings = new SettingsOld();
                 settings.SetDefaultSRZ();
                 settings.SetDefaultAttachedPatientsFile();
                 settings.SetDefaultExaminations();

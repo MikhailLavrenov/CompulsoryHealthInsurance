@@ -1,5 +1,6 @@
 ﻿using CHI.Infrastructure;
 using CHI.Models;
+using CHI.Models.AppSettings;
 using CHI.Models.ServiceAccounting;
 using CHI.Services;
 using CHI.Services.Report;
@@ -17,7 +18,7 @@ namespace CHI.ViewModels
     class ReportViewModel : DomainObject, IRegionMemberLifetime, INavigationAware
     {
         AppDBContext dbContext;
-        Settings settings;
+        ServiceAccounting settings;
         int year = DateTime.Now.Year;
         int month = DateTime.Now.Month;
         bool isGrowing;
@@ -47,11 +48,11 @@ namespace CHI.ViewModels
         public DelegateCommandAsync BuildAndSaveExcelCommand { get; }
 
 
-        public ReportViewModel(IMainRegionService mainRegionService, IFileDialogService fileDialogService)
+        public ReportViewModel(AppSettings settings, IMainRegionService mainRegionService, IFileDialogService fileDialogService)
         {
-            dbContext = new AppDBContext();
+            this.settings = settings.ServiceAccounting;
 
-            settings = Settings.Instance;
+            dbContext = new AppDBContext();           
 
             this.mainRegionService = mainRegionService;
             this.fileDialogService = fileDialogService;
@@ -62,7 +63,7 @@ namespace CHI.ViewModels
             DecreaseYear = new DelegateCommand(() => --Year);
             BuildReportCommand = new DelegateCommandAsync(BuildReportExecute);
             SaveExcelCommand = new DelegateCommandAsync(SaveExcelExecute);
-            BuildAndSaveExcelCommand = new DelegateCommandAsync(BuildAndSaveExcelExecute, () => !string.IsNullOrEmpty(settings.ServiceAccountingReportPath));
+            BuildAndSaveExcelCommand = new DelegateCommandAsync(BuildAndSaveExcelExecute, () => !string.IsNullOrEmpty(settings.ServiceAccounting.ReportPath));
         }
 
 
@@ -142,13 +143,13 @@ namespace CHI.ViewModels
         {
             mainRegionService.ShowProgressBar("Построение отчета");
 
-            if (!Directory.Exists(Path.GetDirectoryName(settings.ServiceAccountingReportPath)))
+            if (!Directory.Exists(Path.GetDirectoryName(settings.ReportPath)))
             {
                 mainRegionService.HideProgressBar("Отменено. Заданная директория не существует");
                 return;
             }
 
-            if (File.Exists(settings.ServiceAccountingReportPath) && Helpers.IsFileLocked(settings.ServiceAccountingReportPath))
+            if (File.Exists(settings.ReportPath) && Helpers.IsFileLocked(settings.ReportPath))
             {
                 mainRegionService.HideProgressBar("Отменено. Файл занят другим пользователем, поэтому не может быть изменен");
                 return;
@@ -161,7 +162,7 @@ namespace CHI.ViewModels
             IsGrowing = false;
             BuildReportInternal();
 
-            var excelBuilder = new ReportExcelBuilder(settings.ServiceAccountingReportPath)                
+            var excelBuilder = new ReportExcelBuilder(settings.ReportPath)                
                 .UseReportStyle()
                 .SetNewSheet(reportService.Month, reportService.Year, reportService.IsGrowing)
                 .FillSheet(RowHeaders, ColumnHeaders, GridItems);

@@ -1,28 +1,32 @@
 ﻿using CHI.Infrastructure;
+using CHI.Services.MedicalExaminations;
+using CHI.Services.SRZ;
 using System;
 using System.IO;
 using System.Net;
+using System.Net.Http;
 using System.Net.Sockets;
 using System.Security.Cryptography;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 
-namespace CHI.Models.Settings
+namespace CHI.Models.AppSettings
 {
     public class AppSettings : DomainObject
     {
-        static readonly int timeoutConnection = 3000;
-        static readonly string settingsFileName = "Settings.xml";
+        static readonly string fileName = "Settings.xml";
         Common common;
         SRZ srz;
         MedicalExaminations medicalExaminations;
-        AttachedPatients attachedPatients;
+        AttachedPatientsFile attachedPatientsFile;
         ServiceAccounting serviceAccounting;
+
 
         public Common Common { get => common; set => SetProperty(ref common, value); }
         public SRZ Srz { get => srz; set => SetProperty(ref srz, value); }
         public MedicalExaminations MedicalExaminations { get => medicalExaminations; set => SetProperty(ref medicalExaminations, value); }
-        public AttachedPatients AttachedPatients { get => attachedPatients; set => SetProperty(ref attachedPatients, value); }
+        public AttachedPatientsFile AttachedPatientsFile { get => attachedPatientsFile; set => SetProperty(ref attachedPatientsFile, value); }
         public ServiceAccounting ServiceAccounting { get => serviceAccounting; set => SetProperty(ref serviceAccounting, value); }
         [XmlIgnore] public bool FailedToDecrypt { get; set; }
         [XmlIgnore] public string BackupSettingsFile { get; set; }
@@ -33,12 +37,11 @@ namespace CHI.Models.Settings
             Common = new();
             Srz = new();
             MedicalExaminations = new();
-            AttachedPatients = new();
+            AttachedPatientsFile = new();
             ServiceAccounting = new();
         }
 
 
-        //сохраняет настройки в xml
         public void Save()
         {
             Common.ProxyConnectionIsValid = false;
@@ -53,27 +56,26 @@ namespace CHI.Models.Settings
             MedicalExaminations.Credential.Validate();
             MedicalExaminations.Credential.Encrypt(Common.CredentialsScope);
 
-            foreach (var columnProperty in AttachedPatients.ColumnProperties)
+            foreach (var columnProperty in AttachedPatientsFile.ColumnProperties)
                 columnProperty.Validate();
 
-            using (var stream = new FileStream(settingsFileName, FileMode.Create))
+            using (var stream = new FileStream(fileName, FileMode.Create))
             {
                 var formatter = new XmlSerializer(GetType());
                 formatter.Serialize(stream, this);
             }
         }
 
-        //загружает настройки из xml
         public static AppSettings Load()
         {
             AppSettings settings;
 
-            if (File.Exists(settingsFileName))
+            if (File.Exists(fileName))
             {
-                using (var stream = new FileStream(settingsFileName, FileMode.Open))
+                using (var stream = new FileStream(fileName, FileMode.Open))
                 {
-                    var formatter = new XmlSerializer(typeof(Settings));
-                    settings = formatter.Deserialize(stream) as Settings;
+                    var formatter = new XmlSerializer(typeof(AppSettings));
+                    settings = formatter.Deserialize(stream) as AppSettings;
                 }
 
                 try
@@ -89,7 +91,7 @@ namespace CHI.Models.Settings
                     settings.BackupSettingsFile = $@"Settings backup {DateTime.Now.ToString("dd_MM_yyyy_HH_mm_ss_FFF")}.xml";
                     settings.FailedToDecrypt = true;
 
-                    File.Copy(settingsFileName, settings.BackupSettingsFile);
+                    File.Copy(fileName, settings.BackupSettingsFile);
 
                     return settings;
                 }
@@ -97,7 +99,7 @@ namespace CHI.Models.Settings
 
             else
             {
-                settings = new Settings();
+                settings = new AppSettings();
                 settings.SetDefault();
             }
 
@@ -109,11 +111,10 @@ namespace CHI.Models.Settings
             Common.SetDefault();
             Srz.SetDefault();
             MedicalExaminations.SetDefault();
-            AttachedPatients.SetDefault();
+            AttachedPatientsFile.SetDefault();
             ServiceAccounting.SetDefault();
         }
 
-        //исправляет url
         public static string FixUrl(string url)
         {
             url = url.Trim().ToLower();
@@ -131,30 +132,39 @@ namespace CHI.Models.Settings
         }
 
         //проверяет настройки прокси-сервера, true-соединение установлено или прокси-сервер не используется, false-иначе
-        public void TestConnectionProxy()
+        public async Task TestConnectionProxyAsync()
         {
             var connected = false;
 
             if (Common.UseProxy)
-                using (var client = new TcpClient())
-                {
-                    try
-                    {
-                        client.ConnectAsync(Common.ProxyAddress, Common.ProxyPort).Wait(timeoutConnection);
-                        connected = client.Connected;
-                    }
-                    catch (Exception)
-                    { }
-                }
-
-            if (Common.UseProxy && !connected)
             {
-                Common.AddError(ErrorMessages.Connection, nameof(Common.ProxyAddress));
-                Common.AddError(ErrorMessages.Connection, nameof(Common.ProxyPort));
-                Srz.ConnectionIsValid = false;
-                MedicalExaminations.ConnectionIsValid = false;
+                using var client = new TcpClient();
 
-                Common.ProxyConnectionIsValid = false;
+                client.ReceiveTimeout = Common.TimeoutConnection;
+                client.SendTimeout = Common.TimeoutConnection;
+
+                CancellationTokenSource cts = new();
+                cts.CancelAfter(Common.TimeoutConnection);
+                var token = cts.Token;
+
+                try
+                {
+                    await client.ConnectAsync(Common.ProxyAddress, Common.ProxyPort, token);
+                    connected = client.Connected;
+                }
+                catch (Exception)
+                { }
+
+
+                if (!connected)
+                {
+                    Common.AddError(ErrorMessages.Connection, nameof(Common.ProxyAddress));
+                    Common.AddError(ErrorMessages.Connection, nameof(Common.ProxyPort));
+                    Srz.ConnectionIsValid = false;
+                    MedicalExaminations.ConnectionIsValid = false;
+
+                    Common.ProxyConnectionIsValid = false;
+                }
             }
             else
             {
@@ -166,80 +176,79 @@ namespace CHI.Models.Settings
         }
 
         //проверяет доступность сайта, в случае успеха - true
-        bool TryConnectSite(string url, string nameOfAddress)
+        async Task<bool> TryConnectSiteAsync(string url, string nameOfAddress, DomainObject obj)
         {
             try
             {
-                var webRequest = (HttpWebRequest)WebRequest.Create(url);
+                IWebProxy proxy = Common.UseProxy ? null : new WebProxy(Common.Proxy);
+                using var handler = new HttpClientHandler() { Proxy = proxy, UseProxy = Common.UseProxy };
+                using var client = new HttpClient(handler);
+                client.Timeout = TimeSpan.FromMilliseconds(Common.TimeoutConnection);
 
-                webRequest.Timeout = timeoutConnection;
+                var response = await client.GetAsync(url);
 
-                if (Common.UseProxy)
-                    webRequest.Proxy = new WebProxy(Common.ProxyAddress + ":" + Common.ProxyPort);
+                response.EnsureSuccessStatusCode();
 
-                webRequest.GetResponse();
-                webRequest.Abort();
-
-                RemoveError(ErrorMessages.Connection, nameOfAddress);
+                obj.RemoveError(ErrorMessages.Connection, nameOfAddress);
                 return true;
             }
             catch (Exception)
             {
-                AddError(ErrorMessages.Connection, nameOfAddress);
+                obj.AddError(ErrorMessages.Connection, nameOfAddress);
                 return false;
             }
         }
 
-        //проверить настройеки подключения к порталу диспансризации
+        //проверить настройки подключения к порталу диспансризации
         public async Task TestConnectionExaminationsAsync()
         {
-            ExaminationsConnectionIsValid = false;
+            MedicalExaminations.ConnectionIsValid = false;
 
-            RemoveError(ErrorMessages.Connection, nameof(ExaminationsAddress));
-            ExaminationsCredentials.ToList().ForEach(x => x.RemoveErrorsMessage(ErrorMessages.Authorization));
+            MedicalExaminations.RemoveError(ErrorMessages.Connection, nameof(MedicalExaminations.Address));
+            MedicalExaminations.Credential.RemoveErrorsMessage(ErrorMessages.Authorization);
 
-            TestConnectionProxy();
+            await TestConnectionProxyAsync();
 
-            if (!ProxyConnectionIsValid)
+            if (!Common.ProxyConnectionIsValid)
                 return;
 
-            if (!TryConnectSite(ExaminationsAddress, nameof(ExaminationsAddress)))
+            if (! await TryConnectSiteAsync(MedicalExaminations.Address, nameof(MedicalExaminations.Address), MedicalExaminations))
                 return;
 
             if (!await TryAuthorizeExaminationsCredentialsAsync())
                 return;
 
-            ExaminationsConnectionIsValid = true;
+            MedicalExaminations.ConnectionIsValid = true;
         }
 
         //проверить настройки подключения к СРЗ
         public async Task TestConnectionSRZAsync()
         {
-            SrzConnectionIsValid = false;
+            Srz.ConnectionIsValid = false;
 
-            RemoveError(ErrorMessages.Connection, nameof(SrzAddress));
-            SrzCredentials.ToList().ForEach(x => x.RemoveErrorsMessage(ErrorMessages.Authorization));
+            Srz.RemoveError(ErrorMessages.Connection, nameof(Srz.Address));
+            Srz.Credential.RemoveErrorsMessage(ErrorMessages.Authorization);
 
-            TestConnectionProxy();
+            await TestConnectionProxyAsync();
 
-            if (!ProxyConnectionIsValid)
+            if (!Common.ProxyConnectionIsValid)
                 return;
 
-            if (!TryConnectSite(SrzAddress, nameof(SrzAddress)))
+            if (! await TryConnectSiteAsync(Srz.Address, nameof(Srz.Address), Srz))
                 return;
 
             if (!await TryAuthorizeSrzCredentialsAsync())
                 return;
 
-            SrzConnectionIsValid = true;
+            Srz.ConnectionIsValid = true;
         }
 
         //проверяет учетные данные СРЗ, в случае успеха - true
         async Task<bool> TryAuthorizeSrzCredentialsAsync()
         {
-            var credential = SrzCredentials.First();
+            var credential = Srz.Credential;
 
-            using var service = new SRZService(SrzAddress, UseProxy, ProxyAddress, ProxyPort);
+            using var service = new SRZService(Srz.Address, Common.UseProxy, Common.ProxyAddress, Common.ProxyPort);
 
             var isAuthorized = false;
             try
@@ -269,9 +278,9 @@ namespace CHI.Models.Settings
         //проверяет учетные данные портала диспансеризации, в случае успеха - true
         async Task<bool> TryAuthorizeExaminationsCredentialsAsync()
         {
-            var credential = ExaminationsCredentials.First();
+            var credential = MedicalExaminations.Credential;
 
-            using var service = new ExaminationService(ExaminationsAddress, UseProxy, ProxyAddress, ProxyPort);
+            using var service = new ExaminationService(MedicalExaminations.Address, Common.UseProxy, Common.ProxyAddress, Common.ProxyPort);
 
             var isAuthorized = false;
 
@@ -285,7 +294,7 @@ namespace CHI.Models.Settings
 
             if (service.IsAuthorized)
             {
-                FomsCodeMO = service.FomsCodeMO;
+                MedicalExaminations.FomsCodeMO = service.FomsCodeMO;
 
                 await service.LogoutAsync();
 

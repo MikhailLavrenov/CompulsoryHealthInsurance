@@ -1,5 +1,6 @@
 ﻿using CHI.Infrastructure;
 using CHI.Models;
+using CHI.Models.AppSettings;
 using CHI.Services;
 using CHI.Services.Common;
 using CHI.Services.MedicalExaminations;
@@ -17,7 +18,6 @@ namespace CHI.ViewModels
 {
     class ExaminationsViewModel : DomainObject, IRegionMemberLifetime
     {
-        Settings settings;
         List<(PatientExaminations PatientExaminations, bool IsLoaded, string Error)> result;
         bool showErrors;
         readonly IFileDialogService fileDialogService;
@@ -28,12 +28,13 @@ namespace CHI.ViewModels
         public bool KeepAlive { get => false; }
         public bool ShowErrors { get => showErrors; set => SetProperty(ref showErrors, value); }
         public List<(PatientExaminations PatientExaminations, bool IsLoaded, string Error)> Result { get => result; set => SetProperty(ref result, value); }
-        public Settings Settings { get => settings; set => SetProperty(ref settings, value); }
+        public AppSettings Settings { get; set; }
         public DelegateCommandAsync ExportExaminationsCommand { get; }
 
 
-        public ExaminationsViewModel(IMainRegionService mainRegionService, IFileDialogService fileDialogService, ILicenseManager licenseManager)
+        public ExaminationsViewModel(AppSettings settings,IMainRegionService mainRegionService, IFileDialogService fileDialogService, ILicenseManager licenseManager)
         {
+            Settings = settings;
             this.fileDialogService = fileDialogService;
             MainRegionService = mainRegionService;
             LicenseManager = licenseManager;
@@ -41,46 +42,9 @@ namespace CHI.ViewModels
             Result = new List<(PatientExaminations, bool, string)>();
 
             ShowErrors = false;
-            Settings = Settings.Instance;
             MainRegionService.Header = "Загрузка осмотров на портал Диспансеризации";
 
             ExportExaminationsCommand = new DelegateCommandAsync(ExportExaminationsExecuteAsync);
-
-
-            //var examination1Stage = new Examination
-            //{
-            //    BeginDate = new DateTime(2019, 10, 10),
-            //    EndDate = new DateTime(2019, 10, 15),
-            //    HealthGroup = HealthGroup.ThirdA,
-            //    Referral = Referral.LocalClinic
-            //};
-            //var examination2Stage = new Examination
-            //{
-            //    BeginDate = new DateTime(2019, 10, 20),
-            //    EndDate = new DateTime(2019, 10, 25),
-            //    HealthGroup = HealthGroup.ThirdB,
-            //    Referral = Referral.AnotherClinic
-            //};
-
-            //ShowErrors = true;
-            //var pe = new PatientExaminations("2751530822000157", 2019, ExaminationKind.Dispanserizacia1)
-            //{
-            //    Stage1 = examination1Stage,
-            //    Stage2 = examination2Stage
-            //};
-
-            //Result = new List<Tuple<PatientExaminations, bool, string>> {
-            //    new Tuple<PatientExaminations, bool,string>(pe, true, ""),
-            //    new Tuple<PatientExaminations,bool, string>(pe, true, ""),
-            //    new Tuple<PatientExaminations,bool, string>(pe, false, "Какая то надпись"),
-            //    new Tuple<PatientExaminations, bool,string>(pe, false, "Еще одна надпись"),
-            //};
-
-            //for (int i = 0; i < 1000; i++)
-            //{
-            //    var item = new Tuple<PatientExaminations, bool, string>(pe, false, "Какая то надпись");
-            //    Result.Add(item);
-            //}
         }
 
 
@@ -89,12 +53,12 @@ namespace CHI.ViewModels
             Result?.Clear();
             ShowErrors = false;
 
-            if (!Settings.ExaminationsConnectionIsValid)
+            if (!Settings.MedicalExaminations.ConnectionIsValid)
             {
                 MainRegionService.ShowProgressBar("Проверка настроек.");
 
                 await Settings.TestConnectionExaminationsAsync();
-                if (!Settings.ExaminationsConnectionIsValid)
+                if (!Settings.MedicalExaminations.ConnectionIsValid)
                 {
                     MainRegionService.HideProgressBar("Не удалось подключиться к web-сервису.");
                     return;
@@ -105,7 +69,7 @@ namespace CHI.ViewModels
             MainRegionService.ShowProgressBar("Выбор файлов.");
 
             fileDialogService.DialogType = FileDialogType.Open;
-            fileDialogService.FileName = Settings.ExaminationsFileDirectory;
+            fileDialogService.FileName = Settings.MedicalExaminations.FileDirectory;
             fileDialogService.MiltiSelect = true;
             fileDialogService.Filter = "Zip files (*.zip)|*.zip|Xml files (*.xml)|*.xml";
 
@@ -115,12 +79,12 @@ namespace CHI.ViewModels
                 return;
             }
 
-            Settings.ExaminationsFileDirectory = Path.GetDirectoryName(fileDialogService.FileNames.FirstOrDefault());
+            Settings.MedicalExaminations.FileDirectory = Path.GetDirectoryName(fileDialogService.FileNames.FirstOrDefault());
 
             MainRegionService.ShowProgressBar("Чтение файлов.");
 
             var registers = new MedExamsBillsRegisterService();
-            var fileFilter = $"{Settings.PatientFileNames},{Settings.ExaminationFileNames}".Split(',', StringSplitOptions.TrimEntries);
+            var fileFilter = $"{Settings.MedicalExaminations.PatientFileNames},{Settings.MedicalExaminations.CasesFileNames}".Split(',', StringSplitOptions.TrimEntries);
             registers.XmlFileNameStartsWithFilter = fileFilter.ToList();
 
             var patientsExaminations = registers.GetPatientExaminationsList(fileDialogService.FileNames);
@@ -131,7 +95,7 @@ namespace CHI.ViewModels
 
             var license = LicenseManager.ActiveLicense;
 
-            if (!(license.ExaminationsUnlimited || license.ExaminationsFomsCodeMO == Settings.FomsCodeMO || license.ExaminationsMaxDate > maxDate))
+            if (!(license.ExaminationsUnlimited || license.ExaminationsFomsCodeMO == Settings.MedicalExaminations.FomsCodeMO || license.ExaminationsMaxDate > maxDate))
             {
                 MainRegionService.HideProgressBar("Отменено, ограничение лицензии.");
                 return;
@@ -139,9 +103,9 @@ namespace CHI.ViewModels
 
             MainRegionService.ShowProgressBar($"Загрузка осмотров. Всего пациентов: {patientsExaminations.Count}.");
 
-            var parallelSerivce = new ParallelExaminationsService(Settings.ExaminationsAddress, Settings.ExaminationsCredentials.First(), Settings.ExaminationsThreadsLimit);
-            if (Settings.UseProxy)
-                parallelSerivce.UseProxy(Settings.ProxyAddress, Settings.ProxyPort);
+            var parallelSerivce = new ParallelExaminationsService(Settings.MedicalExaminations.Address, Settings.MedicalExaminations.Credential, Settings.MedicalExaminations.MaxDegreeOfParallelism);
+            if (Settings.Common.UseProxy)
+                parallelSerivce.UseProxy(Settings.Common.ProxyAddress, Settings.Common.ProxyPort);
             Result = await parallelSerivce.AddExaminationsAsync(patientsExaminations);
 
             Result.OrderBy(x => x.IsLoaded)                
@@ -155,8 +119,6 @@ namespace CHI.ViewModels
             SleepMode.Allow();
             MainRegionService.HideProgressBar("Завершено.");
         }
-
-
 
         //private List<Tuple<PatientExaminations, bool, string>> AddExaminationsParallel(List<PatientExaminations> patientsExaminations)
         //{

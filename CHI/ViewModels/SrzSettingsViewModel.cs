@@ -1,5 +1,6 @@
 ﻿using CHI.Infrastructure;
 using CHI.Models;
+using CHI.Models.AppSettings;
 using Prism.Commands;
 using Prism.Regions;
 using System.Collections.ObjectModel;
@@ -10,28 +11,24 @@ namespace CHI.ViewModels
 {
     class SrzSettingsViewModel : DomainObject, IRegionMemberLifetime
     {
-        #region Поля
-        Settings settings;
         bool showTextPassword;
         bool showProtectedPassword;
-        #endregion
 
-        #region Свойства
+
         public IMainRegionService MainRegionService { get; set; }
         public bool KeepAlive { get => false; }
-        public Settings Settings { get => settings; set => SetProperty(ref settings, value); }
+        public AppSettings Settings { get; set; }
         public bool ShowTextPassword { get => showTextPassword; set => SetProperty(ref showTextPassword, value); }
         public bool ShowProtectedPassword { get => showProtectedPassword; set => SetProperty(ref showProtectedPassword, value); }
         public DelegateCommand SetDefaultCommand { get; }
         public DelegateCommandAsync TestCommand { get; }
         public DelegateCommand SwitchShowPasswordCommand { get; }
-        #endregion
 
-        #region Конструкторы
-        public SrzSettingsViewModel(IMainRegionService mainRegionService)
+
+        public SrzSettingsViewModel(AppSettings settings, IMainRegionService mainRegionService)
         {
-            MainRegionService = mainRegionService;
-            Settings = Settings.Instance;
+            Settings = settings;
+            MainRegionService = mainRegionService;            
 
             MainRegionService.Header = "Настройки подключения к СРЗ";
             ShowTextPassword = false;
@@ -41,34 +38,34 @@ namespace CHI.ViewModels
             TestCommand = new DelegateCommandAsync(TestExecuteAsync);
             SwitchShowPasswordCommand = new DelegateCommand(SwitchShowPasswordExecute);
         }
-        #endregion
 
-        #region Методы        
-        private void SetDefaultExecute()
+      
+        void SetDefaultExecute()
         {
-            Settings.SetDefaultSRZ();
+            Settings.Srz.SetDefault();
 
             MainRegionService.HideProgressBar("Настройки установлены по умолчанию.");
         }
+
         async void TestExecuteAsync()
         {
             MainRegionService.ShowProgressBar("Проверка настроек.");
             await Settings.TestConnectionSRZAsync();
 
-            if (Settings.SrzConnectionIsValid)
+            if (Settings.Srz.ConnectionIsValid)
                 MainRegionService.HideProgressBar("Настройки корректны.");
-            else if (Settings.ContainsErrorMessage(nameof(Settings.ProxyAddress),ErrorMessages.Connection))
+            else if (Settings.Common.ContainsErrorMessage(nameof(Settings.Common.ProxyAddress),ErrorMessages.Connection))
                 MainRegionService.HideProgressBar("Прокси сервер не доступен.");
-            else if (Settings.ContainsErrorMessage(nameof(Settings.SrzAddress), ErrorMessages.Connection))
+            else if (Settings.Srz.ContainsErrorMessage(nameof(Settings.Srz.Address), ErrorMessages.Connection))
                 MainRegionService.HideProgressBar("Web-сайт СРЗ не доступен.");
             else
                 MainRegionService.HideProgressBar($"Не удалось авторизоваться под некоторыми учетными записями.");
         }
-        private void SwitchShowPasswordExecute()
+
+        void SwitchShowPasswordExecute()
         {
             ShowTextPassword = !ShowTextPassword;
             ShowProtectedPassword = !ShowTextPassword;
         }
-        #endregion
     }
 }

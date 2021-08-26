@@ -6,26 +6,26 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 
-namespace CHI.Models
+namespace CHI.Models.AppSettings
 {
     public class MedicalExaminations : DomainObject
     {
         string address;
         byte maxDegreeOfParallelism;
-        string fileNames;
+        string casesFileNames;
         string patientsFileNames;
         Credential credential;
         string fileDirectory;
         bool connectionIsValid;
 
 
-        public string Address { get => address; set => SetProperty(ref address, Settings.FixUrl(value)); }
+        public string Address { get => address; set => SetProperty(ref address, AppSettings.FixUrl(value)); }
         public byte MaxDegreeOfParallelism { get => maxDegreeOfParallelism; set => SetProperty(ref maxDegreeOfParallelism, value); }
-        public string FileNames { get => fileNames; set => SetProperty(ref fileNames, value); }
+        public string CasesFileNames { get => casesFileNames; set => SetProperty(ref casesFileNames, value); }
         public string PatientFileNames { get => patientsFileNames; set => SetProperty(ref patientsFileNames, value); }
         public Credential Credential { get => credential; set => SetProperty(ref credential, value); }
         public string FileDirectory { get => fileDirectory; set => SetProperty(ref fileDirectory, value); }
-        [XmlIgnore] public string FomsCodeMO { get; private set; }
+        [XmlIgnore] public string FomsCodeMO { get; internal set; }
         [XmlIgnore] public bool ConnectionIsValid { get => connectionIsValid; set => SetProperty(ref connectionIsValid, value); }
 
 
@@ -55,7 +55,7 @@ namespace CHI.Models
             Address = @"http://disp.foms.local/";
             MaxDegreeOfParallelism = 5;
             PatientFileNames = @"LPM, LVM, LOM, LAM";
-            FileNames = @"DPM, DVM, DOM, DAM";
+            CasesFileNames = @"DPM, DVM, DOM, DAM";
             Credential = new Credential { Login = "МойЛогин", Password = "МойПароль" };
         }
 

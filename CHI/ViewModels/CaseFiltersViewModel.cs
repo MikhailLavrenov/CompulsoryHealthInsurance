@@ -20,6 +20,7 @@ namespace CHI.ViewModels
         CaseFilter currentCaseFilter;
         IMainRegionService mainRegionService;
 
+
         public bool KeepAlive { get => false; }
         public CaseFilter CurrentCaseFilter { get => currentCaseFilter; set => SetProperty(ref currentCaseFilter, value); }
         public Component CurrentComponent { get => currentComponent; set => SetProperty(ref currentComponent, value); }
@@ -31,6 +32,7 @@ namespace CHI.ViewModels
         public DelegateCommand MoveUpCommand { get; }
         public DelegateCommand MoveDownCommand { get; }
 
+
         public CaseFiltersViewModel(IMainRegionService mainRegionService)
         {
             this.mainRegionService = mainRegionService;
@@ -40,6 +42,7 @@ namespace CHI.ViewModels
             AddCommand = new DelegateCommand(AddExecute);
             DeleteCommand = new DelegateCommand(DeleteExecute, () => CurrentCaseFilter != null).ObservesProperty(() => CurrentCaseFilter);
         }
+
 
         private void AddExecute()
         {
@@ -80,6 +83,5 @@ namespace CHI.ViewModels
         {
             dbContext.SaveChanges();
         }
-
     }
 }

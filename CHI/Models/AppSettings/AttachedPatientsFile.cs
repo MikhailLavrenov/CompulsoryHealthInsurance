@@ -6,22 +6,22 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 
-namespace CHI.Models
+namespace CHI.Models.AppSettings
 {
-    public class AttachedPatients : DomainObject
+    public class AttachedPatientsFile : DomainObject
     {
 
-        string filePath;
-        bool formatFile;
+        string path;
+        bool applyFormat;
         ObservableCollection<ColumnProperty> columnProperties;
 
 
-        public string PatientsFilePath { get => filePath; set => SetProperty(ref filePath, value); }
-        public bool FormatFile { get => formatFile; set => SetProperty(ref formatFile, value); }
+        public string Path { get => path; set => SetProperty(ref path, value); }
+        public bool ApplyFormat { get => applyFormat; set => SetProperty(ref applyFormat, value); }
         public ObservableCollection<ColumnProperty> ColumnProperties { get => columnProperties; set => SetProperty(ref columnProperties, value); }
 
 
-        public AttachedPatients()
+        public AttachedPatientsFile()
         {
             ColumnProperties = new();
         }
@@ -46,8 +46,8 @@ namespace CHI.Models
         //устанавливает по-умолчанию настройки файла прикрепленных пациентов
         public void SetDefault()
         {
-            FormatFile = true;
-            PatientsFilePath = "Прикрепленные пациенты выгрузка.xlsx";
+            ApplyFormat = true;
+            Path = "Прикрепленные пациенты выгрузка.xlsx";
 
             ColumnProperties = new ObservableCollection<ColumnProperty>()
              {

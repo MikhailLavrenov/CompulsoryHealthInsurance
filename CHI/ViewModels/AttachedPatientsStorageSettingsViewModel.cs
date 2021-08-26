@@ -1,10 +1,10 @@
 ﻿using CHI.Infrastructure;
 using CHI.Models;
+using CHI.Models.AppSettings;
 using CHI.Services;
 using Microsoft.EntityFrameworkCore;
 using Prism.Commands;
 using Prism.Regions;
-using Prism.Services.Dialogs;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,7 +13,6 @@ namespace CHI.ViewModels
 {
     public class AttachedPatientsStorageSettingsViewModel : DomainObject, IRegionMemberLifetime
     {
-        Settings settings;
         readonly IFileDialogService fileDialogService;
         IMainRegionService mainRegionService;
         string patientsCount = "Вычисляется...";
@@ -21,18 +20,15 @@ namespace CHI.ViewModels
 
         public string PatientsCount { get => patientsCount; set => SetProperty(ref patientsCount, value); }
         public bool KeepAlive { get => false; }
-        public Settings Settings { get => settings; set => SetProperty(ref settings, value); }
         public DelegateCommandAsync ImportPatientsCommand { get; }
         public DelegateCommandAsync SaveExampleCommand { get; }
         public DelegateCommand ClearDatabaseCommand { get; }
 
 
-        public AttachedPatientsStorageSettingsViewModel(IMainRegionService mainRegionService, IFileDialogService fileDialogService)
+        public AttachedPatientsStorageSettingsViewModel( IMainRegionService mainRegionService, IFileDialogService fileDialogService)
         {
             this.fileDialogService = fileDialogService;
             this.mainRegionService = mainRegionService;
-
-            Settings = Settings.Instance;
 
             this.mainRegionService.Header = "База данных прикрепленных пациентов";
 

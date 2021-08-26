@@ -1,5 +1,5 @@
 ﻿using CHI.Infrastructure;
-using CHI.Models;
+using CHI.Models.AppSettings;
 using CHI.Models.ServiceAccounting;
 using CHI.Services;
 using CHI.Views;
@@ -24,7 +24,8 @@ namespace CHI
     /// </summary>
     public partial class App : PrismApplication
     {
-        private ILogger logger { get; set; }
+        ILogger logger { get; set; }
+
 
         protected override Window CreateShell()
         {
@@ -56,6 +57,7 @@ namespace CHI
         {
             containerRegistry.RegisterInstance(containerRegistry.GetContainer());
             containerRegistry.RegisterInstance(GetCurrentUser());
+            containerRegistry.RegisterInstance(AppSettings.Load());
             containerRegistry.RegisterInstance<ILogger>(LogManager.GetCurrentClassLogger());
             containerRegistry.RegisterSingleton<IMainRegionService, MainRegionService>();
             containerRegistry.RegisterSingleton<ILicenseManager, LicenseManager>();
@@ -94,7 +96,7 @@ namespace CHI
             containerRegistry.RegisterForNavigation<ServiceAccountingSettingsView>();
         }
 
-        private User GetCurrentUser()
+        User GetCurrentUser()
         {
             using var curentWindowsUser = UserPrincipal.Current;
 
@@ -106,7 +108,7 @@ namespace CHI
             try
             {
                 dbContext = new AppDBContext();
-                currentUser = dbContext.Users.Where(x => x.Sid == sid).Include(x=>x.PlanningPermisions).FirstOrDefault();
+                currentUser = dbContext.Users.Where(x => x.Sid == sid).Include(x => x.PlanningPermisions).FirstOrDefault();
             }
             catch (Exception)
             { }
@@ -145,12 +147,12 @@ namespace CHI
             return currentUser;
         }
 
-        private void LogUnhandledException(object sender, UnhandledExceptionEventArgs args)
+        void LogUnhandledException(object sender, UnhandledExceptionEventArgs args)
         {
             logger.Error((Exception)args.ExceptionObject, "AppDomainException");
         }
 
-        private void LogDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs args)
+        void LogDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs args)
         {
             logger.Error(args.Exception, "XamlDispatcherException");
         }
