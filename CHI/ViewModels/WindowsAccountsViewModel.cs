@@ -1,5 +1,6 @@
 ﻿using CHI.Infrastructure;
 using CHI.Models;
+using CHI.Models.AppSettings;
 using CHI.Models.ServiceAccounting;
 using CHI.Services;
 using CHI.Services.WindowsAccounts;
@@ -28,7 +29,7 @@ namespace CHI.ViewModels
         public DelegateCommand OkCommand { get; }
 
 
-        public WindowsAccountsViewModel(IMainRegionService mainRegionService, IFileDialogService fileDialogService)
+        public WindowsAccountsViewModel(AppSettings settings, IMainRegionService mainRegionService, IFileDialogService fileDialogService)
         {
             this.mainRegionService = mainRegionService;
 
@@ -36,9 +37,7 @@ namespace CHI.ViewModels
 
             dbContext = new AppDBContext();
 
-            var settings = Settings.Instance;
-
-            accountService = new WindowsAccountsService(settings.DomainName, settings.DomainUsersRootOU);
+            accountService = new WindowsAccountsService(settings.ServiceAccounting.DomainName, settings.ServiceAccounting.DomainUsersRootOU);
 
             IsDomain = accountService.IsDomainAvailable;
 

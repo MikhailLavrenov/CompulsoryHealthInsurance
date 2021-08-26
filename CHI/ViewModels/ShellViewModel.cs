@@ -1,5 +1,6 @@
 ﻿using CHI.Infrastructure;
 using CHI.Models;
+using CHI.Models.AppSettings;
 using Prism.Commands;
 using System.Linq;
 using System.Reflection;
@@ -9,8 +10,9 @@ namespace CHI.ViewModels
 {
     public class ShellViewModel : DomainObject
     {
-        private bool isMaximizedWindow;
-        private IMainRegionService mainRegionService;
+        AppSettings settings;
+        bool isMaximizedWindow;
+        IMainRegionService mainRegionService;
 
         public IMainRegionService MainRegionService { get; set; }
         public string ApplicationTitle { get; }
@@ -27,15 +29,16 @@ namespace CHI.ViewModels
         public DelegateCommand NavigateBackCommand { get; }
 
 
-        public ShellViewModel(IMainRegionService mainRegionService)
+        public ShellViewModel(AppSettings settings, IMainRegionService mainRegionService)
         {
+            this.settings = settings;
             this.mainRegionService = mainRegionService;
 
             IsMaximizedWidow = System.Windows.Application.Current.MainWindow.WindowState == WindowState.Maximized ? true : false;
             MainRegionService = mainRegionService;
             ApplicationTitle = ((AssemblyTitleAttribute)Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(AssemblyTitleAttribute), false).First()).Title;
 
-            SaveSettingsCommand = new DelegateCommand(() => Settings.Instance.Save());
+            SaveSettingsCommand = new DelegateCommand(() => settings.Save());
             CheckSettingsCommand = new DelegateCommand(CheckSettingsExecute);
             NavigateHomeCommand = new DelegateCommand(MainRegionService.RequestNavigateHome);
             NavigateBackCommand = new DelegateCommand(MainRegionService.RequestNavigateBack);
@@ -58,9 +61,9 @@ namespace CHI.ViewModels
         }
         private void CheckSettingsExecute()
         {
-            if (Settings.Instance.FailedToDecrypt)
+            if (settings.FailedToDecrypt)
             {
-                var message = $"Нет прав на доступ к учетным записям. Создана резервная копия настроек: {Settings.Instance.BackupSettingsFile}. Заново задайте учетные данные.";
+                var message = $"Нет прав на доступ к учетным записям. Создана резервная копия настроек: {settings.BackupSettingsFile}. Заново задайте учетные данные.";
                 mainRegionService.HideProgressBar(message);
             }
         }

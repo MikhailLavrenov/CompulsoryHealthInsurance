@@ -1,7 +1,7 @@
 ﻿using CHI.Infrastructure;
 using System;
 
-namespace CHI.Models.Settings
+namespace CHI.Models.AppSettings
 {
     public class ServiceAccounting : DomainObject
     {
@@ -23,7 +23,6 @@ namespace CHI.Models.Settings
             DomainName = "poliklinika.local";
             DomainUsersRootOU = "Users";
             ApprovedBy = $"Главный врач{Environment.NewLine}Поликлиники{Environment.NewLine}Иванов А.П.";
-            CredentialsScope = CredentialScope.ТекущийПользователь;
         }
     }
 }

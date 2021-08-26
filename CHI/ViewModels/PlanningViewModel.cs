@@ -1,11 +1,9 @@
 ﻿using CHI.Infrastructure;
-using CHI.Models;
+using CHI.Models.AppSettings;
 using CHI.Models.ServiceAccounting;
 using CHI.Services;
 using CHI.Services.Report;
 using Microsoft.EntityFrameworkCore;
-using OfficeOpenXml;
-using OfficeOpenXml.Style;
 using Prism.Commands;
 using Prism.Regions;
 using System;
@@ -13,7 +11,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Windows.Media;
 
 namespace CHI.ViewModels
 {
@@ -30,7 +27,7 @@ namespace CHI.ViewModels
         IMainRegionService mainRegionService;
         IFileDialogService fileDialogService;
         ReportService reportService;
-        Settings settings ;
+        ServiceAccounting settings;
         User currentUser;
 
         public bool KeepAlive { get => false; }
@@ -77,11 +74,11 @@ namespace CHI.ViewModels
 
 
 
-        public PlanningViewModel(IMainRegionService mainRegionService, IFileDialogService fileDialogService, User currentUser)
+        public PlanningViewModel(AppSettings settings, IMainRegionService mainRegionService, IFileDialogService fileDialogService, User currentUser)
         {
+            this.settings = settings.ServiceAccounting;
             this.mainRegionService = mainRegionService;
             this.fileDialogService = fileDialogService;
-            settings = Settings.Instance;
             this.currentUser = currentUser;
 
             mainRegionService.Header = "Планирование объемов";
@@ -136,8 +133,8 @@ namespace CHI.ViewModels
         private void SetHiddenRows()
         {
             var employeeHeaderGroups = GridItems
-                .SelectMany(x => x)    
-                .Where(x => !x.RowSubHeader.HeaderItem.Childs.Any())   
+                .SelectMany(x => x)
+                .Where(x => !x.RowSubHeader.HeaderItem.Childs.Any())
                 .GroupBy(x => x.RowSubHeader.HeaderItem);
 
             foreach (var group in employeeHeaderGroups)
@@ -151,7 +148,7 @@ namespace CHI.ViewModels
                 if (employee == null)
                     continue;
 
-                rowHeader.AlwaysHidden = !rowGridItems.Where(x => x.Value.HasValue && x.Value!=0).Any() && employee.IsArchive;
+                rowHeader.AlwaysHidden = !rowGridItems.Where(x => x.Value.HasValue && x.Value != 0).Any() && employee.IsArchive;
             }
         }
 
@@ -181,8 +178,8 @@ namespace CHI.ViewModels
 
             new ReportExcelBuilder(filePath)
                 .UsePlaningStyle(settings.ApprovedBy)
-                .SetNewSheet(Month,Year)
-                .FillSheet(RowHeaders,ColumnHeaders,GridItems)
+                .SetNewSheet(Month, Year)
+                .FillSheet(RowHeaders, ColumnHeaders, GridItems)
                 .SaveAndClose();
 
             mainRegionService.HideProgressBar($"Файл сохранен: {filePath}");
@@ -297,7 +294,7 @@ namespace CHI.ViewModels
                     gridItemDataComparator.Add(gridItem, (parameter, indicator));
                 }
 
-            BuildReport();            
+            BuildReport();
         }
 
         public bool IsNavigationTarget(NavigationContext navigationContext)

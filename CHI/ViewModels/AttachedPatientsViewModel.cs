@@ -1,5 +1,6 @@
 ﻿using CHI.Infrastructure;
 using CHI.Models;
+using CHI.Models.AppSettings;
 using CHI.Services;
 using CHI.Services.SRZ;
 using Microsoft.EntityFrameworkCore;
@@ -14,23 +15,22 @@ namespace CHI.ViewModels
 {
     class AttachedPatientsViewModel : DomainObject, IRegionMemberLifetime
     {
-        Settings settings;
         DateTime fileDate;
         readonly IFileDialogService fileDialogService;
 
         public IMainRegionService MainRegionService { get; set; }
         public bool KeepAlive { get => false; }
-        public Settings Settings { get => settings; set => SetProperty(ref settings, value); }
+        public AppSettings Settings { get; set; }
         public DateTime FileDate { get => fileDate; set => SetProperty(ref fileDate, value); }
         public DelegateCommandAsync ProcessFileCommand { get; }
 
 
-        public AttachedPatientsViewModel(IMainRegionService mainRegionService, IFileDialogService fileDialogService)
+        public AttachedPatientsViewModel(AppSettings settings,IMainRegionService mainRegionService, IFileDialogService fileDialogService)
         {
+            Settings = settings;
             this.fileDialogService = fileDialogService;
             MainRegionService = mainRegionService;
 
-            Settings = Settings.Instance;
             MainRegionService.Header = "Загрузка прикрепленных пациентов из СРЗ";
             FileDate = DateTime.Today;
 
@@ -42,10 +42,10 @@ namespace CHI.ViewModels
         {
             MainRegionService.ShowProgressBar("Проверка подключения к СРЗ.");
 
-            if (!Settings.SrzConnectionIsValid)
+            if (!Settings.Srz.ConnectionIsValid)
                 await Settings.TestConnectionSRZAsync();
 
-            if (!Settings.SrzConnectionIsValid && Settings.DownloadNewPatientsFile)
+            if (!Settings.Srz.ConnectionIsValid && Settings.Srz.DownloadNewPatientsFile)
             {
                 MainRegionService.HideProgressBar("Не удалось подключиться к СРЗ, проверьте настройки и доступность сайта. Возможно только подставить ФИО из БД в существующий файл.");
                 return;
@@ -54,8 +54,8 @@ namespace CHI.ViewModels
             SleepMode.Deny();
             MainRegionService.ShowProgressBar("Выбор пути к файлу.");
 
-            fileDialogService.DialogType = settings.DownloadNewPatientsFile ? FileDialogType.Save : FileDialogType.Open;
-            fileDialogService.FileName = settings.PatientsFilePath;
+            fileDialogService.DialogType = Settings.Srz.DownloadNewPatientsFile ? FileDialogType.Save : FileDialogType.Open;
+            fileDialogService.FileName = Settings.AttachedPatientsFile.Path;
             fileDialogService.Filter = "Excel files (*.xslx)|*.xlsx";
 
             if (fileDialogService.ShowDialog() != true)
@@ -64,7 +64,7 @@ namespace CHI.ViewModels
                 return;
             }
 
-            settings.PatientsFilePath = fileDialogService.FileName;
+            Settings.AttachedPatientsFile.Path = fileDialogService.FileName;
 
             var dbLoadingTask = Task.Run(() =>
             {
@@ -73,38 +73,37 @@ namespace CHI.ViewModels
                 return dbContext;
             });
 
-            if (Settings.DownloadNewPatientsFile)
+            if (Settings.Srz.DownloadNewPatientsFile)
             {
                 MainRegionService.ShowProgressBar("Скачивание файла.");
 
-                var service = new SRZService(Settings.SrzAddress, Settings.UseProxy, Settings.ProxyAddress, Settings.ProxyPort);
+                var service = new SRZService(Settings.Srz.Address, Settings.Common.UseProxy, Settings.Common.ProxyAddress, Settings.Common.ProxyPort);
 
-                var credential = Settings.SrzCredentials.First();
-                await service.AuthorizeAsync(credential);
-                await service.GetPatientsFileAsync(Settings.PatientsFilePath, FileDate);
+                await service.AuthorizeAsync(Settings.Srz.Credential);
+                await service.GetPatientsFileAsync(Settings.AttachedPatientsFile.Path, FileDate);
             }
 
             MainRegionService.ShowProgressBar("Подстановка ФИО в файл.");
 
             var db = dbLoadingTask.ConfigureAwait(false).GetAwaiter().GetResult();
 
-            using var file = new AttachedPatientsFileService(Settings.PatientsFilePath, Settings.ColumnProperties);
+            using var file = new AttachedPatientsFileService(Settings.AttachedPatientsFile.Path, Settings.AttachedPatientsFile.ColumnProperties);
             file.InsertPatientsWithFullName(db.Patients.ToList());
 
             var resultReport = new StringBuilder();
 
-            if (Settings.SrzConnectionIsValid)
+            if (Settings.Srz.ConnectionIsValid)
             {
-                var unknownInsuaranceNumbers = file.GetInsuranceNumberOfPatientsWithoutFullName().Take((int)Settings.SrzRequestsLimit).ToList();
+                var unknownInsuaranceNumbers = file.GetInsuranceNumberOfPatientsWithoutFullName().Take(Settings.Srz.MaxDegreeOfParallelism).ToList();
 
                 MainRegionService.ShowProgressBar("Поиск ФИО в СРЗ.");
-                var parallelSrzService = new ParallelSRZService(Settings.SrzAddress, Settings.SrzCredentials.First(), Settings.SrzThreadsLimit);
-                if (Settings.UseProxy)
-                    parallelSrzService.UseProxy(Settings.ProxyAddress, Settings.ProxyPort);
+                var parallelSrzService = new ParallelSRZService(Settings.Srz.Address, Settings.Srz.Credential, Settings.Srz.MaxDegreeOfParallelism);
+                if (Settings.Common.UseProxy)
+                    parallelSrzService.UseProxy(Settings.Common.ProxyAddress, Settings.Common.ProxyPort);
 
                 var foundPatients = await parallelSrzService.GetPatientsAsync(unknownInsuaranceNumbers);
 
-                resultReport.Append($"Запрошено пациентов в СРЗ: {foundPatients.Count}, лимит {Settings.SrzRequestsLimit}. ");
+                resultReport.Append($"Запрошено пациентов в СРЗ: {foundPatients.Count}, лимит {Settings.Srz.MaxDegreeOfParallelism}. ");
                 MainRegionService.ShowProgressBar("Подстановка ФИО в файл.");
                 file.InsertPatientsWithFullName(foundPatients);
 
@@ -123,7 +122,7 @@ namespace CHI.ViewModels
 
             var unknownPatients = file.GetInsuranceNumberOfPatientsWithoutFullName();
 
-            if (Settings.FormatPatientsFile && unknownPatients.Count == 0)
+            if (Settings.AttachedPatientsFile.ApplyFormat && unknownPatients.Count == 0)
             {
                 MainRegionService.ShowProgressBar("Форматирование файла.");
                 file.Format();
@@ -132,7 +131,7 @@ namespace CHI.ViewModels
             MainRegionService.ShowProgressBar("Сохранение файла.");
             file.Save();
 
-            if (!Settings.SrzConnectionIsValid && unknownPatients.Count != 0)
+            if (!Settings.Srz.ConnectionIsValid && unknownPatients.Count != 0)
                 resultReport.Append("Не удалось подключиться к СРЗ, проверьте настройки и доступность сайта. ");
 
             if (unknownPatients.Count == 0)

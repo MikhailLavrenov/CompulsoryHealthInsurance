@@ -13,6 +13,7 @@ namespace CHI.ViewModels
         Color defaultColor;
         Action<Color> onClose;
 
+
         public bool KeepAlive { get => false; }
         public Color Color { get => color; set => SetProperty(ref color, value); }
 

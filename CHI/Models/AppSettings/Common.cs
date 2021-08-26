@@ -1,14 +1,10 @@
 ﻿using CHI.Infrastructure;
-using System;
-using System.Net;
-using System.Net.Sockets;
 using System.Xml.Serialization;
 
-namespace CHI.Models
+namespace CHI.Models.AppSettings
 {
     public class Common : DomainObject
     {
-        static readonly int timeoutConnection = 3000;
         bool useProxy;
         string proxyAddress;
         ushort proxyPort;
@@ -17,6 +13,15 @@ namespace CHI.Models
         string sqlServer;
         string sqlServerDB;
         CredentialScope credentialsScope;
+
+
+        static internal int TimeoutConnection { get; } = 3000;
+
+
+        public Common()
+        {
+            CredentialsScope = CredentialScope.ТекущийПользователь;
+        }
 
 
         public bool UseProxy
@@ -33,21 +38,10 @@ namespace CHI.Models
 
             }
         }
-        public string ProxyAddress
-        {
-            get => proxyAddress;
-            set
-            {
-                value = value.Trim();
-                SetProperty(ref proxyAddress, value);
-            }
-        }
-        public ushort ProxyPort
-        {
-            get => proxyPort;
-            set => SetProperty(ref proxyPort, value);
-        }
+        public string ProxyAddress { get => proxyAddress; set => SetProperty(ref proxyAddress, value.Trim()); }
+        public ushort ProxyPort { get => proxyPort; set => SetProperty(ref proxyPort, value); }
         [XmlIgnore] public bool ProxyConnectionIsValid { get => proxyConnectionIsValid; set => SetProperty(ref proxyConnectionIsValid, value); }
+        [XmlIgnore] public string Proxy { get => $"{ProxyAddress}:{ProxyPort}"; }
         public bool UseSQLServer { get => useSQLServer; set => SetProperty(ref useSQLServer, value); }
         public string SQLServer { get => sqlServer; set => SetProperty(ref sqlServer, value); }
         public string SQLServerDB { get => sqlServerDB; set => SetProperty(ref sqlServerDB, value); }
@@ -58,7 +52,7 @@ namespace CHI.Models
         {
             switch (propertyName)
             {
-                 case nameof(UseProxy):
+                case nameof(UseProxy):
                     if (UseProxy == false)
                     {
                         RemoveErrors(nameof(ProxyAddress));
@@ -73,7 +67,6 @@ namespace CHI.Models
             }
         }
 
-        //устанавливает по-умолчанию настройки для прочих настроек
         public void SetDefault()
         {
             UseProxy = false;

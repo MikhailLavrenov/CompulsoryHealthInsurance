@@ -2,7 +2,7 @@
 using System;
 using System.Xml.Serialization;
 
-namespace CHI.Models
+namespace CHI.Models.AppSettings
 {
     public class SRZ : DomainObject
     {
@@ -14,7 +14,7 @@ namespace CHI.Models
         bool downloadNewPatientsFile;
 
 
-        public string Address { get => address; set => SetProperty(ref address, Settings.FixUrl(value)); }
+        public string Address { get => address; set => SetProperty(ref address, AppSettings.FixUrl(value)); }
         public byte MaxDegreeOfParallelism { get => maxDegreeOfParallelism; set => SetProperty(ref maxDegreeOfParallelism, value); }
         public uint RequestsLimit { get => srzRequestsLimit; set => SetProperty(ref srzRequestsLimit, value); }
         public Credential Credential { get => srzCredential; set => SetProperty(ref srzCredential, value); }

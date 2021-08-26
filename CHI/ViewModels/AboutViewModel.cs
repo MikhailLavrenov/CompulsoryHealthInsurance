@@ -10,14 +10,12 @@ namespace CHI.ViewModels
 {
     class AboutViewModel : DomainObject, IRegionMemberLifetime, INavigationAware
     {
-        #region Поля
-        private readonly string manualPath;
-        private readonly IFileDialogService fileDialogService;
-        private readonly ILicenseManager licenseManager;
-        private string license;
-        #endregion
+        readonly string manualPath;
+        readonly IFileDialogService fileDialogService;
+        readonly ILicenseManager licenseManager;
+        string license;
 
-        #region Свойства
+
         public IMainRegionService MainRegionService { get; set; }
         public bool KeepAlive { get => true; }
         public string Name { get; }
@@ -29,9 +27,8 @@ namespace CHI.ViewModels
         public string License { get => license; set => SetProperty(ref license, value); }
         public DelegateCommand OpenManualCommand { get; }
         public DelegateCommandAsync ImportLicenseCommand { get; }
-        #endregion
 
-        #region Конструкторы
+
         public AboutViewModel(IMainRegionService mainRegionService, ILicenseManager licenseManager, IFileDialogService fileDialogService)
         {
             MainRegionService = mainRegionService;
@@ -51,21 +48,23 @@ namespace CHI.ViewModels
             OpenManualCommand = new DelegateCommand(() => Process.Start(manualPath), () => File.Exists(manualPath));
             ImportLicenseCommand = new DelegateCommandAsync(ImportLicenseExecute);
         }
-        #endregion
 
-        #region Методы
+
         public void OnNavigatedTo(NavigationContext navigationContext)
         {
             MainRegionService.Header = "О программе";
         }
+
         public bool IsNavigationTarget(NavigationContext navigationContext)
         {
             return false;
         }
+
         public void OnNavigatedFrom(NavigationContext navigationContext)
         {
         }
-        private void ImportLicenseExecute()
+
+        void ImportLicenseExecute()
         {
             MainRegionService.ShowProgressBar("Импорт лицензии.");
 
@@ -81,7 +80,7 @@ namespace CHI.ViewModels
             var existenLicenseFiles = Directory.GetFiles(licenseManager.DefaultDirectory, $"*{licenseManager.LicenseExtension}").ToList();
 
             foreach (var file in existenLicenseFiles)
-                File.Move(file,Path.ChangeExtension(file,".old"));
+                File.Move(file, Path.ChangeExtension(file, ".old"));
 
             var destination = Path.Combine(licenseManager.DefaultDirectory, Path.GetFileName(fileDialogService.FileName));
 
@@ -92,7 +91,5 @@ namespace CHI.ViewModels
 
             MainRegionService.HideProgressBar("Лицензия установлена.");
         }
-        #endregion
-
     }
 }

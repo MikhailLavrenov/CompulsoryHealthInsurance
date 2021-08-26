@@ -1,5 +1,6 @@
 ﻿using CHI.Infrastructure;
 using CHI.Models;
+using CHI.Models.AppSettings;
 using CHI.Models.ServiceAccounting;
 using CHI.Services;
 using Microsoft.EntityFrameworkCore;
@@ -12,25 +13,19 @@ namespace CHI.ViewModels
 {
     public class CommonSettingsViewModel : DomainObject, IRegionMemberLifetime
     {
-        private Settings settings;
-        private IDialogService dialogService;
-        private readonly IFileDialogService fileDialogService;
-
         public IMainRegionService MainRegionService { get; set; }
         public bool KeepAlive { get => false; }
-        public Settings Settings { get => settings; set => SetProperty(ref settings, value); }
+        public AppSettings Settings { get; set; }
         public DelegateCommandAsync TestCommand { get; }
         public DelegateCommand SetDefaultCommand { get; }
         public DelegateCommandAsync MigrateDBCommand { get; }
 
 
-        public CommonSettingsViewModel(IMainRegionService mainRegionService, IFileDialogService fileDialogService, IDialogService dialogService)
+        public CommonSettingsViewModel(AppSettings settings, IMainRegionService mainRegionService)
         {
-            this.fileDialogService = fileDialogService;
-            this.dialogService = dialogService;
+            Settings = settings;
             MainRegionService = mainRegionService;
 
-            Settings = Settings.Instance;
             MainRegionService.Header = "Общие настройки";
 
             TestCommand = new DelegateCommandAsync(TestExecute);
@@ -39,12 +34,12 @@ namespace CHI.ViewModels
         }
 
 
-        private void TestExecute()
+        async void TestExecute()
         {
             MainRegionService.ShowProgressBar("Проверка настроек.");
-            Settings.TestConnectionProxy();
+            await Settings.TestConnectionProxyAsync();
 
-            if (Settings.ProxyConnectionIsValid)
+            if (Settings.Common.ProxyConnectionIsValid)
                 MainRegionService.HideProgressBar("Настройки корректны.");
             else
                 MainRegionService.HideProgressBar("Прокси сервер не доступен.");
@@ -52,7 +47,7 @@ namespace CHI.ViewModels
 
         private void SetDefaultExecute()
         {
-            Settings.SetDefaultOther();
+            Settings.Common.SetDefault();
             MainRegionService.HideProgressBar("Настройки установлены по умолчанию.");
         }
 
