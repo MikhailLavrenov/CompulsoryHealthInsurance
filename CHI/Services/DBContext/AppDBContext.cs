@@ -6,6 +6,10 @@ namespace CHI.Services
 {
     public class AppDBContext : DbContext
     {
+        string sqlServer;
+        string database;
+
+
         public DbSet<Patient> Patients { get; set; }
         public DbSet<Register> Registers { get; set; }
         public DbSet<Case> Cases { get; set; }
@@ -24,12 +28,16 @@ namespace CHI.Services
         public DbSet<User> Users { get; set; }
 
 
+        public AppDBContext( string sqlServer, string database)
+        {
+            this.sqlServer = sqlServer;
+            this.database = database;
+        }
+
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            if (Settings.Instance.UseSQLServer)
-                optionsBuilder.UseSqlServer(@$"Server={Settings.Instance.SQLServerName};Database={Settings.Instance.SQLServerDBName};Trusted_Connection=True;");
-            else
-                optionsBuilder.UseSqlite(@$"Data Source=Database.db");
+            optionsBuilder.UseSqlServer(@$"Server={sqlServer};Database={database};Trusted_Connection=True;");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

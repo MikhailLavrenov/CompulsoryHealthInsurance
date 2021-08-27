@@ -1,5 +1,6 @@
 ﻿using CHI.Infrastructure;
 using CHI.Models;
+using CHI.Models.AppSettings;
 using CHI.Models.ServiceAccounting;
 using CHI.Services;
 using Microsoft.EntityFrameworkCore;
@@ -16,6 +17,7 @@ namespace CHI.ViewModels
         AppDBContext dbContext;
         ObservableCollection<ServiceClassifier> serviceClassifiers;
         ServiceClassifier currentServiceClassifier;
+        private readonly AppSettings settings;
         IMainRegionService mainRegionService;
 
         public bool KeepAlive { get; set; }
@@ -28,11 +30,12 @@ namespace CHI.ViewModels
         public DelegateCommand<Type> NavigateCommand { get; }
 
 
-        public ServiceClassifiersViewModel(IMainRegionService mainRegionService)
+        public ServiceClassifiersViewModel(AppSettings settings, IMainRegionService mainRegionService)
         {
+            this.settings = settings;
             this.mainRegionService = mainRegionService;
 
-            dbContext = new AppDBContext();
+            dbContext = new AppDBContext(settings.Common.SQLServer, settings.Common.SQLServerDB);
 
             dbContext.ServiceClassifiers.Load();
 
@@ -69,7 +72,7 @@ namespace CHI.ViewModels
         {
             mainRegionService.ShowProgressBar("Пересчет стоимости");
 
-            var tempContext = new AppDBContext();
+            var tempContext = new AppDBContext(settings.Common.SQLServer, settings.Common.SQLServerDB);
 
             var classifierItems = tempContext.ServiceClassifiers
                 .Where(x => x.Id == CurrentServiceClassifier.Id)

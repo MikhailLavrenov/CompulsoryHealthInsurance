@@ -24,8 +24,8 @@ namespace CHI.ViewModels
             MainRegionService.Header = "Форматирование файла прикрепленных пациентов";
 
             SetDefaultCommand = new DelegateCommand(SetDefaultExecute);
-            MoveUpCommand = new DelegateCommand<ColumnProperty>(x => Settings.MoveUpColumnProperty(x as ColumnProperty));
-            MoveDownCommand = new DelegateCommand<ColumnProperty>(x => Settings.MoveDownColumnProperty(x as ColumnProperty));
+            MoveUpCommand = new DelegateCommand<ColumnProperty>(x => Settings.MoveUpColumnProperty(x));
+            MoveDownCommand = new DelegateCommand<ColumnProperty>(x => Settings.MoveDownColumnProperty(x));
         }
 
 

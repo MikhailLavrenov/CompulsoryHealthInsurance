@@ -24,7 +24,7 @@ namespace CHI
     /// </summary>
     public partial class App : PrismApplication
     {
-        ILogger logger { get; set; }
+        ILogger logger;
 
 
         protected override Window CreateShell()
@@ -56,8 +56,8 @@ namespace CHI
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
             containerRegistry.RegisterInstance(containerRegistry.GetContainer());
-            containerRegistry.RegisterInstance(GetCurrentUser());
             containerRegistry.RegisterInstance(AppSettings.Load());
+            containerRegistry.RegisterInstance(GetCurrentUser());
             containerRegistry.RegisterInstance<ILogger>(LogManager.GetCurrentClassLogger());
             containerRegistry.RegisterSingleton<IMainRegionService, MainRegionService>();
             containerRegistry.RegisterSingleton<ILicenseManager, LicenseManager>();
@@ -107,7 +107,8 @@ namespace CHI
 
             try
             {
-                dbContext = new AppDBContext();
+                var settings = Container.Resolve<AppSettings>();
+                dbContext = new AppDBContext(settings.Common.SQLServer, settings.Common.SQLServerDB);
                 currentUser = dbContext.Users.Where(x => x.Sid == sid).Include(x => x.PlanningPermisions).FirstOrDefault();
             }
             catch (Exception)

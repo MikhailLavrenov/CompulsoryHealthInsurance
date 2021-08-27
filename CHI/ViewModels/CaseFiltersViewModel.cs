@@ -1,5 +1,6 @@
 ﻿using CHI.Infrastructure;
 using CHI.Models;
+using CHI.Models.AppSettings;
 using CHI.Models.ServiceAccounting;
 using CHI.Services;
 using Microsoft.EntityFrameworkCore;
@@ -18,6 +19,7 @@ namespace CHI.ViewModels
         ObservableCollection<CaseFilter> caseFilters;
         Component currentComponent;
         CaseFilter currentCaseFilter;
+        AppSettings settings;
         IMainRegionService mainRegionService;
 
 
@@ -33,11 +35,12 @@ namespace CHI.ViewModels
         public DelegateCommand MoveDownCommand { get; }
 
 
-        public CaseFiltersViewModel(IMainRegionService mainRegionService)
+        public CaseFiltersViewModel(AppSettings settings, IMainRegionService mainRegionService)
         {
+            this.settings = settings;
             this.mainRegionService = mainRegionService;
 
-            dbContext = new AppDBContext();
+            dbContext = new AppDBContext(settings.Common.SQLServer, settings.Common.SQLServerDB);
 
             AddCommand = new DelegateCommand(AddExecute);
             DeleteCommand = new DelegateCommand(DeleteExecute, () => CurrentCaseFilter != null).ObservesProperty(() => CurrentCaseFilter);

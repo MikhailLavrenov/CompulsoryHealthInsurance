@@ -9,7 +9,6 @@ namespace CHI.Models.AppSettings
         string proxyAddress;
         ushort proxyPort;
         bool proxyConnectionIsValid;
-        bool useSQLServer;
         string sqlServer;
         string sqlServerDB;
         CredentialScope credentialsScope;
@@ -42,7 +41,6 @@ namespace CHI.Models.AppSettings
         public ushort ProxyPort { get => proxyPort; set => SetProperty(ref proxyPort, value); }
         [XmlIgnore] public bool ProxyConnectionIsValid { get => proxyConnectionIsValid; set => SetProperty(ref proxyConnectionIsValid, value); }
         [XmlIgnore] public string Proxy { get => $"{ProxyAddress}:{ProxyPort}"; }
-        public bool UseSQLServer { get => useSQLServer; set => SetProperty(ref useSQLServer, value); }
         public string SQLServer { get => sqlServer; set => SetProperty(ref sqlServer, value); }
         public string SQLServerDB { get => sqlServerDB; set => SetProperty(ref sqlServerDB, value); }
         public CredentialScope CredentialsScope { get => credentialsScope; set => SetProperty(ref credentialsScope, value); }
@@ -73,7 +71,6 @@ namespace CHI.Models.AppSettings
             ProxyAddress = "";
             ProxyPort = 0;
 
-            UseSQLServer = true;
             SQLServer = "yourServer\\istance";
             SQLServerDB = "CHI";
         }

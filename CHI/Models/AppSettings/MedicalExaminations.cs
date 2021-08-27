@@ -22,7 +22,7 @@ namespace CHI.Models.AppSettings
         public string Address { get => address; set => SetProperty(ref address, AppSettings.FixUrl(value)); }
         public byte MaxDegreeOfParallelism { get => maxDegreeOfParallelism; set => SetProperty(ref maxDegreeOfParallelism, value); }
         public string CasesFileNames { get => casesFileNames; set => SetProperty(ref casesFileNames, value); }
-        public string PatientFileNames { get => patientsFileNames; set => SetProperty(ref patientsFileNames, value); }
+        public string PatientsFileNames { get => patientsFileNames; set => SetProperty(ref patientsFileNames, value); }
         public Credential Credential { get => credential; set => SetProperty(ref credential, value); }
         public string FileDirectory { get => fileDirectory; set => SetProperty(ref fileDirectory, value); }
         [XmlIgnore] public string FomsCodeMO { get; internal set; }
@@ -54,7 +54,7 @@ namespace CHI.Models.AppSettings
         {
             Address = @"http://disp.foms.local/";
             MaxDegreeOfParallelism = 5;
-            PatientFileNames = @"LPM, LVM, LOM, LAM";
+            PatientsFileNames = @"LPM, LVM, LOM, LAM";
             CasesFileNames = @"DPM, DVM, DOM, DAM";
             Credential = new Credential { Login = "МойЛогин", Password = "МойПароль" };
         }

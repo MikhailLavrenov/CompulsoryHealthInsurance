@@ -1,5 +1,6 @@
 ﻿using CHI.Infrastructure;
 using CHI.Models;
+using CHI.Models.AppSettings;
 using CHI.Models.ServiceAccounting;
 using CHI.Services;
 using Microsoft.EntityFrameworkCore;
@@ -21,6 +22,7 @@ namespace CHI.ViewModels
         ObservableCollection<ServiceClassifierItem> serviceClassifierItems;
         ServiceClassifier currentServiceClassifier;
         ServiceClassifierItem currentServiceClassifierItem;
+        private readonly AppSettings settings;
         IMainRegionService mainRegionService;
         IFileDialogService fileDialogService;
 
@@ -35,8 +37,9 @@ namespace CHI.ViewModels
         public DelegateCommandAsync SaveExampleCommand { get; }
 
 
-        public ServiceClassifierItemsViewModel(IMainRegionService mainRegionService, IFileDialogService fileDialogService)
+        public ServiceClassifierItemsViewModel(AppSettings settings, IMainRegionService mainRegionService, IFileDialogService fileDialogService)
         {
+            this.settings = settings;
             this.mainRegionService = mainRegionService;
             this.fileDialogService = fileDialogService;
 
@@ -91,7 +94,7 @@ namespace CHI.ViewModels
                     Code = int.Parse(sheet.Cells[i, 1].Value.ToString(), CultureInfo.InvariantCulture),
                     LaborCost = double.Parse(sheet.Cells[i, 2].Value.ToString().Replace(',','.'), CultureInfo.InvariantCulture),
                     Price = double.Parse(sheet.Cells[i, 3].Value.ToString().Replace(',', '.'), CultureInfo.InvariantCulture),
-                    IsCaseClosing = sheet.Cells[i, 4].Value.ToString() == "1" ? true : false
+                    IsCaseClosing = sheet.Cells[i, 4].Value.ToString() == "1"
                 };
 
                 loadedClassifierItems.Add(serviceClassifier);
@@ -165,7 +168,7 @@ namespace CHI.ViewModels
 
         private void Refresh()
         {
-            dbContext = new AppDBContext();
+            dbContext = new AppDBContext(settings.Common.SQLServer, settings.Common.SQLServerDB);
 
             CurrentServiceClassifier = dbContext.ServiceClassifiers.Where(x => x.Id == CurrentServiceClassifier.Id).Include(x => x.ServiceClassifierItems).First();
 

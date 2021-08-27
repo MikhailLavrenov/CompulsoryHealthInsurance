@@ -1,5 +1,4 @@
 ﻿using CHI.Infrastructure;
-using CHI.Models;
 using CHI.Models.AppSettings;
 using CHI.Services;
 using CHI.Services.SRZ;
@@ -25,7 +24,7 @@ namespace CHI.ViewModels
         public DelegateCommandAsync ProcessFileCommand { get; }
 
 
-        public AttachedPatientsViewModel(AppSettings settings,IMainRegionService mainRegionService, IFileDialogService fileDialogService)
+        public AttachedPatientsViewModel(AppSettings settings, IMainRegionService mainRegionService, IFileDialogService fileDialogService)
         {
             Settings = settings;
             this.fileDialogService = fileDialogService;
@@ -68,7 +67,7 @@ namespace CHI.ViewModels
 
             var dbLoadingTask = Task.Run(() =>
             {
-                var dbContext = new AppDBContext();
+                var dbContext = new AppDBContext(Settings.Common.SQLServer, Settings.Common.SQLServerDB);
                 dbContext.Patients.Load();
                 return dbContext;
             });

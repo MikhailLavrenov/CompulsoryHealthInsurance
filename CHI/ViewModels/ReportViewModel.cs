@@ -52,7 +52,7 @@ namespace CHI.ViewModels
         {
             this.settings = settings.ServiceAccounting;
 
-            dbContext = new AppDBContext();           
+            dbContext = new AppDBContext(settings.Common.SQLServer, settings.Common.SQLServerDB);           
 
             this.mainRegionService = mainRegionService;
             this.fileDialogService = fileDialogService;

@@ -1,5 +1,6 @@
 ﻿using CHI.Infrastructure;
 using CHI.Models;
+using CHI.Models.AppSettings;
 using CHI.Models.ServiceAccounting;
 using CHI.Services;
 using Microsoft.EntityFrameworkCore;
@@ -18,6 +19,7 @@ namespace CHI.ViewModels
     {
         AppDBContext dbContext;
         ObservableCollection<Specialty> specialties;
+        private readonly AppSettings settings;
         IMainRegionService mainRegionService;
         IFileDialogService fileDialogService;
 
@@ -28,14 +30,15 @@ namespace CHI.ViewModels
         public DelegateCommandAsync SaveExampleCommand { get; }
 
 
-        public SpecialtiesViewModel(IMainRegionService mainRegionService, IFileDialogService fileDialogService)
+        public SpecialtiesViewModel(AppSettings settings, IMainRegionService mainRegionService, IFileDialogService fileDialogService)
         {
+            this.settings = settings;
             this.mainRegionService = mainRegionService;
             this.fileDialogService = fileDialogService;
 
             mainRegionService.Header = "Специальности";
 
-            dbContext = new AppDBContext();
+            dbContext = new AppDBContext(settings.Common.SQLServer, settings.Common.SQLServerDB);
             dbContext.Specialties.Load();
             Specialties = dbContext.Specialties.Local.ToObservableCollection();
 
@@ -74,7 +77,7 @@ namespace CHI.ViewModels
 
             dbContext.SaveChanges();
 
-            dbContext =new AppDBContext();
+            dbContext =new AppDBContext(settings.Common.SQLServer, settings.Common.SQLServerDB);
             dbContext.Specialties.Load();
             Specialties = dbContext.Specialties.Local.ToObservableCollection();
 

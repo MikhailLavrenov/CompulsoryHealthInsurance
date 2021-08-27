@@ -42,28 +42,28 @@
                    Text="Адрес сайта" />
         <TextBox Grid.Row="0"
                  Grid.Column="1"
-                 Text="{Binding Settings.ExaminationsAddress, ValidatesOnDataErrors=True}" />
+                 Text="{Binding Settings.MedicalExaminations.Address, ValidatesOnDataErrors=True}" />
 
         <TextBlock Grid.Row="1"
                    Grid.Column="0"
                    Text="Количество потоков" />
         <TextBox Grid.Row="1"
                  Grid.Column="1"
-                 Text="{Binding Settings.ExaminationsThreadsLimit, ValidatesOnDataErrors=True}" />
+                 Text="{Binding Settings.MedicalExaminations.MaxDegreeOfParallelism, ValidatesOnDataErrors=True}" />
 
         <TextBlock Grid.Row="2"
                    Grid.Column="0"
                    Text="Имена файлов пациентов" />
         <TextBox  Grid.Row="2"
                   Grid.Column="1"
-                  Text="{Binding Settings.PatientFileNames}" />
+                  Text="{Binding Settings.MedicalExaminations.PatientsFileNames}" />
 
         <TextBlock Grid.Row="3"
                    Grid.Column="0"
                    Text="Имена файлов услуг" />
         <TextBox  Grid.Row="3"
                   Grid.Column="1"
-                  Text="{Binding Settings.ExaminationFileNames}" />
+                  Text="{Binding Settings.MedicalExaminations.CasesFileNames}" />
 
         <!--Столбцы DataGrid не являются частью логического дерева этого View, поэтому их нельзя привязать к свойствам ViewModel-->
         <!--Использование x:Name и FrameworkElement принадлежащего логическому дереву позволяет обойти ограничение используя FrameworkElement как посредника-->
@@ -74,7 +74,7 @@
                           Grid.ColumnSpan="2"
                           Margin="0,20,0,10"
                           MinHeight="100"
-                          ItemsSource="{Binding Settings.ExaminationsCredentials}">
+                          ItemsSource="{Binding Settings.MedicalExaminations.Credential}">
 
             <DataGrid.Columns>
 

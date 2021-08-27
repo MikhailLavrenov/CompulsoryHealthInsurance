@@ -1,4 +1,5 @@
 ﻿using CHI.Infrastructure;
+using CHI.Models.AppSettings;
 using CHI.Models.ServiceAccounting;
 using CHI.Services;
 using Microsoft.EntityFrameworkCore;
@@ -17,6 +18,7 @@ namespace CHI.ViewModels
         Register currentRegister;
         ObservableCollection<Register> registers;
         IFileDialogService fileDialogService;
+        private readonly AppSettings settings;
         IMainRegionService mainRegionService;
 
         public bool KeepAlive { get => false; }
@@ -27,9 +29,10 @@ namespace CHI.ViewModels
         public DelegateCommandAsync LoadPaymentStateCommand { get; }
 
 
-        public RegistersViewModel(IMainRegionService mainRegionService, IFileDialogService fileDialogService)
+        public RegistersViewModel(AppSettings settings, IMainRegionService mainRegionService, IFileDialogService fileDialogService)
         {
-            this.fileDialogService = fileDialogService;
+            this.settings = settings;
+            this.fileDialogService = fileDialogService;            
             this.mainRegionService = mainRegionService;
 
             mainRegionService.Header = "Реестры";
@@ -60,7 +63,7 @@ namespace CHI.ViewModels
             var registerService = new BillsRegisterService();
             var register = registerService.GetRegister(fileDialogService.FileNames);
 
-            using var localDbContext = new AppDBContext();
+            using var localDbContext = new AppDBContext(settings.Common.SQLServer, settings.Common.SQLServerDB);
 
             var registerForSamePeriod = localDbContext.Registers.FirstOrDefault(x => x.Month == register.Month && x.Year == register.Year);
 
@@ -94,7 +97,7 @@ namespace CHI.ViewModels
                 var laterServices = mCase.Services.Where(x => x.Date == maxDate && x.Employee.Specialty.FomsId == mCase.Employee.Specialty.FomsId).ToList();
                 var medicFomsIds = laterServices.Select(x => x.Employee.Medic.FomsId).Distinct().ToList();
 
-                if (medicFomsIds.Count() == 1)
+                if (medicFomsIds.Count == 1)
                     mCase.Employee.Medic.FomsId = medicFomsIds.First();
                 else
                 {
@@ -114,7 +117,7 @@ namespace CHI.ViewModels
 
                     medicFomsIds = laterServices.Where(x => caseClosingCodes.Contains(x.Code)).Select(x => x.Employee.Medic.FomsId).Distinct().ToList();
 
-                    if (medicFomsIds.Count() == 1)
+                    if (medicFomsIds.Count == 1)
                         mCase.Employee.Medic.FomsId = medicFomsIds.First();
                     else
                         throw new InvalidOperationException($"Не удается однозначно определить мед. работника закрывшего случай {mCase.IdCase}");
@@ -188,8 +191,8 @@ namespace CHI.ViewModels
 
             employee = new Employee
             {
-                Medic = medic == null ? Medic.CreateUnknown(medicFomsId) : medic,
-                Specialty = specialty == null ? Specialty.CreateUnknown(specialtyFomsId) : specialty,
+                Medic = medic ?? Medic.CreateUnknown(medicFomsId),
+                Specialty = specialty ?? Specialty.CreateUnknown(specialtyFomsId),
                 Department = defaultDepartment,
                 Parameters = new List<Parameter>
                 {
@@ -224,7 +227,7 @@ namespace CHI.ViewModels
             var registerService = new BillsRegisterService();
             var paidRegister = registerService.GetRegister(fileDialogService.FileNames);
 
-            var dbContext = new AppDBContext();
+            var dbContext = new AppDBContext(settings.Common.SQLServer, settings.Common.SQLServerDB);
 
             var register = dbContext.Registers.Where(x => x.Month == paidRegister.Month && x.Year == paidRegister.Year).Include(x => x.Cases).FirstOrDefault();
 
@@ -248,12 +251,12 @@ namespace CHI.ViewModels
 
             Refresh();
 
-            mainRegionService.HideProgressBar($"Загрузка статусов оплаты завершена. В файле(ах) {paidRegister.Cases.Count} случая, загружено {casePairs.Count()}.");
+            mainRegionService.HideProgressBar($"Загрузка статусов оплаты завершена. В файле(ах) {paidRegister.Cases.Count} случая, загружено {casePairs.Count}.");
         }
 
         private void Refresh()
         {
-            dbContext = new AppDBContext();
+            dbContext = new AppDBContext(settings.Common.SQLServer, settings.Common.SQLServerDB);
             dbContext.Registers.Load();
             Registers = new ObservableCollection<Register>(dbContext.Registers.Local.OrderByDescending(x => x.Month).OrderByDescending(x => x.Year));
         }

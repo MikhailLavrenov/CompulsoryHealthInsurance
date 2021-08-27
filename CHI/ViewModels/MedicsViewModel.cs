@@ -1,5 +1,6 @@
 ﻿using CHI.Infrastructure;
 using CHI.Models;
+using CHI.Models.AppSettings;
 using CHI.Models.ServiceAccounting;
 using CHI.Services;
 using Microsoft.EntityFrameworkCore;
@@ -17,6 +18,7 @@ namespace CHI.ViewModels
     {
         AppDBContext dbContext;
         ObservableCollection<Medic> medics;
+        private readonly AppSettings settings;
         IMainRegionService mainRegionService;
         IFileDialogService fileDialogService;
 
@@ -26,14 +28,15 @@ namespace CHI.ViewModels
         public DelegateCommandAsync LoadCommand { get; }
         public DelegateCommandAsync SaveExampleCommand { get; }
 
-        public MedicsViewModel(IMainRegionService mainRegionService, IFileDialogService fileDialogService)
+        public MedicsViewModel(AppSettings settings, IMainRegionService mainRegionService, IFileDialogService fileDialogService)
         {
+            this.settings = settings;
             this.mainRegionService = mainRegionService;
             this.fileDialogService = fileDialogService;
 
             mainRegionService.Header = "Медицинские работники";
 
-            dbContext = new AppDBContext();
+            dbContext = new AppDBContext(settings.Common.SQLServer, settings.Common.SQLServerDB);
             dbContext.Medics.Load();
             Medics = dbContext.Medics.Local.ToObservableCollection();
 
@@ -73,7 +76,7 @@ namespace CHI.ViewModels
 
             dbContext.SaveChanges();
 
-            dbContext = new AppDBContext();
+            dbContext = new AppDBContext(settings.Common.SQLServer, settings.Common.SQLServerDB);
             dbContext.Medics.Load();
             Medics = dbContext.Medics.Local.ToObservableCollection();
 

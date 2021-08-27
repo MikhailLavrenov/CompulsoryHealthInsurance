@@ -1,5 +1,6 @@
 ﻿using CHI.Infrastructure;
 using CHI.Models;
+using CHI.Models.AppSettings;
 using CHI.Models.ServiceAccounting;
 using CHI.Services;
 using Microsoft.EntityFrameworkCore;
@@ -18,6 +19,7 @@ namespace CHI.ViewModels
         ObservableCollection<Indicator> indicators;
         Component currentComponent;
         Indicator currentIndicator;
+        AppSettings settings;
         IMainRegionService mainRegionService;
 
         public bool KeepAlive { get; set; }
@@ -32,11 +34,12 @@ namespace CHI.ViewModels
         public DelegateCommand MoveDownCommand { get; }
         public DelegateCommand<Type> NavigateCommand { get; }
 
-        public IndicatorsViewModel(IMainRegionService mainRegionService)
+        public IndicatorsViewModel(AppSettings settings, IMainRegionService mainRegionService)
         {
+            this.settings = settings;
             this.mainRegionService = mainRegionService;           
 
-            dbContext = new AppDBContext();
+            dbContext = new AppDBContext(settings.Common.SQLServer, settings.Common.SQLServerDB);
 
             AddCommand = new DelegateCommand(AddExecute);
             DeleteCommand = new DelegateCommand(DeleteExecute,()=> CurrentIndicator!=null).ObservesProperty(() => CurrentIndicator);
