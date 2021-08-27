@@ -59,11 +59,9 @@ namespace CHI.Models.AppSettings
             foreach (var columnProperty in AttachedPatientsFile.ColumnProperties)
                 columnProperty.Validate();
 
-            using (var stream = new FileStream(fileName, FileMode.Create))
-            {
-                var formatter = new XmlSerializer(GetType());
-                formatter.Serialize(stream, this);
-            }
+            using var stream = new FileStream(fileName, FileMode.Create);
+            var formatter = new XmlSerializer(GetType());
+            formatter.Serialize(stream, this);
         }
 
         public static AppSettings Load()
@@ -88,7 +86,7 @@ namespace CHI.Models.AppSettings
                 {
                     settings.Srz.Credential = new();
                     settings.MedicalExaminations.Credential = new();
-                    settings.BackupSettingsFile = $@"Settings backup {DateTime.Now.ToString("dd_MM_yyyy_HH_mm_ss_FFF")}.xml";
+                    settings.BackupSettingsFile = $"Settings backup {DateTime.Now.ToString("dd_MM_yyyy_HH_mm_ss_FFF")}.xml";
                     settings.FailedToDecrypt = true;
 
                     File.Copy(fileName, settings.BackupSettingsFile);
@@ -100,7 +98,7 @@ namespace CHI.Models.AppSettings
             else
             {
                 settings = new AppSettings();
-                settings.SetDefault();
+                //settings.SetDefault();
             }
 
             return settings;

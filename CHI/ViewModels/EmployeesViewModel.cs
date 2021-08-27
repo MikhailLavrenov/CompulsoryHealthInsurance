@@ -1,4 +1,5 @@
 ﻿using CHI.Infrastructure;
+using CHI.Models.AppSettings;
 using CHI.Models.ServiceAccounting;
 using CHI.Services;
 using Microsoft.EntityFrameworkCore;
@@ -44,13 +45,13 @@ namespace CHI.ViewModels
         public DelegateCommandAsync MergeAgesCommand { get; }
         public DelegateCommand RefreshCommand { get; }
 
-        public EmployeesViewModel(IMainRegionService mainRegionService)
+        public EmployeesViewModel(AppSettings settings, IMainRegionService mainRegionService)
         {
             this.mainRegionService = mainRegionService;
 
             mainRegionService.Header = "Штатные единицы";
 
-            dbContext = new AppDBContext();
+            dbContext = new AppDBContext(settings.Common.SQLServer, settings.Common.SQLServerDB);
 
             dbContext.Employees.Load();
             Medics = dbContext.Medics.ToList();

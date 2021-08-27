@@ -1,5 +1,6 @@
 ﻿using CHI.Infrastructure;
 using CHI.Models;
+using CHI.Models.AppSettings;
 using CHI.Models.ServiceAccounting;
 using CHI.Services;
 using Microsoft.EntityFrameworkCore;
@@ -21,7 +22,6 @@ namespace CHI.ViewModels
         Department root;
         List<Department> parents;
         IMainRegionService mainRegionService;
-        IDialogService dialogService;
 
         public bool KeepAlive { get => false; }
         public Department CurrentDepartment { get => currentDepartment; set => SetProperty(ref currentDepartment, value); }
@@ -34,14 +34,13 @@ namespace CHI.ViewModels
         public DelegateCommand MoveDownCommand { get; }
         public DelegateCommand SelectColorCommand { get; }
 
-        public DepartmentsViewModel(IMainRegionService mainRegionService, IDialogService dialogService)
+        public DepartmentsViewModel(AppSettings settings, IMainRegionService mainRegionService)
         {
             this.mainRegionService = mainRegionService;
-            this.dialogService = dialogService;
 
             mainRegionService.Header = "Подразделения";
 
-            dbContext = new AppDBContext();
+            dbContext = new AppDBContext(settings.Common.SQLServer, settings.Common.SQLServerDB);
             dbContext.Departments.Include(x => x.Employees).Load();
 
             root = dbContext.Departments.Local.Where(x => x.IsRoot).FirstOrDefault();

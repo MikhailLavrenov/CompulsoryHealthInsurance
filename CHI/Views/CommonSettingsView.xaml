@@ -36,7 +36,6 @@
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
-            <RowDefinition Height="auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
@@ -45,10 +44,10 @@
                    Text="Доступ к учетным записям" />
         <ComboBox Grid.Row="0"
                   Grid.Column="1"
-                  ItemsSource="{Binding Settings.CredentialsScope, Converter={i:EnumToCollectionConverter}, Mode=OneTime}"
+                  ItemsSource="{Binding Settings.Common.CredentialsScope, Converter={i:EnumToCollectionConverter}, Mode=OneTime}"
                   SelectedValuePath="Key"
                   DisplayMemberPath="Value"
-                  SelectedValue="{Binding Settings.CredentialsScope}" />
+                  SelectedValue="{Binding Settings.Common.CredentialsScope}" />
 
         <TextBlock Grid.Row="1"
                    Grid.Column="0"
@@ -56,7 +55,7 @@
         <CheckBox Grid.Row="1"
                   Grid.Column="1"
                   Name="CheckBoxUseProxy"
-                  IsChecked="{Binding Settings.UseProxy}" />
+                  IsChecked="{Binding Settings.Common.UseProxy}" />
 
         <TextBlock Grid.Row="2"
                    Grid.Column="0"
@@ -71,45 +70,35 @@
                 <ColumnDefinition Width="1*" />
             </Grid.ColumnDefinitions>
             <TextBox Grid.Column="0"
-                     Text="{Binding Settings.ProxyAddress,ValidatesOnDataErrors=True}" />
+                     Text="{Binding Settings.Common.ProxyAddress,ValidatesOnDataErrors=True}" />
             <TextBox Grid.Column="1"
-                     Text="{Binding Settings.ProxyPort}" />
+                     Text="{Binding Settings.Common.ProxyPort}" />
         </Grid>
 
         <TextBlock Grid.Row="3"
                    Grid.Column="0"
-                   Text="Использовать MS SQL сервер" />
-        <CheckBox Grid.Row="3"
+                   Text="Имя SQL сервера"/>
+        <TextBox Grid.Row="3"
                  Grid.Column="1" 
-                 IsChecked="{Binding Settings.UseSQLServer}" />
+                 Text="{Binding Settings.Common.SQLServer}"                   
+                 />
 
         <TextBlock Grid.Row="4"
                    Grid.Column="0"
-                   Text="Имя SQL сервера" 
-                   Visibility="{Binding Settings.UseSQLServer, Converter={i:BoolToVisibleConverter}}"/>
+                   Text="Имя SQL базы данных"     />
         <TextBox Grid.Row="4"
                  Grid.Column="1" 
-                 Text="{Binding Settings.SQLServerName}"                   
-                 Visibility="{Binding Settings.UseSQLServer, Converter={i:BoolToVisibleConverter}}"/>
+                 Text="{Binding Settings.Common.SQLServerDB}"/>
 
         <TextBlock Grid.Row="5"
                    Grid.Column="0"
-                   Text="Имя SQL базы данных"                       
-                   Visibility="{Binding Settings.UseSQLServer, Converter={i:BoolToVisibleConverter}}"/>
-        <TextBox Grid.Row="5"
-                 Grid.Column="1" 
-                 Text="{Binding Settings.SQLServerDBName}"                   
-                 Visibility="{Binding Settings.UseSQLServer, Converter={i:BoolToVisibleConverter}}"/>
-
-        <TextBlock Grid.Row="6"
-                   Grid.Column="0"
                    Text="База данных" />
-        <Button Grid.Row="6"                   
+        <Button Grid.Row="5"                   
                 Grid.Column="1" 
                 Content="Обновить структуру"
                 Command="{Binding MigrateDBCommand}" />
 
-               <FrameworkElement Grid.Row="7" Style="{StaticResource Separator}"/>
+               <FrameworkElement Grid.Row="6" Style="{StaticResource Separator}"/>
 
         <StackPanel VerticalAlignment="Top"
                     Grid.Row="8"

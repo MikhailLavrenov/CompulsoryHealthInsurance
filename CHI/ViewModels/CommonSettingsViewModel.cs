@@ -1,12 +1,10 @@
 ﻿using CHI.Infrastructure;
-using CHI.Models;
 using CHI.Models.AppSettings;
 using CHI.Models.ServiceAccounting;
 using CHI.Services;
 using Microsoft.EntityFrameworkCore;
 using Prism.Commands;
 using Prism.Regions;
-using Prism.Services.Dialogs;
 using System.Linq;
 
 namespace CHI.ViewModels
@@ -54,7 +52,7 @@ namespace CHI.ViewModels
         private void MigrateDBExecute()
         {
             MainRegionService.ShowProgressBar("Обновление структуры базы данных.");
-            var dbContext = new AppDBContext();
+            var dbContext = new AppDBContext(Settings.Common.SQLServer, Settings.Common.SQLServerDB);
             dbContext.Database.Migrate();
 
             var rootDepartment = dbContext.Departments.FirstOrDefault(x => x.IsRoot);

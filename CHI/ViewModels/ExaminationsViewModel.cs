@@ -84,7 +84,7 @@ namespace CHI.ViewModels
             MainRegionService.ShowProgressBar("Чтение файлов.");
 
             var registers = new MedExamsBillsRegisterService();
-            var fileFilter = $"{Settings.MedicalExaminations.PatientFileNames},{Settings.MedicalExaminations.CasesFileNames}".Split(',', StringSplitOptions.TrimEntries);
+            var fileFilter = $"{Settings.MedicalExaminations.PatientsFileNames},{Settings.MedicalExaminations.CasesFileNames}".Split(',', StringSplitOptions.TrimEntries);
             registers.XmlFileNameStartsWithFilter = fileFilter.ToList();
 
             var patientsExaminations = registers.GetPatientExaminationsList(fileDialogService.FileNames);

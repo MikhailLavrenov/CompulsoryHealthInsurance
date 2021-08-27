@@ -1,5 +1,6 @@
 ﻿using CHI.Infrastructure;
 using CHI.Models;
+using CHI.Models.AppSettings;
 using CHI.Models.ServiceAccounting;
 using CHI.Services;
 using CHI.Services.WindowsAccounts;
@@ -18,6 +19,7 @@ namespace CHI.ViewModels
         AppDBContext dbContext;
         ObservableCollection<User> serviceClassifiers;
         User currentUser;
+        private readonly AppSettings settings;
         IMainRegionService mainRegionService;
         User currentAppUser;
         IContainer container;
@@ -30,13 +32,14 @@ namespace CHI.ViewModels
         public DelegateCommand DeleteCommand { get; }
         public DelegateCommand<Type> NavigateCommand { get; }
 
-        public UsersViewModel(IMainRegionService mainRegionService, User currentUser,IContainer container)
+        public UsersViewModel(AppSettings settings, IMainRegionService mainRegionService, User currentUser,IContainer container)
         {
+            this.settings = settings;
             this.mainRegionService = mainRegionService;
             this.container = container;
             currentAppUser = currentUser;
 
-            dbContext = new AppDBContext();
+            dbContext = new AppDBContext(settings.Common.SQLServer, settings.Common.SQLServerDB);
 
             dbContext.Users.Load();
 

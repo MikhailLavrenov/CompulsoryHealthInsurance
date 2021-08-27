@@ -1,5 +1,6 @@
 ﻿using CHI.Infrastructure;
 using CHI.Models;
+using CHI.Models.AppSettings;
 using CHI.Models.ServiceAccounting;
 using CHI.Services;
 using Microsoft.EntityFrameworkCore;
@@ -17,6 +18,7 @@ namespace CHI.ViewModels
         ObservableCollection<Ratio> ratios;
         Indicator currentIndicator;
         Ratio currentRatio;
+        private readonly AppSettings settings;
         IMainRegionService mainRegionService;
 
         public bool KeepAlive { get => false; }
@@ -28,11 +30,12 @@ namespace CHI.ViewModels
         public DelegateCommand AddCommand { get; }
         public DelegateCommand DeleteCommand { get; }
 
-        public RatiosViewModel(IMainRegionService mainRegionService)
+        public RatiosViewModel(AppSettings settings, IMainRegionService mainRegionService)
         {
+            this.settings = settings;
             this.mainRegionService = mainRegionService;
 
-            dbContext = new AppDBContext();
+            dbContext = new AppDBContext(settings.Common.SQLServer, settings.Common.SQLServerDB);
 
             AddCommand = new DelegateCommand(AddExecute);
             DeleteCommand = new DelegateCommand(DeleteExecute, () => CurrentRatio != null).ObservesProperty(() => CurrentRatio);

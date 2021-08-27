@@ -1,5 +1,6 @@
 ﻿using CHI.Infrastructure;
 using CHI.Models;
+using CHI.Models.AppSettings;
 using CHI.Models.ServiceAccounting;
 using CHI.Services;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +13,7 @@ namespace CHI.ViewModels
     public class PlanPermisionsViewModel : DomainObject, IRegionMemberLifetime, INavigationAware
     {
         AppDBContext dbContext;
+        private readonly AppSettings settings;
         IMainRegionService mainRegionService;
         User currentUser;
 
@@ -20,13 +22,14 @@ namespace CHI.ViewModels
         public List<SelectedObject<Department>> Departments { get; set; }
 
 
-        public PlanPermisionsViewModel(IMainRegionService mainRegionService)
+        public PlanPermisionsViewModel(AppSettings settings, IMainRegionService mainRegionService)
         {
+            this.settings = settings;
             this.mainRegionService = mainRegionService;
 
             mainRegionService.Header = "Отделения пользователя";
 
-            dbContext = new AppDBContext();
+            dbContext = new AppDBContext(settings.Common.SQLServer, settings.Common.SQLServerDB);
 
             Departments=dbContext.Departments.Where(x=>!x.IsRoot).AsEnumerable().Select(x => new SelectedObject<Department>(false, x)).ToList();
         }

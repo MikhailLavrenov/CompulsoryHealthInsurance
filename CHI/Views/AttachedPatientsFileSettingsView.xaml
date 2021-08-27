@@ -22,7 +22,7 @@
     </UserControl.Resources>
 
 
-    <Grid d:DataContext="{d:DesignInstance vm:AttachedPatientsViewModel }">
+    <Grid d:DataContext="{d:DesignInstance vm:AttachedPatientsFileSettingsViewModel }">
 
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="210" />
@@ -58,7 +58,7 @@
         <CheckBox  Grid.Row="0"
                    Grid.Column="1"
                    Name="CheckBoxFormat"
-                   IsChecked="{Binding Path=Settings.FormatPatientsFile}" />
+                   IsChecked="{Binding Path=Settings.ApplyFormat}" />
 
         <DockPanel Grid.Row="1"
                    Grid.Column="0"

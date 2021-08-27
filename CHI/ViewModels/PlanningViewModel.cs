@@ -83,7 +83,7 @@ namespace CHI.ViewModels
 
             mainRegionService.Header = "Планирование объемов";
 
-            dbContext = new AppDBContext();
+            dbContext = new AppDBContext(settings.Common.SQLServer, settings.Common.SQLServerDB);
 
             IncreaseYear = new DelegateCommand(() => ++Year);
             DecreaseYear = new DelegateCommand(() => --Year);

@@ -1,5 +1,4 @@
 ﻿using CHI.Infrastructure;
-using CHI.Models;
 using CHI.Models.AppSettings;
 using CHI.Services;
 using Microsoft.EntityFrameworkCore;
@@ -14,6 +13,7 @@ namespace CHI.ViewModels
     public class AttachedPatientsStorageSettingsViewModel : DomainObject, IRegionMemberLifetime
     {
         readonly IFileDialogService fileDialogService;
+        AppSettings settings;
         IMainRegionService mainRegionService;
         string patientsCount = "Вычисляется...";
 
@@ -25,14 +25,16 @@ namespace CHI.ViewModels
         public DelegateCommand ClearDatabaseCommand { get; }
 
 
-        public AttachedPatientsStorageSettingsViewModel( IMainRegionService mainRegionService, IFileDialogService fileDialogService)
+        public AttachedPatientsStorageSettingsViewModel(AppSettings settings,IMainRegionService mainRegionService, IFileDialogService fileDialogService)
         {
+
             this.fileDialogService = fileDialogService;
+            this.settings = settings;
             this.mainRegionService = mainRegionService;
 
             this.mainRegionService.Header = "База данных прикрепленных пациентов";
 
-            Task.Run(() => PatientsCount = new AppDBContext().Patients.Count().ToString());
+            Task.Run(() => PatientsCount = new AppDBContext(settings.Common.SQLServer, settings.Common.SQLServerDB).Patients.Count().ToString());
 
             ImportPatientsCommand = new DelegateCommandAsync(ImportPatientsExecute);
             SaveExampleCommand = new DelegateCommandAsync(SaveExampleExecute);
@@ -56,7 +58,7 @@ namespace CHI.ViewModels
             var newPatients = importReader.GetPatients();
 
             mainRegionService.ShowProgressBar("Проверка значений.");
-            var db = new AppDBContext();
+            var db = new AppDBContext(settings.Common.SQLServer, settings.Common.SQLServerDB);
             db.Patients.Load();
 
             var existenInsuaranceNumbers = new HashSet<string>(db.Patients.Select(x => x.InsuranceNumber));
@@ -107,7 +109,7 @@ namespace CHI.ViewModels
                 return;
             }
 
-            var db = new AppDBContext();
+            var db = new AppDBContext(settings.Common.SQLServer, settings.Common.SQLServerDB);
 
             db.Database.EnsureDeleted();
             db.Database.EnsureCreated();

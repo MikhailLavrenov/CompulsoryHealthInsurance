@@ -44,7 +44,7 @@
         <CheckBox  Grid.Row="0"
                    Grid.Column="1"
                    Name="CheckBoxDowloadNewFile"
-                   IsChecked="{Binding Settings.DownloadNewPatientsFile}" />
+                   IsChecked="{Binding Settings.Srz.DownloadNewPatientsFile}" />
 
         <TextBlock Grid.Row="1"
                    Grid.Column="0"

@@ -1,5 +1,6 @@
 ﻿using CHI.Infrastructure;
 using CHI.Models;
+using CHI.Models.AppSettings;
 using CHI.Models.ServiceAccounting;
 using CHI.Services;
 using Microsoft.EntityFrameworkCore;
@@ -21,6 +22,7 @@ namespace CHI.ViewModels
         Component currentComponent;
         Component root;
         List<Component> parents;
+        AppSettings settings;
         IMainRegionService mainRegionService;
         IDialogService dialogService;
 
@@ -36,12 +38,13 @@ namespace CHI.ViewModels
         public DelegateCommand<Type> NavigateCommand { get; }
         public DelegateCommand SelectColorCommand { get; }
 
-        public ComponentsViewModel(IMainRegionService mainRegionService, IDialogService dialogService)
+        public ComponentsViewModel(AppSettings settings, IMainRegionService mainRegionService, IDialogService dialogService)
         {
+            this.settings = settings;
             this.mainRegionService = mainRegionService;
             this.dialogService = dialogService;
 
-            dbContext = new AppDBContext();
+            dbContext = new AppDBContext(settings.Common.SQLServer, settings.Common.SQLServerDB);
             dbContext.Components.Load();
 
             root = dbContext.Components.Local.Where(x => x.IsRoot).FirstOrDefault();
