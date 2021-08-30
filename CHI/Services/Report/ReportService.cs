@@ -14,6 +14,7 @@ namespace CHI.Services.Report
         List<Employee> employees;
         List<Component> components;
 
+
         public int MoneyRoundDigits { get; set; } = 0;
         public int Month { get; private set; }
         public int Year { get; private set; }
@@ -28,7 +29,6 @@ namespace CHI.Services.Report
             components = rootComponent.ToListRecursive();
             parameters = departments.SelectMany(x => x.Parameters).ToList().Concat(employees.SelectMany(x => x.Parameters).ToList()).ToList();
             indicators = components.SelectMany(x => x.Indicators).ToList();
-
             Results = parameters.SelectMany(x => indicators, (x, y) => (x, y)).ToDictionary(x => x, x => (double?)null);
         }
 
@@ -116,8 +116,7 @@ namespace CHI.Services.Report
             DropZeroAndRoundValues();
         }
 
-        //суммирует строки
-        private void SumRows()
+        void SumRows()
         {
             foreach (var parameter in parameters.Where(x => x.Department != null).Reverse())
             {
@@ -148,8 +147,7 @@ namespace CHI.Services.Report
             }
         }
 
-        //суммирует столбцы
-        private void SumColumns()
+        void SumColumns()
         {
             foreach (var parameter in parameters)
                 foreach (var indicator in indicators.Where(x => x.Component.CaseFilters.First().Kind == CaseFilterKind.Total).Reverse())
@@ -166,8 +164,7 @@ namespace CHI.Services.Report
                 }
         }
 
-        //округляет значения и убирает нули
-        private void DropZeroAndRoundValues()
+        void DropZeroAndRoundValues()
         {
             foreach (var key in Results.Keys.ToList())
             {
@@ -191,7 +188,7 @@ namespace CHI.Services.Report
             }
         }
 
-        private void SetValuesFromCases(int month, int year, IEnumerable<Case> cases, bool isPaymentAccepted)
+        void SetValuesFromCases(int month, int year, IEnumerable<Case> cases, bool isPaymentAccepted)
         {
             //оптимизация чтобы не выполнять одинаковые действия в разных итерациях
             var employeesCases = cases

@@ -13,38 +13,36 @@ namespace CHI.Infrastructure
     /// </summary>
     public abstract class DomainObject : BindableBase, INotifyDataErrorInfo
     {
-        #region Поля
         //Хранит все ошибки экземпляра класса
         private Dictionary<string, List<string>> errors = new Dictionary<string, List<string>>();
 
-        #endregion
 
-        #region Свойства
         public bool HasErrors { get => errors.Count > 0; }
-        #endregion
 
-        #region События
+
         public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
-        #endregion
 
-        #region Методы       
+
         //BindableBase
         protected override void OnPropertyChanged(PropertyChangedEventArgs args)
         {
             base.OnPropertyChanged(args);
             Validate(args.PropertyName);
         }
+
         //INotifyDataErrorInfo
         public void OnErrorsChanged(string propertyName)
         {
             ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
         }
+
         public IEnumerable GetErrors(string propertyName)
         {
             if (string.IsNullOrEmpty(propertyName) || !errors.ContainsKey(propertyName))
                 return null;
             return errors[propertyName];
         }
+
         public bool ContainsErrorMessage(string propertyName, string errorMessage)
         {
             if (errors.ContainsKey(propertyName) && errors[propertyName].Contains(errorMessage))
@@ -52,9 +50,11 @@ namespace CHI.Infrastructure
             else
                 return false;
         }
+
         //Выполняет валидацию. Должен быть переопределен в производном классе для автоматического вызова при изменении свойств.
         public virtual void Validate(string propertyName)
         { }
+
         //Валидация cвойства типа string на null или пусто
         protected void ValidateIsNullOrEmptyString(string propertyName, string propertyValue)
         {
@@ -63,6 +63,7 @@ namespace CHI.Infrastructure
             else
                 RemoveError(ErrorMessages.IsNullOrEmpty, propertyName);
         }
+
         //Добавить сообщение об ошибке в значении свойства
         public void AddError(string errorMessage, [CallerMemberName]string propertyName = "")
         {
@@ -75,6 +76,7 @@ namespace CHI.Infrastructure
                 OnErrorsChanged(propertyName);
             }
         }
+
         //Удалить сообщение об ошибке в значении свойства
         public void RemoveError(string errorMessage, [CallerMemberName]string propertyName = "")
         {
@@ -88,6 +90,7 @@ namespace CHI.Infrastructure
                 OnErrorsChanged(propertyName);
             }
         }
+
         //Удалить сообщение об ошибке во всех свойствах
         public void RemoveErrorsMessage(string errormessage)
         {
@@ -109,6 +112,7 @@ namespace CHI.Infrastructure
                 }
             }
         }
+
         //Удалить все сообщения об ошибке  в значении свойства
         public void RemoveErrors([CallerMemberName]string propertyName = "")
         {
@@ -118,6 +122,5 @@ namespace CHI.Infrastructure
                 OnErrorsChanged(propertyName);
             }
         }
-        #endregion
     }
 }
