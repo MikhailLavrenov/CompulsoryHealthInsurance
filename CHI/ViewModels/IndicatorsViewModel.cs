@@ -1,8 +1,7 @@
 ﻿using CHI.Infrastructure;
-using CHI.Models;
-using CHI.Models.AppSettings;
 using CHI.Models.ServiceAccounting;
 using CHI.Services;
+using CHI.Settings;
 using Microsoft.EntityFrameworkCore;
 using Prism.Commands;
 using Prism.Regions;
@@ -37,12 +36,12 @@ namespace CHI.ViewModels
         public IndicatorsViewModel(AppSettings settings, IMainRegionService mainRegionService)
         {
             this.settings = settings;
-            this.mainRegionService = mainRegionService;           
+            this.mainRegionService = mainRegionService;
 
             dbContext = new AppDBContext(settings.Common.SQLServer, settings.Common.SQLServerDB);
 
             AddCommand = new DelegateCommand(AddExecute);
-            DeleteCommand = new DelegateCommand(DeleteExecute,()=> CurrentIndicator!=null).ObservesProperty(() => CurrentIndicator);
+            DeleteCommand = new DelegateCommand(DeleteExecute, () => CurrentIndicator != null).ObservesProperty(() => CurrentIndicator);
             MoveUpCommand = new DelegateCommand(MoveUpExecute, MoveUpCanExecute).ObservesProperty(() => CurrentIndicator);
             MoveDownCommand = new DelegateCommand(MoveDownExecute, MoveDownCanExecute).ObservesProperty(() => CurrentIndicator);
             NavigateCommand = new DelegateCommand<Type>(NavigateExecute);
@@ -67,7 +66,7 @@ namespace CHI.ViewModels
 
             CurrentComponent.Indicators.Remove(CurrentIndicator);
 
-            Indicators.Remove(CurrentIndicator);            
+            Indicators.Remove(CurrentIndicator);
 
             for (int i = offset; i < Indicators.Count; i++)
                 Indicators[i].Order--;

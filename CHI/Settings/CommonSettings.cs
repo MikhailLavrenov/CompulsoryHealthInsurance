@@ -1,10 +1,12 @@
 ﻿using CHI.Infrastructure;
+using CHI.Models;
 using System.Xml.Serialization;
 
-namespace CHI.Models.AppSettings
+namespace CHI.Settings
 {
-    public class Common : DomainObject
+    public class CommonSettings : DomainObject
     {
+        static internal int TimeoutConnection { get; } = 3000;
         bool useProxy;
         string proxyAddress;
         ushort proxyPort;
@@ -12,15 +14,6 @@ namespace CHI.Models.AppSettings
         string sqlServer;
         string sqlServerDB;
         CredentialScope credentialsScope;
-
-
-        static internal int TimeoutConnection { get; } = 3000;
-
-
-        public Common()
-        {
-            CredentialsScope = CredentialScope.ТекущийПользователь;
-        }
 
 
         public bool UseProxy
@@ -44,6 +37,12 @@ namespace CHI.Models.AppSettings
         public string SQLServer { get => sqlServer; set => SetProperty(ref sqlServer, value); }
         public string SQLServerDB { get => sqlServerDB; set => SetProperty(ref sqlServerDB, value); }
         public CredentialScope CredentialsScope { get => credentialsScope; set => SetProperty(ref credentialsScope, value); }
+
+
+        public CommonSettings()
+        {
+            CredentialsScope = CredentialScope.ТекущийПользователь;
+        }
 
 
         public override void Validate(string propertyName)

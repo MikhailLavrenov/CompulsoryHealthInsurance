@@ -1,7 +1,7 @@
 ﻿using CHI.Infrastructure;
-using CHI.Models.AppSettings;
 using CHI.Services;
 using CHI.Services.SRZ;
+using CHI.Settings;
 using Microsoft.EntityFrameworkCore;
 using Prism.Regions;
 using System;

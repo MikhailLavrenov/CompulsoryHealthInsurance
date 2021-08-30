@@ -1,6 +1,5 @@
 ﻿using CHI.Infrastructure;
-using CHI.Models;
-using CHI.Models.AppSettings;
+using CHI.Settings;
 using Prism.Commands;
 using System.Linq;
 using System.Reflection;

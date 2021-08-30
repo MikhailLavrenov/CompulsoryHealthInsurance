@@ -1,9 +1,8 @@
 ﻿using CHI.Infrastructure;
-using CHI.Models;
-using CHI.Models.AppSettings;
 using CHI.Models.ServiceAccounting;
 using CHI.Services;
 using CHI.Services.WindowsAccounts;
+using CHI.Settings;
 using Prism.Commands;
 using Prism.Regions;
 using System.Collections.ObjectModel;

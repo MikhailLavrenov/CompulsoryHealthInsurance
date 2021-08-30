@@ -1,6 +1,6 @@
 ﻿using CHI.Infrastructure;
 using CHI.Models;
-using CHI.Models.AppSettings;
+using CHI.Settings;
 using Prism.Commands;
 using Prism.Regions;
 
@@ -10,7 +10,7 @@ namespace CHI.ViewModels
     {
         public IMainRegionService MainRegionService { get; set; }
         public bool KeepAlive { get => false; }
-        public AttachedPatientsFile Settings { get; set; }
+        public AttachedPatientsFileSettings Settings { get; set; }
         public DelegateCommand SetDefaultCommand { get; }
         public DelegateCommand<ColumnProperty> MoveUpCommand { get; }
         public DelegateCommand<ColumnProperty> MoveDownCommand { get; }

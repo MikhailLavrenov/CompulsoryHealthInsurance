@@ -1,8 +1,7 @@
 ﻿using CHI.Infrastructure;
-using CHI.Models;
-using CHI.Models.AppSettings;
 using CHI.Models.ServiceAccounting;
 using CHI.Services;
+using CHI.Settings;
 using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml;
 using Prism.Regions;
@@ -77,7 +76,7 @@ namespace CHI.ViewModels
 
             dbContext.SaveChanges();
 
-            dbContext =new AppDBContext(settings.Common.SQLServer, settings.Common.SQLServerDB);
+            dbContext = new AppDBContext(settings.Common.SQLServer, settings.Common.SQLServerDB);
             dbContext.Specialties.Load();
             Specialties = dbContext.Specialties.Local.ToObservableCollection();
 

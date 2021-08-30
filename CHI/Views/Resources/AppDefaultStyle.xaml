@@ -184,6 +184,18 @@
                 Value="Center" />
     </Style>
 
+    <!--TextBoxes-->
+
+    <Style BasedOn="{StaticResource {x:Type PasswordBox}}"
+           TargetType="{x:Type PasswordBox}">
+        <Setter Property="Margin"
+                Value="5" />
+        <Setter Property="HorizontalAlignment"
+                Value="Stretch" />
+        <Setter Property="VerticalAlignment"
+                Value="Center" />
+    </Style>
+
     <!--CheckBox-->
 
     <Style TargetType="{x:Type CheckBox}"
@@ -297,6 +309,7 @@
                 Value="7" />
     </Style>
 
+    
 
     <DataTemplate x:Key="DataGridDragColumn">
         <Viewbox Stretch="Uniform"
@@ -321,7 +334,7 @@
                 Value="{DynamicResource DataGridValidationTemplate}" />
     </Style>
 
-
+    
 
     <Style x:Key="DataGridTextEditing"
            TargetType="{x:Type TextBox}" 
@@ -338,23 +351,7 @@
                 Value="{DynamicResource DataGridValidationTemplate}" />
     </Style>
 
-
-
-    <Style x:Key="DataGridPasswordBox"
-           TargetType="{x:Type PasswordBox}"
-           BasedOn="{StaticResource {x:Type PasswordBox}}">
-        <Setter Property="VerticalAlignment"
-                Value="Center" />
-        <Setter Property="Background"
-                Value="Transparent" />
-        <Setter Property="BorderThickness"
-                Value="0" />
-        <Setter Property="Margin"
-                Value="0" />
-        <Setter Property="Validation.ErrorTemplate"
-                Value="{DynamicResource DataGridValidationTemplate}" />
-    </Style>
-
+    
 
     <ControlTemplate x:Key="DataGridValidationTemplate">
         <StackPanel Orientation="Vertical">
@@ -369,18 +366,5 @@
 
         </StackPanel>
     </ControlTemplate>
-
-
-
-    <!--<ControlTemplate x:Key="DataGridValidationTemplate">
-        <StackPanel Orientation="Horizontal">
-            <TextBlock Text="!"
-                       VerticalAlignment="Center"
-                       Margin="0,0,4,0"
-                       FontSize="{Binding ElementName=Placeholder, Path=AdornedElement.(materialDesign:ValidationAssist.FontSize)}"
-                       Foreground="{DynamicResource ValidationErrorBrush}" />
-            <AdornedElementPlaceholder />
-        </StackPanel>
-    </ControlTemplate>-->
 
 </ResourceDictionary>

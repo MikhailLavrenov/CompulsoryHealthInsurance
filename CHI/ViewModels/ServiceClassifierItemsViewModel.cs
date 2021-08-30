@@ -1,8 +1,7 @@
 ﻿using CHI.Infrastructure;
-using CHI.Models;
-using CHI.Models.AppSettings;
 using CHI.Models.ServiceAccounting;
 using CHI.Services;
+using CHI.Settings;
 using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml;
 using Prism.Commands;
@@ -92,7 +91,7 @@ namespace CHI.ViewModels
                 var serviceClassifier = new ServiceClassifierItem
                 {
                     Code = int.Parse(sheet.Cells[i, 1].Value.ToString(), CultureInfo.InvariantCulture),
-                    LaborCost = double.Parse(sheet.Cells[i, 2].Value.ToString().Replace(',','.'), CultureInfo.InvariantCulture),
+                    LaborCost = double.Parse(sheet.Cells[i, 2].Value.ToString().Replace(',', '.'), CultureInfo.InvariantCulture),
                     Price = double.Parse(sheet.Cells[i, 3].Value.ToString().Replace(',', '.'), CultureInfo.InvariantCulture),
                     IsCaseClosing = sheet.Cells[i, 4].Value.ToString() == "1"
                 };

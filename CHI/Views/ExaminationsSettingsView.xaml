@@ -26,6 +26,7 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="210" />
             <ColumnDefinition Width="260" />
+            <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
         <Grid.RowDefinitions>
@@ -33,8 +34,10 @@
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
-            <RowDefinition Height="*" />
             <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
         <TextBlock Grid.Row="0"
@@ -46,110 +49,62 @@
 
         <TextBlock Grid.Row="1"
                    Grid.Column="0"
-                   Text="Количество потоков" />
+                   Text="Логин" />
         <TextBox Grid.Row="1"
                  Grid.Column="1"
-                 Text="{Binding Settings.MedicalExaminations.MaxDegreeOfParallelism, ValidatesOnDataErrors=True}" />
+                 Text="{Binding Settings.MedicalExaminations.Credential.Login, ValidatesOnDataErrors=True}" />
 
         <TextBlock Grid.Row="2"
                    Grid.Column="0"
-                   Text="Имена файлов пациентов" />
-        <TextBox  Grid.Row="2"
-                  Grid.Column="1"
-                  Text="{Binding Settings.MedicalExaminations.PatientsFileNames}" />
+                   Text="Пароль" />
+
+        <PasswordBox Grid.Row="2"                                                        
+                     Grid.Column="1"                           
+                     i:PasswordBoxHelper.BoundPassword="{Binding Settings.MedicalExaminations.Credential.Password, UpdateSourceTrigger=LostFocus, ValidatesOnDataErrors=True}"                                                                    
+                     Visibility="{Binding ShowPassword,  Converter={i:InvertedBoolToVisibleConverter}}"/>
+
+        <TextBox Grid.Row="2"                                                    
+                 Grid.Column="1"                      
+                 Text="{Binding Settings.MedicalExaminations.Credential.Password, UpdateSourceTrigger=LostFocus,  ValidatesOnDataErrors=True}"                                                            
+                 Visibility="{Binding ShowPassword, Converter={i:BoolToVisibleConverter}}"/>
+
+        <Button Grid.Row="2"
+                Grid.Column="3"                                  
+                Style="{StaticResource IconButton}"   
+                HorizontalAlignment="Left"
+                Command="{Binding SwitchShowPasswordCommand}">
+
+            <!--В кнопку вставляем 2 рисунка - пароль видно и пароль скрыт. Одновременно отображается только один-->
+            <StackPanel VerticalAlignment="Center">
+                <ContentControl Content="{materialDesign:PackIcon EyeOff}"                                                                                       
+                                Visibility="{Binding ShowPassword, Converter={i:BoolToVisibleConverter} }" />
+                <ContentControl Content="{materialDesign:PackIcon Eye}"                                                                                     
+                                Visibility="{Binding ShowPassword, Converter={i:InvertedBoolToVisibleConverter} }" />
+            </StackPanel>
+        </Button>
 
         <TextBlock Grid.Row="3"
                    Grid.Column="0"
+                   Text="Количество потоков" />
+        <TextBox Grid.Row="3"
+                 Grid.Column="1"
+                 Text="{Binding Settings.MedicalExaminations.MaxDegreeOfParallelism, ValidatesOnDataErrors=True}" />
+
+        <TextBlock Grid.Row="4"
+                   Grid.Column="0"
+                   Text="Имена файлов пациентов" />
+        <TextBox  Grid.Row="4"
+                  Grid.Column="1"
+                  Text="{Binding Settings.MedicalExaminations.PatientsFileNames}" />
+
+        <TextBlock Grid.Row="5"
+                   Grid.Column="0"
                    Text="Имена файлов услуг" />
-        <TextBox  Grid.Row="3"
+        <TextBox  Grid.Row="5"
                   Grid.Column="1"
                   Text="{Binding Settings.MedicalExaminations.CasesFileNames}" />
 
-        <!--Столбцы DataGrid не являются частью логического дерева этого View, поэтому их нельзя привязать к свойствам ViewModel-->
-        <!--Использование x:Name и FrameworkElement принадлежащего логическому дереву позволяет обойти ограничение используя FrameworkElement как посредника-->
-        <FrameworkElement x:Name="proxyElement" />
-
-        <i:CustomDataGrid Grid.Row="4"
-                          Grid.Column="0"
-                          Grid.ColumnSpan="2"
-                          Margin="0,20,0,10"
-                          MinHeight="100"
-                          ItemsSource="{Binding Settings.MedicalExaminations.Credential}">
-
-            <DataGrid.Columns>
-
-                <DataGridTemplateColumn CellTemplate="{StaticResource DataGridDragColumn}"
-                                        IsReadOnly="True" />
-
-                <!--Столбец Логин-->
-                <DataGridTextColumn Header="Логин"
-                                    Binding="{Binding Login, ValidatesOnDataErrors=True}"
-                                    ElementStyle="{StaticResource DataGridTextBlock}"
-                                    EditingElementStyle="{StaticResource DataGridTextEditing}"
-                                    MinWidth="190" />
-
-                <!--Столбец Пароль-->
-                <!--Шаблон Заголовка. В заголовок вставляем текст и кнопку для переключения видимости паролей-->
-                <DataGridTemplateColumn MinWidth="190">
-                    <DataGridTemplateColumn.HeaderStyle>
-                        <Style TargetType="{x:Type DataGridColumnHeader}">
-                            <Setter Property="Background"
-                                    Value="Transparent" />
-                        </Style>
-                    </DataGridTemplateColumn.HeaderStyle>
-                    <DataGridTemplateColumn.Header>
-                        <StackPanel Orientation="Horizontal"
-                                    Margin="0">
-
-                            <TextBlock Grid.Column="0"
-                                       FontSize="12"
-                                       FontWeight="Medium"
-                                       Foreground="{DynamicResource MaterialDesignColumnHeader}"
-                                       Text="Пароль"
-                                       Margin="5,0,0,0"
-                                       VerticalAlignment="Center" />
-
-                            <Button Grid.Column="2"
-                                    Margin="5,0,0,0"
-                                    Style="{StaticResource IconButton}"
-                                    Command="{Binding DataContext.SwitchShowPasswordCommand, Source={x:Reference proxyElement}}">
-
-                                <!--В кнопку вставляем 2 рисунка - пароль видно и пароль скрыт. Одновременно отображается только один-->
-                                <StackPanel Orientation="Horizontal"
-                                            VerticalAlignment="Center">
-                                    <ContentControl Content="{materialDesign:PackIcon EyeOff}"
-                                                    Visibility="{Binding DataContext.ShowTextPassword,  Source={x:Reference proxyElement}, Converter={i:BoolToVisibleConverter} }" />
-                                    <ContentControl Content="{materialDesign:PackIcon Eye}"
-                                                    Visibility="{Binding DataContext.ShowProtectedPassword, Source={x:Reference proxyElement}, Converter={i:BoolToVisibleConverter}}" />
-                                </StackPanel>
-                            </Button>
-                        </StackPanel>
-                    </DataGridTemplateColumn.Header>
-
-                    <!--Шаблон ячейки-->
-                    <DataGridTemplateColumn.CellTemplate>
-                        <!--Вставляем 2 контрола. Одновременно отображается только один -->
-                        <DataTemplate>
-                            <Grid VerticalAlignment="Stretch">
-
-                                <PasswordBox Style="{StaticResource DataGridPasswordBox}"
-                                             i:PasswordBoxHelper.BoundPassword="{Binding Password, UpdateSourceTrigger=LostFocus, ValidatesOnDataErrors=True}"
-                                             Visibility="{Binding DataContext.ShowProtectedPassword, Source={x:Reference proxyElement}, Converter={i:BoolToVisibleConverter}}" />
-
-                                <TextBox Style="{StaticResource DataGridTextEditing}"
-                                         Text="{Binding Password, UpdateSourceTrigger=LostFocus,  ValidatesOnDataErrors=True}"
-                                         Visibility="{Binding DataContext.ShowTextPassword, Source={x:Reference proxyElement}, Converter={i:BoolToVisibleConverter}}" />
-
-                            </Grid>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-
-                </DataGridTemplateColumn>
-
-            </DataGrid.Columns>
-        </i:CustomDataGrid>
-
-        <StackPanel Grid.Row="8"
+        <StackPanel Grid.Row="6"
                     Grid.Column="0"
                     Grid.ColumnSpan="2"
                     Orientation="Horizontal">

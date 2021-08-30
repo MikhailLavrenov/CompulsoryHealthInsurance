@@ -1,8 +1,8 @@
 ﻿using CHI.Infrastructure;
-using CHI.Models.AppSettings;
 using CHI.Models.ServiceAccounting;
 using CHI.Services;
 using CHI.Services.Report;
+using CHI.Settings;
 using Microsoft.EntityFrameworkCore;
 using Prism.Commands;
 using Prism.Regions;
@@ -27,7 +27,7 @@ namespace CHI.ViewModels
         IMainRegionService mainRegionService;
         IFileDialogService fileDialogService;
         ReportService reportService;
-        ServiceAccounting settings;
+        ServiceAccountingSettings settings;
         User currentUser;
 
         public bool KeepAlive { get => false; }

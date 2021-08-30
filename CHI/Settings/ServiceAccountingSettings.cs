@@ -1,17 +1,16 @@
 ﻿using CHI.Infrastructure;
 using System;
 
-namespace CHI.Models.AppSettings
+namespace CHI.Settings
 {
-    public class ServiceAccounting : DomainObject
+    public class ServiceAccountingSettings : DomainObject
     {
-        
         string domainName;
         string domainUsersRootOU;
         string approvedBy;
         string reportPath;
 
-        
+
         public string DomainName { get => domainName; set => SetProperty(ref domainName, value); }
         public string DomainUsersRootOU { get => domainUsersRootOU; set => SetProperty(ref domainUsersRootOU, value); }
         public string ApprovedBy { get => approvedBy; set => SetProperty(ref approvedBy, value); }

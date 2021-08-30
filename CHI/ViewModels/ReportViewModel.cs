@@ -1,9 +1,8 @@
 ﻿using CHI.Infrastructure;
-using CHI.Models;
-using CHI.Models.AppSettings;
 using CHI.Models.ServiceAccounting;
 using CHI.Services;
 using CHI.Services.Report;
+using CHI.Settings;
 using Microsoft.EntityFrameworkCore;
 using Prism.Commands;
 using Prism.Regions;
@@ -18,7 +17,7 @@ namespace CHI.ViewModels
     class ReportViewModel : DomainObject, IRegionMemberLifetime, INavigationAware
     {
         AppDBContext dbContext;
-        ServiceAccounting settings;
+        ServiceAccountingSettings settings;
         int year = DateTime.Now.Year;
         int month = DateTime.Now.Month;
         bool isGrowing;
@@ -52,7 +51,7 @@ namespace CHI.ViewModels
         {
             this.settings = settings.ServiceAccounting;
 
-            dbContext = new AppDBContext(settings.Common.SQLServer, settings.Common.SQLServerDB);           
+            dbContext = new AppDBContext(settings.Common.SQLServer, settings.Common.SQLServerDB);
 
             this.mainRegionService = mainRegionService;
             this.fileDialogService = fileDialogService;
@@ -130,10 +129,10 @@ namespace CHI.ViewModels
 
             mainRegionService.ShowProgressBar("Сохранение файла");
 
-            new ReportExcelBuilder(filePath)   
-                .UseReportStyle()   
-                .SetNewSheet(reportService.Month,reportService.Year,reportService.IsGrowing)   
-                .FillSheet(RowHeaders, ColumnHeaders, GridItems)  
+            new ReportExcelBuilder(filePath)
+                .UseReportStyle()
+                .SetNewSheet(reportService.Month, reportService.Year, reportService.IsGrowing)
+                .FillSheet(RowHeaders, ColumnHeaders, GridItems)
                 .SaveAndClose();
 
             mainRegionService.HideProgressBar($"Файл сохранен: {filePath}");
@@ -162,7 +161,7 @@ namespace CHI.ViewModels
             IsGrowing = false;
             BuildReportInternal();
 
-            var excelBuilder = new ReportExcelBuilder(settings.ReportPath)                
+            var excelBuilder = new ReportExcelBuilder(settings.ReportPath)
                 .UseReportStyle()
                 .SetNewSheet(reportService.Month, reportService.Year, reportService.IsGrowing)
                 .FillSheet(RowHeaders, ColumnHeaders, GridItems);

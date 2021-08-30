@@ -1,8 +1,7 @@
 ﻿using CHI.Infrastructure;
-using CHI.Models;
-using CHI.Models.AppSettings;
 using CHI.Models.ServiceAccounting;
 using CHI.Services;
+using CHI.Settings;
 using Microsoft.EntityFrameworkCore;
 using Prism.Commands;
 using Prism.Regions;
@@ -100,10 +99,10 @@ namespace CHI.ViewModels
 
             dbContext.RemoveRange(CurrentComponent.ToListRecursive());
 
-            parentDetails.Remove(CurrentComponent);            
+            parentDetails.Remove(CurrentComponent);
 
             for (int i = offset; i < parentDetails.Count; i++)
-                parentDetails[i].Order--;            
+                parentDetails[i].Order--;
 
             Refresh();
         }
