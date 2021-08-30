@@ -1,4 +1,5 @@
-﻿using CHI.Models.ServiceAccounting;
+﻿using CHI.Infrastructure;
+using CHI.Models.ServiceAccounting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,13 +33,14 @@ namespace CHI.Services
 
             foreach (var bill in billsRegister.Bills)
             {
-                var billPersons = bill.Persons.PERS.ToDictionary(x => x.ID_PAC, x => x);
+                //добавлен DistinctBy потому то реестрах МЭК пациент может дублироваться хотя в реестре ЛПУ этого не было
+                var billPersons = bill.Persons.PERS.DistinctBy(x=>x.ID_PAC).ToDictionary(x => x.ID_PAC, x => x);
 
                 foreach (var billCase in bill.Cases.ZAP)
                 {
                     var billPerson = billPersons[billCase.PACIENT.ID_PAC];
 
-                    var mCase = MapCase(billPerson, billCase);
+                    var mCase = MapToCase(billPerson, billCase);
 
                     register.Cases.Add(mCase);
                 }
@@ -49,7 +51,7 @@ namespace CHI.Services
             return register;
         }
 
-        Case MapCase(PERS billPerson, ZAP billCase)
+        static Case MapToCase(PERS billPerson, ZAP billCase)
         {
             var mCase = new Case()
             {
@@ -83,13 +85,13 @@ namespace CHI.Services
             return mCase;
         }
 
-        AgeKind GetAgeKind(DateTime onDate, DateTime birthday)
+        static AgeKind GetAgeKind(DateTime onDate, DateTime birthday)
         {
             var ageYears = (DateTime.MinValue + (onDate - birthday)).Year - 1;
             return ageYears < 18 ? AgeKind.Сhildren : AgeKind.Adults;
         }
 
-        string GetTitle(string anyFileName)
+        static string GetTitle(string anyFileName)
         {
             var index = anyFileName.IndexOfAny("0123456789".ToCharArray());
             return anyFileName.Substring(index);
