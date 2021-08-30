@@ -1,5 +1,5 @@
 ﻿using CHI.Infrastructure;
-using CHI.Models.AppSettings;
+using CHI.Settings;
 using Prism.Regions;
 using Prism.Services.Dialogs;
 

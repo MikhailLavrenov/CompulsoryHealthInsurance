@@ -1,9 +1,7 @@
 ﻿using CHI.Infrastructure;
-using CHI.Models;
-using CHI.Models.AppSettings;
 using CHI.Models.ServiceAccounting;
 using CHI.Services;
-using CHI.Services.WindowsAccounts;
+using CHI.Settings;
 using DryIoc;
 using Microsoft.EntityFrameworkCore;
 using Prism.Commands;
@@ -32,7 +30,7 @@ namespace CHI.ViewModels
         public DelegateCommand DeleteCommand { get; }
         public DelegateCommand<Type> NavigateCommand { get; }
 
-        public UsersViewModel(AppSettings settings, IMainRegionService mainRegionService, User currentUser,IContainer container)
+        public UsersViewModel(AppSettings settings, IMainRegionService mainRegionService, User currentUser, IContainer container)
         {
             this.settings = settings;
             this.mainRegionService = mainRegionService;

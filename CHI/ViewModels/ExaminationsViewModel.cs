@@ -1,18 +1,13 @@
 ﻿using CHI.Infrastructure;
 using CHI.Models;
-using CHI.Models.AppSettings;
 using CHI.Services;
-using CHI.Services.Common;
 using CHI.Services.MedicalExaminations;
+using CHI.Settings;
 using Prism.Regions;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace CHI.ViewModels
 {
@@ -32,7 +27,7 @@ namespace CHI.ViewModels
         public DelegateCommandAsync ExportExaminationsCommand { get; }
 
 
-        public ExaminationsViewModel(AppSettings settings,IMainRegionService mainRegionService, IFileDialogService fileDialogService, ILicenseManager licenseManager)
+        public ExaminationsViewModel(AppSettings settings, IMainRegionService mainRegionService, IFileDialogService fileDialogService, ILicenseManager licenseManager)
         {
             Settings = settings;
             this.fileDialogService = fileDialogService;
@@ -108,7 +103,7 @@ namespace CHI.ViewModels
                 parallelSerivce.UseProxy(Settings.Common.ProxyAddress, Settings.Common.ProxyPort);
             Result = await parallelSerivce.AddExaminationsAsync(patientsExaminations);
 
-            Result.OrderBy(x => x.IsLoaded)                
+            Result.OrderBy(x => x.IsLoaded)
                 .ThenBy(x => x.PatientExaminations.Kind)
                 .ThenBy(x => x.PatientExaminations.Year)
                 .ToList();

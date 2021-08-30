@@ -1,14 +1,11 @@
 ﻿using CHI.Infrastructure;
-using CHI.Services.MedicalExaminations;
+using CHI.Models;
 using System;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Xml.Serialization;
 
-namespace CHI.Models.AppSettings
+namespace CHI.Settings
 {
-    public class MedicalExaminations : DomainObject
+    public class MedicalExaminationsSettings : DomainObject
     {
         string address;
         byte maxDegreeOfParallelism;
@@ -49,7 +46,6 @@ namespace CHI.Models.AppSettings
             }
         }
 
-        //Устанавливает значения по умолчанию для портала диспансеризации
         public void SetDefault()
         {
             Address = @"http://disp.foms.local/";
@@ -58,6 +54,5 @@ namespace CHI.Models.AppSettings
             CasesFileNames = @"DPM, DVM, DOM, DAM";
             Credential = new Credential { Login = "МойЛогин", Password = "МойПароль" };
         }
-
     }
 }

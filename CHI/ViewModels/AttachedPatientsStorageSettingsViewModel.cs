@@ -1,6 +1,6 @@
 ﻿using CHI.Infrastructure;
-using CHI.Models.AppSettings;
 using CHI.Services;
+using CHI.Settings;
 using Microsoft.EntityFrameworkCore;
 using Prism.Commands;
 using Prism.Regions;
@@ -25,7 +25,7 @@ namespace CHI.ViewModels
         public DelegateCommand ClearDatabaseCommand { get; }
 
 
-        public AttachedPatientsStorageSettingsViewModel(AppSettings settings,IMainRegionService mainRegionService, IFileDialogService fileDialogService)
+        public AttachedPatientsStorageSettingsViewModel(AppSettings settings, IMainRegionService mainRegionService, IFileDialogService fileDialogService)
         {
 
             this.fileDialogService = fileDialogService;

@@ -1,10 +1,11 @@
 ﻿using CHI.Infrastructure;
+using CHI.Models;
 using System;
 using System.Xml.Serialization;
 
-namespace CHI.Models.AppSettings
+namespace CHI.Settings
 {
-    public class SRZ : DomainObject
+    public class SrzSettings : DomainObject
     {
         string address;
         byte maxDegreeOfParallelism;
@@ -42,7 +43,6 @@ namespace CHI.Models.AppSettings
             }
         }
 
-        //устанавливает по-умолчанию настройки подключения к СРЗ
         public void SetDefault()
         {
             Address = @"http://srz.foms.local/";

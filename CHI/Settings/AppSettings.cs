@@ -11,23 +11,23 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 
-namespace CHI.Models.AppSettings
+namespace CHI.Settings
 {
     public class AppSettings : DomainObject
     {
         static readonly string fileName = "Settings.xml";
-        Common common;
-        SRZ srz;
-        MedicalExaminations medicalExaminations;
-        AttachedPatientsFile attachedPatientsFile;
-        ServiceAccounting serviceAccounting;
+        CommonSettings common;
+        SrzSettings srz;
+        MedicalExaminationsSettings medicalExaminations;
+        AttachedPatientsFileSettings attachedPatientsFile;
+        ServiceAccountingSettings serviceAccounting;
 
 
-        public Common Common { get => common; set => SetProperty(ref common, value); }
-        public SRZ Srz { get => srz; set => SetProperty(ref srz, value); }
-        public MedicalExaminations MedicalExaminations { get => medicalExaminations; set => SetProperty(ref medicalExaminations, value); }
-        public AttachedPatientsFile AttachedPatientsFile { get => attachedPatientsFile; set => SetProperty(ref attachedPatientsFile, value); }
-        public ServiceAccounting ServiceAccounting { get => serviceAccounting; set => SetProperty(ref serviceAccounting, value); }
+        public CommonSettings Common { get => common; set => SetProperty(ref common, value); }
+        public SrzSettings Srz { get => srz; set => SetProperty(ref srz, value); }
+        public MedicalExaminationsSettings MedicalExaminations { get => medicalExaminations; set => SetProperty(ref medicalExaminations, value); }
+        public AttachedPatientsFileSettings AttachedPatientsFile { get => attachedPatientsFile; set => SetProperty(ref attachedPatientsFile, value); }
+        public ServiceAccountingSettings ServiceAccounting { get => serviceAccounting; set => SetProperty(ref serviceAccounting, value); }
         [XmlIgnore] public bool FailedToDecrypt { get; set; }
         [XmlIgnore] public string BackupSettingsFile { get; set; }
 
@@ -129,7 +129,6 @@ namespace CHI.Models.AppSettings
             return url;
         }
 
-        //проверяет настройки прокси-сервера, true-соединение установлено или прокси-сервер не используется, false-иначе
         public async Task TestConnectionProxyAsync()
         {
             var connected = false;
@@ -138,11 +137,11 @@ namespace CHI.Models.AppSettings
             {
                 using var client = new TcpClient();
 
-                client.ReceiveTimeout = Common.TimeoutConnection;
-                client.SendTimeout = Common.TimeoutConnection;
+                client.ReceiveTimeout = CommonSettings.TimeoutConnection;
+                client.SendTimeout = CommonSettings.TimeoutConnection;
 
                 CancellationTokenSource cts = new();
-                cts.CancelAfter(Common.TimeoutConnection);
+                cts.CancelAfter(CommonSettings.TimeoutConnection);
                 var token = cts.Token;
 
                 try
@@ -173,7 +172,6 @@ namespace CHI.Models.AppSettings
             }
         }
 
-        //проверяет доступность сайта, в случае успеха - true
         async Task<bool> TryConnectSiteAsync(string url, string nameOfAddress, DomainObject obj)
         {
             try
@@ -181,7 +179,7 @@ namespace CHI.Models.AppSettings
                 IWebProxy proxy = Common.UseProxy ? null : new WebProxy(Common.Proxy);
                 using var handler = new HttpClientHandler() { Proxy = proxy, UseProxy = Common.UseProxy };
                 using var client = new HttpClient(handler);
-                client.Timeout = TimeSpan.FromMilliseconds(Common.TimeoutConnection);
+                client.Timeout = TimeSpan.FromMilliseconds(CommonSettings.TimeoutConnection);
 
                 var response = await client.GetAsync(url);
 
@@ -197,7 +195,6 @@ namespace CHI.Models.AppSettings
             }
         }
 
-        //проверить настройки подключения к порталу диспансризации
         public async Task TestConnectionExaminationsAsync()
         {
             MedicalExaminations.ConnectionIsValid = false;
@@ -219,7 +216,6 @@ namespace CHI.Models.AppSettings
             MedicalExaminations.ConnectionIsValid = true;
         }
 
-        //проверить настройки подключения к СРЗ
         public async Task TestConnectionSRZAsync()
         {
             Srz.ConnectionIsValid = false;
@@ -241,7 +237,6 @@ namespace CHI.Models.AppSettings
             Srz.ConnectionIsValid = true;
         }
 
-        //проверяет учетные данные СРЗ, в случае успеха - true
         async Task<bool> TryAuthorizeSrzCredentialsAsync()
         {
             var credential = Srz.Credential;
@@ -273,7 +268,6 @@ namespace CHI.Models.AppSettings
             return isAuthorized;
         }
 
-        //проверяет учетные данные портала диспансеризации, в случае успеха - true
         async Task<bool> TryAuthorizeExaminationsCredentialsAsync()
         {
             var credential = MedicalExaminations.Credential;

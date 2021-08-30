@@ -1,7 +1,7 @@
 ﻿using CHI.Infrastructure;
-using CHI.Models.AppSettings;
 using CHI.Models.ServiceAccounting;
 using CHI.Services;
+using CHI.Settings;
 using CHI.Views;
 using Microsoft.EntityFrameworkCore;
 using NLog;

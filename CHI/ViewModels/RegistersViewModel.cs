@@ -1,7 +1,7 @@
 ﻿using CHI.Infrastructure;
-using CHI.Models.AppSettings;
 using CHI.Models.ServiceAccounting;
 using CHI.Services;
+using CHI.Settings;
 using Microsoft.EntityFrameworkCore;
 using Prism.Regions;
 using System;
@@ -32,7 +32,7 @@ namespace CHI.ViewModels
         public RegistersViewModel(AppSettings settings, IMainRegionService mainRegionService, IFileDialogService fileDialogService)
         {
             this.settings = settings;
-            this.fileDialogService = fileDialogService;            
+            this.fileDialogService = fileDialogService;
             this.mainRegionService = mainRegionService;
 
             mainRegionService.Header = "Реестры";

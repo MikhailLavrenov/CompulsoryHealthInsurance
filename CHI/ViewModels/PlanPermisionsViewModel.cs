@@ -1,8 +1,7 @@
 ﻿using CHI.Infrastructure;
-using CHI.Models;
-using CHI.Models.AppSettings;
 using CHI.Models.ServiceAccounting;
 using CHI.Services;
+using CHI.Settings;
 using Microsoft.EntityFrameworkCore;
 using Prism.Regions;
 using System.Collections.Generic;
@@ -31,7 +30,7 @@ namespace CHI.ViewModels
 
             dbContext = new AppDBContext(settings.Common.SQLServer, settings.Common.SQLServerDB);
 
-            Departments=dbContext.Departments.Where(x=>!x.IsRoot).AsEnumerable().Select(x => new SelectedObject<Department>(false, x)).ToList();
+            Departments = dbContext.Departments.Where(x => !x.IsRoot).AsEnumerable().Select(x => new SelectedObject<Department>(false, x)).ToList();
         }
 
 

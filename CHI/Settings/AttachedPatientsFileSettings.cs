@@ -1,14 +1,10 @@
 ﻿using CHI.Infrastructure;
-using CHI.Services.SRZ;
-using System;
+using CHI.Models;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Xml.Serialization;
 
-namespace CHI.Models.AppSettings
+namespace CHI.Settings
 {
-    public class AttachedPatientsFile : DomainObject
+    public class AttachedPatientsFileSettings : DomainObject
     {
 
         string path;
@@ -21,13 +17,12 @@ namespace CHI.Models.AppSettings
         public ObservableCollection<ColumnProperty> ColumnProperties { get => columnProperties; set => SetProperty(ref columnProperties, value); }
 
 
-        public AttachedPatientsFile()
+        public AttachedPatientsFileSettings()
         {
             ColumnProperties = new();
         }
 
 
-        //сдвигает вверх элемент коллекции ColumnProperties
         public void MoveUpColumnProperty(ColumnProperty item)
         {
             var itemIndex = ColumnProperties.IndexOf(item);
@@ -35,7 +30,6 @@ namespace CHI.Models.AppSettings
                 ColumnProperties.Move(itemIndex, itemIndex - 1);
         }
 
-        //сдвигает вниз элемент коллекции ColumnProperties
         public void MoveDownColumnProperty(ColumnProperty item)
         {
             var itemIndex = ColumnProperties.IndexOf(item);
@@ -43,7 +37,6 @@ namespace CHI.Models.AppSettings
                 ColumnProperties.Move(itemIndex, itemIndex + 1);
         }
 
-        //устанавливает по-умолчанию настройки файла прикрепленных пациентов
         public void SetDefault()
         {
             ApplyFormat = true;
