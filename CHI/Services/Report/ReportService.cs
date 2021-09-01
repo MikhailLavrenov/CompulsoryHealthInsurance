@@ -9,7 +9,7 @@ namespace CHI.Services.Report
     public class ReportService
     {
         List<Parameter> parameters;
-        List<IndicatorBase> indicators;
+        List<Indicator> indicators;
         List<Department> departments;
         List<Employee> employees;
         List<Component> components;
@@ -19,7 +19,7 @@ namespace CHI.Services.Report
         public int Month { get; private set; }
         public int Year { get; private set; }
         public bool IsGrowing { get; private set; }
-        public Dictionary<(Parameter, IndicatorBase), double?> Results { get; set; }
+        public Dictionary<(Parameter, Indicator), double?> Results { get; set; }
 
 
         public ReportService(Department rootDepartment, Component rootComponent)
@@ -47,16 +47,16 @@ namespace CHI.Services.Report
             if (registers?.Any() ?? false)
                 for (var currentMonth = isGrowing ? 1 : month; currentMonth <= month; currentMonth++)
                 {
-                    var register = registers.FirstOrDefault(x => x.Month == currentMonth);
+                    var cases = registers.FirstOrDefault(x => x.Month == currentMonth)?.Cases;
 
-                    if (register == null)
+                    if (cases == null)
                         continue;
 
                     //заполняет факт
-                    SetValuesFromCases(register.GetPaidCases(), currentMonth, year, true);
+                    SetValuesFromCases(currentMonth, year, cases, true);
 
                     //заполняет ошибки (снятия)
-                    SetValuesFromCases(register.GetRefusedCases(), currentMonth, year, false);
+                    SetValuesFromCases(currentMonth, year, cases, false);
                 }
 
             SumRows();
@@ -105,7 +105,7 @@ namespace CHI.Services.Report
                 if (eqEmployeeKind == ParameterKind.None)
                     continue;
 
-                foreach (var indicator in indicators.Where(x => !x.Component.IsTotal))
+                foreach (var indicator in indicators.Where(x => x.Component.CaseFilters.First().Kind != CaseFilterKind.Total))
                 {
                     double sum = 0;
 
@@ -123,21 +123,13 @@ namespace CHI.Services.Report
         void SumColumns()
         {
             foreach (var parameter in parameters)
-                foreach (var indicator in indicators.Where(x => x.Component.IsTotal).Reverse())
+                foreach (var indicator in indicators.Where(x => x.Component.CaseFilters.First().Kind == CaseFilterKind.Total).Reverse())
                 {
                     double sum = 0;
 
-                    var indicatorType = indicator.GetType();
-                    var indicatorEqTypes = new List<Type> { indicatorType };
-
-                    if (indicatorType == typeof(CasesIndicator))
-                        indicatorEqTypes.Add(typeof(CasesLaborCostIndicator));
-                    else if (indicatorType == typeof(VisitsIndicator))
-                        indicatorEqTypes.Add(typeof(VisitsLaborCostIndicator));
-
                     indicator.Component.Childs
                         .SelectMany(x => x.Indicators)
-                        .Where(x => indicatorEqTypes.Contains(x.GetType()))
+                        .Where(x => x.FacadeKind == indicator.ValueKind)
                         .ToList()
                         .ForEach(x => sum += Results[(parameter, x)] ?? 0);
 
@@ -197,11 +189,10 @@ namespace CHI.Services.Report
 
                 if (result == 0)
                     result = null;
-
                 else if (key.Item1.Kind == ParameterKind.DepartmentPercent)
                     result = Math.Round(result.Value, 1, MidpointRounding.AwayFromZero);
 
-                else if (key.Item2.GetType() == typeof(CostIndicator))
+                else if (key.Item2.FacadeKind == IndicatorKind.Cost)
                     result = Math.Round(result.Value, MoneyRoundDigits, MidpointRounding.AwayFromZero);
 
                 else
@@ -211,21 +202,89 @@ namespace CHI.Services.Report
             }
         }
 
-        void SetValuesFromCases(IEnumerable<Case> cases, int periodMonth, int periodYear, bool isPaymentAccepted)
+        void SetValuesFromCases(int month, int year, IEnumerable<Case> cases, bool isPaymentAccepted)
         {
-            var parameterKind = isPaymentAccepted ? ParameterKind.EmployeeFact : ParameterKind.EmployeeRejectedFact;
+            //оптимизация чтобы не выполнять одинаковые действия в разных итерациях
+            var employeesCases = cases
+                .Where(x => x.PaidStatus != PaidKind.Refuse == isPaymentAccepted)
+                .GroupBy(x => x.Employee)
+                .ToDictionary(x => x.Key, x => x.ToList());
 
-            foreach (var employeeCasesGroup in cases.GroupBy(x => x.Employee))
-                foreach (Component component in components.Where(x => !x.IsTotal))
+            foreach (var component in components.Where(x => x.CaseFilters.Any() && x.CaseFilters.First().Kind != CaseFilterKind.Total))
+            {
+                //отбирает фильтры которые удовлетворяют заданому месяцу и году
+                var groupedFilterCodes = component.CaseFilters
+                    .Where(x => Helpers.BetweenDates(x.ValidFrom, x.ValidTo, month, year))
+                    .GroupBy(x => x.Kind)
+                    .ToDictionary(x => x.Key, x => x.Select(y => y.Code).ToList());
+
+                foreach (var employeeCases in employeesCases)
                 {
-                    //возможное место для оптимизации: В методе ApplyFilters на каждой штатной единице отбираются одни и те же фильтры для одного периода
-                    var selectedCases = component.ApplyFilters(employeeCasesGroup.ToList(), periodMonth, periodYear).ToList();
+                    //отбирает случаи которые удолветворяют фильтрам
+                    IEnumerable<Case> selectedCases = employeeCases.Value;
+
+                    if (groupedFilterCodes.ContainsKey(CaseFilterKind.TreatmentPurpose))
+                        selectedCases = selectedCases.Where(x => groupedFilterCodes[CaseFilterKind.TreatmentPurpose].Contains(x.TreatmentPurpose));
+                    if (groupedFilterCodes.ContainsKey(CaseFilterKind.VisitPurpose))
+                        selectedCases = selectedCases.Where(x => groupedFilterCodes[CaseFilterKind.VisitPurpose].Contains(x.VisitPurpose));
+                    if (groupedFilterCodes.ContainsKey(CaseFilterKind.ContainsService))
+                        selectedCases = selectedCases.Where(x => x.Services.Any(y => groupedFilterCodes[CaseFilterKind.ContainsService].Contains(y.Code)));
+                    if (groupedFilterCodes.ContainsKey(CaseFilterKind.NotContainsService))
+                        selectedCases = selectedCases.Where(x => x.Services.Any(y => !groupedFilterCodes[CaseFilterKind.NotContainsService].Contains(y.Code)));
+
+                    selectedCases = selectedCases.ToList();
 
                     //расчитывает значения Results
-                    foreach (var parameter in employeeCasesGroup.Key.Parameters.Where(x => x.Kind == parameterKind))
+                    foreach (var parameter in employeeCases.Key.Parameters.Where(x => (isPaymentAccepted && x.Kind == ParameterKind.EmployeeFact) || (!isPaymentAccepted && x.Kind == ParameterKind.EmployeeRejectedFact)))
                         foreach (var indicator in component.Indicators)
-                            Results[(parameter, indicator)] += indicator.CalculateValue(selectedCases, isPaymentAccepted, periodMonth, periodYear);
+                        {
+                            double value = 0;
+
+                            switch (indicator.ValueKind)
+                            {
+                                case IndicatorKind.Cases:
+                                    value = selectedCases.Count();
+                                    break;
+
+                                case IndicatorKind.Services:
+                                    value = selectedCases.Select(x => x.Services.Count == 0 ? 0 : x.Services.Count - 1).Sum();
+                                    break;
+
+                                case IndicatorKind.BedDays:
+                                    value = selectedCases.Sum(x => x.BedDays);
+                                    break;
+
+                                case IndicatorKind.LaborCost:
+                                    value = selectedCases
+                                        .SelectMany(x => x.Services)
+                                        .Where(x => x.ClassifierItem != null)
+                                        .Sum(x => x.Count * x.ClassifierItem.LaborCost);
+                                    break;
+
+                                case IndicatorKind.Cost:
+                                    if (isPaymentAccepted)
+                                        value = selectedCases
+                                            .Where(x => x.PaidStatus == PaidKind.None)
+                                            .SelectMany(x => x.Services)
+                                            .Where(x => x.ClassifierItem != null)
+                                            .Sum(x => x.Count * x.ClassifierItem.Price)
+                                            + selectedCases
+                                            .Where(x => x.PaidStatus == PaidKind.Full || x.PaidStatus == PaidKind.Partly)
+                                            .Sum(x => x.AmountPaid);
+                                    else
+                                        value = selectedCases
+                                            .Where(x => x.PaidStatus == PaidKind.Refuse || x.PaidStatus == PaidKind.Partly)
+                                            .Sum(x => x.AmountUnpaid);
+                                    break;
+                            }
+
+                            var ratio = indicator.Ratios.FirstOrDefault(x => Helpers.BetweenDates(x.ValidFrom, x.ValidTo, month, year));
+
+                            Results[(parameter, indicator)] += ratio is null ? value : value * ratio.Multiplier / ratio.Divider;
+                        }
                 }
+            }
+
         }
     }
 }
