@@ -42,11 +42,7 @@ namespace CHI.Services.Report
             foreach (var key in Results.Keys.ToList())
                 Results[key] = 0;
 
-            //заполняет план
-            foreach (var parameter in parameters.Where(x => x.Kind == ParameterKind.EmployeePlan || x.Kind == ParameterKind.DepartmentHandPlan))
-                foreach (var indicator in indicators.Where(x => x.Component.IsCanPlanning))
-                    Results[(parameter, indicator)] = plans.Where(x => x.Parameter.Id == parameter.Id && x.Indicator.Id == indicator.Id).Sum(x => x.Value);
-
+            SetPlans(plans);
 
             if (registers?.Any() ?? false)
                 for (var currentMonth = isGrowing ? 1 : month; currentMonth <= month; currentMonth++)
@@ -67,42 +63,9 @@ namespace CHI.Services.Report
 
             SumColumns();
 
-            //вычисляет проценты в штатных единицах
-            foreach (var employee in employees.Where(x => x.Parameters.Any()))
-            {
+            SetPercentsInEmployees();
 
-                var dividendParameter = employee.Parameters.Where(x => x.Kind == ParameterKind.EmployeeFact).FirstOrDefault();
-                var dividerParameter = employee.Parameters.Where(x => x.Kind == ParameterKind.EmployeePlan).FirstOrDefault();
-                var percentParamenter = employee.Parameters.Where(x => x.Kind == ParameterKind.EmployeePercent).FirstOrDefault();
-
-                if (percentParamenter == null || dividendParameter == null || dividerParameter == null)
-                    continue;
-
-                foreach (var indicator in indicators)
-                {
-                    var dividend = Results[(dividendParameter, indicator)];
-                    var divider = Results[(dividerParameter, indicator)];
-                    Results[(percentParamenter, indicator)] = divider == 0 ? 0 : dividend / divider * 100;
-                }
-            }
-
-            //вычисляет проценты в подразделениях
-            foreach (var department in departments.Where(x => x.Parameters.Any()))
-            {
-                var dividendParameter = department.Parameters.Where(x => x.Kind == ParameterKind.DepartmentFact).FirstOrDefault();
-                var dividerParameter = department.Parameters.Where(x => x.Kind == ParameterKind.DepartmentHandPlan).FirstOrDefault();
-                var percentParamenter = department.Parameters.Where(x => x.Kind == ParameterKind.DepartmentPercent).FirstOrDefault();
-
-                if (percentParamenter == null || dividendParameter == null || dividerParameter == null)
-                    continue;
-
-                foreach (var indicator in indicators)
-                {
-                    var dividend = Results[(dividendParameter, indicator)];
-                    var divider = Results[(dividerParameter, indicator)];
-                    Results[(percentParamenter, indicator)] = divider == 0 ? 0 : dividend / divider * 100;
-                }
-            }
+            SetPercentsInDepartments();
 
             DropZeroAndRoundValues();
         }
@@ -114,6 +77,16 @@ namespace CHI.Services.Report
             SumColumns();
 
             DropZeroAndRoundValues();
+        }
+
+        void SetPlans(List<Plan> plans)
+        {
+            if (!(plans?.Any() ?? false))
+                return;
+
+            foreach (var parameter in parameters.Where(x => x.Kind == ParameterKind.EmployeePlan || x.Kind == ParameterKind.DepartmentHandPlan))
+                foreach (var indicator in indicators.Where(x => x.Component.IsCanPlanning))
+                    Results[(parameter, indicator)] = plans.Where(x => x.Parameter.Id == parameter.Id && x.Indicator.Id == indicator.Id).Sum(x => x.Value);
         }
 
         void SumRows()
@@ -162,6 +135,47 @@ namespace CHI.Services.Report
 
                     Results[(parameter, indicator)] = sum;
                 }
+        }
+
+        void SetPercentsInEmployees()
+        {
+            foreach (var employee in employees.Where(x => x.Parameters.Any()))
+            {
+
+                var dividendParameter = employee.Parameters.Where(x => x.Kind == ParameterKind.EmployeeFact).FirstOrDefault();
+                var dividerParameter = employee.Parameters.Where(x => x.Kind == ParameterKind.EmployeePlan).FirstOrDefault();
+                var percentParamenter = employee.Parameters.Where(x => x.Kind == ParameterKind.EmployeePercent).FirstOrDefault();
+
+                if (percentParamenter == null || dividendParameter == null || dividerParameter == null)
+                    continue;
+
+                foreach (var indicator in indicators)
+                {
+                    var dividend = Results[(dividendParameter, indicator)];
+                    var divider = Results[(dividerParameter, indicator)];
+                    Results[(percentParamenter, indicator)] = divider == 0 ? 0 : dividend / divider * 100;
+                }
+            }
+        }
+
+        void SetPercentsInDepartments()
+        {
+            foreach (var department in departments.Where(x => x.Parameters.Any()))
+            {
+                var dividendParameter = department.Parameters.Where(x => x.Kind == ParameterKind.DepartmentFact).FirstOrDefault();
+                var dividerParameter = department.Parameters.Where(x => x.Kind == ParameterKind.DepartmentHandPlan).FirstOrDefault();
+                var percentParamenter = department.Parameters.Where(x => x.Kind == ParameterKind.DepartmentPercent).FirstOrDefault();
+
+                if (percentParamenter == null || dividendParameter == null || dividerParameter == null)
+                    continue;
+
+                foreach (var indicator in indicators)
+                {
+                    var dividend = Results[(dividendParameter, indicator)];
+                    var divider = Results[(dividerParameter, indicator)];
+                    Results[(percentParamenter, indicator)] = divider == 0 ? 0 : dividend / divider * 100;
+                }
+            }
         }
 
         void DropZeroAndRoundValues()
@@ -266,10 +280,7 @@ namespace CHI.Services.Report
 
                             var ratio = indicator.Ratios.FirstOrDefault(x => Helpers.BetweenDates(x.ValidFrom, x.ValidTo, month, year));
 
-                            if (ratio != null && value != 0)
-                                Results[(parameter, indicator)] += value * ratio.Multiplier / ratio.Divider;
-                            else
-                                Results[(parameter, indicator)] += value;
+                            Results[(parameter, indicator)] += ratio is null ? value : value * ratio.Multiplier / ratio.Divider;
                         }
                 }
             }
