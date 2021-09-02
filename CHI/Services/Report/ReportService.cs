@@ -53,10 +53,10 @@ namespace CHI.Services.Report
                         continue;
 
                     //заполняет факт
-                    SetValuesFromCases(currentMonth, year, register.GetPaidCases(), true);
+                    SetValuesFromCases(register.GetPaidCases(), currentMonth, year, true);
 
                     //заполняет ошибки (снятия)
-                    SetValuesFromCases(currentMonth, year, register.GetRefusedCases(), false);
+                    SetValuesFromCases(register.GetRefusedCases(), currentMonth, year, false);
                 }
 
             SumRows();
@@ -202,7 +202,7 @@ namespace CHI.Services.Report
             }
         }
 
-        void SetValuesFromCases(int periodMonth, int periodYear, IEnumerable<Case> cases, bool isPaymentAccepted)
+        void SetValuesFromCases(IEnumerable<Case> cases, int periodMonth, int periodYear, bool isPaymentAccepted)
         {
             //оптимизация чтобы не выполнять одинаковые действия в разных итерациях
             var employeesCases = cases.GroupBy(x => x.Employee)
