@@ -47,16 +47,16 @@ namespace CHI.Services.Report
             if (registers?.Any() ?? false)
                 for (var currentMonth = isGrowing ? 1 : month; currentMonth <= month; currentMonth++)
                 {
-                    var cases = registers.FirstOrDefault(x => x.Month == currentMonth)?.Cases;
+                    var register = registers.FirstOrDefault(x => x.Month == currentMonth);
 
-                    if (cases == null)
+                    if (register == null)
                         continue;
 
                     //заполняет факт
-                    SetValuesFromCases(currentMonth, year, cases, true);
+                    SetValuesFromCases(currentMonth, year, register.GetPaidCases(), true);
 
                     //заполняет ошибки (снятия)
-                    SetValuesFromCases(currentMonth, year, cases, false);
+                    SetValuesFromCases(currentMonth, year, register.GetRefusedCases(), false);
                 }
 
             SumRows();
@@ -202,25 +202,23 @@ namespace CHI.Services.Report
             }
         }
 
-        void SetValuesFromCases(int month, int year, IEnumerable<Case> cases, bool isPaymentAccepted)
+        void SetValuesFromCases(int periodMonth, int periodYear, IEnumerable<Case> cases, bool isPaymentAccepted)
         {
             //оптимизация чтобы не выполнять одинаковые действия в разных итерациях
-            var employeesCases = cases
-                .Where(x => x.PaidStatus != PaidKind.Refuse == isPaymentAccepted)
-                .GroupBy(x => x.Employee)
+            var employeesCases = cases.GroupBy(x => x.Employee)
                 .ToDictionary(x => x.Key, x => x.ToList());
 
             foreach (var component in components.Where(x => x.CaseFilters.Any() && x.CaseFilters.First().Kind != CaseFilterKind.Total))
             {
                 //отбирает фильтры которые удовлетворяют заданому месяцу и году
                 var groupedFilterCodes = component.CaseFilters
-                    .Where(x => Helpers.BetweenDates(x.ValidFrom, x.ValidTo, month, year))
+                    .Where(x => Helpers.BetweenDates(x.ValidFrom, x.ValidTo, periodMonth, periodYear))
                     .GroupBy(x => x.Kind)
                     .ToDictionary(x => x.Key, x => x.Select(y => y.Code).ToList());
 
                 foreach (var employeeCases in employeesCases)
                 {
-                    //отбирает случаи которые удолветворяют фильтрам
+                    //отбирает случаи которые удовлетворяют фильтрам
                     IEnumerable<Case> selectedCases = employeeCases.Value;
 
                     if (groupedFilterCodes.ContainsKey(CaseFilterKind.TreatmentPurpose))
@@ -269,16 +267,14 @@ namespace CHI.Services.Report
                                             .Where(x => x.ClassifierItem != null)
                                             .Sum(x => x.Count * x.ClassifierItem.Price)
                                             + selectedCases
-                                            .Where(x => x.PaidStatus == PaidKind.Full || x.PaidStatus == PaidKind.Partly)
+                                            .Where(x => x.PaidStatus != PaidKind.None)
                                             .Sum(x => x.AmountPaid);
                                     else
-                                        value = selectedCases
-                                            .Where(x => x.PaidStatus == PaidKind.Refuse || x.PaidStatus == PaidKind.Partly)
-                                            .Sum(x => x.AmountUnpaid);
+                                        value = selectedCases.Sum(x => x.AmountUnpaid);
                                     break;
                             }
 
-                            var ratio = indicator.Ratios.FirstOrDefault(x => Helpers.BetweenDates(x.ValidFrom, x.ValidTo, month, year));
+                            var ratio = indicator.Ratios.FirstOrDefault(x => Helpers.BetweenDates(x.ValidFrom, x.ValidTo, periodMonth, periodYear));
 
                             Results[(parameter, indicator)] += ratio is null ? value : value * ratio.Multiplier / ratio.Divider;
                         }
