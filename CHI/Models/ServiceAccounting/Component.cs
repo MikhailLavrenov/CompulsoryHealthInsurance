@@ -1,6 +1,7 @@
 ﻿using CHI.Infrastructure;
 using Prism.Mvvm;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CHI.Models.ServiceAccounting
 {
@@ -14,7 +15,7 @@ namespace CHI.Models.ServiceAccounting
         public string HexColor { get => hexColor; set => SetProperty(ref hexColor, value); }
         public bool IsRoot { get; set; } = false;
         public bool IsCanPlanning { get; set; }
-        public List<CaseFilter> CaseFilters { get; set; }
+        public List<CaseFiltersCollection> CaseFilterCollections { get; set; }
         public List<Indicator> Indicators { get; set; }
 
         public Component Parent { get; set; }
@@ -23,6 +24,19 @@ namespace CHI.Models.ServiceAccounting
         public Component()
         {
             Childs = new List<Component>();
+        }
+
+
+        public List<Case> ApplyFilters(IEnumerable<Case> cases, int periodMonth, int periodYear)
+        {
+            var result = cases;
+
+            foreach (var caseFiltersCollection in CaseFilterCollections)
+            {
+                result = caseFiltersCollection.ApplyFilter(result, periodMonth, periodYear);
+            }
+
+            return result.ToList();
         }
 
     }
