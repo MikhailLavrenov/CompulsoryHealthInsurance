@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace CHI.Models.ServiceAccounting
@@ -15,9 +16,17 @@ namespace CHI.Models.ServiceAccounting
         public int PaymentStateCasesCount { get; set; }
         public List<Case> Cases { get; set; }
 
+
         public Register()
         {
             Cases = new List<Case>();
         }
+
+
+        public List<Case> GetPaidCases()
+            => Cases.Where(x => x.PaidStatus != PaidKind.Refuse).ToList();
+
+        public List<Case> GetRefusedCases()    
+            => Cases.Where(x => x.PaidStatus == PaidKind.Refuse).ToList();
     }
 }
