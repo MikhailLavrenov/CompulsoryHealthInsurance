@@ -16,6 +16,7 @@ namespace CHI.Models.ServiceAccounting
         public bool IsRoot { get; set; } = false;
         public bool IsCanPlanning { get; set; }
         public List<CaseFiltersCollection> CaseFilterCollections { get; set; }
+        public bool IsTotal { get; set; }
         public List<Indicator> Indicators { get; set; }
 
         public Component Parent { get; set; }
