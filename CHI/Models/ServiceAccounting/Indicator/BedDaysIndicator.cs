@@ -1,22 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace CHI.Models.ServiceAccounting
 {
-    public class BedDaysIndicator : IndicatorBase
+    public class BedDaysIndicator: Indicator
     {
-        public override string Description => "Койко-дни";
-        public override string ShortDescription => "КДн";
-
-
-        //static BedDaysIndicator()
-        //{
-        //    Description = "Койко-дни";
-        //    ShortDescription = "КДн";
-        //}
-
-
-        protected override double CalculateCases(List<Case> cases, bool isPaymentAccepted)
-            => cases.Sum(x => x.BedDays);
     }
 }

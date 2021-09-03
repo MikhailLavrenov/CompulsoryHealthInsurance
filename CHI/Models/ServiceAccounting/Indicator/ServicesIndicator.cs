@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CHI.Models.ServiceAccounting
 {
-    public class CasesIndicator : Indicator
+    public class ServicesIndicator : Indicator
     {
     }
 }
