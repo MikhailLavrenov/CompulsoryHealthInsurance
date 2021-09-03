@@ -105,7 +105,7 @@ namespace CHI.Services.Report
                 if (eqEmployeeKind == ParameterKind.None)
                     continue;
 
-                foreach (var indicator in indicators.Where(x => x.Component.CaseFilters.First().Kind != CaseFilterKind.Total))
+                foreach (var indicator in indicators.Where(x => !x.Component.IsTotal))
                 {
                     double sum = 0;
 
@@ -123,7 +123,7 @@ namespace CHI.Services.Report
         void SumColumns()
         {
             foreach (var parameter in parameters)
-                foreach (var indicator in indicators.Where(x => x.Component.CaseFilters.First().Kind == CaseFilterKind.Total).Reverse())
+                foreach (var indicator in indicators.Where(x => x.Component.IsTotal).Reverse())
                 {
                     double sum = 0;
 
@@ -204,36 +204,16 @@ namespace CHI.Services.Report
 
         void SetValuesFromCases(IEnumerable<Case> cases, int periodMonth, int periodYear, bool isPaymentAccepted)
         {
-            //оптимизация чтобы не выполнять одинаковые действия в разных итерациях
-            var employeesCases = cases.GroupBy(x => x.Employee)
-                .ToDictionary(x => x.Key, x => x.ToList());
-
-            foreach (var component in components.Where(x => x.CaseFilters.Any() && x.CaseFilters.First().Kind != CaseFilterKind.Total))
-            {
-                //отбирает фильтры которые удовлетворяют заданому месяцу и году
-                var groupedFilterCodes = component.CaseFilters
-                    .Where(x => Helpers.BetweenDates(x.ValidFrom, x.ValidTo, periodMonth, periodYear))
-                    .GroupBy(x => x.Kind)
-                    .ToDictionary(x => x.Key, x => x.Select(y => y.Code).ToList());
-
-                foreach (var employeeCases in employeesCases)
+            foreach (var employeeCasesGroup in cases.GroupBy(x => x.Employee))
+                foreach (Component component in components.Where(x => !x.IsTotal))
                 {
-                    //отбирает случаи которые удовлетворяют фильтрам
-                    IEnumerable<Case> selectedCases = employeeCases.Value;
-
-                    if (groupedFilterCodes.ContainsKey(CaseFilterKind.TreatmentPurpose))
-                        selectedCases = selectedCases.Where(x => groupedFilterCodes[CaseFilterKind.TreatmentPurpose].Contains(x.TreatmentPurpose));
-                    if (groupedFilterCodes.ContainsKey(CaseFilterKind.VisitPurpose))
-                        selectedCases = selectedCases.Where(x => groupedFilterCodes[CaseFilterKind.VisitPurpose].Contains(x.VisitPurpose));
-                    if (groupedFilterCodes.ContainsKey(CaseFilterKind.ContainsService))
-                        selectedCases = selectedCases.Where(x => x.Services.Any(y => groupedFilterCodes[CaseFilterKind.ContainsService].Contains(y.Code)));
-                    if (groupedFilterCodes.ContainsKey(CaseFilterKind.NotContainsService))
-                        selectedCases = selectedCases.Where(x => x.Services.Any(y => !groupedFilterCodes[CaseFilterKind.NotContainsService].Contains(y.Code)));
-
-                    selectedCases = selectedCases.ToList();
+                    //возможное место для оптимизации: В методе ApplyFilters на каждой штатной единице отбираются одни и те же фильтры для одного периода
+                    var selectedCases = component.ApplyFilters(employeeCasesGroup.ToList(), periodMonth, periodYear).ToList();
 
                     //расчитывает значения Results
-                    foreach (var parameter in employeeCases.Key.Parameters.Where(x => (isPaymentAccepted && x.Kind == ParameterKind.EmployeeFact) || (!isPaymentAccepted && x.Kind == ParameterKind.EmployeeRejectedFact)))
+                    var parameterKind = isPaymentAccepted ? ParameterKind.EmployeeFact : ParameterKind.EmployeeRejectedFact;
+
+                    foreach (var parameter in employeeCasesGroup.Key.Parameters.Where(x => x.Kind == parameterKind))
                         foreach (var indicator in component.Indicators)
                         {
                             double value = 0;
@@ -279,8 +259,6 @@ namespace CHI.Services.Report
                             Results[(parameter, indicator)] += ratio is null ? value : value * ratio.Multiplier / ratio.Divider;
                         }
                 }
-            }
-
         }
     }
 }
