@@ -13,16 +13,16 @@ namespace CHI.ViewModels
 {
     class ExaminationsViewModel : DomainObject, IRegionMemberLifetime
     {
-        List<(PatientExaminations PatientExaminations, bool IsLoaded, string Error)> result;
-        bool showErrors;
+        List<LoadResult> result;
+        bool showResults;
         readonly IFileDialogService fileDialogService;
 
 
         public IMainRegionService MainRegionService { get; set; }
         public ILicenseManager LicenseManager { get; set; }
         public bool KeepAlive { get => false; }
-        public bool ShowErrors { get => showErrors; set => SetProperty(ref showErrors, value); }
-        public List<(PatientExaminations PatientExaminations, bool IsLoaded, string Error)> Result { get => result; set => SetProperty(ref result, value); }
+        public bool ShowResults { get => showResults; set => SetProperty(ref showResults, value); }
+        public List<LoadResult> Result { get => result; set => SetProperty(ref result, value); }
         public AppSettings Settings { get; set; }
         public DelegateCommandAsync ExportExaminationsCommand { get; }
 
@@ -34,9 +34,9 @@ namespace CHI.ViewModels
             MainRegionService = mainRegionService;
             LicenseManager = licenseManager;
 
-            Result = new List<(PatientExaminations, bool, string)>();
+            Result = new List<LoadResult>();
 
-            ShowErrors = false;
+            ShowResults = false;
             MainRegionService.Header = "Загрузка осмотров на портал Диспансеризации";
 
             ExportExaminationsCommand = new DelegateCommandAsync(ExportExaminationsExecuteAsync);
@@ -46,7 +46,7 @@ namespace CHI.ViewModels
         async void ExportExaminationsExecuteAsync()
         {
             Result?.Clear();
-            ShowErrors = false;
+            ShowResults = false;
 
             if (!Settings.MedicalExaminations.ConnectionIsValid)
             {
@@ -101,15 +101,16 @@ namespace CHI.ViewModels
             var parallelSerivce = new ParallelExaminationsService(Settings.MedicalExaminations.Address, Settings.MedicalExaminations.Credential, Settings.MedicalExaminations.MaxDegreeOfParallelism);
             if (Settings.Common.UseProxy)
                 parallelSerivce.UseProxy(Settings.Common.ProxyAddress, Settings.Common.ProxyPort);
-            Result = await parallelSerivce.AddExaminationsAsync(patientsExaminations);
+            parallelSerivce.ProgressChanged += n => MainRegionService.ShowProgressBar($"Загружено {n} осмотров из {patientsExaminations.Count}.");
+            var results = await parallelSerivce.AddExaminationsAsync(patientsExaminations);
 
-            Result.OrderBy(x => x.IsLoaded)
+            Result= results.OrderBy(x => x.IsLoaded)
                 .ThenBy(x => x.PatientExaminations.Kind)
                 .ThenBy(x => x.PatientExaminations.Year)
                 .ToList();
 
             if (Result?.Count > 0)
-                ShowErrors = true;
+                ShowResults = true;
 
             SleepMode.Allow();
             MainRegionService.HideProgressBar("Завершено.");

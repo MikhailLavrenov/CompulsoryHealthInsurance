@@ -31,7 +31,7 @@
                         <Setter Property="Height"
                                 Value="*" />
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding ShowErrors}" Value="False">
+                            <DataTrigger Binding="{Binding ShowResults}" Value="False">
                                 <Setter Property="Height"
                                         Value="0" />
                             </DataTrigger>
@@ -54,60 +54,60 @@
                           SelectionUnit="Cell"
                           SelectionMode="Extended"
                           ItemsSource="{Binding Result}"                  
-                          Visibility="{Binding Path=ShowErrors,  Converter={i:BoolToVisibleConverter}}">
+                          Visibility="{Binding Path=ShowResults,  Converter={i:BoolToVisibleConverter}}">
 
             <DataGrid.Columns>
 
                 <DataGridTextColumn Header="Полис"
-                                    Binding="{Binding Item1.InsuranceNumber, Mode=OneWay}"
+                                    Binding="{Binding PatientExaminations.InsuranceNumber, Mode=OneWay}"
                                     Width="150" />
 
                 <DataGridTextColumn Header="Вид осмотра"
-                                    Binding="{Binding Item1.Kind, Mode=OneWay, Converter={i:EnumToDescriptionConverter}}"
+                                    Binding="{Binding PatientExaminations.Kind, Mode=OneWay, Converter={i:EnumToDescriptionConverter}}"
                                     Width="220" />
 
                 <DataGridTextColumn Header="Год"
-                                    Binding="{Binding Item1.Year, Mode=OneWay}"
+                                    Binding="{Binding PatientExaminations.Year, Mode=OneWay}"
                                     Width="60" />
 
                 <DataGridCheckBoxColumn Header="Загружено"                                    
-                                        Binding="{Binding Item2, Mode=OneWay}"                                    
+                                        Binding="{Binding IsLoaded, Mode=OneWay}"                                    
                                         Width="90" />
 
                 <DataGridTextColumn Header="Сообщение об ошибке"
-                                    Binding="{Binding Item3, Mode=OneWay}"
+                                    Binding="{Binding ErrorMessage, Mode=OneWay}"
                                     Width="230" />
 
                 <DataGridTextColumn Header="1эт Начало"
-                                    Binding="{Binding Item1.Stage1.BeginDate, Mode=OneWay, StringFormat='dd.MM.yyyy'}"
+                                    Binding="{Binding PatientExaminations.Stage1.BeginDate, Mode=OneWay, StringFormat='dd.MM.yyyy'}"
                                     Width="100" />
 
                 <DataGridTextColumn Header="1эт Конец"
-                                    Binding="{Binding Item1.Stage1.EndDate, Mode=OneWay, StringFormat='dd.MM.yyyy'}"
+                                    Binding="{Binding PatientExaminations.Stage1.EndDate, Mode=OneWay, StringFormat='dd.MM.yyyy'}"
                                     Width="100" />
 
                 <DataGridTextColumn Header="1эт Гр.здоровья"
-                                    Binding="{Binding Item1.Stage1.HealthGroup, Mode=OneWay, Converter={i:EnumToDescriptionConverter}}"
+                                    Binding="{Binding PatientExaminations.Stage1.HealthGroup, Mode=OneWay, Converter={i:EnumToDescriptionConverter}}"
                                     Width="110" />
 
                 <DataGridTextColumn Header="1эт Направлен"
-                                    Binding="{Binding Item1.Stage1.Referral, Mode=OneWay, Converter={i:EnumToDescriptionConverter}}"
+                                    Binding="{Binding PatientExaminations.Stage1.Referral, Mode=OneWay, Converter={i:EnumToDescriptionConverter}}"
                                     Width="230" />
 
                 <DataGridTextColumn Header="2эт Начало"
-                                    Binding="{Binding Item1.Stage2.BeginDate, Mode=OneWay, StringFormat='dd.MM.yyyy'}"
+                                    Binding="{Binding PatientExaminations.Stage2.BeginDate, Mode=OneWay, StringFormat='dd.MM.yyyy'}"
                                     Width="100" />
 
                 <DataGridTextColumn Header="2эт Конец"
-                                    Binding="{Binding Item1.Stage2.EndDate, Mode=OneWay, StringFormat='dd.MM.yyyy'}"
+                                    Binding="{Binding PatientExaminations.Stage2.EndDate, Mode=OneWay, StringFormat='dd.MM.yyyy'}"
                                     Width="100" />
 
                 <DataGridTextColumn Header="2эт Гр.здоровья"
-                                    Binding="{Binding Item1.Stage2.HealthGroup, Mode=OneWay, Converter={i:EnumToDescriptionConverter}}"
+                                    Binding="{Binding PatientExaminations.Stage2.HealthGroup, Mode=OneWay, Converter={i:EnumToDescriptionConverter}}"
                                     Width="110" />
 
                 <DataGridTextColumn Header="2эт Направлен"
-                                    Binding="{Binding Item1.Stage2.Referral, Mode=OneWay, Converter={i:EnumToDescriptionConverter}}"
+                                    Binding="{Binding PatientExaminations.Stage2.Referral, Mode=OneWay, Converter={i:EnumToDescriptionConverter}}"
                                     Width="230" />
 
             </DataGrid.Columns>

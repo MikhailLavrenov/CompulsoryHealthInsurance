@@ -29,7 +29,8 @@ namespace CHI.Services.MedicalExaminations
             => obj is ExaminationStep step && Equals(step);
 
         public bool Equals(ExaminationStep other)       
-            => StepKind == other.StepKind &&
+            => other !=null &&
+            StepKind == other.StepKind &&
             Date == other.Date &&
             HealthGroup == other.HealthGroup &&
             Referral == other.Referral;

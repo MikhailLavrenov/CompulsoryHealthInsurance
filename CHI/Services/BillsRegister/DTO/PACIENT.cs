@@ -24,5 +24,10 @@ namespace CHI.Services
         /// </summary>
         [XmlElement(ElementName = "NPOLIS")]
         public string NPOLIS { get; set; }
+        /// <summary>
+        /// Единый номер полиса
+        /// </summary>
+        [XmlElement(ElementName = "ENP")]
+        public string ENP { get; set; }
     }
 }

@@ -224,12 +224,16 @@ namespace CHI.Services.MedicalExaminations
             var idString = responseText.SubstringBetween("personId", "\"", "\"");
 
             if (!int.TryParse(idString, out int srzPatientId))
+                throw new WebServiceOperationException("Поиск в СРЗ завершился c ошибкой");
+
+            if (srzPatientId == 0)
                 return null;
 
             return new SrzInfo
             {
                 SrzPatientId = srzPatientId,
-                FilledByAnotherClinic = responseText.Contains("Начата диспансеризация другой МО"),
+                //На самом деле это сообщение означает что у пациента есть заполненные этапы, возможно др ЛПУ, но мб и своим
+                FilledSomeStages = responseText.Contains("Начата диспансеризация другой МО"),
                 ExistInPlan = responseText.Contains("Застрахованное лицо уже находится в плане диспансеризации вашей МО")
             };
         }

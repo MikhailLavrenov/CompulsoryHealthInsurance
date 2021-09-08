@@ -99,7 +99,7 @@ namespace CHI.ViewModels
                 var parallelSrzService = new ParallelSRZService(Settings.Srz.Address, Settings.Srz.Credential, Settings.Srz.MaxDegreeOfParallelism);
                 if (Settings.Common.UseProxy)
                     parallelSrzService.UseProxy(Settings.Common.ProxyAddress, Settings.Common.ProxyPort);
-
+                parallelSrzService.ProgressChanged += n => MainRegionService.ShowProgressBar($"В СРЗ запрощено {n} ФИО из {unknownInsuaranceNumbers.Count}.");
                 var foundPatients = await parallelSrzService.GetPatientsAsync(unknownInsuaranceNumbers);
 
                 resultReport.Append($"Запрошено пациентов в СРЗ: {foundPatients.Count}, лимит {Settings.Srz.MaxDegreeOfParallelism}. ");

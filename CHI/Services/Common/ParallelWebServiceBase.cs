@@ -30,6 +30,6 @@ namespace CHI.Services
         }
 
         protected void OnProgressChanged(int proceedCount)
-            => ProgressChanged(proceedCount);
+            => ProgressChanged?.Invoke(proceedCount);
     }
 }

@@ -25,9 +25,9 @@ namespace CHI.Services.MedicalExaminations
         /// </summary>
         /// <param name="patientsExaminations">Список профилактических осмотров пациентов.</param>
         /// <returns>Список кортежей состоящий из PatientExaminations, флага успешной загрузки (true-успешно, false-иначе), строки с сообщением об ошибке.</returns>
-        public async Task<List<(PatientExaminations, bool, string)>> AddExaminationsAsync(IEnumerable<PatientExaminations> patientsExaminations)
+        public async Task<List<LoadResult>> AddExaminationsAsync(IEnumerable<PatientExaminations> patientsExaminations)
         {
-            var loadedExaminations = new ConcurrentBag<(PatientExaminations PatientExaminations, bool IsLoaded, string Error)>();
+            var loadedExaminations = new ConcurrentBag<LoadResult>();
             var tasks = new Task[Math.Min(maxDegreeOfParallelism, patientsExaminations.Count())];
             var patientsExaminationsStack = new ConcurrentStack<PatientExaminations>(patientsExaminations);
 
@@ -42,8 +42,8 @@ namespace CHI.Services.MedicalExaminations
 
                     while (patientsExaminationsStack.TryPop(out var patientExaminations))
                     {
-                        string error = string.Empty;
-                        bool isSuccessful = false;
+                        string errorMessage = string.Empty;
+                        bool isLoaded = false;
 
                         //3 попытки на загрузку осмотра, т.к. иногда веб-сервер обрывает сессии
                         for (int j = 0; j < 3; j++)
@@ -59,26 +59,25 @@ namespace CHI.Services.MedicalExaminations
                                 }
 
                                 await service.AddPatientExaminationsAsync(patientExaminations);
-                                error = string.Empty;
-                                isSuccessful = true;
-
+                                errorMessage = string.Empty;
+                                isLoaded = true;
                                 DecreaseWaitTimeThreadSafety(ref waitTime);
 
                                 break;
                             }
                             catch (HttpRequestException ex)
                             {
-                                error = ex.Message;
+                                errorMessage = ex.Message;
                                 Interlocked.Add(ref waitTime, increaseWaiting);
                             }
                             catch (WebServiceOperationException ex)
                             {
-                                error = ex.Message;
+                                errorMessage = ex.Message;
                                 break;
                             }
                         }
 
-                        loadedExaminations.Add((patientExaminations, isSuccessful, error));
+                        loadedExaminations.Add(new LoadResult(patientExaminations, isLoaded, errorMessage));
 
                         OnProgressChanged(loadedExaminations.Count);
                     }

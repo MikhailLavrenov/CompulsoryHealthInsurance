@@ -40,13 +40,13 @@ namespace CHI.Services.MedicalExaminations
         /// При необходимости удаление пациента из др. планов и информации о прохождении профилактических осмотров.
         /// </summary>
         /// <param name="patientExaminations">Экземпляр PatientExaminations</param>
-        /// <exception cref="InvalidOperationException">
+        /// <exception cref="WebServiceOperationException">
         /// Вызвыет исключение при невозможности добавить пациента в нужный план.
         /// </exception>
         public async Task AddPatientExaminationsAsync(PatientExaminations patientExaminations)
         {
             if (IsAnyFutureDate(patientExaminations))
-                throw new InvalidOperationException("Осмотр будущей датой не может быть загружен.");
+                throw new WebServiceOperationException("Осмотр будущей датой не может быть загружен.");
 
             var webPatientData = await ChangeOrAddPatientToPlanAsync(patientExaminations.InsuranceNumber, patientExaminations, patientExaminations.Kind, patientExaminations.Year);
 
@@ -67,10 +67,7 @@ namespace CHI.Services.MedicalExaminations
         {
             var srzInfo = await GetInfoFromSRZAsync(patient, year)
                 ?? await GetInfoFromSRZAsync(insuranceNumber, year)
-                ?? throw new InvalidOperationException("Не удалось найти пациента в СРЗ");
-
-            if (srzInfo.FilledByAnotherClinic)
-                throw new InvalidOperationException("При поиске в СРЗ установлено - осмотр подан др. ЛПУ.");
+                ?? throw new WebServiceOperationException("Не удалось найти пациента в СРЗ");
 
             WebPatientData webPatientData;
 
@@ -98,7 +95,7 @@ namespace CHI.Services.MedicalExaminations
 
             webPatientData = await GetPatientDataFromPlanAsync(srzInfo.SrzPatientId, kind, year);
 
-            return webPatientData ?? throw new InvalidOperationException("Не удалось найти пациента в плане");
+            return webPatientData ?? throw new WebServiceOperationException("Не удалось найти пациента в плане");
         }
 
         async Task DeepDeleteFromPlanAsync(WebPatientData webPatientData)

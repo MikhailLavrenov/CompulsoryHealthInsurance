@@ -41,7 +41,7 @@ namespace CHI.Services
                     if (examination.HealthGroup == HealthGroup.None)
                         continue;
 
-                    var insuranceNumber = GetInsuranceNumber(billCase.PACIENT.SPOLIS, billCase.PACIENT.NPOLIS);
+                    var insuranceNumber = GetInsuranceNumber(billCase.PACIENT);
                     var examinationYear = billCase.Z_SL.SL.DATE_2.Year;
                     var patient = billPersons[billCase.PACIENT.ID_PAC];
                     var examinationKind = GetExaminationType(bill.Cases.SCHET.DISP, examinationYear - patient.DR.Year);
@@ -72,12 +72,14 @@ namespace CHI.Services
             return result.Values.ToList();
         }
 
-        string GetInsuranceNumber(string SPOLIS, string NPOLIS)
+        string GetInsuranceNumber(PACIENT PACIENT)
         {
-            if (string.IsNullOrEmpty(SPOLIS))
-                return NPOLIS;
+            if (!string.IsNullOrEmpty(PACIENT.ENP))
+                return PACIENT.ENP;
+            if (string.IsNullOrEmpty(PACIENT.SPOLIS))
+                return PACIENT.NPOLIS;
             else
-                return $"{SPOLIS} {NPOLIS}";
+                return $"{PACIENT.SPOLIS} {PACIENT.NPOLIS}";
         }
 
         Examination GetExamination(ZAP billCase, int examinationStage)

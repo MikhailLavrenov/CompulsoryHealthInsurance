@@ -152,24 +152,18 @@ namespace CHI.Settings
                 catch (Exception)
                 { }
 
-
                 if (!connected)
                 {
                     Common.AddError(ErrorMessages.Connection, nameof(Common.ProxyAddress));
                     Common.AddError(ErrorMessages.Connection, nameof(Common.ProxyPort));
-                    Srz.ConnectionIsValid = false;
-                    MedicalExaminations.ConnectionIsValid = false;
-
                     Common.ProxyConnectionIsValid = false;
+                    return;
                 }
             }
-            else
-            {
-                Common.RemoveError(ErrorMessages.Connection, nameof(Common.ProxyAddress));
-                Common.RemoveError(ErrorMessages.Connection, nameof(Common.ProxyPort));
 
-                Common.ProxyConnectionIsValid = true;
-            }
+            Common.RemoveError(ErrorMessages.Connection, nameof(Common.ProxyAddress));
+            Common.RemoveError(ErrorMessages.Connection, nameof(Common.ProxyPort));
+            Common.ProxyConnectionIsValid = true;
         }
 
         async Task<bool> TryConnectSiteAsync(string url, string nameOfAddress, DomainObject obj)
@@ -207,7 +201,7 @@ namespace CHI.Settings
             if (!Common.ProxyConnectionIsValid)
                 return;
 
-            if (! await TryConnectSiteAsync(MedicalExaminations.Address, nameof(MedicalExaminations.Address), MedicalExaminations))
+            if (!await TryConnectSiteAsync(MedicalExaminations.Address, nameof(MedicalExaminations.Address), MedicalExaminations))
                 return;
 
             if (!await TryAuthorizeExaminationsCredentialsAsync())
@@ -228,7 +222,7 @@ namespace CHI.Settings
             if (!Common.ProxyConnectionIsValid)
                 return;
 
-            if (! await TryConnectSiteAsync(Srz.Address, nameof(Srz.Address), Srz))
+            if (!await TryConnectSiteAsync(Srz.Address, nameof(Srz.Address), Srz))
                 return;
 
             if (!await TryAuthorizeSrzCredentialsAsync())
