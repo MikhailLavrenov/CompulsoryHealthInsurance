@@ -93,7 +93,7 @@ namespace CHI.ViewModels
 
             if (Settings.Srz.ConnectionIsValid)
             {
-                var unknownInsuaranceNumbers = file.GetInsuranceNumberOfPatientsWithoutFullName().Take(Settings.Srz.MaxDegreeOfParallelism).ToList();
+                var unknownInsuaranceNumbers = file.GetInsuranceNumberOfPatientsWithoutFullName().Take((int)Settings.Srz.RequestsLimit).ToList();
 
                 MainRegionService.ShowProgressBar("Поиск ФИО в СРЗ.");
                 var parallelSrzService = new ParallelSRZService(Settings.Srz.Address, Settings.Srz.Credential, Settings.Srz.MaxDegreeOfParallelism);
@@ -102,7 +102,7 @@ namespace CHI.ViewModels
                 parallelSrzService.ProgressChanged += n => MainRegionService.ShowProgressBar($"В СРЗ запрощено {n} ФИО из {unknownInsuaranceNumbers.Count}.");
                 var foundPatients = await parallelSrzService.GetPatientsAsync(unknownInsuaranceNumbers);
 
-                resultReport.Append($"Запрошено пациентов в СРЗ: {foundPatients.Count}, лимит {Settings.Srz.MaxDegreeOfParallelism}. ");
+                resultReport.Append($"Запрошено пациентов в СРЗ: {foundPatients.Count}, лимит {Settings.Srz.RequestsLimit}. ");
                 MainRegionService.ShowProgressBar("Подстановка ФИО в файл.");
                 file.InsertPatientsWithFullName(foundPatients);
 
