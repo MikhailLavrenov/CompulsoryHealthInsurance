@@ -174,7 +174,7 @@ namespace CHI.Services
 
                 if (patientToAdd != null && patientsInFile[i].Initials == patientToAdd.Initials)
                 {
-                    WritePatient(i + headerRowIndex, patientToAdd);
+                    WritePatient(i + headerRowIndex+1, patientToAdd);
                     patientsInFile[i] = patientToAdd;
                 }
             }

@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace CHI.ViewModels
 {
-    class AttachedPatientsViewModel : DomainObject, IRegionMemberLifetime
+    public class AttachedPatientsViewModel : DomainObject, IRegionMemberLifetime
     {
         DateTime fileDate;
         readonly IFileDialogService fileDialogService;

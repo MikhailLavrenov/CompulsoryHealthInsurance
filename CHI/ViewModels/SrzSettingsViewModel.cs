@@ -5,7 +5,7 @@ using Prism.Regions;
 
 namespace CHI.ViewModels
 {
-    class SrzSettingsViewModel : DomainObject, IRegionMemberLifetime
+    public class SrzSettingsViewModel : DomainObject, IRegionMemberLifetime
     {
         bool showPassword;
 
