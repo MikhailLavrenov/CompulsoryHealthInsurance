@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CHI.Models.ServiceAccounting
 {
-    public class BedDaysIndicator: Indicator
+    public class BedDaysIndicator : Indicator
     {
+        public override double CalculateValue(List<Case> cases, bool isPaymentAccepted)
+            => cases.Sum(x => x.BedDays);
     }
 }

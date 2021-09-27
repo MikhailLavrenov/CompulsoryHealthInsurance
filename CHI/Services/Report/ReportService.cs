@@ -216,47 +216,10 @@ namespace CHI.Services.Report
                     foreach (var parameter in employeeCasesGroup.Key.Parameters.Where(x => x.Kind == parameterKind))
                         foreach (var indicator in component.Indicators)
                         {
-                            double value = 0;
-
-                            switch (indicator.ValueKind)
-                            {
-                                case IndicatorKind.Cases:
-                                    value = selectedCases.Count();
-                                    break;
-
-                                case IndicatorKind.Services:
-                                    value = selectedCases.Select(x => x.Services.Count == 0 ? 0 : x.Services.Count - 1).Sum();
-                                    break;
-
-                                case IndicatorKind.BedDays:
-                                    value = selectedCases.Sum(x => x.BedDays);
-                                    break;
-
-                                case IndicatorKind.LaborCost:
-                                    value = selectedCases
-                                        .SelectMany(x => x.Services)
-                                        .Where(x => x.ClassifierItem != null)
-                                        .Sum(x => x.Count * x.ClassifierItem.LaborCost);
-                                    break;
-
-                                case IndicatorKind.Cost:
-                                    if (isPaymentAccepted)
-                                        value = selectedCases
-                                            .Where(x => x.PaidStatus == PaidKind.None)
-                                            .SelectMany(x => x.Services)
-                                            .Where(x => x.ClassifierItem != null)
-                                            .Sum(x => x.Count * x.ClassifierItem.Price)
-                                            + selectedCases
-                                            .Where(x => x.PaidStatus != PaidKind.None)
-                                            .Sum(x => x.AmountPaid);
-                                    else
-                                        value = selectedCases.Sum(x => x.AmountUnpaid);
-                                    break;
-                            }
-
+                            var value = indicator.CalculateValue(selectedCases, isPaymentAccepted);
                             var ratio = indicator.Ratios.FirstOrDefault(x => Helpers.BetweenDates(x.ValidFrom, x.ValidTo, periodMonth, periodYear));
 
-                            Results[(parameter, indicator)] += ratio is null ? value : value * ratio.Multiplier / ratio.Divider;
+                            Results[(parameter, indicator)] += ratio?.Apply(value) ?? value;
                         }
                 }
         }
