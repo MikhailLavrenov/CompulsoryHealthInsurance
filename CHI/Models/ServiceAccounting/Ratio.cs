@@ -11,5 +11,8 @@ namespace CHI.Models.ServiceAccounting
         public DateTime? ValidFrom { get; set; }
         public DateTime? ValidTo { get; set; }
 
+
+        public double Apply(double value)
+            => value * Multiplier / Divider;
     }
 }
