@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace CHI.Models.ServiceAccounting
 {
-    public class Indicator : BindableBase
+    public abstract class Indicator : BindableBase
     {
         IndicatorKind faceKind;
         IndicatorKind valueKind;
@@ -15,5 +15,8 @@ namespace CHI.Models.ServiceAccounting
         public List<Ratio> Ratios { get; set; }
 
         public Component Component { get; set; }
+
+
+        public abstract double CalculateValue(List<Case> cases, bool isPaymentAccepted);
     }
 }
