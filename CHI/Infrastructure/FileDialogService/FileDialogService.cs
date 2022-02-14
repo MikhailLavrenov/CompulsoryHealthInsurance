@@ -20,26 +20,29 @@ namespace CHI.Infrastructure
         /// <returns></returns>
         public bool? ShowDialog()
         {
-            FileDialog fileDialog = null;            
+            FileDialog fileDialog = null;
 
             if (DialogType == FileDialogType.Save)
                 fileDialog = new SaveFileDialog();
             else if (DialogType == FileDialogType.Open)
-                fileDialog = new OpenFileDialog() { Multiselect= MiltiSelect };
+                fileDialog = new OpenFileDialog() { Multiselect = MiltiSelect };
 
             fileDialog.Filter = Filter;
-            
+
 
             if (!string.IsNullOrEmpty(FileName))
             {
-                fileDialog.InitialDirectory = Path.GetDirectoryName(FileName);
+                var initialDirectory = Path.GetDirectoryName(FileName);
+                if (Directory.Exists(initialDirectory))
+                    fileDialog.InitialDirectory = initialDirectory;
+
                 fileDialog.FileName = Path.GetFileName(FileName);
             }
 
             var result = fileDialog.ShowDialog();
 
             FileName = fileDialog.FileName;
-            FileNames= fileDialog.FileNames;
+            FileNames = fileDialog.FileNames;
 
             return result;
         }
