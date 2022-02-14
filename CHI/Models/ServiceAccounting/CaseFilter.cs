@@ -2,7 +2,7 @@
 
 namespace CHI.Models.ServiceAccounting
 {
-    public abstract class CaseFilter
+    public class CaseFilter
     {
         public int Id { get; set; }
         public double Code { get; set; }

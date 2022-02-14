@@ -9,7 +9,7 @@ namespace CHI.Services.Report
     public class ReportService
     {
         List<Parameter> parameters;
-        List<Indicator> indicators;
+        List<IndicatorBase> indicators;
         List<Department> departments;
         List<Employee> employees;
         List<Component> components;
@@ -19,7 +19,7 @@ namespace CHI.Services.Report
         public int Month { get; private set; }
         public int Year { get; private set; }
         public bool IsGrowing { get; private set; }
-        public Dictionary<(Parameter, Indicator), double?> Results { get; set; }
+        public Dictionary<(Parameter, IndicatorBase), double?> Results { get; set; }
 
 
         public ReportService(Department rootDepartment, Component rootComponent)
@@ -127,9 +127,17 @@ namespace CHI.Services.Report
                 {
                     double sum = 0;
 
+                    var indicatorType = indicator.GetType();
+                    var indicatorEqTypes = new List<Type> { indicatorType };
+
+                    if (indicatorType == typeof(CasesIndicator))
+                        indicatorEqTypes.Add(typeof(CasesLaborCostIndicator));
+                    else if (indicatorType == typeof(VisitsIndicator))
+                        indicatorEqTypes.Add(typeof(VisitsLaborCostIndicator));
+
                     indicator.Component.Childs
                         .SelectMany(x => x.Indicators)
-                        .Where(x => x.FacadeKind == indicator.ValueKind)
+                        .Where(x => indicatorEqTypes.Contains(x.GetType()))
                         .ToList()
                         .ForEach(x => sum += Results[(parameter, x)] ?? 0);
 
@@ -189,10 +197,11 @@ namespace CHI.Services.Report
 
                 if (result == 0)
                     result = null;
+
                 else if (key.Item1.Kind == ParameterKind.DepartmentPercent)
                     result = Math.Round(result.Value, 1, MidpointRounding.AwayFromZero);
 
-                else if (key.Item2.FacadeKind == IndicatorKind.Cost)
+                else if (key.Item2.GetType() == typeof(CostIndicator))
                     result = Math.Round(result.Value, MoneyRoundDigits, MidpointRounding.AwayFromZero);
 
                 else
@@ -204,6 +213,8 @@ namespace CHI.Services.Report
 
         void SetValuesFromCases(IEnumerable<Case> cases, int periodMonth, int periodYear, bool isPaymentAccepted)
         {
+            var parameterKind = isPaymentAccepted ? ParameterKind.EmployeeFact : ParameterKind.EmployeeRejectedFact;
+
             foreach (var employeeCasesGroup in cases.GroupBy(x => x.Employee))
                 foreach (Component component in components.Where(x => !x.IsTotal))
                 {
@@ -211,16 +222,9 @@ namespace CHI.Services.Report
                     var selectedCases = component.ApplyFilters(employeeCasesGroup.ToList(), periodMonth, periodYear).ToList();
 
                     //расчитывает значения Results
-                    var parameterKind = isPaymentAccepted ? ParameterKind.EmployeeFact : ParameterKind.EmployeeRejectedFact;
-
                     foreach (var parameter in employeeCasesGroup.Key.Parameters.Where(x => x.Kind == parameterKind))
                         foreach (var indicator in component.Indicators)
-                        {
-                            var value = indicator.CalculateValue(selectedCases, isPaymentAccepted);
-                            var ratio = indicator.Ratios.FirstOrDefault(x => Helpers.BetweenDates(x.ValidFrom, x.ValidTo, periodMonth, periodYear));
-
-                            Results[(parameter, indicator)] += ratio?.Apply(value) ?? value;
-                        }
+                            Results[(parameter, indicator)] += indicator.CalculateValue(selectedCases, isPaymentAccepted, periodMonth, periodYear);
                 }
         }
     }
