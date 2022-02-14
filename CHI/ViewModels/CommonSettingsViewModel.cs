@@ -11,12 +11,19 @@ namespace CHI.ViewModels
 {
     public class CommonSettingsViewModel : DomainObject, IRegionMemberLifetime
     {
+        bool showPassword;
+
+
+        public bool ShowPassword { get => showPassword; set => SetProperty(ref showPassword, value); }
+
+
         public IMainRegionService MainRegionService { get; set; }
         public bool KeepAlive { get => false; }
         public AppSettings Settings { get; set; }
         public DelegateCommandAsync TestCommand { get; }
         public DelegateCommand SetDefaultCommand { get; }
         public DelegateCommandAsync MigrateDBCommand { get; }
+        public DelegateCommand SwitchShowPasswordCommand { get; }
 
 
         public CommonSettingsViewModel(AppSettings settings, IMainRegionService mainRegionService)
@@ -29,6 +36,7 @@ namespace CHI.ViewModels
             TestCommand = new DelegateCommandAsync(TestExecute);
             SetDefaultCommand = new DelegateCommand(SetDefaultExecute);
             MigrateDBCommand = new DelegateCommandAsync(MigrateDBExecute);
+            SwitchShowPasswordCommand = new DelegateCommand(() => ShowPassword = !ShowPassword);
         }
 
 
@@ -52,7 +60,7 @@ namespace CHI.ViewModels
         private void MigrateDBExecute()
         {
             MainRegionService.ShowProgressBar("Обновление структуры базы данных.");
-            var dbContext = new AppDBContext(Settings.Common.SQLServer, Settings.Common.SQLServerDB);
+            var dbContext = new AppDBContext(Settings.Common.SqlServer, Settings.Common.SqlDatabase, Settings.Common.SqlLogin, Settings.Common.SqlPassword);
             dbContext.Database.Migrate();
 
             var rootDepartment = dbContext.Departments.FirstOrDefault(x => x.IsRoot);

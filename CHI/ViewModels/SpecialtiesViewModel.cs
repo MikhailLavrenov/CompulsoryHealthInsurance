@@ -37,7 +37,7 @@ namespace CHI.ViewModels
 
             mainRegionService.Header = "Специальности";
 
-            dbContext = new AppDBContext(settings.Common.SQLServer, settings.Common.SQLServerDB);
+            dbContext = new AppDBContext(settings.Common.SqlServer, settings.Common.SqlDatabase, settings.Common.SqlLogin, settings.Common.SqlPassword);
             dbContext.Specialties.Load();
             Specialties = dbContext.Specialties.Local.ToObservableCollection();
 
@@ -76,7 +76,7 @@ namespace CHI.ViewModels
 
             dbContext.SaveChanges();
 
-            dbContext = new AppDBContext(settings.Common.SQLServer, settings.Common.SQLServerDB);
+            dbContext = new AppDBContext(settings.Common.SqlServer, settings.Common.SqlDatabase, settings.Common.SqlLogin, settings.Common.SqlPassword);
             dbContext.Specialties.Load();
             Specialties = dbContext.Specialties.Local.ToObservableCollection();
 

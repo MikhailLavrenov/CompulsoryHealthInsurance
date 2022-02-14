@@ -4,12 +4,14 @@ using System.Linq;
 
 namespace CHI.Models.ServiceAccounting
 {
-    public abstract class CaseFiltersCollection
+    public abstract class CaseFiltersCollectionBase
     {
+        public int Id { get; set; }
         public List<CaseFilter> Filters { get; set; }
+        public abstract string Description { get; }
 
 
-        public CaseFiltersCollection()
+        public CaseFiltersCollectionBase()
         {
             Filters = new List<CaseFilter>();
         }

@@ -12,7 +12,10 @@ namespace CHI.Settings
         ushort proxyPort;
         bool proxyConnectionIsValid;
         string sqlServer;
-        string sqlServerDB;
+        string sqlDatabase;
+        string sqlLogin;
+        string sqlPassword;
+        bool isSqlAuthorization;
         CredentialScope credentialsScope;
 
 
@@ -34,8 +37,11 @@ namespace CHI.Settings
         public ushort ProxyPort { get => proxyPort; set => SetProperty(ref proxyPort, value); }
         [XmlIgnore] public bool ProxyConnectionIsValid { get => proxyConnectionIsValid; set => SetProperty(ref proxyConnectionIsValid, value); }
         [XmlIgnore] public string Proxy { get => $"{ProxyAddress}:{ProxyPort}"; }
-        public string SQLServer { get => sqlServer; set => SetProperty(ref sqlServer, value); }
-        public string SQLServerDB { get => sqlServerDB; set => SetProperty(ref sqlServerDB, value); }
+        public string SqlServer { get => sqlServer; set => SetProperty(ref sqlServer, value); }
+        public string SqlDatabase { get => sqlDatabase; set => SetProperty(ref sqlDatabase, value); }
+        public string SqlLogin { get => sqlLogin; set => SetProperty(ref sqlLogin, value); }
+        public string SqlPassword { get => sqlPassword; set => SetProperty(ref sqlPassword, value); }
+        public bool IsSqlAuthorization { get => isSqlAuthorization; set => SetProperty(ref isSqlAuthorization, value); }
         public CredentialScope CredentialsScope { get => credentialsScope; set => SetProperty(ref credentialsScope, value); }
 
 
@@ -67,11 +73,14 @@ namespace CHI.Settings
         public void SetDefault()
         {
             UseProxy = false;
-            ProxyAddress = "";
+            ProxyAddress = string.Empty;
             ProxyPort = 0;
 
-            SQLServer = "yourServer\\istance";
-            SQLServerDB = "CHI";
+            SqlServer = "yourServer\\istance";
+            SqlDatabase = "CHI";
+            isSqlAuthorization = false;
+            SqlLogin = string.Empty;
+            SqlPassword = string.Empty;
         }
     }
 }

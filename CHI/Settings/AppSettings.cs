@@ -50,11 +50,11 @@ namespace CHI.Settings
 
             // Т.к. при создании экзмпляра класса если свойства не инициализируются - не срабатывает валидация. Поэтому принудительно проверяем все. 
             // Свойства не инициализируются сразу т.к. иначе сразу после создания на них будут отображаться ошибки, и во View тоже, это плохо.
-            Srz.Credential.Validate();
-            Srz.Credential.Encrypt(Common.CredentialsScope);
+            Srz.Credential?.Validate();
+            Srz.Credential?.Encrypt(Common.CredentialsScope);
 
-            MedicalExaminations.Credential.Validate();
-            MedicalExaminations.Credential.Encrypt(Common.CredentialsScope);
+            MedicalExaminations.Credential?.Validate();
+            MedicalExaminations.Credential?.Encrypt(Common.CredentialsScope);
 
             foreach (var columnProperty in AttachedPatientsFile.ColumnProperties)
                 columnProperty.Validate();
@@ -78,9 +78,9 @@ namespace CHI.Settings
 
                 try
                 {
-                    settings.Srz.Credential.Decrypt(settings.Common.CredentialsScope);
+                    settings.Srz.Credential?.Decrypt(settings.Common.CredentialsScope);
 
-                    settings.MedicalExaminations.Credential.Decrypt(settings.Common.CredentialsScope);
+                    settings.MedicalExaminations.Credential?.Decrypt(settings.Common.CredentialsScope);
                 }
                 catch (CryptographicException)
                 {

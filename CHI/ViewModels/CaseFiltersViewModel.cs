@@ -15,18 +15,20 @@ namespace CHI.ViewModels
     public class CaseFiltersViewModel : DomainObject, IRegionMemberLifetime, INavigationAware
     {
         AppDBContext dbContext;
-        ObservableCollection<CaseFilter> caseFilters;
+        ObservableCollection<Tuple<string, CaseFilter>> caseFilters;
         Component currentComponent;
-        CaseFilter currentCaseFilter;
+        Tuple<string, CaseFilter> currentCaseFilter;
+        Type newKind;
         AppSettings settings;
         IMainRegionService mainRegionService;
 
 
         public bool KeepAlive { get => false; }
-        public CaseFilter CurrentCaseFilter { get => currentCaseFilter; set => SetProperty(ref currentCaseFilter, value); }
+        public Tuple<string, CaseFilter> CurrentCaseFilter { get => currentCaseFilter; set => SetProperty(ref currentCaseFilter, value); }
         public Component CurrentComponent { get => currentComponent; set => SetProperty(ref currentComponent, value); }
-        public ObservableCollection<CaseFilter> CaseFilters { get => caseFilters; set => SetProperty(ref caseFilters, value); }
-        public List<KeyValuePair<Enum, string>> CaseFilterKinds { get; } = Helpers.GetAllValuesAndDescriptions(typeof(CaseFilterKind));
+        public ObservableCollection<Tuple<string, CaseFilter>> CaseFilters { get => caseFilters; set => SetProperty(ref caseFilters, value); }
+        public Type NewKind { get => newKind; set => SetProperty(ref newKind, value); }
+        public List<Tuple<Type, string>> Kinds { get; }
 
         public DelegateCommand AddCommand { get; }
         public DelegateCommand DeleteCommand { get; }
@@ -39,9 +41,17 @@ namespace CHI.ViewModels
             this.settings = settings;
             this.mainRegionService = mainRegionService;
 
-            dbContext = new AppDBContext(settings.Common.SQLServer, settings.Common.SQLServerDB);
+            Kinds = new List<Tuple<Type, string>>
+            {
+                new Tuple<Type, string>(typeof(TreatmentPurposeCaseFiltersCollection), new TreatmentPurposeCaseFiltersCollection().Description),
+                new Tuple<Type, string>(typeof(VisitPurposeCaseFiltersCollection), new VisitPurposeCaseFiltersCollection().Description),
+                new Tuple<Type, string>(typeof(ServiceCodeCaseFiltersCollection), new ServiceCodeCaseFiltersCollection().Description),
+                new Tuple<Type, string>(typeof(ExcludingServiceCodeCaseFiltersCollection), new ExcludingServiceCodeCaseFiltersCollection().Description),
+            };
 
-            AddCommand = new DelegateCommand(AddExecute);
+            dbContext = new AppDBContext(settings.Common.SqlServer, settings.Common.SqlDatabase, settings.Common.SqlLogin, settings.Common.SqlPassword);
+
+            AddCommand = new DelegateCommand(AddExecute, () => NewKind != null).ObservesProperty(() => NewKind);
             DeleteCommand = new DelegateCommand(DeleteExecute, () => CurrentCaseFilter != null).ObservesProperty(() => CurrentCaseFilter);
         }
 
@@ -50,14 +60,16 @@ namespace CHI.ViewModels
         {
             var newCaseFilter = new CaseFilter();
 
-            CaseFilters.Add(newCaseFilter);
+            var description = ((CaseFiltersCollectionBase)Activator.CreateInstance(newKind)).Description;
 
-            CurrentComponent.CaseFilters.Add(newCaseFilter);
+            CaseFilters.Add(new Tuple<string, CaseFilter>(description, newCaseFilter));
+
+            CurrentComponent.AddCaseFilter(NewKind, newCaseFilter);
         }
 
         private void DeleteExecute()
         {
-            CurrentComponent.CaseFilters.Remove(CurrentCaseFilter);
+            CurrentComponent.RemoveCaseFilter(CurrentCaseFilter.Item2);
 
             CaseFilters.Remove(CurrentCaseFilter);
         }
@@ -68,9 +80,18 @@ namespace CHI.ViewModels
             {
                 CurrentComponent = navigationContext.Parameters.GetValue<Component>(nameof(Component));
 
-                CurrentComponent = dbContext.Components.Where(x => x.Id == CurrentComponent.Id).Include(x => x.CaseFilters).First();
+                CurrentComponent = dbContext.Components
+                    .Where(x => x.Id == CurrentComponent.Id)
+                    .Include(x => x.CaseFiltersCollections)
+                    .ThenInclude(x=>x.Filters)
+                    .First();
 
-                CaseFilters = new ObservableCollection<CaseFilter>(CurrentComponent.CaseFilters?.OrderBy(x => x.Code).OrderBy(x => x.Kind).ToList() ?? new List<CaseFilter>());
+                   var caseFilterTuples = CurrentComponent.CaseFiltersCollections?
+                        .SelectMany(x => x.Filters.Select(y=>new Tuple<string, CaseFilter> (x.Description,y)))
+                        .ToList()
+                        ?? new ();
+
+                CaseFilters = new ObservableCollection<Tuple<string, CaseFilter>>(caseFilterTuples);
             }
 
             mainRegionService.Header = $"{CurrentComponent.Name} > Фильтр случаев";

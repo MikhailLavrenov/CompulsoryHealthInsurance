@@ -20,6 +20,13 @@
         <StackPanel DockPanel.Dock="Top"
                     Orientation="Horizontal">
 
+            <ComboBox ItemsSource="{Binding Kinds}"
+                      SelectedValuePath="Item1"
+                      DisplayMemberPath="Item2"
+                      SelectedValue="{Binding NewKind, UpdateSourceTrigger=PropertyChanged}"
+                      SelectedIndex="0"
+                      MinWidth="200" />
+
             <Button Style="{StaticResource IconButton}"
                     Command="{Binding AddCommand}">
                 <Viewbox Stretch="Uniform">
@@ -49,24 +56,22 @@
                 <DataGridTemplateColumn CellTemplate="{StaticResource DataGridDragColumn}"
                                         IsReadOnly="True" />
 
-                <materialDesign:DataGridComboBoxColumn Header="Вид"
-                                                       ItemsSource="{Binding DataContext.CaseFilterKinds, Source={x:Reference proxyElement}, Mode=OneTime}"
-                                                       SelectedValuePath="Key"
-                                                       DisplayMemberPath="Value"
-                                                       SelectedValueBinding="{Binding Kind}"
-                                                       MinWidth="200" />
-
+                <DataGridTextColumn Header="Вид"
+                                    Binding="{Binding Item1}"
+                                    IsReadOnly="True"
+                                    MinWidth="100" />
+                
                 <DataGridTextColumn Header="Код"
-                                    Binding="{Binding Code}"
+                                    Binding="{Binding Item2.Code}"
                                     MinWidth="100" />
 
                 <DataGridTextColumn Header="Действует с"
-                                        Binding="{Binding ValidFrom, StringFormat='{}{0:MM.yyyy}'}"
+                                    Binding="{Binding Item2.ValidFrom, StringFormat='{}{0:MM.yyyy}'}"
                                         MinWidth="100" />
 
 
                 <DataGridTextColumn Header="Действует по"
-                                        Binding="{Binding ValidTo, StringFormat='{}{0:MM.yyyy}'}"
+                                    Binding="{Binding Item2.ValidTo, StringFormat='{}{0:MM.yyyy}'}"
                                         MinWidth="100" />
 
 

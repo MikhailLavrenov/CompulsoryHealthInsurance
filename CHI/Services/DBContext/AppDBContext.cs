@@ -8,6 +8,8 @@ namespace CHI.Services
     {
         string sqlServer;
         string database;
+        string login;
+        string password;
 
 
         public DbSet<Patient> Patients { get; set; }
@@ -22,26 +24,59 @@ namespace CHI.Services
         public DbSet<ServiceClassifierItem> ServiceClassifierItems { get; set; }
         public DbSet<ServiceClassifier> ServiceClassifiers { get; set; }
         public DbSet<Component> Components { get; set; }
-        public DbSet<Indicator> Indicators { get; set; }
+        public DbSet<IndicatorBase> Indicators { get; set; }
+        public DbSet<CaseFiltersCollectionBase> CaseFiltersCollections { get; set; }
         public DbSet<CaseFilter> CaseFilters { get; set; }
         public DbSet<Plan> Plans { get; set; }
         public DbSet<User> Users { get; set; }
 
 
-        public AppDBContext( string sqlServer, string database)
+        public AppDBContext()    
+            : this(string.Empty, string.Empty, null, null)
+        {
+        }
+
+        //public AppDBContext() : this("WS2016\\SQLEXPRESS", "CHI2", "sa", "1")
+        //{
+        //}
+
+        public AppDBContext(string sqlServer, string database, string login, string password)
         {
             this.sqlServer = sqlServer;
             this.database = database;
+            this.login = login;
+            this.password = password;
         }
 
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer(@$"Server={sqlServer};Database={database};Trusted_Connection=True;");
+            var connectionString = @$"Server={sqlServer};Database={database};";
+
+            if (!string.IsNullOrEmpty(login) && !string.IsNullOrEmpty(password))
+                connectionString += @$"User Id={login};Password={password};";
+            else
+                connectionString += @$"Trusted_Connection=True;";
+
+            optionsBuilder.UseSqlServer(connectionString);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<ExcludingServiceCodeCaseFiltersCollection>();
+            modelBuilder.Entity<ServiceCodeCaseFiltersCollection>();
+            modelBuilder.Entity<TreatmentPurposeCaseFiltersCollection>();
+            modelBuilder.Entity<VisitPurposeCaseFiltersCollection>();
+
+            modelBuilder.Entity<BedDaysIndicator>();
+            modelBuilder.Entity<CasesIndicator>();
+            modelBuilder.Entity<CostIndicator>();
+            modelBuilder.Entity<LaborCostIndicator>();
+            modelBuilder.Entity<VisitsIndicator>();
+            modelBuilder.Entity<CasesLaborCostIndicator>();
+            modelBuilder.Entity<VisitsLaborCostIndicator>();
+
+
             modelBuilder.Entity<Register>()
                 .HasMany(x => x.Cases)
                 .WithOne()
@@ -63,7 +98,7 @@ namespace CHI.Services
             modelBuilder.Entity<PlanningPermision>()
                 .HasOne(x => x.User)
                 .WithMany(x => x.PlanningPermisions)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<PlanningPermision>()
                 .HasOne(x => x.Department)
@@ -76,7 +111,7 @@ namespace CHI.Services
                 .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<Component>()
-                .HasMany(x => x.CaseFilters)
+                .HasMany(x => x.CaseFiltersCollections)
                 .WithOne()
                 .OnDelete(DeleteBehavior.Cascade);
 
@@ -85,7 +120,12 @@ namespace CHI.Services
                 .WithOne(x => x.Component)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<Indicator>()
+            modelBuilder.Entity<CaseFiltersCollectionBase>()
+                .HasMany(x => x.Filters)
+                .WithOne()
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<IndicatorBase>()
                 .HasMany(x => x.Ratios)
                 .WithOne()
                 .OnDelete(DeleteBehavior.Cascade);

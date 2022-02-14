@@ -6,14 +6,14 @@
 
         public int Month { get; set; }
         public int Year { get; set; }
-        public Indicator Indicator { get; set; }
+        public IndicatorBase Indicator { get; set; }
         public Parameter Parameter { get; set; }
         public double Value { get; set; }
 
         public Plan()
         {
         }
-        public Plan(Indicator indicator, Parameter parameter)
+        public Plan(IndicatorBase indicator, Parameter parameter)
         {
             Indicator = indicator;
             Parameter = parameter;

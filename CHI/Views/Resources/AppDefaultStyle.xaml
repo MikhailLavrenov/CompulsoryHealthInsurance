@@ -216,7 +216,7 @@
                 Value="5" />
         <Setter Property="VerticalAlignment"
                 Value="Center" />
-        <Setter Property="ItemTemplate">
+        <!--<Setter Property="ItemTemplate">
             <Setter.Value>
                 <DataTemplate>
                     <TextBlock Text="{Binding Path=Value}"
@@ -224,7 +224,7 @@
                                Margin="0" />
                 </DataTemplate>
             </Setter.Value>
-        </Setter>
+        </Setter>-->
     </Style>
 
     <!--Separator-->

@@ -88,7 +88,7 @@ namespace CHI.Infrastructure
                 formatter.Serialize(mstream, signedLicense.License);
                 var licenseBytes = mstream.ToArray();
 
-                if (!cryptoProvider.VerifyData(licenseBytes, new SHA512CryptoServiceProvider(), signedLicense.Sign))
+                if (!cryptoProvider.VerifyData(licenseBytes,  SHA512.Create(), signedLicense.Sign))
                     throw new InvalidOperationException("Ошибка проверки лицензии: подпись не соответствует лицензии.");
             }
 

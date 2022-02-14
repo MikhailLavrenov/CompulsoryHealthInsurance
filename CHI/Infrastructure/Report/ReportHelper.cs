@@ -37,7 +37,7 @@ namespace CHI.Infrastructure
 
         public static HeaderItem CreateHeaderItemRecursive(Component component, HeaderItem parent)
         {
-            var subItemNames = component.Indicators.Select(x => x.FacadeKind.GetShortDescription()).ToList();
+            var subItemNames = component.Indicators.Select(x => x.ShortDescription).ToList();
 
             var headerItem = new HeaderItem(component.Name, null, component.HexColor, false, false, component.Childs.Any(), parent, subItemNames);
 

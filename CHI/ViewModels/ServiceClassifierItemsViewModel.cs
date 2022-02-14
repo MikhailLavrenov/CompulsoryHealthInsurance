@@ -167,7 +167,7 @@ namespace CHI.ViewModels
 
         private void Refresh()
         {
-            dbContext = new AppDBContext(settings.Common.SQLServer, settings.Common.SQLServerDB);
+            dbContext = new AppDBContext(settings.Common.SqlServer, settings.Common.SqlDatabase, settings.Common.SqlLogin, settings.Common.SqlPassword);
 
             CurrentServiceClassifier = dbContext.ServiceClassifiers.Where(x => x.Id == CurrentServiceClassifier.Id).Include(x => x.ServiceClassifierItems).First();
 

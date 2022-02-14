@@ -84,7 +84,7 @@ namespace CHI.Licensing
                 formatter.Serialize(mstream, license);
                 mstream.Position = 0;
 
-                signedLicense.Sign = cryptoProvider.SignData(mstream, new SHA512CryptoServiceProvider());
+                signedLicense.Sign = cryptoProvider.SignData(mstream,  SHA512.Create());
 
                 formatter = new XmlSerializer(signedLicense.GetType());
                 formatter.Serialize(stream, signedLicense);

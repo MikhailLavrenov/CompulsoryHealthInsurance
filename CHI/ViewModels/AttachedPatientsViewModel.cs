@@ -67,7 +67,7 @@ namespace CHI.ViewModels
 
             var dbLoadingTask = Task.Run(() =>
             {
-                var dbContext = new AppDBContext(Settings.Common.SQLServer, Settings.Common.SQLServerDB);
+                var dbContext = new AppDBContext(Settings.Common.SqlServer, Settings.Common.SqlDatabase, Settings.Common.SqlLogin, Settings.Common.SqlPassword);
                 dbContext.Patients.Load();
                 return dbContext;
             });
