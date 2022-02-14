@@ -3,9 +3,20 @@ using System.Linq;
 
 namespace CHI.Models.ServiceAccounting
 {
-    public class CostIndicator : Indicator
+    public class CostIndicator : IndicatorBase
     {
-        public override double CalculateValue(List<Case> cases, bool isPaymentAccepted)
+        public override string Description => "Стоимость";
+        public override string ShortDescription => "Стоим";
+
+
+        //static CostIndicator()
+        //{
+        //    Description = "Стоимость";
+        //    ShortDescription = "Стоим";
+        //}
+
+
+        protected override double CalculateCases(List<Case> cases, bool isPaymentAccepted)
         {
             if (isPaymentAccepted)
                 return cases

@@ -25,7 +25,7 @@ namespace CHI.ViewModels
         List<HeaderItem> rowHeaders;
         List<HeaderItem> columnHeaders;
         GridItem[][] gridItems;
-        Dictionary<GridItem, (Parameter, Indicator)> gridItemDataComparator;
+        Dictionary<GridItem, (Parameter, IndicatorBase)> gridItemDataComparator;
         IMainRegionService mainRegionService;
         IFileDialogService fileDialogService;
         ReportService reportService;
@@ -51,7 +51,7 @@ namespace CHI.ViewModels
         {
             this.settings = settings.ServiceAccounting;
 
-            dbContext = new AppDBContext(settings.Common.SQLServer, settings.Common.SQLServerDB);
+            dbContext = new AppDBContext(settings.Common.SqlServer, settings.Common.SqlDatabase, settings.Common.SqlLogin, settings.Common.SqlPassword);
 
             this.mainRegionService = mainRegionService;
             this.fileDialogService = fileDialogService;
@@ -191,7 +191,7 @@ namespace CHI.ViewModels
 
             dbContext.Components
                 .Include(x => x.Indicators).ThenInclude(x => x.Ratios)
-                .Include(x => x.CaseFilters)
+                .Include(x => x.CaseFiltersCollections).ThenInclude(x =>x.Filters)
                 .Load();
 
             dbContext.Departments.Local.ToList().ForEach(x => x.Childs = x.Childs.OrderBy(x => x.Order).ToList());
@@ -228,7 +228,7 @@ namespace CHI.ViewModels
             var parameters = rootDepartment.ToListRecursive().Skip(1).SelectMany(x => x.Parameters.Concat(x.Employees.SelectMany(y => y.Parameters))).ToList();
             var indicators = rootComponent.ToListRecursive().Skip(1).SelectMany(x => x.Indicators).ToList();
 
-            gridItemDataComparator = new Dictionary<GridItem, (Parameter, Indicator)>();
+            gridItemDataComparator = new Dictionary<GridItem, (Parameter, IndicatorBase)>();
 
             for (int row = 0; row < parameters.Count; row++)
                 for (int col = 0; col < indicators.Count; col++)

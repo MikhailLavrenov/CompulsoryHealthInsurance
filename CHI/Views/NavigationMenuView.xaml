@@ -95,7 +95,8 @@
 
             <Button Style="{StaticResource MenuButton}"
                     Background="#1976d2"
-                    CommandParameter="{x:Type v:ReportView}">
+                    CommandParameter="{x:Type v:ReportView}"
+                    Cursor="Hand">
                 <DockPanel>
                     <materialDesign:PackIcon Style="{StaticResource ButtonIcon}"
                                              Kind="ChartAreaspline" />

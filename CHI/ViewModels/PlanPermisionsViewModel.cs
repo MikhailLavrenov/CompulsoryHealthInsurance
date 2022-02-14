@@ -28,7 +28,7 @@ namespace CHI.ViewModels
 
             mainRegionService.Header = "Отделения пользователя";
 
-            dbContext = new AppDBContext(settings.Common.SQLServer, settings.Common.SQLServerDB);
+            dbContext = new AppDBContext(settings.Common.SqlServer, settings.Common.SqlDatabase, settings.Common.SqlLogin, settings.Common.SqlPassword);
 
             Departments = dbContext.Departments.Where(x => !x.IsRoot).AsEnumerable().Select(x => new SelectedObject<Department>(false, x)).ToList();
         }

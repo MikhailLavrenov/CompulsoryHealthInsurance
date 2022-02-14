@@ -34,7 +34,7 @@ namespace CHI.ViewModels
 
             mainRegionService.Header = "Учетные записи Windows";
 
-            dbContext = new AppDBContext(settings.Common.SQLServer, settings.Common.SQLServerDB);
+            dbContext = new AppDBContext(settings.Common.SqlServer, settings.Common.SqlDatabase, settings.Common.SqlLogin, settings.Common.SqlPassword);
 
             accountService = new WindowsAccountsService(settings.ServiceAccounting.DomainName, settings.ServiceAccounting.DomainUsersRootOU);
 

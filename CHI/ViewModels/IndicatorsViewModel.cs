@@ -15,17 +15,19 @@ namespace CHI.ViewModels
     public class IndicatorsViewModel : DomainObject, IRegionMemberLifetime, INavigationAware
     {
         AppDBContext dbContext;
-        ObservableCollection<Indicator> indicators;
+        ObservableCollection<IndicatorBase> indicators;
         Component currentComponent;
-        Indicator currentIndicator;
+        IndicatorBase currentIndicator;
+        Type newKind;
         AppSettings settings;
         IMainRegionService mainRegionService;
 
         public bool KeepAlive { get; set; }
-        public Indicator CurrentIndicator { get => currentIndicator; set => SetProperty(ref currentIndicator, value); }
+        public IndicatorBase CurrentIndicator { get => currentIndicator; set => SetProperty(ref currentIndicator, value); }
         public Component CurrentComponent { get => currentComponent; set => SetProperty(ref currentComponent, value); }
-        public ObservableCollection<Indicator> Indicators { get => indicators; set => SetProperty(ref indicators, value); }
-        public List<KeyValuePair<Enum, string>> IndicatorKinds { get; } = Helpers.GetAllValuesAndDescriptions(typeof(IndicatorKind));
+        public ObservableCollection<IndicatorBase> Indicators { get => indicators; set => SetProperty(ref indicators, value); }
+        public Type NewKind { get => newKind; set => SetProperty(ref newKind, value); }
+        public List<Tuple<Type, string>> Kinds { get; }
 
         public DelegateCommand AddCommand { get; }
         public DelegateCommand DeleteCommand { get; }
@@ -37,8 +39,18 @@ namespace CHI.ViewModels
         {
             this.settings = settings;
             this.mainRegionService = mainRegionService;
+            Kinds = new List<Tuple<Type, string>>
+            {
+                new Tuple<Type, string>(typeof(CasesIndicator), new CasesIndicator().Description),
+                new Tuple<Type, string>(typeof(VisitsIndicator), new VisitsIndicator().Description),
+                new Tuple<Type, string>(typeof(LaborCostIndicator), new LaborCostIndicator().Description),                                
+                new Tuple<Type, string>(typeof(CasesLaborCostIndicator), new CasesLaborCostIndicator().Description),                                                
+                new Tuple<Type, string>(typeof(VisitsLaborCostIndicator), new VisitsLaborCostIndicator().Description),
+                new Tuple<Type, string>(typeof(BedDaysIndicator), new BedDaysIndicator().Description),
+                new Tuple<Type, string>(typeof(CostIndicator), new CostIndicator().Description),
+            };
 
-            dbContext = new AppDBContext(settings.Common.SQLServer, settings.Common.SQLServerDB);
+            dbContext = new AppDBContext(settings.Common.SqlServer, settings.Common.SqlDatabase, settings.Common.SqlLogin, settings.Common.SqlPassword);
 
             AddCommand = new DelegateCommand(AddExecute);
             DeleteCommand = new DelegateCommand(DeleteExecute, () => CurrentIndicator != null).ObservesProperty(() => CurrentIndicator);
@@ -47,20 +59,19 @@ namespace CHI.ViewModels
             NavigateCommand = new DelegateCommand<Type>(NavigateExecute);
         }
 
-        private void AddExecute()
+
+        void AddExecute()
         {
-            var newIndicator = new Indicator
-            {
-                Component = CurrentComponent,
-                Order = Indicators.Count == 0 ? 0 : Indicators.Last().Order + 1
-            };
+            var newIndicator = (IndicatorBase)Activator.CreateInstance(newKind);
+            newIndicator.Component = CurrentComponent;
+            newIndicator.Order = Indicators.Count == 0 ? 0 : Indicators.Last().Order + 1;
 
             Indicators.Add(newIndicator);
 
             CurrentComponent.Indicators.Add(newIndicator);
         }
 
-        private void DeleteExecute()
+        void DeleteExecute()
         {
             var offset = Indicators.IndexOf(CurrentIndicator);
 
@@ -72,13 +83,13 @@ namespace CHI.ViewModels
                 Indicators[i].Order--;
         }
 
-        private bool MoveUpCanExecute()
+        bool MoveUpCanExecute()
         {
             return CurrentIndicator != null
                 && CurrentIndicator.Order != 0;
         }
 
-        private void MoveUpExecute()
+        void MoveUpExecute()
         {
             var itemIndex = Indicators.IndexOf(CurrentIndicator);
 
@@ -93,13 +104,13 @@ namespace CHI.ViewModels
             MoveUpCommand.RaiseCanExecuteChanged();
         }
 
-        private bool MoveDownCanExecute()
+        bool MoveDownCanExecute()
         {
             return CurrentIndicator != null
                 && CurrentIndicator != Indicators.Last();
         }
 
-        private void MoveDownExecute()
+        void MoveDownExecute()
         {
             var itemIndex = Indicators.IndexOf(CurrentIndicator);
 
@@ -114,12 +125,12 @@ namespace CHI.ViewModels
             MoveUpCommand.RaiseCanExecuteChanged();
         }
 
-        private void NavigateExecute(Type view)
+        void NavigateExecute(Type view)
         {
             KeepAlive = true;
 
             var navigationParameters = new NavigationParameters();
-            navigationParameters.Add(nameof(Indicator), CurrentIndicator);
+            navigationParameters.Add(nameof(IndicatorBase), CurrentIndicator);
             mainRegionService.RequestNavigate(view.Name, navigationParameters, true);
         }
 
@@ -132,7 +143,7 @@ namespace CHI.ViewModels
 
                 CurrentComponent = dbContext.Components.Where(x => x.Id == CurrentComponent.Id).Include(x => x.Indicators).First();
 
-                Indicators = new ObservableCollection<Indicator>(CurrentComponent.Indicators?.OrderBy(x => x.Order).ToList() ?? new List<Indicator>());
+                Indicators = new ObservableCollection<IndicatorBase>(CurrentComponent.Indicators?.OrderBy(x => x.Order).ToList() ?? new List<IndicatorBase>());
             }
 
             mainRegionService.Header = $"{CurrentComponent.Name} > Показатели";

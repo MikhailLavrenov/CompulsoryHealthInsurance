@@ -20,6 +20,13 @@
         <StackPanel DockPanel.Dock="Top"
                     Orientation="Horizontal">
 
+            <ComboBox ItemsSource="{Binding Kinds}"
+                      SelectedValuePath="Item1"
+                      DisplayMemberPath="Item2"
+                      SelectedValue="{Binding NewKind, UpdateSourceTrigger=PropertyChanged}"
+                      SelectedIndex="0"
+                      MinWidth="200" />
+            
             <Button Style="{StaticResource IconButton}"
                     Command="{Binding AddCommand}">
                 <Viewbox Stretch="Uniform">
@@ -70,7 +77,7 @@
                                     Binding="{Binding Order}"
                                     MinWidth="80" />-->
 
-                <materialDesign:DataGridComboBoxColumn Header="Внешний вид"
+                <!--<materialDesign:DataGridComboBoxColumn Header="Внешний вид"
                                                        ItemsSource="{Binding DataContext.IndicatorKinds, Source={x:Reference proxyElement}, Mode=OneTime}"
                                                        SelectedValuePath="Key"
                                                        DisplayMemberPath="Value"
@@ -82,7 +89,11 @@
                                                        SelectedValuePath="Key"
                                                        DisplayMemberPath="Value"
                                                        SelectedValueBinding="{Binding ValueKind}"
-                                                       MinWidth="200" />
+                                                       MinWidth="200" />-->
+
+                <DataGridTextColumn Header="Вид"
+                                    Binding="{Binding Description}"
+                                    MinWidth="100" />
 
                 <DataGridTemplateColumn Header="Коэффициенты"
                                             MinWidth="80">

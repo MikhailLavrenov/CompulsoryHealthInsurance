@@ -51,7 +51,7 @@ namespace CHI.ViewModels
 
             mainRegionService.Header = "Штатные единицы";
 
-            dbContext = new AppDBContext(settings.Common.SQLServer, settings.Common.SQLServerDB);
+            dbContext = new AppDBContext(settings.Common.SqlServer, settings.Common.SqlDatabase, settings.Common.SqlLogin, settings.Common.SqlPassword);
 
             dbContext.Employees.Load();
             Medics = dbContext.Medics.ToList();

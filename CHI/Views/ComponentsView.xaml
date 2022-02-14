@@ -54,29 +54,29 @@
 
         </StackPanel>
 
-        <i:CustomDataGrid x:Name="datagrid1"                              
+        <i:CustomDataGrid x:Name="datagrid1"
                           ItemsSource="{Binding Components}"
-                              CanUserAddRows="False"
-                              CanUserDeleteRows="False"
-                              SelectedItem="{Binding CurrentComponent, Mode=OneWayToSource}">
+                          CanUserAddRows="False"
+                          CanUserDeleteRows="False"
+                          SelectedItem="{Binding CurrentComponent, Mode=OneWayToSource}">
 
             <DataGrid.Columns>
 
                 <DataGridTemplateColumn CellTemplate="{StaticResource DataGridDragColumn}"
-                                            IsReadOnly="True" />
-
-                <DataGridTextColumn Header="Родитель"
-                                        Binding="{Binding Parent.Name}"
-                                        MinWidth="200"
                                         IsReadOnly="True" />
 
+                <DataGridTextColumn Header="Родитель"
+                                    Binding="{Binding Parent.Name}"
+                                    MinWidth="200"
+                                    IsReadOnly="True" />
+
                 <DataGridTextColumn Header="Название"
-                                        Binding="{Binding Name}"
-                                        MinWidth="200" />
+                                    Binding="{Binding Name}"
+                                    MinWidth="200" />
 
                 <DataGridCheckBoxColumn Header="Планирование"
                                         Binding="{Binding IsCanPlanning}"
-                                        MinWidth="80"/>
+                                        MinWidth="80" />
 
                 <DataGridTemplateColumn Width="50">
                     <DataGridTemplateColumn.CellTemplate>
@@ -91,32 +91,16 @@
                 </DataGridTemplateColumn>
 
                 <DataGridTextColumn Header="Цвет"
-                                    MinWidth="80" 
+                                    MinWidth="80"
                                     Binding="{Binding HexColor}" />
 
                 <DataGridTemplateColumn Header="Показатели"
-                                            MinWidth="80">
+                                        MinWidth="80">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Button Style="{StaticResource DataGridRowButton}"
                                     Command="{Binding DataContext.NavigateCommand, Source={x:Reference datagrid1}}"
-                                        CommandParameter="{x:Type v:IndicatorsView}"
-                                        Visibility="{Binding IsRoot, Converter={i:InvertedBoolToVisibleConverter}}">
-                                <Viewbox Stretch="Uniform">
-                                    <materialDesign:PackIcon Kind="EllipsisHorizontalCircle" />
-                                </Viewbox>
-                            </Button>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-
-                <DataGridTemplateColumn Header="Фильтр случаев"
-                                        MinWidth="120">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <Button Style="{StaticResource DataGridRowButton}"
-                                    Command="{Binding DataContext.NavigateCommand, Source={x:Reference datagrid1}}"
-                                    CommandParameter="{x:Type v:CaseFiltersView}"
+                                    CommandParameter="{x:Type v:IndicatorsView}"
                                     Visibility="{Binding IsRoot, Converter={i:InvertedBoolToVisibleConverter}}">
                                 <Viewbox Stretch="Uniform">
                                     <materialDesign:PackIcon Kind="EllipsisHorizontalCircle" />
@@ -125,6 +109,27 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn Header="Условия отбора"
+                                        MinWidth="110">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Style="{StaticResource DataGridRowButton}"
+                                    Command="{Binding DataContext.NavigateCommand, Source={x:Reference datagrid1}}"
+                                    CommandParameter="{x:Type v:CaseFiltersView}"
+                                    Visibility="{Binding IsRoot, Converter={i:InvertedBoolToVisibleConverter}}"
+                                    IsEnabled="{Binding IsTotal,Converter={i:InvertBoolConverter}}" >
+                            <Viewbox Stretch="Uniform">
+                                    <materialDesign:PackIcon Kind="EllipsisHorizontalCircle" />
+                                </Viewbox>
+                            </Button>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridCheckBoxColumn Header="Сумма"
+                                        MinWidth="60"
+                                        Binding="{Binding IsTotal, UpdateSourceTrigger=PropertyChanged}" />
 
             </DataGrid.Columns>
 

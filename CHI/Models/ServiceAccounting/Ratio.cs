@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CHI.Infrastructure;
+using System;
 
 namespace CHI.Models.ServiceAccounting
 {
@@ -11,6 +12,8 @@ namespace CHI.Models.ServiceAccounting
         public DateTime? ValidFrom { get; set; }
         public DateTime? ValidTo { get; set; }
 
+        public bool IsValidForPeriod(int month, int year)
+            => Helpers.BetweenDates(ValidFrom, ValidTo, month, year);
 
         public double Apply(double value)
             => value * Multiplier / Divider;

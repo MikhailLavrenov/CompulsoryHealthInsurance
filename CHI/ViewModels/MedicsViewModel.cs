@@ -35,7 +35,7 @@ namespace CHI.ViewModels
 
             mainRegionService.Header = "Медицинские работники";
 
-            dbContext = new AppDBContext(settings.Common.SQLServer, settings.Common.SQLServerDB);
+            dbContext = new AppDBContext(settings.Common.SqlServer, settings.Common.SqlDatabase, settings.Common.SqlLogin, settings.Common.SqlPassword);
             dbContext.Medics.Load();
             Medics = dbContext.Medics.Local.ToObservableCollection();
 
@@ -75,7 +75,7 @@ namespace CHI.ViewModels
 
             dbContext.SaveChanges();
 
-            dbContext = new AppDBContext(settings.Common.SQLServer, settings.Common.SQLServerDB);
+            dbContext = new AppDBContext(settings.Common.SqlServer, settings.Common.SqlDatabase, settings.Common.SqlLogin, settings.Common.SqlPassword);
             dbContext.Medics.Load();
             Medics = dbContext.Medics.Local.ToObservableCollection();
 

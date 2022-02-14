@@ -108,7 +108,7 @@ namespace CHI
             try
             {
                 var settings = Container.Resolve<AppSettings>();
-                dbContext = new AppDBContext(settings.Common.SQLServer, settings.Common.SQLServerDB);
+                dbContext = new AppDBContext(settings.Common.SqlServer, settings.Common.SqlDatabase, settings.Common.SqlLogin, settings.Common.SqlPassword);
                 currentUser = dbContext.Users.Where(x => x.Sid == sid).Include(x => x.PlanningPermisions).FirstOrDefault();
             }
             catch (Exception)
