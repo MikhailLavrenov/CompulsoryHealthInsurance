@@ -15,14 +15,14 @@ namespace CHI.ViewModels
     {
         AppDBContext dbContext;
         ObservableCollection<Ratio> ratios;
-        Indicator currentIndicator;
+        IndicatorBase currentIndicator;
         Ratio currentRatio;
         private readonly AppSettings settings;
         IMainRegionService mainRegionService;
 
         public bool KeepAlive { get => false; }
         public Ratio CurrentRatio { get => currentRatio; set => SetProperty(ref currentRatio, value); }
-        public Indicator CurrentIndicator { get => currentIndicator; set => SetProperty(ref currentIndicator, value); }
+        public IndicatorBase CurrentIndicator { get => currentIndicator; set => SetProperty(ref currentIndicator, value); }
         public ObservableCollection<Ratio> Ratios { get => ratios; set => SetProperty(ref ratios, value); }
 
 
@@ -34,7 +34,7 @@ namespace CHI.ViewModels
             this.settings = settings;
             this.mainRegionService = mainRegionService;
 
-            dbContext = new AppDBContext(settings.Common.SQLServer, settings.Common.SQLServerDB);
+            dbContext = new AppDBContext(settings.Common.SqlServer, settings.Common.SqlDatabase, settings.Common.SqlLogin, settings.Common.SqlPassword);
 
             AddCommand = new DelegateCommand(AddExecute);
             DeleteCommand = new DelegateCommand(DeleteExecute, () => CurrentRatio != null).ObservesProperty(() => CurrentRatio);
@@ -58,9 +58,9 @@ namespace CHI.ViewModels
 
         public void OnNavigatedTo(NavigationContext navigationContext)
         {
-            if (navigationContext.Parameters.ContainsKey(nameof(Indicator)))
+            if (navigationContext.Parameters.ContainsKey(nameof(IndicatorBase)))
             {
-                CurrentIndicator = navigationContext.Parameters.GetValue<Indicator>(nameof(Indicator));
+                CurrentIndicator = navigationContext.Parameters.GetValue<IndicatorBase>(nameof(IndicatorBase));
 
                 CurrentIndicator = dbContext.Indicators.Where(x => x.Id == CurrentIndicator.Id).Include(x => x.Ratios).First();
 
@@ -70,7 +70,7 @@ namespace CHI.ViewModels
                 Ratios = new ObservableCollection<Ratio>(CurrentIndicator.Ratios);
             }
 
-            mainRegionService.Header = $"{CurrentIndicator.FacadeKind.GetDescription()} > Коэффициенты";
+            mainRegionService.Header = $"{CurrentIndicator.Description} > Коэффициенты";
         }
 
         public bool IsNavigationTarget(NavigationContext navigationContext)

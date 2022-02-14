@@ -34,7 +34,7 @@ namespace CHI.ViewModels
 
             this.mainRegionService.Header = "База данных прикрепленных пациентов";
 
-            Task.Run(() => PatientsCount = new AppDBContext(settings.Common.SQLServer, settings.Common.SQLServerDB).Patients.Count().ToString());
+            Task.Run(() => PatientsCount = new AppDBContext(settings.Common.SqlServer, settings.Common.SqlDatabase, settings.Common.SqlLogin, settings.Common.SqlPassword).Patients.Count().ToString());
 
             ImportPatientsCommand = new DelegateCommandAsync(ImportPatientsExecute);
             SaveExampleCommand = new DelegateCommandAsync(SaveExampleExecute);
@@ -58,7 +58,7 @@ namespace CHI.ViewModels
             var newPatients = importReader.GetPatients();
 
             mainRegionService.ShowProgressBar("Проверка значений.");
-            var db = new AppDBContext(settings.Common.SQLServer, settings.Common.SQLServerDB);
+            var db = new AppDBContext(settings.Common.SqlServer, settings.Common.SqlDatabase, settings.Common.SqlLogin, settings.Common.SqlPassword);
             db.Patients.Load();
 
             var existenInsuaranceNumbers = new HashSet<string>(db.Patients.Select(x => x.InsuranceNumber));
@@ -109,7 +109,7 @@ namespace CHI.ViewModels
                 return;
             }
 
-            var db = new AppDBContext(settings.Common.SQLServer, settings.Common.SQLServerDB);
+            var db = new AppDBContext(settings.Common.SqlServer, settings.Common.SqlDatabase, settings.Common.SqlLogin, settings.Common.SqlPassword);
 
             db.Database.EnsureDeleted();
             db.Database.EnsureCreated();

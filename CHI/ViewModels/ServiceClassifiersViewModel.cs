@@ -34,7 +34,7 @@ namespace CHI.ViewModels
             this.settings = settings;
             this.mainRegionService = mainRegionService;
 
-            dbContext = new AppDBContext(settings.Common.SQLServer, settings.Common.SQLServerDB);
+            dbContext = new AppDBContext(settings.Common.SqlServer, settings.Common.SqlDatabase, settings.Common.SqlLogin, settings.Common.SqlPassword);
 
             dbContext.ServiceClassifiers.Load();
 
@@ -71,7 +71,7 @@ namespace CHI.ViewModels
         {
             mainRegionService.ShowProgressBar("Пересчет стоимости");
 
-            var tempContext = new AppDBContext(settings.Common.SQLServer, settings.Common.SQLServerDB);
+            var tempContext = new AppDBContext(settings.Common.SqlServer, settings.Common.SqlDatabase, settings.Common.SqlLogin, settings.Common.SqlPassword);
 
             var classifierItems = tempContext.ServiceClassifiers
                 .Where(x => x.Id == CurrentServiceClassifier.Id)

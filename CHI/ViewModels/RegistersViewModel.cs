@@ -63,7 +63,7 @@ namespace CHI.ViewModels
             var registerService = new BillsRegisterService();
             var register = registerService.GetRegister(fileDialogService.FileNames);
 
-            using var localDbContext = new AppDBContext(settings.Common.SQLServer, settings.Common.SQLServerDB);
+            using var localDbContext = new AppDBContext(settings.Common.SqlServer, settings.Common.SqlDatabase, settings.Common.SqlLogin, settings.Common.SqlPassword);
 
             var registerForSamePeriod = localDbContext.Registers.FirstOrDefault(x => x.Month == register.Month && x.Year == register.Year);
 
@@ -227,7 +227,7 @@ namespace CHI.ViewModels
             var registerService = new BillsRegisterService();
             var paidRegister = registerService.GetRegister(fileDialogService.FileNames);
 
-            var dbContext = new AppDBContext(settings.Common.SQLServer, settings.Common.SQLServerDB);
+            var dbContext = new AppDBContext(settings.Common.SqlServer, settings.Common.SqlDatabase, settings.Common.SqlLogin, settings.Common.SqlPassword);
 
             var register = dbContext.Registers.Where(x => x.Month == paidRegister.Month && x.Year == paidRegister.Year).Include(x => x.Cases).FirstOrDefault();
 
@@ -256,7 +256,7 @@ namespace CHI.ViewModels
 
         private void Refresh()
         {
-            dbContext = new AppDBContext(settings.Common.SQLServer, settings.Common.SQLServerDB);
+            dbContext = new AppDBContext(settings.Common.SqlServer, settings.Common.SqlDatabase,settings.Common.SqlLogin, settings.Common.SqlPassword);
             dbContext.Registers.Load();
             Registers = new ObservableCollection<Register>(dbContext.Registers.Local.OrderByDescending(x => x.Month).OrderByDescending(x => x.Year));
         }

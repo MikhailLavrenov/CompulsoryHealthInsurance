@@ -38,7 +38,7 @@ namespace CHI.ViewModels
 
             mainRegionService.Header = "Подразделения";
 
-            dbContext = new AppDBContext(settings.Common.SQLServer, settings.Common.SQLServerDB);
+            dbContext = new AppDBContext(settings.Common.SqlServer, settings.Common.SqlDatabase, settings.Common.SqlLogin, settings.Common.SqlPassword);
             dbContext.Departments.Include(x => x.Employees).Load();
 
             root = dbContext.Departments.Local.Where(x => x.IsRoot).FirstOrDefault();

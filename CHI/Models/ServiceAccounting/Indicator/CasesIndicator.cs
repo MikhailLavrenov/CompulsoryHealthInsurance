@@ -1,11 +1,21 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 
 namespace CHI.Models.ServiceAccounting
 {
-    public class CasesIndicator : Indicator
+    public class CasesIndicator : IndicatorBase
     {
-        public override double CalculateValue(List<Case> cases, bool isPaymentAccepted)
+        public override string Description => "Cлучаи";
+        public override string ShortDescription => "Cлуч";
+
+
+        //static CasesIndicator()
+        //{
+        //    Description = "Cлучаи";
+        //    ShortDescription = "Cлуч";
+        //}
+
+
+        protected override double CalculateCases(List<Case> cases, bool isPaymentAccepted)
             => cases.Count;
     }
 }

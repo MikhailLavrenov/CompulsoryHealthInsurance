@@ -37,7 +37,7 @@ namespace CHI.ViewModels
             this.container = container;
             currentAppUser = currentUser;
 
-            dbContext = new AppDBContext(settings.Common.SQLServer, settings.Common.SQLServerDB);
+            dbContext = new AppDBContext(settings.Common.SqlServer, settings.Common.SqlDatabase, settings.Common.SqlLogin, settings.Common.SqlPassword);
 
             dbContext.Users.Load();
 
