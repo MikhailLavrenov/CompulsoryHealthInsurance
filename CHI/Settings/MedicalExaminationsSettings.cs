@@ -26,6 +26,12 @@ namespace CHI.Settings
         [XmlIgnore] public bool ConnectionIsValid { get => connectionIsValid; set => SetProperty(ref connectionIsValid, value); }
 
 
+        public MedicalExaminationsSettings()
+        {
+            Credential = new();
+        }
+
+
         public override void Validate(string propertyName)
         {
             switch (propertyName)

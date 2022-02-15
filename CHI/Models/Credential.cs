@@ -1,5 +1,4 @@
 ﻿using CHI.Infrastructure;
-using CHI.Services;
 using System;
 using System.Security.Cryptography;
 using System.Text;
@@ -9,11 +8,11 @@ namespace CHI.Models
 {
     public class Credential : DomainObject, ICredential
     {
-        private string login;
-        private string password;
+        string login;
+        string password;
 
 
-        [XmlIgnore] public string Login { get => login; set => SetProperty(ref login, value); }        
+        [XmlIgnore] public string Login { get => login; set => SetProperty(ref login, value); }
         [XmlIgnore] public string Password { get => password; set => SetProperty(ref password, value); }
         public string ProtectedLogin { get; set; }
         public string ProtectedPassword { get; set; }
