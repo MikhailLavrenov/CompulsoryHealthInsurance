@@ -10,7 +10,7 @@ namespace CHI.Settings
         string address;
         byte maxDegreeOfParallelism;
         uint srzRequestsLimit;
-        Credential srzCredential;
+        Credential credential;
         bool connectionIsValid;
         bool downloadNewPatientsFile;
 
@@ -18,9 +18,15 @@ namespace CHI.Settings
         public string Address { get => address; set => SetProperty(ref address, AppSettings.FixUrl(value)); }
         public byte MaxDegreeOfParallelism { get => maxDegreeOfParallelism; set => SetProperty(ref maxDegreeOfParallelism, value); }
         public uint RequestsLimit { get => srzRequestsLimit; set => SetProperty(ref srzRequestsLimit, value); }
-        public Credential Credential { get => srzCredential; set => SetProperty(ref srzCredential, value); }
+        public Credential Credential { get => credential; set => SetProperty(ref credential, value); }
         [XmlIgnore] public bool ConnectionIsValid { get => connectionIsValid; set => SetProperty(ref connectionIsValid, value); }
         public bool DownloadNewPatientsFile { get => downloadNewPatientsFile; set => SetProperty(ref downloadNewPatientsFile, value); }
+
+
+        public SrzSettings()
+        {
+            Credential = new();
+        }
 
 
         public override void Validate(string propertyName)
