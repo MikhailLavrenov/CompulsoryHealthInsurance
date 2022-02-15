@@ -7,7 +7,6 @@ namespace CHI.Infrastructure
     //Присоединненное свойство для привязки пароля в PasswordBox
     public static class PasswordBoxHelper
     {
-        #region Свойства
         /// <summary>
         /// Свойство зависимостей связанное с паролем PasswordBox
         /// </summary>
@@ -15,17 +14,13 @@ namespace CHI.Infrastructure
             nameof(BoundPassword),
             typeof(string),
             typeof(PasswordBoxHelper),
-             new FrameworkPropertyMetadata(string.Empty, OnBoundPasswordChanged)
+             new FrameworkPropertyMetadata(null, OnBoundPasswordChanged)
              {
                  BindsTwoWayByDefault = true,
                  DefaultUpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
              });
-        #endregion
 
-        #region Конструкторы
-        #endregion
 
-        #region Методы
         public static string GetBoundPassword(DependencyObject dp)
         {
             return (string)dp.GetValue(BoundPassword);
@@ -57,6 +52,5 @@ namespace CHI.Infrastructure
 
             SetBoundPassword(passwordBox, passwordBox.Password);
         }
-        #endregion
     }
 }
