@@ -107,7 +107,7 @@ namespace CHI.Licensing
             ShowSave = false;
             ShowLicense = false;
 
-            licenseAdmin.SingAndSaveLicense(CurrentLicense, fileDialogService.FileName);
+            licenseAdmin.SignAndSaveLicense(CurrentLicense, fileDialogService.FileName);
             Status = "Лицензия сохранена.";
         }
         #endregion

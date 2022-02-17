@@ -11,9 +11,10 @@ namespace CHI.Licensing
     /// </summary>
     internal sealed class LicenseAdmin : LicenseManager
     {
-        private static readonly int KeySize = 2048;
-        private static readonly string secretKeyName = "licensing.skey";
-        private bool SecretKeyLoaded;
+        static readonly int KeySize = 2048;
+        static readonly string secretKeyName = "licensing.skey";
+        bool SecretKeyLoaded;
+
 
         /// <summary>
         /// Полный путь к ключевой паре подписи лицензий.
@@ -23,6 +24,7 @@ namespace CHI.Licensing
         /// Полный путь к открытому ключу проверки подписи лицензий.
         /// </summary>
         internal string PublicKeyPath { get; }
+
 
         /// <summary>
         /// Конструктор. Вызывает инициализацию класса.
@@ -35,8 +37,9 @@ namespace CHI.Licensing
             Initialize();
         }
 
+
         /// <summary>
-        /// Инициализирует класс: загржуает ключевую пару подписи лицензий.
+        /// Инициализирует класс: загружает ключевую пару подписи лицензий.
         /// </summary>
         public override void Initialize()
         {
@@ -47,6 +50,7 @@ namespace CHI.Licensing
                 SecretKeyLoaded = true;
             }
         }
+
         /// <summary>
         /// Генерирует и сохраняет в файлы новую ключевую пару для подписи лицензий.
         /// </summary>
@@ -63,32 +67,31 @@ namespace CHI.Licensing
                 File.WriteAllBytes(PublicKeyPath, publicKey);
             }
         }
+
         /// <summary>
         /// Сохраняет лицензию в файл, генерирует его подпись и сохраняет подпись в файл по тому же пути и имени но с отличным расширением.
         /// </summary>
         /// <param name="license">Лицензия</param>
         /// <param name="licensePath">Полный путь для сохранения лицензии.</param>
         /// <exception cref="InvalidOperationException">Возникает когда не найден закрытый ключ для подписания лицензий.</exception>
-        internal void SingAndSaveLicense(License license, string licensePath)
+        internal void SignAndSaveLicense(License license, string licensePath)
         {
             if (!SecretKeyLoaded)
                 throw new InvalidOperationException("Ошибка генерации лицензии: отсутствует закрытый ключ.");
+            
+            var signedLicense = new SignedLicense();
+            signedLicense.License = license;
 
-            using (var stream = new FileStream(licensePath, FileMode.CreateNew))
-            {
-                var signedLicense = new SignedLicense();
-                signedLicense.License = license;
+            var licenseStream = new MemoryStream();
+            var formatter = new XmlSerializer(license.GetType());
+            formatter.Serialize(licenseStream, license);
+            licenseStream.Position = 0;
 
-                var mstream = new MemoryStream();
-                var formatter = new XmlSerializer(license.GetType());
-                formatter.Serialize(mstream, license);
-                mstream.Position = 0;
+            signedLicense.Sign = cryptoProvider.SignData(licenseStream, SHA512.Create());
 
-                signedLicense.Sign = cryptoProvider.SignData(mstream,  SHA512.Create());
-
-                formatter = new XmlSerializer(signedLicense.GetType());
-                formatter.Serialize(stream, signedLicense);
-            }
+            using var stream = new FileStream(licensePath, FileMode.CreateNew);
+            formatter = new XmlSerializer(signedLicense.GetType());
+            formatter.Serialize(stream, signedLicense);
         }
     }
 }
