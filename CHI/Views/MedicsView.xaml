@@ -20,14 +20,18 @@
                     Orientation="Horizontal">
 
                 <Button Style="{StaticResource IconButton}"
-                    Command="{Binding LoadCommand}">
+                    ToolTip="Импортировать из файла"
+                    Command="{Binding LoadCommand}"
+                    Cursor="Hand">
                     <Viewbox Stretch="Uniform">
                         <materialDesign:PackIcon Kind="Import" />
                     </Viewbox>
                 </Button>
 
                 <Button Style="{StaticResource IconButton}"
-                    Command="{Binding SaveExampleCommand}">
+                    ToolTip="Скачать пример импорта"
+                    Command="{Binding SaveExampleCommand}"
+                    Cursor="Hand">
                     <Viewbox Stretch="Uniform">
                         <materialDesign:PackIcon Kind="ContentSaveMoveOutline" />
                     </Viewbox>

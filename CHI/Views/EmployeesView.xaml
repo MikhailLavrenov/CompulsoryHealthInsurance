@@ -22,6 +22,7 @@
 
 
             <Button Style="{StaticResource IconButton}"
+                    ToolTip="Обновить"
                     Command="{Binding RefreshCommand}">
                 <Viewbox Stretch="Uniform">
                     <materialDesign:PackIcon Kind="Reload" />
@@ -29,6 +30,7 @@
             </Button>
 
             <Button Style="{StaticResource IconButton}"
+                    ToolTip="Разделить на детский и взрослый"
                     Command="{Binding SplitAgesCommand}">
                 <Viewbox Stretch="Uniform">
                     <materialDesign:PackIcon Kind="CallSplit" />
@@ -36,13 +38,16 @@
             </Button>
 
             <Button Style="{StaticResource IconButton}"
-                    Command="{Binding MergeAgesCommand}">
+                    ToolTip="Объединить детский и взрослый"
+                    Command="{Binding MergeAgesCommand}"
+                    Cursor="Hand">
                 <Viewbox Stretch="Uniform">
                     <materialDesign:PackIcon Kind="MergeType" />
                 </Viewbox>
             </Button>
 
             <Button Style="{StaticResource IconButton}"
+                    ToolTip="Переместить вверх"
                     Command="{Binding MoveUpCommand}">
                 <Viewbox Stretch="Uniform">
                     <materialDesign:PackIcon Kind="ArrowUpward" />
@@ -50,6 +55,7 @@
             </Button>
 
             <Button Style="{StaticResource IconButton}"
+                    ToolTip="Переместить вниз"
                     Command="{Binding MoveDownCommand}">
                 <Viewbox Stretch="Uniform">
                     <materialDesign:PackIcon Kind="ArrowDownward" />

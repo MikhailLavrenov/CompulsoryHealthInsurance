@@ -128,6 +128,7 @@
                     Orientation="Horizontal">
 
             <Button Style="{StaticResource IconButton}"
+                    ToolTip="Пересчитать"
                     Command="{Binding UpdateCalculatedCellsCommand}">
                 <Viewbox Stretch="Uniform">
                     <materialDesign:PackIcon Kind="Refresh" />
@@ -135,7 +136,9 @@
             </Button>
 
             <Button Style="{StaticResource IconButton}"
-                    Command="{Binding SaveExcelCommand}">
+                    ToolTip="Выгрузить в Excel"
+                    Command="{Binding SaveExcelCommand}"
+                    Cursor="Hand">
                 <Viewbox Stretch="Uniform">
                     <materialDesign:PackIcon Kind="MicrosoftExcel" />
                 </Viewbox>

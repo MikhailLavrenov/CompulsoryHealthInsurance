@@ -21,6 +21,7 @@
                     Orientation="Horizontal">
 
             <Button Style="{StaticResource IconButton}"
+                    ToolTip="ОК"
                     Command="{Binding OkCommand}">
                 <Viewbox Stretch="Uniform">
                     <materialDesign:PackIcon Kind="Check" />
@@ -28,6 +29,7 @@
             </Button>
 
             <ToggleButton IsChecked="{Binding IsDomain}"
+                          ToolTip="Отобразить учетные записи ActiveDirectory/Локальные"
                           Style="{StaticResource MaterialDesignActionToggleButton}" Background="Transparent" Foreground="Gray">
                 <ToggleButton.Content>
                     <materialDesign:PackIcon Kind="Computer" />

@@ -21,6 +21,7 @@
                     Orientation="Horizontal">
 
             <Button Style="{StaticResource IconButton}"
+                    ToolTip="Добавить"
                     Command="{Binding AddCommand}">
                 <Viewbox Stretch="Uniform">
                     <materialDesign:PackIcon Kind="FileOutline" />
@@ -28,6 +29,7 @@
             </Button>
 
             <Button Style="{StaticResource IconRedButton}"
+                    ToolTip="Удалить"
                     Command="{Binding DeleteCommand}">
                 <Viewbox Stretch="Uniform">
                     <materialDesign:PackIcon Kind="GarbageOutline" />
@@ -35,6 +37,7 @@
             </Button>
 
             <Button Style="{StaticResource IconButton}"
+                    ToolTip="Импортировать из файла"
                     Command="{Binding LoadCommand}">
                 <Viewbox Stretch="Uniform">
                     <materialDesign:PackIcon Kind="Import" />
@@ -42,7 +45,9 @@
             </Button>
 
             <Button Style="{StaticResource IconButton}"
-                    Command="{Binding SaveExampleCommand}">
+                    ToolTip="Скачать шаблон импорта"
+                    Command="{Binding SaveExampleCommand}"
+                    Cursor="Hand">
                 <Viewbox Stretch="Uniform">
                     <materialDesign:PackIcon Kind="ContentSaveMoveOutline" />
                 </Viewbox>

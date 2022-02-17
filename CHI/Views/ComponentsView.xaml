@@ -21,6 +21,7 @@
                     Orientation="Horizontal">
 
             <Button Style="{StaticResource IconButton}"
+                    ToolTip="Добавить"
                     Command="{Binding AddCommand}"
                     Cursor="Hand">
                 <Viewbox Stretch="Uniform">
@@ -29,6 +30,7 @@
             </Button>
 
             <Button Style="{StaticResource IconRedButton}"
+                    ToolTip="Удалить"
                     Command="{Binding DeleteCommand}">
                 <Viewbox Stretch="Uniform">
                     <materialDesign:PackIcon Kind="GarbageOutline" />
@@ -38,6 +40,7 @@
             <FrameworkElement Style="{StaticResource Separator}" />
 
             <Button Style="{StaticResource IconButton}"
+                    ToolTip="Переместить вверх"
                     Command="{Binding MoveUpCommand}"
                     Cursor="Hand">
                 <Viewbox Stretch="Uniform">
@@ -46,6 +49,7 @@
             </Button>
 
             <Button Style="{StaticResource IconButton}"
+                    ToolTip="Переместить вниз"
                     Command="{Binding MoveDownCommand}">
                 <Viewbox Stretch="Uniform">
                     <materialDesign:PackIcon Kind="ArrowDownward" />

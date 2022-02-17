@@ -28,13 +28,16 @@
                       MinWidth="200" />
             
             <Button Style="{StaticResource IconButton}"
-                    Command="{Binding AddCommand}">
+                    ToolTip="Добавить"
+                    Command="{Binding AddCommand}"
+                    Cursor="Hand">
                 <Viewbox Stretch="Uniform">
                     <materialDesign:PackIcon Kind="FileOutline" />
                 </Viewbox>
             </Button>
 
             <Button Style="{StaticResource IconRedButton}"
+                    ToolTip="Удалить"
                     Command="{Binding DeleteCommand}">
                 <Viewbox Stretch="Uniform">
                     <materialDesign:PackIcon Kind="GarbageOutline" />
@@ -44,6 +47,7 @@
             <FrameworkElement Style="{StaticResource Separator}" />
 
             <Button Style="{StaticResource IconButton}"
+                    ToolTip="Переместить вверх"
                     Command="{Binding MoveUpCommand}"
                     Cursor="Hand">
                 <Viewbox Stretch="Uniform">
@@ -52,7 +56,9 @@
             </Button>
 
             <Button Style="{StaticResource IconButton}"
-                    Command="{Binding MoveDownCommand}">
+                    ToolTip="Переместить вниз"
+                    Command="{Binding MoveDownCommand}"
+                    Cursor="Hand">
                 <Viewbox Stretch="Uniform">
                     <materialDesign:PackIcon Kind="ArrowDownward" />
                 </Viewbox>

@@ -21,6 +21,7 @@
                     Orientation="Horizontal">
 
             <Button Style="{StaticResource IconButton}"
+                    ToolTip="Добавить"
                     Command="{Binding AddCommand}"
                     CommandParameter="{x:Type v:WindowsAccountsView}">
                 <Viewbox Stretch="Uniform">
@@ -29,7 +30,9 @@
             </Button>
 
             <Button Style="{StaticResource IconRedButton}"
-                    Command="{Binding DeleteCommand}">
+                    ToolTip="Удалить"
+                    Command="{Binding DeleteCommand}"
+                    Cursor="Hand">
                 <Viewbox Stretch="Uniform">
                     <materialDesign:PackIcon Kind="GarbageOutline" />
                 </Viewbox>

@@ -66,6 +66,7 @@
                     Orientation="Horizontal">
 
             <Button Style="{StaticResource IconButton}"
+                    ToolTip="Построить отчет"
                     Command="{Binding BuildReportCommand}">
                 <Viewbox Stretch="Uniform">
                     <materialDesign:PackIcon Kind="Check" />
@@ -73,6 +74,7 @@
             </Button>
 
             <Button Style="{StaticResource IconButton}"
+                    ToolTip="Выгрузить в Excel"
                     Command="{Binding SaveExcelCommand}">
                 <Viewbox Stretch="Uniform">
                     <materialDesign:PackIcon Kind="MicrosoftExcel" />
@@ -80,7 +82,9 @@
             </Button>
 
             <Button Style="{StaticResource IconButton}"
-                    Command="{Binding BuildAndSaveExcelCommand}">
+                    ToolTip="Сформировать и выгрузить в Excel отчет за месяц и нарастающий"
+                    Command="{Binding BuildAndSaveExcelCommand}"
+                    Cursor="Hand">
                 <Viewbox Stretch="Uniform">
                     <materialDesign:PackIcon Kind="ShareAllOutline" />
                 </Viewbox>

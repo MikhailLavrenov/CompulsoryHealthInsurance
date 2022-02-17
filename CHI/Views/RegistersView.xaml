@@ -24,12 +24,24 @@
 
         <StackPanel Grid.Row="0"
                     Orientation="Horizontal">
-            
-        <Button  Content="Загрузить реестр"
-                Command="{Binding LoadRegisterCommand}" />
 
-            <Button  Content="Загрузить статус оплаты"
-                     Command="{Binding LoadPaymentStateCommand}" />
+            <Button Style="{StaticResource IconButton}"
+                    ToolTip="Загрузить реестр"
+                    Command="{Binding LoadRegisterCommand}"
+                    Cursor="Hand">
+                <Viewbox Stretch="Uniform">
+                    <materialDesign:PackIcon Kind="DatabaseArrowDownOutline" />
+                </Viewbox>
+            </Button>
+
+            <Button Style="{StaticResource IconButton}"
+                    ToolTip="Загрузить статусы оплаты"
+                    Command="{Binding LoadPaymentStateCommand}"
+                    Cursor="Hand">
+                <Viewbox Stretch="Uniform">
+                    <materialDesign:PackIcon Kind="LabelPercentOutline" />
+                </Viewbox>
+            </Button>
 
         </StackPanel>
 

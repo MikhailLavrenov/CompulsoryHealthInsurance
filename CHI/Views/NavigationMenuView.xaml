@@ -23,7 +23,7 @@
 
             <Style x:Key="MenuButton"
                    TargetType="Button"
-                   BasedOn="{StaticResource MaterialDesignFlatButton}">
+                   BasedOn="{StaticResource MaterialDesignRaisedButton}">
                 <Setter Property="Command"
                         Value="{Binding SwitchViewCommand}" />
                 <Setter Property="Width"
@@ -31,7 +31,7 @@
                 <Setter Property="Height"
                         Value="60" />
                 <Setter Property="Margin"
-                        Value="0,0,2,2" />
+                        Value="0,0,4,4" />
                 <Setter Property="materialDesign:ButtonAssist.CornerRadius"
                         Value="0" />
                 <Setter Property="Padding"
@@ -40,8 +40,8 @@
                         Value="Left" />
                 <Setter Property="VerticalContentAlignment"
                         Value="Center" />
-                <Setter Property="Foreground"
-                        Value="White" />
+                <Setter Property="BorderThickness"
+                        Value="0" />
             </Style>
 
             <Style x:Key="ButtonIcon"
