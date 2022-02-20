@@ -37,6 +37,91 @@
                 Value="Regular" />
     </Style>
 
+    <Style x:Key="StandartButton"
+           TargetType="{x:Type i:CustomButton}"
+           BasedOn="{StaticResource MaterialDesignFlatButton}">
+        <Setter Property="MinWidth"
+                Value="0" />
+        <Setter Property="Padding"
+                Value="3" />
+        <Setter Property="Margin"
+                Value="0,0,5,0" />
+        <Setter Property="Cursor"
+                Value="Hand" />
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type i:CustomButton}">
+                    <Grid>
+                        <Border Background="{TemplateBinding Background}"
+                                x:Name="border"
+                                CornerRadius="{Binding Path=(materialDesign:ButtonAssist.CornerRadius), RelativeSource={RelativeSource TemplatedParent}}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}" />
+
+                        <materialDesign:Ripple ContentTemplate="{TemplateBinding ContentTemplate}"
+                                               Focusable="False"
+                                               ContentStringFormat="{TemplateBinding ContentStringFormat}"
+                                               HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                               VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                               Padding="{TemplateBinding Padding}"
+                                               SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}">
+                            <materialDesign:Ripple.Content>
+                                <StackPanel Orientation="Horizontal">
+                                    <Viewbox Stretch="Uniform">
+                                        <materialDesign:PackIcon Kind="{TemplateBinding IconKind}" />
+                                    </Viewbox>
+                                    <TextBlock Text="{TemplateBinding Text}" />
+                                </StackPanel>
+                            </materialDesign:Ripple.Content>
+                            <materialDesign:Ripple.Clip>
+                                <MultiBinding Converter="{StaticResource BorderClipConverter}">
+                                    <Binding ElementName="border"
+                                             Path="ActualWidth" />
+                                    <Binding ElementName="border"
+                                             Path="ActualHeight" />
+                                    <Binding ElementName="border"
+                                             Path="CornerRadius" />
+                                    <Binding ElementName="border"
+                                             Path="BorderThickness" />
+                                </MultiBinding>
+                            </materialDesign:Ripple.Clip>
+                        </materialDesign:Ripple>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver"
+                                 Value="true">
+                            <Setter Property="Background"
+                                    TargetName="border"
+                                    Value="{Binding Foreground,
+                                                                                        RelativeSource={RelativeSource Mode=TemplatedParent},
+                                                                                        Converter={StaticResource BrushOpacityConverter},
+                                                                                        ConverterParameter=0.16}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled"
+                                 Value="false">
+                            <Setter Property="Opacity"
+                                    Value="0.38" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver"
+                     Value="true">
+                <Setter Property="Foreground"
+                        Value="{DynamicResource PrimaryHueMidBrush}" />
+            </Trigger>
+            <Trigger Property="IsMouseOver"
+                     Value="false">
+                <Setter Property="Foreground"
+                        Value="DimGray" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
 
     <Style x:Key="IconButton"
            TargetType="{x:Type Button}"
@@ -44,13 +129,11 @@
         <Setter Property="MinWidth"
                 Value="0" />
         <Setter Property="Padding"
-                Value="6" />
+                Value="3" />
         <Setter Property="Margin"
                 Value="0,0,5,0" />
-        <Setter Property="Cursor" 
-                Value="Hand"/>
-        <Setter Property="Width"
-                Value="{Binding ActualHeight, RelativeSource={RelativeSource Self}}" />
+        <Setter Property="Cursor"
+                Value="Hand" />
         <Style.Triggers>
             <Trigger Property="IsMouseOver"
                      Value="true">
@@ -78,64 +161,64 @@
     </Style>
 
     <Style x:Key="IconTransparentButton"
-                   TargetType="{x:Type ButtonBase}"
-                   BasedOn="{StaticResource MaterialDesignIconButton}">
+           TargetType="{x:Type ButtonBase}"
+           BasedOn="{StaticResource MaterialDesignIconButton}">
         <Setter Property="IsTabStop"
-                        Value="False" />
+                Value="False" />
         <Setter Property="Margin"
-                        Value="0" />
+                Value="0" />
         <Setter Property="Width"
-                        Value="20" />
+                Value="20" />
         <Setter Property="Height"
-                        Value="20" />
+                Value="20" />
         <Setter Property="Padding"
-                        Value="0" />
+                Value="0" />
         <Setter Property="materialDesign:ShadowAssist.ShadowDepth"
-                        Value="Depth0" />
+                Value="Depth0" />
         <Setter Property="Background"
-                        Value="Transparent" />
+                Value="Transparent" />
         <Setter Property="materialDesign:ButtonAssist.CornerRadius"
-                        Value="0" />
+                Value="0" />
         <Setter Property="Template">
 
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ButtonBase}">
                     <Grid Background="{TemplateBinding Background}">
                         <materialDesign:Ripple Content="{TemplateBinding Content}"
-                                                       ContentTemplate="{TemplateBinding ContentTemplate}"
-                                                       Focusable="False"
-                                                       HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                                       VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
-                                                       Padding="{TemplateBinding Padding}"
-                                                       SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
-                        <Border Background="White"                                        
-                                Opacity="0"                                       
-                                x:Name="SelectionHue"                                     
-                                CornerRadius="{Binding (materialDesign:ButtonAssist.CornerRadius), RelativeSource={RelativeSource TemplatedParent}}"                                  
-                                BorderThickness="0"/>
+                                               ContentTemplate="{TemplateBinding ContentTemplate}"
+                                               Focusable="False"
+                                               HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                               VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                               Padding="{TemplateBinding Padding}"
+                                               SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                        <Border Background="White"
+                                Opacity="0"
+                                x:Name="SelectionHue"
+                                CornerRadius="{Binding (materialDesign:ButtonAssist.CornerRadius), RelativeSource={RelativeSource TemplatedParent}}"
+                                BorderThickness="0" />
                     </Grid>
 
                     <ControlTemplate.Triggers>
 
-                        <Trigger Property="IsMouseOver"                     
+                        <Trigger Property="IsMouseOver"
                                  Value="true">
-                            <Setter Property="Foreground"                       
+                            <Setter Property="Foreground"
                                     Value="{DynamicResource PrimaryHueMidBrush}" />
-                            <Setter TargetName="SelectionHue"                                            
-                                    Property="Opacity"                                            
+                            <Setter TargetName="SelectionHue"
+                                    Property="Opacity"
                                     Value="0.15" />
                         </Trigger>
 
-                        <Trigger Property="IsMouseOver"                  
+                        <Trigger Property="IsMouseOver"
                                  Value="false">
-                            <Setter Property="Foreground"                       
+                            <Setter Property="Foreground"
                                     Value="DimGray" />
                         </Trigger>
 
                         <Trigger Property="IsEnabled"
-                                         Value="false">
+                                 Value="false">
                             <Setter Property="Opacity"
-                                            Value="0.23" />
+                                    Value="0.23" />
                         </Trigger>
 
                     </ControlTemplate.Triggers>
@@ -309,7 +392,7 @@
                 Value="7" />
     </Style>
 
-    
+
 
     <DataTemplate x:Key="DataGridDragColumn">
         <Viewbox Stretch="Uniform"
@@ -334,10 +417,10 @@
                 Value="{DynamicResource DataGridValidationTemplate}" />
     </Style>
 
-    
+
 
     <Style x:Key="DataGridTextEditing"
-           TargetType="{x:Type TextBox}" 
+           TargetType="{x:Type TextBox}"
            BasedOn="{StaticResource {x:Type TextBox}}">
         <Setter Property="VerticalAlignment"
                 Value="Bottom" />
@@ -351,13 +434,12 @@
                 Value="{DynamicResource DataGridValidationTemplate}" />
     </Style>
 
-    
+
 
     <ControlTemplate x:Key="DataGridValidationTemplate">
         <StackPanel Orientation="Vertical">
             <AdornedElementPlaceholder />
-            <TextBlock 
-                       Text="{Binding CurrentItem.ErrorContent}"
+            <TextBlock Text="{Binding CurrentItem.ErrorContent}"
                        VerticalAlignment="Center"
                        Margin="2"
                        FontSize="10"
