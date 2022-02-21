@@ -20,38 +20,26 @@
         <StackPanel DockPanel.Dock="Top"
                     Orientation="Horizontal">
 
-            <Button Style="{StaticResource IconButton}"
-                    ToolTip="Добавить"
-                    Command="{Binding AddCommand}">
-                <Viewbox Stretch="Uniform">
-                    <materialDesign:PackIcon Kind="FileOutline" />
-                </Viewbox>
-            </Button>
+            <i:CustomButton Text="Добавить"
+                            IconKind="FileOutline"
+                            Command="{Binding AddCommand}"
+                            Cursor="Hand" />
 
-            <Button Style="{StaticResource IconRedButton}"
-                    ToolTip="Удалить"
-                    Command="{Binding DeleteCommand}">
-                <Viewbox Stretch="Uniform">
-                    <materialDesign:PackIcon Kind="GarbageOutline" />
-                </Viewbox>
-            </Button>
+            <i:CustomButton Text="Удалить"
+                            IconKind="GarbageOutline"
+                            Command="{Binding DeleteCommand}" />
+            
+            <FrameworkElement Style="{StaticResource Separator}" />
 
-            <Button Style="{StaticResource IconButton}"
-                    ToolTip="Импортировать из файла"
-                    Command="{Binding LoadCommand}">
-                <Viewbox Stretch="Uniform">
-                    <materialDesign:PackIcon Kind="Import" />
-                </Viewbox>
-            </Button>
+            <i:CustomButton Text="Импорт"
+                            ToolTip="Импортировать услуги классификации"
+                            IconKind="Import"
+                            Command="{Binding LoadCommand}" />
 
-            <Button Style="{StaticResource IconButton}"
-                    ToolTip="Скачать шаблон импорта"
-                    Command="{Binding SaveExampleCommand}"
-                    Cursor="Hand">
-                <Viewbox Stretch="Uniform">
-                    <materialDesign:PackIcon Kind="ContentSaveMoveOutline" />
-                </Viewbox>
-            </Button>
+            <i:CustomButton Text="Пример"
+                            ToolTip="Скачать пример для импортирования услуг классификации"
+                            IconKind="FileStarOutline"
+                            Command="{Binding SaveExampleCommand}" />
 
         </StackPanel>
 

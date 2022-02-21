@@ -20,23 +20,14 @@
         <StackPanel DockPanel.Dock="Top"
                     Orientation="Horizontal">
 
-            <Button Style="{StaticResource IconButton}"
-                    ToolTip="Добавить"
-                    Command="{Binding AddCommand}"
-                    Cursor="Hand">
-                <Viewbox Stretch="Uniform">
-                    <materialDesign:PackIcon Kind="FileOutline" />
-                </Viewbox>
-            </Button>
 
-            <Button Style="{StaticResource IconRedButton}"
-                    ToolTip="Удалить"
-                    Command="{Binding DeleteCommand}"
-                    Cursor="Hand">
-                <Viewbox Stretch="Uniform">
-                    <materialDesign:PackIcon Kind="GarbageOutline" />
-                </Viewbox>
-            </Button>
+            <i:CustomButton Text="Добавить"
+                            IconKind="FileOutline"
+                            Command="{Binding AddCommand}"/>
+
+            <i:CustomButton Text="Удалить"
+                            IconKind="GarbageOutline"
+                            Command="{Binding DeleteCommand}" />
 
         </StackPanel>
 

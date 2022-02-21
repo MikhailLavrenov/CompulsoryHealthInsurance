@@ -55,13 +55,13 @@
 
         </Grid.RowDefinitions>
 
-        <i:CustomButton ToolTip="Установить настройки по-умолчанию"                            
-                        Command="{Binding SetDefaultCommand}"                        
-                        Text="По умолчанию"                        
-                        IconKind="Check"                         
-                        Grid.Row="0"                    
-                        Grid.Column="0"                    
-                        Grid.ColumnSpan="2" Cursor="Hand"/>
+        <i:CustomButton Grid.Row="0"
+                        Grid.Column="0"
+                        Grid.ColumnSpan="2"
+                        Text="По умолчанию"
+                        ToolTip="Установить настройки по умолчанию"
+                        IconKind="BackupRestore"
+                        Command="{Binding SetDefaultCommand}"/>
 
         <FrameworkElement Grid.Row="1"
                           Style="{StaticResource Separator}" />
@@ -72,7 +72,7 @@
         <CheckBox  Grid.Row="2"
                    Grid.Column="1"
                    Name="CheckBoxFormat"
-                   IsChecked="{Binding Path=Settings.ApplyFormat}" />
+                   IsChecked="{Binding Settings.ApplyFormat}" />
 
         <DockPanel Grid.Row="3"
                    Grid.Column="0"
@@ -80,7 +80,7 @@
 
             <StackPanel  DockPanel.Dock="Right"
                          Margin="4"
-                         Visibility="{Binding Path=IsChecked, ElementName=CheckBoxFormat, Converter={i:BoolToVisibleConverter}}"
+                         Visibility="{Binding IsChecked, ElementName=CheckBoxFormat, Converter={i:BoolToVisibleConverter}}"
                          VerticalAlignment="Center">
 
                 <Button Style="{StaticResource IconButton}"

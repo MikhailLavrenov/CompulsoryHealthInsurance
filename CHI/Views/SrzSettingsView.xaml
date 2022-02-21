@@ -39,38 +39,61 @@
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0"
-                   Grid.Column="0"
-                   Text="Адрес сайта" />
-        <TextBox Grid.Row="0"
-                 Grid.Column="1"
-                 Text="{Binding Settings.Srz.Address, ValidatesOnDataErrors=True}" />
+        <StackPanel Grid.Row="0"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2"
+                    Orientation="Horizontal">
 
-        <TextBlock Grid.Row="1"
-                   Grid.Column="0"
-                   Text="Логин" />
-        <TextBox Grid.Row="1"
-                 Grid.Column="1"
-                 Text="{Binding Settings.Srz.Credential.Login, ValidatesOnDataErrors=True}" />
+            <i:CustomButton Text="Проверить"
+                            ToolTip="Проверить настройки"
+                            IconKind="FormatListChecks"
+                            Command="{Binding TestCommand}" />
+
+            <i:CustomButton Text="По умолчанию"
+                            ToolTip="Установить настройки по умолчанию"
+                            IconKind="BackupRestore"
+                            Command="{Binding SetDefaultCommand}"
+                            Cursor="Hand" />
+
+        </StackPanel>
+
+        <FrameworkElement Grid.Row="1"
+                          Style="{StaticResource Separator}"
+                          x:Name="proxyElement" />
 
         <TextBlock Grid.Row="2"
                    Grid.Column="0"
+                   Text="Адрес сайта" />
+        <TextBox Grid.Row="2"
+                 Grid.Column="1"
+                 Text="{Binding Settings.Srz.Address, ValidatesOnDataErrors=True}" />
+
+        <TextBlock Grid.Row="3"
+                   Grid.Column="0"
+                   Text="Логин" />
+        <TextBox Grid.Row="3"
+                 Grid.Column="1"
+                 Text="{Binding Settings.Srz.Credential.Login, ValidatesOnDataErrors=True}" />
+
+        <TextBlock Grid.Row="4"
+                   Grid.Column="0"
                    Text="Пароль" />
            
-        <PasswordBox Grid.Row="2"                                                        
+        <PasswordBox Grid.Row="4"                                                        
                      Grid.Column="1"                           
                      i:PasswordBoxHelper.BoundPassword="{Binding Settings.Srz.Credential.Password, UpdateSourceTrigger=LostFocus, ValidatesOnDataErrors=True}"                                                                    
                      Visibility="{Binding ShowPassword,  Converter={i:InvertedBoolToVisibleConverter}}"/>
             
-        <TextBox Grid.Row="2"                                                    
+        <TextBox Grid.Row="4"                                                    
                  Grid.Column="1"                      
                  Text="{Binding Settings.Srz.Credential.Password, UpdateSourceTrigger=LostFocus,  ValidatesOnDataErrors=True}"                                                            
                  Visibility="{Binding ShowPassword, Converter={i:BoolToVisibleConverter}}"/>
    
-        <Button Grid.Row="2"
+        <Button Grid.Row="4"
                 Grid.Column="3"                                  
                 Style="{StaticResource IconButton}"   
                 HorizontalAlignment="Left"
@@ -85,29 +108,19 @@
             </StackPanel>
         </Button>
 
-        <TextBlock Grid.Row="3"
+        <TextBlock Grid.Row="5"
                    Grid.Column="0"
                    Text="Количество потоков" />
-        <TextBox Grid.Row="3"
+        <TextBox Grid.Row="5"
                  Grid.Column="1"
                  Text="{Binding Settings.Srz.MaxDegreeOfParallelism, ValidatesOnDataErrors=True}" />
 
-        <TextBlock Grid.Row="4"
+        <TextBlock Grid.Row="6"
                    Grid.Column="0"
                    Text="Лимит запросов" />
-        <TextBox Grid.Row="4"
+        <TextBox Grid.Row="6"
                  Grid.Column="1"
                  Text="{Binding Settings.Srz.RequestsLimit, ValidatesOnDataErrors=True}" />
-
-        <StackPanel Grid.Row="6"
-                    Grid.Column="0"
-                    Grid.ColumnSpan="2"
-                    Orientation="Horizontal">
-            <Button Content="Проверить"
-                    Command="{Binding TestCommand}" />
-            <Button Content="По умолчанию"
-                    Command="{Binding SetDefaultCommand}" />
-        </StackPanel>
 
     </Grid>
 </UserControl>

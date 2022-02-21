@@ -25,6 +25,9 @@
     <Grid >
 
         <Grid.RowDefinitions>
+
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
             <RowDefinition>
                 <RowDefinition.Style>
                     <Style TargetType="{x:Type RowDefinition}">
@@ -40,20 +43,29 @@
                 </RowDefinition.Style>
             </RowDefinition>
             <RowDefinition Height="auto" />
-            <RowDefinition Height="auto" />
-            <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
 
-        <i:CustomDataGrid Grid.Row="0"  
+        <i:CustomButton Grid.Row="0"
+                        Text="Выполнить"
+                        ToolTip="Загрузить осмотры на портал диспансеризации"
+                        IconKind="Check"
+                        Command="{Binding ExportExaminationsCommand}"
+                        Cursor="Hand" />
+
+        <FrameworkElement Grid.Row="1"
+                          Style="{StaticResource Separator}"
+                          x:Name="proxyElement" />
+
+        <i:CustomDataGrid Grid.Row="2"
                           Margin="0,10,0,5"
-                          MinHeight="200"                                                        
-                          CanUserAddRows="False"                              
-                          CanUserDeleteRows="False"   
+                          MinHeight="200"
+                          CanUserAddRows="False"
+                          CanUserDeleteRows="False"
                           CanUserSortColumns="True"
                           CanUserReorderColumns="True"
                           SelectionUnit="Cell"
                           SelectionMode="Extended"
-                          ItemsSource="{Binding Result}"                  
+                          ItemsSource="{Binding Result}"
                           Visibility="{Binding Path=ShowResults,  Converter={i:BoolToVisibleConverter}}">
 
             <DataGrid.Columns>
@@ -70,8 +82,8 @@
                                     Binding="{Binding PatientExaminations.Year, Mode=OneWay}"
                                     Width="60" />
 
-                <DataGridCheckBoxColumn Header="Загружено"                                    
-                                        Binding="{Binding IsLoaded, Mode=OneWay}"                                    
+                <DataGridCheckBoxColumn Header="Загружено"
+                                        Binding="{Binding IsLoaded, Mode=OneWay}"
                                         Width="90" />
 
                 <DataGridTextColumn Header="Сообщение об ошибке"
@@ -113,10 +125,6 @@
             </DataGrid.Columns>
 
         </i:CustomDataGrid>
-
-        <Button Grid.Row="1"
-                Content="Загрузить"
-                Command="{Binding ExportExaminationsCommand}" />
 
     </Grid>
 

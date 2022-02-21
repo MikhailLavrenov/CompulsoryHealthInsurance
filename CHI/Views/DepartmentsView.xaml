@@ -20,40 +20,27 @@
         <StackPanel DockPanel.Dock="Top"
                     Orientation="Horizontal">
 
-            <Button Style="{StaticResource IconButton}"
-                    ToolTip="Добавить"
-                    Command="{Binding AddCommand}">
-                <Viewbox Stretch="Uniform">
-                    <materialDesign:PackIcon Kind="FileOutline" />
-                </Viewbox>
-            </Button>
+            <i:CustomButton Text="Добавить"
+                            IconKind="FileOutline"
+                            Command="{Binding AddCommand}"
+                            Cursor="Hand" />
 
-            <Button Style="{StaticResource IconRedButton}"
-                    ToolTip="Удалить"
-                    Command="{Binding DeleteCommand}">
-                <Viewbox Stretch="Uniform">
-                    <materialDesign:PackIcon Kind="GarbageOutline" />
-                </Viewbox>
-            </Button>
+            <i:CustomButton Text="Удалить"
+                            IconKind="GarbageOutline"
+                            Command="{Binding DeleteCommand}" />
 
             <FrameworkElement Style="{StaticResource Separator}" />
 
-            <Button Style="{StaticResource IconButton}"
-                    ToolTip="Переместить вверх"
-                    Command="{Binding MoveUpCommand}"
-                    Cursor="Hand">
-                <Viewbox Stretch="Uniform">
-                    <materialDesign:PackIcon Kind="ArrowUpward" />
-                </Viewbox>
-            </Button>
+            <i:CustomButton Text="Вверх"
+                            ToolTip="Переместить строку вверх"
+                            IconKind="ArrowUpward"
+                            Command="{Binding MoveUpCommand}" />
 
-            <Button Style="{StaticResource IconButton}"
-                    ToolTip="Переместить вниз"
-                    Command="{Binding MoveDownCommand}">
-                <Viewbox Stretch="Uniform">
-                    <materialDesign:PackIcon Kind="ArrowDownward" />
-                </Viewbox>
-            </Button>
+            <i:CustomButton Text="Вниз"
+                            ToolTip="Переместить строку вниз"
+                            IconKind="ArrowDownward"
+                            Command="{Binding MoveDownCommand}"
+                            Cursor="Hand" />
 
         </StackPanel>
 

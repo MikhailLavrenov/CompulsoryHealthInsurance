@@ -19,23 +19,16 @@
         <StackPanel DockPanel.Dock="Top"
                     Orientation="Horizontal">
 
-            <Button Style="{StaticResource IconButton}"
-                    ToolTip="Импортировать из файла"
-                    Command="{Binding LoadCommand}"
-                    Cursor="Hand">
-                <Viewbox Stretch="Uniform">
-                    <materialDesign:PackIcon Kind="Import" />
-                </Viewbox>
-            </Button>
+            <i:CustomButton Text="Импорт"
+                            ToolTip="Импортировать специальности"
+                            IconKind="Import"
+                            Command="{Binding LoadCommand}"
+                            Cursor="Hand" />
 
-            <Button Style="{StaticResource IconButton}"
-                    ToolTip="Скачать шаблон импорта"
-                    Command="{Binding SaveExampleCommand}"
-                    Cursor="Hand">
-                <Viewbox Stretch="Uniform">
-                    <materialDesign:PackIcon Kind="ContentSaveMoveOutline" />
-                </Viewbox>
-            </Button>
+            <i:CustomButton Text="Пример"
+                            ToolTip="Скачать пример для импортирования специальностей"
+                            IconKind="FileStarOutline"
+                            Command="{Binding SaveExampleCommand}"/>
 
         </StackPanel>
 

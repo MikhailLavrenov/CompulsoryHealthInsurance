@@ -66,23 +66,22 @@
             <i:CustomButton Text="Построить"
                             ToolTip="Построить отчет"
                             IconKind="Check"
-                            Command="{Binding BuildReportCommand}"/>
+                            Command="{Binding BuildReportCommand}"
+                            Cursor="Hand" />
 
-            <i:CustomButton ToolTip="Экспортировать в Excel"
+            <i:CustomButton Text="В Excel"                
+                            ToolTip="Сохранить в Excel"
+                            IconKind="MicrosoftExcel"
                             Command="{Binding SaveExcelCommand}"
-                            Text="Экспортировать"
-                            IconKind="MicrosoftExcel" />
+                            Cursor="Hand" />
 
-            <i:CustomButton ToolTip="Сформировать и выгрузить в Excel отчет за месяц и нарастающий"
-                            Command="{Binding BuildAndSaveExcelCommand}"
-                            Text="Экспресс 4 в 1"
-                            IconKind="ShareAllOutline" />
+            <i:CustomButton Text="Экспресс 4 в 1"
+                            ToolTip="Сформировать и выгрузить в Excel отчет за месяц и нарастающий"
+                            IconKind="ShareAllOutline"
+                            Command="{Binding BuildAndSaveExcelCommand}"/>
 
-        </StackPanel>
-
-        <StackPanel Grid.Row="0"
-                    HorizontalAlignment="Right"
-                    Orientation="Horizontal">
+            <FrameworkElement Style="{StaticResource Separator}" />
+            <FrameworkElement Style="{StaticResource Separator}" />
 
             <TextBlock Text="Нарастающий" />
 
@@ -92,11 +91,12 @@
 
             <ComboBox Grid.Row="1"
                       Grid.Column="2"
-                      Width="90"
                       ItemsSource="{Binding Months}"
                       SelectedValue="{Binding Month}"
                       SelectedValuePath="Key"
-                      DisplayMemberPath="Value" />
+                      DisplayMemberPath="Value"
+                      Width="90"
+                      MaxDropDownHeight="400" />
 
             <FrameworkElement Style="{StaticResource Separator}" />
 
@@ -116,6 +116,14 @@
                     <materialDesign:PackIcon Kind="MenuRight" />
                 </Viewbox>
             </Button>
+
+        </StackPanel>
+
+        <StackPanel Grid.Row="0"
+                    HorizontalAlignment="Right"
+                    Orientation="Horizontal">
+
+          
 
         </StackPanel>
 

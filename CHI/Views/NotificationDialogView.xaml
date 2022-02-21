@@ -23,6 +23,7 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/CHI;component/Views/Resources/WindowDefaultStyle.xaml" />
+                <ResourceDictionary Source="/CHI;component/Views/Resources/ReportCommonStyle.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary >
     </UserControl.Resources>
@@ -40,20 +41,20 @@
         <StackPanel Orientation="Horizontal"
                         HorizontalAlignment="Center" >
 
-            <Button Content="ОК"                        
-                    Style="{StaticResource MaterialDesignFlatButton}"
-                        Width="100"
-                        Command="{Binding CloseDialogCommand}"
-                       CommandParameter="{x:Static prism:ButtonResult.OK}" />
+            <i:CustomButton Text="ОК"
+                            IconKind="Check"
+                            Width="100"
+                            Command="{Binding CloseDialogCommand}"
+                            CommandParameter="{x:Static prism:ButtonResult.OK}" />
 
-            <FrameworkElement Style="{StaticResource Separator}"/>
+            <FrameworkElement Width="30" />
 
-            <Button Content="Отмена"
-                        IsDefault="True"
-                        Style="{StaticResource MaterialDesignFlatButton}"
-                        Width="100"
-                        Command="{Binding CloseDialogCommand}"
-                        CommandParameter="{x:Static prism:ButtonResult.Cancel}" />
+            <i:CustomButton Text="Отмена"
+                            IconKind="Cancel"
+                            IsDefault="True"
+                            Width="100"
+                            Command="{Binding CloseDialogCommand}"
+                            CommandParameter="{x:Static prism:ButtonResult.Cancel}" />
 
         </StackPanel>
 

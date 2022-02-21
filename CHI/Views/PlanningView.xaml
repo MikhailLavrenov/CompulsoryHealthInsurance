@@ -127,22 +127,15 @@
         <StackPanel Grid.Row="0"
                     Orientation="Horizontal">
 
-            <Button Style="{StaticResource IconButton}"
-                    ToolTip="Пересчитать"
-                    Command="{Binding UpdateCalculatedCellsCommand}">
-                <Viewbox Stretch="Uniform">
-                    <materialDesign:PackIcon Kind="Refresh" />
-                </Viewbox>
-            </Button>
+            <i:CustomButton Text="Пересчитать"
+                            ToolTip="Пересчитать значения в вычислимых ячейках"
+                            IconKind="Refresh"
+                            Command="{Binding UpdateCalculatedCellsCommand}"/>
 
-            <Button Style="{StaticResource IconButton}"
-                    ToolTip="Выгрузить в Excel"
-                    Command="{Binding SaveExcelCommand}"
-                    Cursor="Hand">
-                <Viewbox Stretch="Uniform">
-                    <materialDesign:PackIcon Kind="MicrosoftExcel" />
-                </Viewbox>
-            </Button>
+            <i:CustomButton Text="В Excel"
+                            ToolTip="Сохранить в Excel"
+                            IconKind="MicrosoftExcel"
+                            Command="{Binding SaveExcelCommand}" />
 
         </StackPanel>
 
@@ -152,11 +145,12 @@
 
             <ComboBox Grid.Row="1"
                       Grid.Column="2"
-                      Width="90"
                       ItemsSource="{Binding Months}"
                       SelectedValue="{Binding Month}"
                       SelectedValuePath="Key"
-                      DisplayMemberPath="Value" />
+                      DisplayMemberPath="Value"
+                      Width="90"
+                      MaxDropDownHeight="400"/>
 
             <FrameworkElement Style="{StaticResource Separator}" />
 

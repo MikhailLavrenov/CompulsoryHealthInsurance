@@ -25,23 +25,16 @@
         <StackPanel Grid.Row="0"
                     Orientation="Horizontal">
 
-            <Button Style="{StaticResource IconButton}"
-                    ToolTip="Загрузить реестр"
-                    Command="{Binding LoadRegisterCommand}"
-                    Cursor="Hand">
-                <Viewbox Stretch="Uniform">
-                    <materialDesign:PackIcon Kind="DatabaseArrowDownOutline" />
-                </Viewbox>
-            </Button>
+            <i:CustomButton Text="Загрузить реестр"
+                            ToolTip="Загрузить реестр за 1 период (xml или zip архивы)"
+                            IconKind="ArchiveArrowDownOutline"
+                            Command="{Binding LoadRegisterCommand}"/>
 
-            <Button Style="{StaticResource IconButton}"
-                    ToolTip="Загрузить статусы оплаты"
-                    Command="{Binding LoadPaymentStateCommand}"
-                    Cursor="Hand">
-                <Viewbox Stretch="Uniform">
-                    <materialDesign:PackIcon Kind="LabelPercentOutline" />
-                </Viewbox>
-            </Button>
+
+            <i:CustomButton Text="Загрузить статусы оплаты"
+                            ToolTip="Загрузить статусы оплаты за 1 период (xml или zip архивы)"
+                            IconKind="LabelPercentOutline"
+                            Command="{Binding LoadPaymentStateCommand}" />
 
         </StackPanel>
 

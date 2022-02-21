@@ -14,23 +14,30 @@
              d:DesignWidth="800"
              prism:ViewModelLocator.AutoWireViewModel="True">
 
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/CHI;component/Views/Resources/WindowDefaultStyle.xaml" />
+                <ResourceDictionary Source="/CHI;component/Views/Resources/ReportCommonStyle.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
     <DockPanel d:DataContext="{d:DesignInstance vm:WindowsAccountsViewModel}"
                HorizontalAlignment="Left">
 
         <StackPanel DockPanel.Dock="Top"
                     Orientation="Horizontal">
 
-            <Button Style="{StaticResource IconButton}"
-                    ToolTip="ОК"
-                    Command="{Binding OkCommand}">
-                <Viewbox Stretch="Uniform">
-                    <materialDesign:PackIcon Kind="Check" />
-                </Viewbox>
-            </Button>
+            <i:CustomButton Text="Выбрать"
+                            IconKind="Check"
+                            Command="{Binding OkCommand}"/>
 
             <ToggleButton IsChecked="{Binding IsDomain}"
-                          ToolTip="Отобразить учетные записи ActiveDirectory/Локальные"
-                          Style="{StaticResource MaterialDesignActionToggleButton}" Background="Transparent" Foreground="Gray">
+                          ToolTip="Переключить учетные записи ActiveDirectory/Локальные"
+                          Style="{StaticResource MaterialDesignActionToggleButton}" 
+                          Cursor="Hand"
+                          Background="SlateGray">
                 <ToggleButton.Content>
                     <materialDesign:PackIcon Kind="Computer" />
                 </ToggleButton.Content>
@@ -38,6 +45,14 @@
                     <materialDesign:PackIcon Kind="OfficeBuilding" />
                 </materialDesign:ToggleButtonAssist.OnContent>
             </ToggleButton>
+
+            <TextBlock Text="Локальные"
+                       VerticalAlignment="Center"
+                       Visibility="{Binding IsDomain, Converter={i:InvertedBoolToVisibleConverter}}" />
+
+            <TextBlock Text="Active Directory"
+                       VerticalAlignment="Center"
+                       Visibility="{Binding IsDomain, Converter={i:BoolToVisibleConverter}}" />
 
         </StackPanel>
 

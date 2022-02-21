@@ -19,7 +19,7 @@
                 <ResourceDictionary Source="/CHI;component/Views/Resources/WindowDefaultStyle.xaml" />
                 <ResourceDictionary Source="/CHI;component/Views/Resources/ReportCommonStyle.xaml" />
             </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary >
+        </ResourceDictionary>
     </UserControl.Resources>
 
 
@@ -41,10 +41,11 @@
         </Grid.RowDefinitions>
 
         <i:CustomButton Grid.Row="0"
-                        Grid.Column="0"
-                        Command="{Binding ProcessFileCommand}"                           
-                        Text="ОК"                        
-                        IconKind="Check" />
+                        Grid.Column="0"                                                  
+                        Text="Выполнить"                        
+                        IconKind="Check"
+                        Command="{Binding ProcessFileCommand}"
+                        Cursor="Hand" />
 
         <FrameworkElement Grid.Row="1"
                           Style="{StaticResource Separator}" />

@@ -55,13 +55,14 @@
                     Grid.ColumnSpan="2" 
                     Orientation="Horizontal">
 
-            <i:CustomButton Command="{Binding ImportLicenseCommand}"
-                            Text="Установить лицензию"
-                            IconKind="Check" Cursor="Hand" />
+            <i:CustomButton Text="Установить лицензию"
+                            IconKind="License"
+                            Command="{Binding ImportLicenseCommand}" />
 
-            <i:CustomButton Command="{Binding OpenManualCommand}"
-                            Text="Открыть инструкцию"
-                            IconKind="Check" />
+            <i:CustomButton Text="Инструкция"
+                            ToolTip="Открыть инструкцию"
+                            IconKind="BookOpenPageVariantOutline"
+                            Command="{Binding OpenManualCommand}" />
 
         </StackPanel>
 

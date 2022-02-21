@@ -53,11 +53,17 @@
                     Grid.ColumnSpan="2"
                     Orientation="Horizontal">
 
-            <Button Content="Проверить"
-                    Command="{Binding TestCommand}" />
-            
-            <Button Content="По умолчанию"
-                    Command="{Binding SetDefaultCommand}" />
+            <i:CustomButton Text="Проверить"
+                            ToolTip="Проверить настройки"
+                            IconKind="FormatListChecks"
+                            Command="{Binding TestCommand}"
+                            Cursor="Hand" />
+
+
+            <i:CustomButton Text="По умолчанию"
+                            ToolTip="Установить настройки по умолчанию"
+                            IconKind="BackupRestore"
+                            Command="{Binding SetDefaultCommand}" />
 
         </StackPanel>
 
@@ -156,7 +162,7 @@
 
         </Grid>
 
-        <Button Grid.Row="11"
+        <Button Grid.Row="10"
                 Grid.Column="3"
                 Style="{StaticResource IconButton}"
                 HorizontalAlignment="Left"
@@ -172,13 +178,16 @@
             </StackPanel>
         </Button>
 
-        <TextBlock Grid.Row="12"
+        <TextBlock Grid.Row="11"
                    Grid.Column="0"
                    Text="База данных" />
-        <Button Grid.Row="12"
-                Grid.Column="1"
-                Content="Обновить структуру"
-                Command="{Binding MigrateDBCommand}" />
+        <i:CustomButton Grid.Row="11"
+                        Grid.Column="1"
+                        Text="Обновить структуру"
+                        ToolTip="Обновить структуру БД (выполнить миграцию)"
+                        IconKind="Check"
+                        Command="{Binding MigrateDBCommand}"
+                        Cursor="Hand" />
 
     </Grid>
 

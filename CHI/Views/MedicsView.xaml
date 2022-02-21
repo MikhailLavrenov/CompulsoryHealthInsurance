@@ -19,25 +19,18 @@
             <StackPanel DockPanel.Dock="Top"
                     Orientation="Horizontal">
 
-                <Button Style="{StaticResource IconButton}"
-                    ToolTip="Импортировать из файла"
-                    Command="{Binding LoadCommand}"
-                    Cursor="Hand">
-                    <Viewbox Stretch="Uniform">
-                        <materialDesign:PackIcon Kind="Import" />
-                    </Viewbox>
-                </Button>
+            <i:CustomButton Text="Импорт"
+                            ToolTip="Импортировать данных мед. персонала"
+                            IconKind="Import"
+                            Command="{Binding LoadCommand}" />
 
-                <Button Style="{StaticResource IconButton}"
-                    ToolTip="Скачать пример импорта"
-                    Command="{Binding SaveExampleCommand}"
-                    Cursor="Hand">
-                    <Viewbox Stretch="Uniform">
-                        <materialDesign:PackIcon Kind="ContentSaveMoveOutline" />
-                    </Viewbox>
-                </Button>
+            <i:CustomButton Text="Пример"
+                            ToolTip="Скачать пример для импортирования данных мед. персонала"
+                            IconKind="FileStarOutline"
+                            Command="{Binding SaveExampleCommand}"
+                            Cursor="Hand" />
 
-            </StackPanel>
+        </StackPanel>
 
             <i:CustomDataGrid CanUserAddRows="False" CanUserDeleteRows="False" ItemsSource="{Binding Medics}">
 

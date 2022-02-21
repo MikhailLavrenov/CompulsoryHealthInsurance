@@ -20,47 +20,30 @@
         <StackPanel DockPanel.Dock="Top"
                     Orientation="Horizontal">
 
+            <i:CustomButton Text="Обновить"
+                            IconKind="Reload"
+                            Command="{Binding RefreshCommand}" />
 
-            <Button Style="{StaticResource IconButton}"
-                    ToolTip="Обновить"
-                    Command="{Binding RefreshCommand}">
-                <Viewbox Stretch="Uniform">
-                    <materialDesign:PackIcon Kind="Reload" />
-                </Viewbox>
-            </Button>
+            <i:CustomButton Text="Разделить"
+                            ToolTip="Разделить на детский и взрослый"
+                            IconKind="CallSplit"
+                            Command="{Binding SplitAgesCommand}" />
 
-            <Button Style="{StaticResource IconButton}"
-                    ToolTip="Разделить на детский и взрослый"
-                    Command="{Binding SplitAgesCommand}">
-                <Viewbox Stretch="Uniform">
-                    <materialDesign:PackIcon Kind="CallSplit" />
-                </Viewbox>
-            </Button>
+            <i:CustomButton Text="Объединить"
+                            ToolTip="Объединить детский и взрослый"
+                            IconKind="MergeType"
+                            Command="{Binding MergeAgesCommand}" />
 
-            <Button Style="{StaticResource IconButton}"
-                    ToolTip="Объединить детский и взрослый"
-                    Command="{Binding MergeAgesCommand}"
-                    Cursor="Hand">
-                <Viewbox Stretch="Uniform">
-                    <materialDesign:PackIcon Kind="MergeType" />
-                </Viewbox>
-            </Button>
+            <i:CustomButton Text="Вверх"
+                            ToolTip="Переместить строку вверх"
+                            IconKind="ArrowUpward"
+                            Command="{Binding MoveUpCommand}"
+                            Cursor="Hand" />
 
-            <Button Style="{StaticResource IconButton}"
-                    ToolTip="Переместить вверх"
-                    Command="{Binding MoveUpCommand}">
-                <Viewbox Stretch="Uniform">
-                    <materialDesign:PackIcon Kind="ArrowUpward" />
-                </Viewbox>
-            </Button>
-
-            <Button Style="{StaticResource IconButton}"
-                    ToolTip="Переместить вниз"
-                    Command="{Binding MoveDownCommand}">
-                <Viewbox Stretch="Uniform">
-                    <materialDesign:PackIcon Kind="ArrowDownward" />
-                </Viewbox>
-            </Button>
+            <i:CustomButton Text="Вниз"
+                            ToolTip="Переместить строку вниз"
+                            IconKind="ArrowDownward"
+                            Command="{Binding MoveDownCommand}" />
 
         </StackPanel>
 

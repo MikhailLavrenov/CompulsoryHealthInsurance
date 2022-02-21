@@ -41,20 +41,21 @@
                     Grid.ColumnSpan="2"                    
                     Orientation="Horizontal">
 
-            <i:CustomButton ToolTip="Импортировать данные пациентов"
+            <i:CustomButton Text="Импорт"                                          
+                            ToolTip="Импортировать данные пациентов"
+                            IconKind="Import"
                             Command="{Binding ImportPatientsCommand}"
-                            Text="Импорт"
-                            IconKind="Check" />
+                            Cursor="Hand" />
 
-            <i:CustomButton ToolTip="Скачать пример для импортирования данных пациентов"
-                            Command="{Binding SaveExampleCommand}"
-                            Text="Скачать пример"
-                            IconKind="Check" />
+            <i:CustomButton Text="Пример"               
+                            ToolTip="Скачать пример для импортирования данных пациентов"
+                            IconKind="FileStarOutline"
+                            Command="{Binding SaveExampleCommand}"/>
 
-            <i:CustomButton ToolTip="Удалить данные пациентов из БД"
-                            Command="{Binding ClearDatabaseCommand}"
-                            Text="Очистить БД"
-                            IconKind="Check" />
+            <i:CustomButton Text="Очистить БД"
+                            ToolTip="Удалить данные пациентов из БД"
+                            IconKind="Eraser"                            
+                            Command="{Binding ClearDatabaseCommand}"/>
 
         </StackPanel>
 

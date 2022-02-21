@@ -8,65 +8,74 @@
              xmlns:vm="clr-namespace:CHI.ViewModels"
              xmlns:prism="http://prismlibrary.com/"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-             xmlns:dialogs="http://prismlibrary.com/Services.Dialogs"            
-             
-             MinHeight="350"   
+             xmlns:dialogs="http://prismlibrary.com/Services.Dialogs"
+             MinHeight="350"
              mc:Ignorable="d"
              VerticalAlignment="Center"
-             HorizontalAlignment="Center"    
-             Background="White"             
+             HorizontalAlignment="Center"
+             Background="White"
              prism:ViewModelLocator.AutoWireViewModel=" True ">
 
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/CHI;component/Views/Resources/WindowDefaultStyle.xaml" />
+                <ResourceDictionary Source="/CHI;component/Views/Resources/ReportCommonStyle.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary >
     </UserControl.Resources>
 
 
-    <Grid d:DataContext="{d:DesignInstance vm:ColorDialogViewModel}" Margin="20,40,20,40" >
+    <Grid d:DataContext="{d:DesignInstance vm:ColorDialogViewModel}"
+          Margin="20,40,20,40">
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="200"/>
-            <RowDefinition/>
-            <RowDefinition/>
+            <RowDefinition Height="200" />
+            <RowDefinition />
+            <RowDefinition />
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="100"/>
-            <ColumnDefinition/>
-            <ColumnDefinition Width="400"/>
+            <ColumnDefinition Width="100" />
+            <ColumnDefinition />
+            <ColumnDefinition Width="400" />
         </Grid.ColumnDefinitions>
 
-        <FrameworkElement Grid.Row="1" Grid.Column="1" Style="{StaticResource Separator}"/>
+        <FrameworkElement Grid.Row="1"
+                          Grid.Column="1"
+                          Style="{StaticResource Separator}" />
 
-        <Border Grid.Row="0" Grid.Column="0"  >
+        <Border Grid.Row="0"
+                Grid.Column="0">
             <Border.Background>
-                <SolidColorBrush Color="{Binding Color}"/>
+                <SolidColorBrush Color="{Binding Color}" />
             </Border.Background>
         </Border>
 
-        <materialDesign:ColorPicker Grid.Row="0" Grid.Column="2"  Color="{Binding Color}"/>
+        <materialDesign:ColorPicker Grid.Row="0"
+                                    Grid.Column="2"
+                                    Color="{Binding Color}" />
 
-        <StackPanel  Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" Orientation="Horizontal"
-                        HorizontalAlignment="Center" >
+        <StackPanel  Grid.Row="3"
+                     Grid.Column="0"
+                     Grid.ColumnSpan="3"
+                     Orientation="Horizontal"
+                     HorizontalAlignment="Center">
 
-            <Button    Content="ОК"                        
-                    Style="{StaticResource MaterialDesignFlatButton}"
-                        Width="100"
-                        Command="{Binding CloseDialogCommand}"
-                        CommandParameter="{x:Static prism:ButtonResult.OK}" />
+            <i:CustomButton Text="ОК"
+                            IconKind="Check"
+                            Width="100"
+                            Command="{Binding CloseDialogCommand}"
+                            CommandParameter="{x:Static prism:ButtonResult.OK}" />
 
-            <FrameworkElement  Style="{StaticResource Separator}"/>
+            <FrameworkElement Width="30" />
 
-            <Button Content="Отмена"
-                        IsDefault="True"
-                        Style="{StaticResource MaterialDesignFlatButton}"
-                        Width="100"
-                        Command="{Binding CloseDialogCommand}"
-                        CommandParameter="{x:Static prism:ButtonResult.Cancel}" />
+            <i:CustomButton Text="Отмена"
+                            IconKind="Cancel"
+                            IsDefault="True"
+                            Width="100"
+                            Command="{Binding CloseDialogCommand}"
+                            CommandParameter="{x:Static prism:ButtonResult.Cancel}" />
 
         </StackPanel>
 
