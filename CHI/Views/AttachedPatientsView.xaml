@@ -17,6 +17,7 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/CHI;component/Views/Resources/WindowDefaultStyle.xaml" />
+                <ResourceDictionary Source="/CHI;component/Views/Resources/ReportCommonStyle.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary >
     </UserControl.Resources>
@@ -26,7 +27,9 @@
 
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="150" />
-            <ColumnDefinition Width="*" MinWidth="400" MaxWidth="650" />
+            <ColumnDefinition Width="*" 
+                              MinWidth="400" 
+                              MaxWidth="650" />
         </Grid.ColumnDefinitions>
 
         <Grid.RowDefinitions>
@@ -34,43 +37,34 @@
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
-            <RowDefinition Height="auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0"
+        <i:CustomButton Grid.Row="0"
+                        Grid.Column="0"
+                        Command="{Binding ProcessFileCommand}"                           
+                        Text="ОК"                        
+                        IconKind="Check" />
+
+        <FrameworkElement Grid.Row="1"
+                          Style="{StaticResource Separator}" />
+
+        <TextBlock Grid.Row="2"
                    Grid.Column="0"
                    Text="Скачать новый файл" />
-        <CheckBox  Grid.Row="0"
+        <CheckBox  Grid.Row="2"
                    Grid.Column="1"
                    Name="CheckBoxDowloadNewFile"
                    IsChecked="{Binding Settings.Srz.DownloadNewPatientsFile}" />
 
-        <TextBlock Grid.Row="1"
+        <TextBlock Grid.Row="3"
                    Grid.Column="0"
                    Text="Файл на дату"
                    Visibility="{Binding IsChecked, ElementName=CheckBoxDowloadNewFile, Converter={i:BoolToVisibleConverter}}" />
-        <DatePicker Grid.Row="1"
+        <DatePicker Grid.Row="3"
                     Grid.Column="1"
                     Visibility="{Binding IsChecked, ElementName=CheckBoxDowloadNewFile, Converter={i:BoolToVisibleConverter}, ValidatesOnDataErrors=True}"
                     SelectedDate="{Binding FileDate}" />
-
-        <!--<TextBlock Grid.Row="2"
-                   Grid.Column="0"
-                   Text="Путь к файлу " />
-        <DockPanel  Grid.Row="2"
-                    Grid.Column="1">
-            <Button DockPanel.Dock="Right"
-                    Content="{materialDesign:PackIcon FolderOpenOutline}"
-                    Style="{StaticResource IconButton}"
-                    Command="{Binding ShowFileDialogCommand}"/>
-            <TextBox  Text="{Binding Settings.PatientsFilePath, ValidatesOnDataErrors=True}" />
-        </DockPanel>-->               
-
-        <Button Grid.Row="2"
-                Grid.Column="0"
-                Content="ОК"
-                Command="{Binding ProcessFileCommand}" />
 
     </Grid>
 

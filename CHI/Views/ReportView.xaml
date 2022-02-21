@@ -52,8 +52,6 @@
     </UserControl.Resources>
 
 
-
-
     <Grid d:DataContext="{d:DesignInstance vm:ReportViewModel}">
 
         <Grid.RowDefinitions>
@@ -65,46 +63,20 @@
         <StackPanel Grid.Row="0"
                     Orientation="Horizontal">
 
-            <Button Style="{StaticResource IconButton}"
-                    ToolTip="Построить отчет"
-                    Command="{Binding BuildReportCommand}">
-                <StackPanel Orientation="Horizontal">
-                    <Viewbox Stretch="Uniform">
-                        <materialDesign:PackIcon Kind="Check" />
-                    </Viewbox>
-                    <TextBlock Text="Построить" />
-                </StackPanel>
-            </Button>
+            <i:CustomButton Text="Построить"
+                            ToolTip="Построить отчет"
+                            IconKind="Check"
+                            Command="{Binding BuildReportCommand}"/>
 
-            <Button Style="{StaticResource IconButton}"
-                    ToolTip="Экспортировать в Excel"
-                    Command="{Binding SaveExcelCommand}">
-                <StackPanel Orientation="Horizontal">
-                    <Viewbox Stretch="Uniform">
-                        <materialDesign:PackIcon Kind="MicrosoftExcel" />
-                    </Viewbox>
-                    <TextBlock Text="Экспортировать" />
-                </StackPanel>
-            </Button>
+            <i:CustomButton ToolTip="Экспортировать в Excel"
+                            Command="{Binding SaveExcelCommand}"
+                            Text="Экспортировать"
+                            IconKind="MicrosoftExcel" />
 
-            <Button Style="{StaticResource IconButton}"
-                    ToolTip="Сформировать и выгрузить в Excel отчет за месяц и нарастающий"
-                    Command="{Binding BuildAndSaveExcelCommand}"
-                    Cursor="Hand">
-                <StackPanel Orientation="Horizontal">
-                    <Viewbox Stretch="Uniform">
-                        <materialDesign:PackIcon Kind="ShareAllOutline" />
-                    </Viewbox>
-                    <TextBlock Text="Экспресс 4 в 1" />
-                </StackPanel>
-            </Button>
-
-            <i:CustomButton Style="{StaticResource StandartButton}"
-                            ToolTip="Сформировать и выгрузить в Excel отчет за месяц и нарастающий"
+            <i:CustomButton ToolTip="Сформировать и выгрузить в Excel отчет за месяц и нарастающий"
                             Command="{Binding BuildAndSaveExcelCommand}"
                             Text="Экспресс 4 в 1"
-                            IconKind="ShareAllOutline"
-                            Cursor="Hand" />
+                            IconKind="ShareAllOutline" />
 
         </StackPanel>
 

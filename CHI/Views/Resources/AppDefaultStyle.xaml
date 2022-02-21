@@ -19,6 +19,24 @@
 
     </Style>
 
+
+    <Style x:Key="StandartTextBlockStyle"
+           TargetType="{x:Type TextBlock}" >
+        <Setter Property="FontSize" 
+                Value="14"/>
+        <Setter Property="Margin"
+                Value="5" />
+        <Setter Property="HorizontalAlignment"
+                Value="Left" />
+        <Setter Property="VerticalAlignment"
+                Value="Center" />
+        <Setter Property="FontWeight"
+                Value="Light" />
+        <Setter Property="SnapsToDevicePixels"
+                Value="True" />
+    </Style>
+
+
     <!--Buttons-->
 
     <Style BasedOn="{StaticResource {x:Type Button}}"
@@ -37,13 +55,14 @@
                 Value="Regular" />
     </Style>
 
-    <Style x:Key="StandartButton"
-           TargetType="{x:Type i:CustomButton}"
+    <Style TargetType="{x:Type i:CustomButton}"
            BasedOn="{StaticResource MaterialDesignFlatButton}">
         <Setter Property="MinWidth"
                 Value="0" />
+        <Setter Property="HorizontalAlignment" 
+                Value="Left"/>
         <Setter Property="Padding"
-                Value="3" />
+                Value="6,3,6,3" />
         <Setter Property="Margin"
                 Value="0,0,5,0" />
         <Setter Property="Cursor"
@@ -51,7 +70,7 @@
 
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate TargetType="{x:Type i:CustomButton}">
+                <ControlTemplate TargetType="{x:Type i:CustomButton}" >                        
                     <Grid>
                         <Border Background="{TemplateBinding Background}"
                                 x:Name="border"
@@ -68,10 +87,11 @@
                                                SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}">
                             <materialDesign:Ripple.Content>
                                 <StackPanel Orientation="Horizontal">
-                                    <Viewbox Stretch="Uniform">
-                                        <materialDesign:PackIcon Kind="{TemplateBinding IconKind}" />
-                                    </Viewbox>
-                                    <TextBlock Text="{TemplateBinding Text}" />
+                                    <materialDesign:PackIcon Kind="{TemplateBinding IconKind}"                                                                  
+                                                             VerticalAlignment="Center"/>
+                                   
+                                    <TextBlock Text="{TemplateBinding Text}" 
+                                               Style="{StaticResource StandartTextBlockStyle}"/>
                                 </StackPanel>
                             </materialDesign:Ripple.Content>
                             <materialDesign:Ripple.Clip>
@@ -91,12 +111,10 @@
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver"
                                  Value="true">
-                            <Setter Property="Background"
+                            <Setter Property="Background"                                    
                                     TargetName="border"
-                                    Value="{Binding Foreground,
-                                                                                        RelativeSource={RelativeSource Mode=TemplatedParent},
-                                                                                        Converter={StaticResource BrushOpacityConverter},
-                                                                                        ConverterParameter=0.16}" />
+                                    Value="{Binding Foreground, RelativeSource={RelativeSource Mode=TemplatedParent},
+                                    Converter={StaticResource BrushOpacityConverter}, ConverterParameter=0.16}" />
                         </Trigger>
                         <Trigger Property="IsEnabled"
                                  Value="false">

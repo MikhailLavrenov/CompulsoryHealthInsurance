@@ -17,6 +17,7 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/CHI;component/Views/Resources/WindowDefaultStyle.xaml" />
+                <ResourceDictionary Source="/CHI;component/Views/Resources/ReportCommonStyle.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary >
     </UserControl.Resources>
@@ -24,6 +25,7 @@
     <Grid d:DataContext="{d:DesignInstance vm:CommonSettingsViewModel}">
 
         <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
@@ -34,22 +36,38 @@
             <ColumnDefinition Width="300"/>
         </Grid.ColumnDefinitions>
 
-        <TextBlock Grid.Row="0" Grid.Column="0" Text="Кол-во пациентов в БД"/>
-        <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding PatientsCount}" FontWeight="Medium"/>
-
-        <StackPanel Grid.Row="1"
+        <StackPanel Grid.Row="0"
                     Grid.Column="0"
                     Grid.ColumnSpan="2"                    
                     Orientation="Horizontal">
 
-            <Button Content="Импорт"
-                    Command="{Binding ImportPatientsCommand}" />
-            <Button Content="Скачать пример"
-                    Command="{Binding SaveExampleCommand}" />
-            <Button Content="Очистить"
-                    Command="{Binding ClearDatabaseCommand}" />
+            <i:CustomButton ToolTip="Импортировать данные пациентов"
+                            Command="{Binding ImportPatientsCommand}"
+                            Text="Импорт"
+                            IconKind="Check" />
+
+            <i:CustomButton ToolTip="Скачать пример для импортирования данных пациентов"
+                            Command="{Binding SaveExampleCommand}"
+                            Text="Скачать пример"
+                            IconKind="Check" />
+
+            <i:CustomButton ToolTip="Удалить данные пациентов из БД"
+                            Command="{Binding ClearDatabaseCommand}"
+                            Text="Очистить БД"
+                            IconKind="Check" />
 
         </StackPanel>
+
+        <FrameworkElement Grid.Row="1"
+                          Style="{StaticResource Separator}" />
+
+        <TextBlock Grid.Row="2" 
+                   Grid.Column="0" 
+                   Text="Кол-во пациентов в БД"/>
+        <TextBlock Grid.Row="2" 
+                   Grid.Column="1" 
+                   Text="{Binding PatientsCount}" 
+                   FontWeight="Medium"/>
 
     </Grid>
 

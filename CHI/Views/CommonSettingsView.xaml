@@ -17,11 +17,13 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/CHI;component/Views/Resources/WindowDefaultStyle.xaml" />
+                <ResourceDictionary Source="/CHI;component/Views/Resources/ReportCommonStyle.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary >
     </UserControl.Resources>
 
     <Grid d:DataContext="{d:DesignInstance vm:CommonSettingsViewModel }">
+        
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="220" />
             <ColumnDefinition Width="300" />
@@ -41,86 +43,107 @@
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0"
+        
+        <StackPanel Grid.Row="0"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2"
+                    Orientation="Horizontal">
+
+            <Button Content="Проверить"
+                    Command="{Binding TestCommand}" />
+            
+            <Button Content="По умолчанию"
+                    Command="{Binding SetDefaultCommand}" />
+
+        </StackPanel>
+
+        <FrameworkElement Grid.Row="1"
+                          Style="{StaticResource Separator}" />
+
+        <TextBlock Grid.Row="2"
                    Grid.Column="0"
                    Text="Доступ к учетным записям" />
-        <ComboBox Grid.Row="0"
+        <ComboBox Grid.Row="2"
                   Grid.Column="1"
                   ItemsSource="{Binding Settings.Common.CredentialsScope, Converter={i:EnumToCollectionConverter}, Mode=OneTime}"
                   SelectedValuePath="Key"
                   DisplayMemberPath="Value"
                   SelectedValue="{Binding Settings.Common.CredentialsScope}" />
 
-        <TextBlock Grid.Row="1"
+        <TextBlock Grid.Row="3"
                    Grid.Column="0"
                    Text="Использовать прокси-сервер" />
-        <CheckBox Grid.Row="1"
+        <CheckBox Grid.Row="3"
                   Grid.Column="1"
                   Name="CheckBoxUseProxy"
                   IsChecked="{Binding Settings.Common.UseProxy}" />
 
-        <TextBlock Grid.Row="2"
+        <TextBlock Grid.Row="4"
                    Grid.Column="0"
                    Name="TextBlockProxy"
                    Text="Прокси-сервер адрес:порт"
                    Visibility="{Binding Path=IsChecked, ElementName=CheckBoxUseProxy, Converter={i:BoolToVisibleConverter}}" />
-        <Grid Grid.Row="2"
+        
+        <Grid Grid.Row="4"
               Grid.Column="1"
               Visibility="{Binding Path=Visibility,ElementName=TextBlockProxy}">
+            
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="3*" />
                 <ColumnDefinition Width="1*" />
             </Grid.ColumnDefinitions>
+            
             <TextBox Grid.Column="0"
                      Text="{Binding Settings.Common.ProxyAddress,ValidatesOnDataErrors=True}" />
             <TextBox Grid.Column="1"
                      Text="{Binding Settings.Common.ProxyPort}" />
         </Grid>
 
-        <TextBlock Grid.Row="3"
+        <TextBlock Grid.Row="5"
                    Grid.Column="0"
                    Text="SQL сервер" />
 
-        <TextBlock Grid.Row="4"
+        <TextBlock Grid.Row="6"
                    Grid.Column="0"
                    Text="Адрес и экземпляр" />
-        <TextBox Grid.Row="4"
+        <TextBox Grid.Row="6"
                  Grid.Column="1"
                  Text="{Binding Settings.Common.SqlServer}" />
 
-        <TextBlock Grid.Row="5"
+        <TextBlock Grid.Row="7"
                    Grid.Column="0"
                    Text="Имя базы данных" />
-        <TextBox Grid.Row="5"
+        <TextBox Grid.Row="7"
                  Grid.Column="1"
                  Text="{Binding Settings.Common.SqlDatabase}" />
 
-        <TextBlock Grid.Row="6"
+        <TextBlock Grid.Row="8"
                    Grid.Column="0"
                    Text="Использовать SQL-авторизацию" />
-        <CheckBox Grid.Row="6"
+        <CheckBox Grid.Row="8"
                   Grid.Column="1"
                   Name="CheckBoxIsSqlAuthorization"
                   IsChecked="{Binding Settings.Common.IsSqlAuthorization}" />
 
-        <TextBlock Grid.Row="7"
+        <TextBlock Grid.Row="9"
                    Grid.Column="0"
                    Name="TextBlockIsSqlAuthorization"
                    Text="SQL Логин"
                    Visibility="{Binding Path=IsChecked, ElementName=CheckBoxIsSqlAuthorization, Converter={i:BoolToVisibleConverter}}" />
-        <TextBox Grid.Row="7"
+        <TextBox Grid.Row="9"
                  Grid.Column="1"
                  Text="{Binding Settings.Common.SqlLogin}"
                  Visibility="{Binding Path=Visibility,ElementName=TextBlockIsSqlAuthorization}" />
 
-        <TextBlock Grid.Row="8"
+        <TextBlock Grid.Row="10"
                    Grid.Column="0"
                    Text="SQL Пароль"
                    Visibility="{Binding Path=Visibility,ElementName=TextBlockIsSqlAuthorization}" />
-        <Grid Grid.Row="8"
+        <Grid Grid.Row="10"
               Grid.Column="1"
               Visibility="{Binding Path=Visibility,ElementName=TextBlockIsSqlAuthorization}">
 
@@ -133,7 +156,7 @@
 
         </Grid>
 
-        <Button Grid.Row="8"
+        <Button Grid.Row="11"
                 Grid.Column="3"
                 Style="{StaticResource IconButton}"
                 HorizontalAlignment="Left"
@@ -149,30 +172,13 @@
             </StackPanel>
         </Button>
 
-        <TextBlock Grid.Row="9"
+        <TextBlock Grid.Row="12"
                    Grid.Column="0"
                    Text="База данных" />
-        <Button Grid.Row="9"
+        <Button Grid.Row="12"
                 Grid.Column="1"
                 Content="Обновить структуру"
                 Command="{Binding MigrateDBCommand}" />
-
-        <FrameworkElement Grid.Row="10"
-                          Style="{StaticResource Separator}" />
-
-        <StackPanel VerticalAlignment="Top"
-                    Grid.Row="11"
-                    Grid.Column="0"
-                    Grid.ColumnSpan="2"
-                    Orientation="Horizontal">
-
-            <Button Content="Проверить"
-                    Command="{Binding TestCommand}" />
-            <Button Content="По умолчанию"
-                    Command="{Binding SetDefaultCommand}" />
-
-        </StackPanel>
-
 
     </Grid>
 

@@ -17,6 +17,7 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/CHI;component/Views/Resources/WindowDefaultStyle.xaml" />
+                <ResourceDictionary Source="/CHI;component/Views/Resources/ReportCommonStyle.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary >
     </UserControl.Resources>
@@ -32,6 +33,8 @@
 
         <Grid.RowDefinitions>
 
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
             <RowDefinition>
                 <RowDefinition.Style>
@@ -52,15 +55,26 @@
 
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0"
+        <i:CustomButton ToolTip="Установить настройки по-умолчанию"                            
+                        Command="{Binding SetDefaultCommand}"                        
+                        Text="По умолчанию"                        
+                        IconKind="Check"                         
+                        Grid.Row="0"                    
+                        Grid.Column="0"                    
+                        Grid.ColumnSpan="2" Cursor="Hand"/>
+
+        <FrameworkElement Grid.Row="1"
+                          Style="{StaticResource Separator}" />
+
+        <TextBlock Grid.Row="2"
                    Grid.Column="0"
                    Text="Применить форматирование" />
-        <CheckBox  Grid.Row="0"
+        <CheckBox  Grid.Row="2"
                    Grid.Column="1"
                    Name="CheckBoxFormat"
                    IsChecked="{Binding Path=Settings.ApplyFormat}" />
 
-        <DockPanel Grid.Row="1"
+        <DockPanel Grid.Row="3"
                    Grid.Column="0"
                    Grid.ColumnSpan="2">
 
@@ -94,20 +108,23 @@
                                             IsReadOnly="True" />
 
                     <DataGridTextColumn     Header="Название столбца"
-                                            Binding="{Binding Path=Name, ValidatesOnDataErrors=True}"                                                                                 
+                                            Binding="{Binding Name, ValidatesOnDataErrors=True}"                                                                                 
                                             ElementStyle="{StaticResource DataGridTextBlock}"                                    
                                             EditingElementStyle="{StaticResource DataGridTextEditing}"
                                             MinWidth="170" />
+                    
                     <DataGridTextColumn     Header="Понятное название"
-                                            Binding="{Binding Path=AltName, ValidatesOnDataErrors=True}"
+                                            Binding="{Binding AltName, ValidatesOnDataErrors=True}"
                                             ElementStyle="{StaticResource DataGridTextBlock}"
                                             EditingElementStyle="{StaticResource DataGridTextEditing}"
                                             MinWidth="170" />
+                    
                     <DataGridCheckBoxColumn Header="Скрыть"
-                                            Binding="{Binding Path=Hide}"                                                                                                                   
+                                            Binding="{Binding Hide}"                                                                                                                   
                                             MinWidth="65" />
+                    
                     <DataGridCheckBoxColumn Header="Удалить"
-                                            Binding="{Binding Path=Delete}"                                                                                                                   
+                                            Binding="{Binding Delete}"                                                                                                                   
                                             MinWidth="65"
                                             Width="*" />
 
@@ -116,17 +133,7 @@
             </i:CustomDataGrid>
 
         </DockPanel>
-
-
-
-        <StackPanel Grid.Row="2"
-                    Grid.Column="0"
-                    Grid.ColumnSpan="2"
-                    Orientation="Horizontal"
-                    VerticalAlignment="Top">
-
-            <Button Content="По умолчанию"
-                    Command="{Binding SetDefaultCommand}" />
-        </StackPanel>
+        
     </Grid>
+    
 </UserControl>
