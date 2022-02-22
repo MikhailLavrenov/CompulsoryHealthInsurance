@@ -22,7 +22,8 @@
 
             <i:CustomButton Text="Добавить"
                             IconKind="FileOutline"
-                            Command="{Binding AddCommand}" />
+                            Command="{Binding AddCommand}" Cursor="Hand" 
+                            CommandParameter="{x:Type v:WindowsAccountsView}"/>
 
             <i:CustomButton Text="Удалить"
                             IconKind="GarbageOutline"

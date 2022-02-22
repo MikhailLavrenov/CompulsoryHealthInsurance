@@ -37,6 +37,7 @@
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
@@ -68,14 +69,14 @@
                  Grid.Column="1"
                  Text="{Binding Settings.MedicalExaminations.Address, ValidatesOnDataErrors=True}" />
 
-        <TextBlock Grid.Row="2"
+        <TextBlock Grid.Row="3"
                    Grid.Column="0"
                    Text="Логин" />
-        <TextBox Grid.Row="2"
+        <TextBox Grid.Row="3"
                  Grid.Column="1"
                  Text="{Binding Settings.MedicalExaminations.Credential.Login, ValidatesOnDataErrors=True}" />
 
-        <TextBlock Grid.Row="3"
+        <TextBlock Grid.Row="4"
                    Grid.Column="0"
                    Text="Пароль" />
 
