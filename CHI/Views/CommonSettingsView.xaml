@@ -25,8 +25,8 @@
     <Grid d:DataContext="{d:DesignInstance vm:CommonSettingsViewModel }">
         
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="220" />
-            <ColumnDefinition Width="300" />
+            <ColumnDefinition Width="230" />
+            <ColumnDefinition Width="270" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 

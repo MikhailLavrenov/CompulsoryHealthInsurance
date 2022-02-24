@@ -55,13 +55,32 @@
 
         </Grid.RowDefinitions>
 
-        <i:CustomButton Grid.Row="0"
-                        Grid.Column="0"
-                        Grid.ColumnSpan="2"
+        <StackPanel Grid.Row="0"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2"
+                    Orientation="Horizontal">
+
+            <i:CustomButton 
                         Text="По умолчанию"
                         ToolTip="Установить настройки по умолчанию"
                         IconKind="BackupRestore"
                         Command="{Binding SetDefaultCommand}"/>
+
+            <FrameworkElement Style="{StaticResource Separator}" />
+
+            <i:CustomButton Text="Вверх"
+                            ToolTip="Переместить строку вверх"
+                            IconKind="ArrowUpward"                                                    
+                            Command="{Binding MoveUpCommand}"/>
+
+            <i:CustomButton Text="Вниз"
+                            ToolTip="Переместить строку вниз"
+                            IconKind="ArrowDownward"                                                    
+                            Command="{Binding MoveDownCommand}"                        
+                            CommandParameter="{Binding SelectedItem, ElementName=DataGrid1}" />
+
+        </StackPanel>
+
 
         <FrameworkElement Grid.Row="1"
                           Style="{StaticResource Separator}" />
@@ -74,66 +93,46 @@
                    Name="CheckBoxFormat"
                    IsChecked="{Binding Settings.ApplyFormat}" />
 
-        <DockPanel Grid.Row="3"
-                   Grid.Column="0"
-                   Grid.ColumnSpan="2">
+        <i:CustomDataGrid Grid.Row="3"                   
+                          Grid.Column="0"                   
+                          Grid.ColumnSpan="2"                
+                          x:Name="DataGrid1"                              
+                          Margin="0,20,0,10"                              
+                          MinHeight="200"                              
+                          Visibility="{Binding Path=IsChecked, ElementName=CheckBoxFormat, Converter={i:BoolToVisibleConverter}}"                              
+                          ItemsSource="{Binding Settings.ColumnProperties}"
+                          SelectedItem="{Binding CurrentColumnProperty, Mode=OneWayToSource}">
 
-            <StackPanel  DockPanel.Dock="Right"
-                         Margin="4"
-                         Visibility="{Binding IsChecked, ElementName=CheckBoxFormat, Converter={i:BoolToVisibleConverter}}"
-                         VerticalAlignment="Center">
+            <DataGrid.Columns>
 
-                <Button Style="{StaticResource IconButton}"
-                        Command="{Binding MoveUpCommand}"
-                        CommandParameter="{Binding SelectedItem, ElementName=DataGrid1}"
-                        Content="{materialDesign:PackIcon ArrowUpThick}"
-                        Cursor="Hand" />
-
-                <Button Style="{StaticResource IconButton}"
-                        Command="{Binding MoveDownCommand}"
-                        CommandParameter="{Binding SelectedItem, ElementName=DataGrid1}"
-                        Content="{materialDesign:PackIcon ArrowDownThick}" />
-
-            </StackPanel>
-
-            <i:CustomDataGrid x:Name="DataGrid1"
-                              Margin="0,20,0,10"
-                              MinHeight="200"
-                              Visibility="{Binding Path=IsChecked, ElementName=CheckBoxFormat, Converter={i:BoolToVisibleConverter}}"
-                              ItemsSource="{Binding Settings.ColumnProperties}">
-
-                <DataGrid.Columns>
-
-                    <DataGridTemplateColumn CellTemplate="{StaticResource DataGridDragColumn}"
+                <DataGridTemplateColumn CellTemplate="{StaticResource DataGridDragColumn}"
                                             IsReadOnly="True" />
 
-                    <DataGridTextColumn     Header="Название столбца"
+                <DataGridTextColumn     Header="Название столбца"
                                             Binding="{Binding Name, ValidatesOnDataErrors=True}"                                                                                 
                                             ElementStyle="{StaticResource DataGridTextBlock}"                                    
                                             EditingElementStyle="{StaticResource DataGridTextEditing}"
                                             MinWidth="170" />
-                    
-                    <DataGridTextColumn     Header="Понятное название"
+
+                <DataGridTextColumn     Header="Понятное название"
                                             Binding="{Binding AltName, ValidatesOnDataErrors=True}"
                                             ElementStyle="{StaticResource DataGridTextBlock}"
                                             EditingElementStyle="{StaticResource DataGridTextEditing}"
                                             MinWidth="170" />
-                    
-                    <DataGridCheckBoxColumn Header="Скрыть"
+
+                <DataGridCheckBoxColumn Header="Скрыть"
                                             Binding="{Binding Hide}"                                                                                                                   
                                             MinWidth="65" />
-                    
-                    <DataGridCheckBoxColumn Header="Удалить"
+
+                <DataGridCheckBoxColumn Header="Удалить"
                                             Binding="{Binding Delete}"                                                                                                                   
                                             MinWidth="65"
                                             Width="*" />
 
-                </DataGrid.Columns>
+            </DataGrid.Columns>
 
-            </i:CustomDataGrid>
+        </i:CustomDataGrid>
 
-        </DockPanel>
-        
     </Grid>
-    
+
 </UserControl>
