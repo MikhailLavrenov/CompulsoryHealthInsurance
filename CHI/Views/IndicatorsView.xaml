@@ -25,7 +25,7 @@
                       DisplayMemberPath="Item2"
                       SelectedValue="{Binding NewKind, UpdateSourceTrigger=PropertyChanged}"
                       SelectedIndex="0"
-                      MinWidth="200" />
+                      MinWidth="150" />
             
             <i:CustomButton Text="Добавить"
                             IconKind="FileOutline"

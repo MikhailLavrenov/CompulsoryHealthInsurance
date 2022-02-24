@@ -114,12 +114,14 @@ namespace CHI.ViewModels
         {
             return CurrentDepartment != null
                 && !CurrentDepartment.IsRoot
-                && CurrentDepartment.Order != 0;
+                && CurrentDepartment != CurrentDepartment.Parent.Childs.First();
         }
 
         private void MoveUpExecute()
         {
-            var previous = CurrentDepartment.Parent.Childs.First(x => x.Order == CurrentDepartment.Order - 1);
+            var curIndex = CurrentDepartment.Parent.Childs.IndexOf(CurrentDepartment);
+
+            var previous = CurrentDepartment.Parent.Childs[curIndex-1];
 
             CurrentDepartment.Order--;
             previous.Order++;
@@ -139,7 +141,9 @@ namespace CHI.ViewModels
 
         private void MoveDownExecute()
         {
-            var next = CurrentDepartment.Parent.Childs.First(x => x.Order == CurrentDepartment.Order + 1);
+            var curIndex = CurrentDepartment.Parent.Childs.IndexOf(CurrentDepartment);
+
+            var next = CurrentDepartment.Parent.Childs[curIndex + 1];
 
             CurrentDepartment.Order++;
             next.Order--;

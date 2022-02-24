@@ -39,7 +39,7 @@ namespace CHI.ViewModels
 
             dbContext = new AppDBContext(settings.Common.SqlServer, settings.Common.SqlDatabase, settings.Common.SqlLogin, settings.Common.SqlPassword);
             dbContext.Specialties.Load();
-            Specialties = dbContext.Specialties.Local.ToObservableCollection();
+            Specialties = new ObservableCollection<Specialty>(dbContext.Specialties.Local.OrderBy(x=>x.Name).OrderBy(x => x.IsArchive));
 
             LoadCommand = new DelegateCommandAsync(LoadExecute);
             SaveExampleCommand = new DelegateCommandAsync(SaveExampleExecute);

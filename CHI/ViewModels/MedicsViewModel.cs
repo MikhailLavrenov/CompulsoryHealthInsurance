@@ -37,7 +37,7 @@ namespace CHI.ViewModels
 
             dbContext = new AppDBContext(settings.Common.SqlServer, settings.Common.SqlDatabase, settings.Common.SqlLogin, settings.Common.SqlPassword);
             dbContext.Medics.Load();
-            Medics = dbContext.Medics.Local.ToObservableCollection();
+            Medics =new ObservableCollection<Medic>( dbContext.Medics.Local.OrderBy(x=>x.FullName).OrderBy(x=>x.IsArchive));
 
             LoadCommand = new DelegateCommandAsync(LoadExecute);
             SaveExampleCommand = new DelegateCommandAsync(SaveExampleExecute);

@@ -185,9 +185,8 @@
                         Grid.Column="1"
                         Text="Обновить структуру"
                         ToolTip="Обновить структуру БД (выполнить миграцию)"
-                        IconKind="Check"
-                        Command="{Binding MigrateDBCommand}"
-                        Cursor="Hand" />
+                        IconKind="DatabaseSyncOutline"
+                        Command="{Binding MigrateDBCommand}"/>
 
     </Grid>
 
