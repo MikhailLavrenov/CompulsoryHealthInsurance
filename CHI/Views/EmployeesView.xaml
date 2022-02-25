@@ -34,11 +34,15 @@
                             IconKind="MergeType"
                             Command="{Binding MergeAgesCommand}" />
 
+            <i:CustomButton Text="Чистить"
+                            ToolTip="Удалить не связанные с реестрами штатные единицы, мед. персонал и специальности"
+                            IconKind="Broom"
+                            Command="{Binding CleanCommand}" />
+
             <i:CustomButton Text="Вверх"
                             ToolTip="Переместить строку вверх"
                             IconKind="ArrowUpward"
-                            Command="{Binding MoveUpCommand}"
-                            Cursor="Hand" />
+                            Command="{Binding MoveUpCommand}" />
 
             <i:CustomButton Text="Вниз"
                             ToolTip="Переместить строку вниз"

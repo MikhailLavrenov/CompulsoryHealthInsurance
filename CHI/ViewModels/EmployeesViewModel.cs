@@ -35,8 +35,6 @@ namespace CHI.ViewModels
             }
         }
         public ObservableCollection<Employee> Employees { get => employees; set => SetProperty(ref employees, value); }
-        public List<Medic> Medics { get; set; }
-        public List<Specialty> Specialties { get; set; }
         public List<Department> Departments { get; set; }
 
         public DelegateCommand MoveUpCommand { get; }
@@ -44,6 +42,7 @@ namespace CHI.ViewModels
         public DelegateCommandAsync SplitAgesCommand { get; }
         public DelegateCommandAsync MergeAgesCommand { get; }
         public DelegateCommand RefreshCommand { get; }
+        public DelegateCommand CleanCommand { get; }
 
         public EmployeesViewModel(AppSettings settings, IMainRegionService mainRegionService)
         {
@@ -53,9 +52,7 @@ namespace CHI.ViewModels
 
             dbContext = new AppDBContext(settings.Common.SqlServer, settings.Common.SqlDatabase, settings.Common.SqlLogin, settings.Common.SqlPassword);
 
-            dbContext.Employees.Load();
-            Medics = dbContext.Medics.ToList();
-            Specialties = dbContext.Specialties.ToList();
+            dbContext.Employees.Include(x => x.Medic).Include(x => x.Specialty).Load();
             Departments = dbContext.Departments.Where(x => x.IsRoot || x.Childs == null || x.Childs.Count == 0).OrderBy(x => x.Order).ToList();
 
             RefreshCommand = new DelegateCommand(RefreshExecute);
@@ -63,11 +60,12 @@ namespace CHI.ViewModels
             MoveDownCommand = new DelegateCommand(MoveDownExecute, MoveDownCanExecute).ObservesProperty(() => CurrentEmployee);
             SplitAgesCommand = new DelegateCommandAsync(SplitAgesExecute, () => CurrentEmployee?.AgeKind == AgeKind.Any).ObservesProperty(() => CurrentEmployee);
             MergeAgesCommand = new DelegateCommandAsync(MergeAgesExecute, () => CurrentEmployee != null && CurrentEmployee.AgeKind != AgeKind.Any).ObservesProperty(() => CurrentEmployee);
+            CleanCommand = new DelegateCommand(CleanExecute);
 
             RefreshExecute();
         }
 
-        private bool MoveUpCanExecute()
+        bool MoveUpCanExecute()
         {
             if (CurrentEmployee == null || Employees.First() == CurrentEmployee)
                 return false;
@@ -77,7 +75,7 @@ namespace CHI.ViewModels
             return CurrentEmployee.Department == previuosEmployee.Department;
         }
 
-        private void MoveUpExecute()
+        void MoveUpExecute()
         {
             var itemIndex = Employees.IndexOf(CurrentEmployee);
 
@@ -92,7 +90,7 @@ namespace CHI.ViewModels
             MoveDownCommand.RaiseCanExecuteChanged();
         }
 
-        private bool MoveDownCanExecute()
+        bool MoveDownCanExecute()
         {
             if (CurrentEmployee == null || Employees.Last() == CurrentEmployee)
                 return false;
@@ -102,7 +100,7 @@ namespace CHI.ViewModels
             return CurrentEmployee.Department == nextEmployee.Department;
         }
 
-        private void MoveDownExecute()
+        void MoveDownExecute()
         {
             var itemIndex = Employees.IndexOf(CurrentEmployee);
 
@@ -117,7 +115,7 @@ namespace CHI.ViewModels
             MoveDownCommand.RaiseCanExecuteChanged();
         }
 
-        private void RefreshExecute()
+        void RefreshExecute()
         {
             foreach (var department in Departments.Where(x => x.Employees != null && x.Employees.Count > 0))
             {
@@ -133,7 +131,7 @@ namespace CHI.ViewModels
             Employees = new ObservableCollection<Employee>(sortedEmployees);
         }
 
-        private void SplitAgesExecute()
+        void SplitAgesExecute()
         {
             mainRegionService.ShowProgressBar("Разделение штатной единицы на детские и взрослые");
 
@@ -178,7 +176,7 @@ namespace CHI.ViewModels
             mainRegionService.HideProgressBar("Разделение штатной единицы на детские и взрослые успешно завершено");
         }
 
-        private void MergeAgesExecute()
+        void MergeAgesExecute()
         {
             mainRegionService.ShowProgressBar("Объединение штатных единиц в одну");
 
@@ -212,7 +210,36 @@ namespace CHI.ViewModels
             mainRegionService.HideProgressBar("Объединение штатных единиц в одну успешно завершено");
         }
 
-        private void CurrentEmployee_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        void CleanExecute()
+        {
+
+            mainRegionService.ShowProgressBar("Удаление не связанных с реестрами штатных единиц, мед. работников и специальностей");
+
+            var usedEmployees = dbContext.Cases.Select(x => x.Employee).Distinct().Union(dbContext.Services.Select(x => x.Employee).Distinct()).Distinct();
+            var usedEmployeeIds = new HashSet<int>(usedEmployees.Select(x => x.Id));
+            var employeesToRemove = dbContext.Employees.Local.Where(x => !usedEmployeeIds.Contains(x.Id)).ToList();
+
+            dbContext.Employees.RemoveRange(employeesToRemove);
+
+            var usedMedics = dbContext.Employees.Local.Select(x => x.Medic).ToList();
+            var usedMedicsIds = new HashSet<int>(usedMedics.Select(x => x.Id));
+            var medicsToRemove = dbContext.Medics.Local.Where(x => !usedMedicsIds.Contains(x.Id)).ToArray();
+
+            dbContext.Medics.RemoveRange(medicsToRemove);
+
+            var usedSpecialties = dbContext.Employees.Local.Select(x => x.Specialty).ToList();
+            var usedSpecialtiesIds = new HashSet<int>(usedSpecialties.Select(x => x.Id));
+            var specialtiesToRemove = dbContext.Specialties.Local.Where(x => !usedSpecialtiesIds.Contains(x.Id)).ToArray();
+
+            dbContext.Specialties.RemoveRange(specialtiesToRemove);
+            dbContext.SaveChanges();
+
+            RefreshExecute();
+
+            mainRegionService.HideProgressBar("Удаление не связанных с реестрами штатных единиц, мед. работников и специальностей успешно завершено");
+        }
+
+        void CurrentEmployee_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(CurrentEmployee.Department))
             {
