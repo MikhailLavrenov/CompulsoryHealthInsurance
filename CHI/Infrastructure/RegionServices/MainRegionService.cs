@@ -65,15 +65,18 @@ namespace CHI.Infrastructure
             get => isShowDialog;
             set
             {
-                if (isShowDialog != value)
+                Application.Current.Dispatcher.Invoke(() =>
                 {
-                    SetProperty(ref isShowDialog, value);
+                    if (isShowDialog != value)
+                    {
+                        SetProperty(ref isShowDialog, value);
 
-                    RaisePropertyChanged(nameof(IsLocked));
+                        RaisePropertyChanged(nameof(IsLocked));
 
-                    if (!IsLocked)
-                        regionManager.Regions[RegionNames.MainRegionOverlay].RemoveAll();
-                }
+                        if (!IsLocked)
+                            regionManager.Regions[RegionNames.MainRegionOverlay].RemoveAll();
+                    }
+                });
             }
         }
         public bool IsShowStatus { get => showStatus; private set => SetProperty(ref showStatus, value); }
@@ -169,11 +172,11 @@ namespace CHI.Infrastructure
         {
             IsShowDialog = true;
 
-            var selectedColor = await ShowDialog<bool>(message, nameof(NotificationDialogView));
+            var dialogResult = await ShowDialog<bool>(message, nameof(NotificationDialogView));
 
             IsShowDialog = false;
 
-            return (bool)selectedColor;
+            return (bool)dialogResult;
         }
 
         private async Task<object> ShowDialog<T>(object content, string viewName)

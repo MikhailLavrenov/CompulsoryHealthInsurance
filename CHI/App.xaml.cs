@@ -25,6 +25,8 @@ namespace CHI
     public partial class App : PrismApplication
     {
         ILogger logger;
+        IMainRegionService mainRegionService;
+        string appCrashMessage = "Произошла ошибка, диагностические данные записаны в лог, приложение будет закрыто.\r\n Если ошибка повторится, обратитесь к системному администратору.";
 
 
         protected override Window CreateShell()
@@ -48,6 +50,7 @@ namespace CHI
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
             logger = Container.Resolve<ILogger>();
+            mainRegionService = Container.Resolve<IMainRegionService>();
 
             AppDomain.CurrentDomain.UnhandledException += LogUnhandledException;
             DispatcherUnhandledException += LogDispatcherUnhandledException;
@@ -151,11 +154,15 @@ namespace CHI
         void LogUnhandledException(object sender, UnhandledExceptionEventArgs args)
         {
             logger.Error((Exception)args.ExceptionObject, "AppDomainException");
+
+            mainRegionService?.ShowNotificationDialog(appCrashMessage).Wait();
         }
 
         void LogDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs args)
         {
             logger.Error(args.Exception, "XamlDispatcherException");
+
+            mainRegionService?.ShowNotificationDialog(appCrashMessage).Wait();
         }
     }
 }
