@@ -26,7 +26,7 @@ namespace CHI
     {
         ILogger logger;
         IMainRegionService mainRegionService;
-        string appCrashMessage = "Произошла ошибка, диагностические данные записаны в лог, приложение будет закрыто.\r\n Если ошибка повторится, обратитесь к системному администратору.";
+        string appCrashMessage = "Произошла ошибка, диагностические данные записаны в лог, приложение будет закрыто.\r\n\r\n Если ошибка повторится, обратитесь к системному администратору.\r\n\r\nТекст ошибки:\r\n";
 
 
         protected override Window CreateShell()
@@ -153,16 +153,19 @@ namespace CHI
 
         void LogUnhandledException(object sender, UnhandledExceptionEventArgs args)
         {
-            logger.Error((Exception)args.ExceptionObject, "AppDomainException");
+            var exception = (Exception)args.ExceptionObject;
+            logger.Error(exception, "AppDomainException");
 
-            mainRegionService?.ShowNotificationDialog(appCrashMessage).Wait();
+            mainRegionService?.ShowNotificationDialog(appCrashMessage + exception.Message).Wait();
         }
 
-        void LogDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs args)
+        async void LogDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs args)
         {
             logger.Error(args.Exception, "XamlDispatcherException");
+            args.Handled = true;
 
-            mainRegionService?.ShowNotificationDialog(appCrashMessage).Wait();
+            await mainRegionService?.ShowNotificationDialog(appCrashMessage + args.Exception.Message);
+            Current.Shutdown();
         }
     }
 }

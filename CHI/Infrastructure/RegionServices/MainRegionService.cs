@@ -198,14 +198,12 @@ namespace CHI.Infrastructure
                 parameters.Add("onClose", callback);
                 parameters.Add("content", content);
 
-                Application.Current.Dispatcher.Invoke(() => regionManager.RequestNavigate(RegionNames.MainRegionOverlay, viewName, parameters));
+                Application.Current.Dispatcher.InvokeAsync(() => regionManager.RequestNavigate(RegionNames.MainRegionOverlay, viewName, parameters));
 
                 autoResetEvent.WaitOne();
 
                 return result;
             });
         }
-
-
     }
 }
