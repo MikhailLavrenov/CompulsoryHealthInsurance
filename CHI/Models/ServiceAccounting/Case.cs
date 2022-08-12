@@ -8,9 +8,21 @@ namespace CHI.Models.ServiceAccounting
     {
         public int Id { get; set; }
         /// <summary>
-        /// Идентификатор законченного случая из реестра
+        /// Код законченного случая в реестре
+        /// </summary>
+        public long CloseCaseCode { get; set; }
+        /// <summary>
+        /// Код случая в реестре
         /// </summary>
         public string IdCase { get; set; }
+        /// <summary>
+        /// Номер истории болезни в реестре
+        /// </summary>
+        public string MedicalHistoryNumber { get; set; }
+        /// <summary>
+        /// Идентификатор xml реестра
+        /// </summary>
+        public int BillRegisterCode { get; set; }
         /// <summary>
         /// Условия оказания
         /// </summary>

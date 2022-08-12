@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CHI.Services.DTO.Flk;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
@@ -8,13 +9,14 @@ using System.Xml.Serialization;
 namespace CHI.Services
 {
     /// <summary>
-    /// Загружает реестры-счетов из xml файлов.
+    /// Загружает реестры-счетов из xml файлов, доступ к результатам через свойства.
     /// </summary>
     public class XmlBillsLoader
     {
         static readonly StringComparison comparer = StringComparison.OrdinalIgnoreCase;
         public List<PERS_LIST> PersonsBills { get; private set; }
         public List<ZL_LIST> CasesBills { get; private set; }
+        public List<FLKP> FlkpList { get; private set; }
         public List<string> XmlFileNameStartsWithFilter { get; set; }
 
         /// <summary>
@@ -23,19 +25,20 @@ namespace CHI.Services
         /// <param name="paths">Пути к xml файлам реестров-счетов. (может быть папками, xml файлами и/или zip архивами)</param>
         public void Load(IEnumerable<string> paths)
         {
-            PersonsBills = new List<PERS_LIST>();
-            CasesBills = new List<ZL_LIST>();
+            PersonsBills = new();
+            CasesBills = new();
+            FlkpList = new();
 
             var allFiles = paths.Where(x => File.GetAttributes(x).HasFlag(FileAttributes.Directory))
                 .SelectMany(x => Directory.GetFiles(x, "*.*", SearchOption.AllDirectories))
                 .Union(paths.Where(x => !File.GetAttributes(x).HasFlag(FileAttributes.Directory)))
                 .ToList();
 
-            foreach (var xmlFilePath in allFiles.Where(x => x.EndsWith(".xml", comparer) && CheckFileNameWithFilter(x)))
+            foreach (var xmlFilePath in allFiles.Where(x => x.EndsWith(".xml", comparer) && CheckBy_XmlFileNameStartsWithFilter(x)))
             {
                 using var file = new FileStream(xmlFilePath, FileMode.Open);
                 var fileName = Path.GetFileName(xmlFilePath);
-                AddToBillsLists(fileName, file);
+                DeserializeToResultList(fileName, file);
             }
 
             foreach (var zipFilePath in allFiles.Where(x => x.EndsWith(".zip", comparer)))
@@ -57,26 +60,30 @@ namespace CHI.Services
 
                 var extension = Path.GetExtension(archiveEntry.Name);
 
-                if (extension.Equals(".xml", comparer) && CheckFileNameWithFilter(archiveEntry.Name))
+                if (extension.Equals(".xml", comparer) && CheckBy_XmlFileNameStartsWithFilter(archiveEntry.Name))
                 {
                     using var file = archiveEntry.Open();
-                    AddToBillsLists(archiveEntry.Name, file);
+                    DeserializeToResultList(archiveEntry.Name, file);
                 }
                 else if (extension.Equals(".zip", comparer))
                 {
                     using var file = archiveEntry.Open();
-
                     LoadFromArchiveRecursive(file);
                 }
             }
         }
 
-        void AddToBillsLists(string fileName, Stream file)
+        void DeserializeToResultList(string fileName, Stream file)
         {
             if (fileName.StartsWith("L", comparer))
             {
                 var persList = Deserialize<PERS_LIST>(file);
                 PersonsBills.Add(persList);
+            }
+            else if (fileName.StartsWith("V", comparer))
+            {
+                var flkp = Deserialize<FLKP>(file);
+                FlkpList.Add(flkp);
             }
             else
             {
@@ -96,7 +103,7 @@ namespace CHI.Services
             return (T)obj;
         }
 
-        bool CheckFileNameWithFilter(string fileNameOrPath)
+        bool CheckBy_XmlFileNameStartsWithFilter(string fileNameOrPath)
         {
             if ((XmlFileNameStartsWithFilter?.Count ?? 0) == 0)
                 return true;

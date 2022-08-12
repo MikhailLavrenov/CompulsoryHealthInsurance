@@ -27,6 +27,7 @@ namespace CHI.ViewModels
 
         public DelegateCommandAsync LoadRegisterCommand { get; }
         public DelegateCommandAsync LoadPaymentStateCommand { get; }
+        public DelegateCommandAsync LoadFlkCommand { get; }
 
 
         public RegistersViewModel(AppSettings settings, IMainRegionService mainRegionService, IFileDialogService fileDialogService)
@@ -41,10 +42,11 @@ namespace CHI.ViewModels
 
             LoadRegisterCommand = new DelegateCommandAsync(LoadRegisterExecute);
             LoadPaymentStateCommand = new DelegateCommandAsync(LoadPaymentStateExecute);
+            LoadFlkCommand = new DelegateCommandAsync(LoadFlkExecute, () => CurrentRegister != null).ObservesProperty(() => CurrentRegister);
         }
 
 
-        private void LoadRegisterExecute()
+        void LoadRegisterExecute()
         {
             mainRegionService.ShowProgressBar("Выбор файлов");
 
@@ -171,6 +173,13 @@ namespace CHI.ViewModels
 
             mainRegionService.ShowProgressBar("Сохранение в базу данных");
 
+            //МИС может сама ставить оплату вместо страховой компании, отбрасываем это
+            foreach (var mcase in register.Cases)
+            {
+                mcase.PaidStatus = PaidKind.None;
+                mcase.AmountPaid = 0;
+            }
+
             localDbContext.Registers.Add(register);
             localDbContext.SaveChanges();
 
@@ -179,7 +188,7 @@ namespace CHI.ViewModels
             mainRegionService.HideProgressBar("Успешно загружено");
         }
 
-        private static Employee FindEmployeeInDbOrCreateNew(string medicFomsId, int specialtyFomsId, AgeKind ageKind, AppDBContext dbContext, Department defaultDepartment)
+        static Employee FindEmployeeInDbOrCreateNew(string medicFomsId, int specialtyFomsId, AgeKind ageKind, AppDBContext dbContext, Department defaultDepartment)
         {
             var employee = dbContext.Employees.Local.FirstOrDefault(x => x.Specialty.FomsId == specialtyFomsId && string.Equals(x.Medic.FomsId, medicFomsId, StringComparison.Ordinal) && (x.AgeKind == AgeKind.Any || x.AgeKind == ageKind));
 
@@ -208,7 +217,7 @@ namespace CHI.ViewModels
             return employee;
         }
 
-        private void LoadPaymentStateExecute()
+        void LoadPaymentStateExecute()
         {
             mainRegionService.ShowProgressBar("Выбор файлов");
 
@@ -236,7 +245,11 @@ namespace CHI.ViewModels
 
             mainRegionService.ShowProgressBar("Запись статусов оплаты");
 
-            var casePairs = register.Cases.Join(paidRegister.Cases, mcase => mcase.IdCase, paidCase => paidCase.IdCase, (mcase, paidCase) => new { mcase, paidCase }).ToList();
+            var casePairs = register.Cases.Join(paidRegister.Cases,
+                mcase => (mcase.IdCase, mcase.MedicalHistoryNumber), 
+                paidCase => (paidCase.IdCase, paidCase.MedicalHistoryNumber), 
+                (mcase, paidCase) => new { mcase, paidCase })
+                .ToList();
 
             foreach (var casePair in casePairs)
             {
@@ -254,9 +267,53 @@ namespace CHI.ViewModels
             mainRegionService.HideProgressBar($"Загрузка статусов оплаты завершена. В файле(ах) {paidRegister.Cases.Count} случая, загружено {casePairs.Count}.");
         }
 
-        private void Refresh()
+        void LoadFlkExecute()
         {
-            dbContext = new AppDBContext(settings.Common.SqlServer, settings.Common.SqlDatabase,settings.Common.SqlLogin, settings.Common.SqlPassword);
+            mainRegionService.ShowProgressBar("Выбор файлов");
+
+            fileDialogService.DialogType = FileDialogType.Open;
+            fileDialogService.Filter = "Archive files (*.zip)|*.zip|Xml files (*.xml)|*.xml";
+            fileDialogService.MiltiSelect = true;
+
+            if (fileDialogService.ShowDialog() != true)
+            {
+                mainRegionService.HideProgressBar("Отменено");
+                return;
+            }
+
+            mainRegionService.ShowProgressBar("Загрузка xml-файлов");
+
+            var registerService = new BillsRegisterService();
+            var flkEntries = registerService.GetFlkCases(fileDialogService.FileNames);
+            var flkRejectedEntries = flkEntries.Where(x => x.IsRejected).ToList();
+
+            var dbContext = new AppDBContext(settings.Common.SqlServer, settings.Common.SqlDatabase, settings.Common.SqlLogin, settings.Common.SqlPassword);
+            var register = dbContext.Registers.Where(x => x.Id == CurrentRegister.Id).Include(x => x.Cases).First();
+
+            mainRegionService.ShowProgressBar("Исключение случаев по результатам ФЛК");
+
+            var rejectedCases = register.Cases.Join(flkRejectedEntries,
+                mcase => (mcase.CloseCaseCode, mcase.MedicalHistoryNumber, mcase.BillRegisterCode),
+                rEntry => (rEntry.CloseCaseCode, rEntry.MedicalHistoryNumber, rEntry.BillRegisterCode),
+                (mcase, rEntry) => mcase)
+                .ToList();
+
+            foreach (var rejectedCase in rejectedCases)
+                register.Cases.Remove(rejectedCase);
+
+            register.FlkRejectCasesCount += rejectedCases.Count;
+            register.CasesCount -= rejectedCases.Count;
+
+            dbContext.SaveChanges();
+
+            Refresh();
+
+            mainRegionService.HideProgressBar($"Загрузка ФЛК завершена. В файле(ах) всего {flkEntries.Count} случаев, отклонено {flkRejectedEntries.Count} случаев, исключено из реестра {rejectedCases.Count} случаев.");
+        }
+
+        void Refresh()
+        {
+            dbContext = new AppDBContext(settings.Common.SqlServer, settings.Common.SqlDatabase, settings.Common.SqlLogin, settings.Common.SqlPassword);
             dbContext.Registers.Load();
             Registers = new ObservableCollection<Register>(dbContext.Registers.Local.OrderByDescending(x => x.Month).OrderByDescending(x => x.Year));
         }

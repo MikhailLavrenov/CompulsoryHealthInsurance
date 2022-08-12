@@ -7,6 +7,7 @@ namespace CHI.Services
     /// </summary>
     public class BillPair
     {
+        public int BillRegisterCode { get; private set; }
         public PERS_LIST Persons { get; private set; }
         public ZL_LIST Cases { get; private set; }
 
@@ -18,6 +19,7 @@ namespace CHI.Services
 
             Persons = persons;
             Cases = cases;
+            BillRegisterCode= cases.SCHET.CODE;
         }
 
 

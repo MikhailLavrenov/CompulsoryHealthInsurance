@@ -20,6 +20,11 @@ namespace CHI.Services
         [XmlElement(ElementName = "MONTH")]
         public int MONTH { get; set; }
         /// <summary>
+        /// Код реестра.
+        /// </summary>
+        [XmlElement(ElementName = "CODE")]
+        public int CODE { get; set; }
+        /// <summary>
         /// Код медицинской организации.
         /// </summary>
         [XmlElement(ElementName = "CODE_MO")]

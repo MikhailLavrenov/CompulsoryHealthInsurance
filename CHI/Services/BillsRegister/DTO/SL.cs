@@ -16,6 +16,11 @@ namespace CHI.Services
         [XmlElement(ElementName = "SL_ID")]
         public string SL_ID { get; set; }
         /// <summary>
+        /// Номер истории болезни
+        /// </summary>
+        [XmlElement(ElementName = "NHISTORY")]
+        public string NHISTORY { get; set; }
+        /// <summary>
         /// Код лечащего врача/врача, закрывшего талон
         /// </summary>
         [XmlElement(ElementName = "IDDOKT")]

@@ -30,11 +30,15 @@
                             IconKind="ArchiveArrowDownOutline"
                             Command="{Binding LoadRegisterCommand}"/>
 
-
+            <i:CustomButton Text="Загрузить ФЛК"
+                            ToolTip="Загрузить ФЛК за 1 период (xml или zip архивы).&#x0a; Необходимо выбрать соответствующий реестр.&#x0a; Если ошибок нет - загружать ФЛК не надо."
+                            IconKind="FileDocumentAlertOutline"
+                            Command="{Binding LoadFlkCommand}" Cursor="Hand" />
+            
             <i:CustomButton Text="Загрузить статусы оплаты"
-                            ToolTip="Загрузить статусы оплаты за 1 период (xml или zip архивы)"
+                            ToolTip="Загрузить статусы оплаты из Банка-счетов за 1 период (xml или zip архивы)"
                             IconKind="LabelPercentOutline"
-                            Command="{Binding LoadPaymentStateCommand}" />
+                            Command="{Binding LoadPaymentStateCommand}" Cursor="Hand" />
 
         </StackPanel>
 
@@ -50,12 +54,12 @@
 
                 <DataGridTextColumn Header="Название"
                                     Binding="{Binding Title}"
-                                    MinWidth="150"
+                                    MinWidth="170"
                                     IsReadOnly="True" />
 
                 <DataGridTextColumn Header="Месяц"
                                     Binding="{Binding Month}"
-                                    MinWidth="80"
+                                    MinWidth="70"
                                     IsReadOnly="True" />
 
                 <DataGridTextColumn Header="Год"
@@ -68,10 +72,15 @@
                                     MinWidth="80"
                                     IsReadOnly="True" />
 
+                <DataGridTextColumn Header="Исключено ФЛК"
+                                    Binding="{Binding FlkRejectCasesCount}"
+                                    MinWidth="120"
+                                    IsReadOnly="True" />
+
 
                 <DataGridTextColumn Header="Инф. об оплате"
                                     Binding="{Binding PaymentStateCasesCount}"
-                                    MinWidth="80"
+                                    MinWidth="110"
                                     IsReadOnly="True" />
 
                 <DataGridTextColumn Header="Дата создания"

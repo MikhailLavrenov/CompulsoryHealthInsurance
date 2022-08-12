@@ -31,16 +31,16 @@ namespace CHI.Services
         public DbSet<User> Users { get; set; }
 
 
-        public AppDBContext()    
+        public AppDBContext()
             : this(string.Empty, string.Empty, null, null)
         {
         }
 
-        //public AppDBContext() : this("WS2016\\SQLEXPRESS", "CHI2", "sa", "1")
+        //public AppDBContext() : this("s-27-db-1\\SQLEXPRESS2017", "CHI2")
         //{
         //}
 
-        public AppDBContext(string sqlServer, string database, string login, string password)
+        public AppDBContext(string sqlServer, string database, string login=null, string password=null)
         {
             this.sqlServer = sqlServer;
             this.database = database;
